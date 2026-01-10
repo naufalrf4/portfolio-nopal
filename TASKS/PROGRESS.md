@@ -258,3 +258,69 @@ apps/admin/
 - All models use snake_case table names with @@map
 - Comprehensive indexes for performance
 - Migration ready (requires DATABASE_URL in .env.local)
+
+---
+
+## Task: 1.3 - Authentication Setup
+
+- **Status**: Completed
+- **Date**: 2026-01-10
+- **Completed By**: Agent
+
+### Subtasks Completed
+
+- [x] Create packages/auth package
+- [x] Configure NextAuth with Google OAuth
+- [x] Implement admin allowlist enforcement
+- [x] Implement role assignment (admin/user)
+
+### Files Created
+
+```
+packages/auth/
+├── package.json
+├── tsconfig.json
+└── src/
+    ├── index.ts (exports)
+    ├── auth.ts (auth helpers)
+    ├── config.ts (NextAuth config factory)
+    └── types.ts (TypeScript declarations)
+
+apps/admin/src/app/api/auth/[...nextauth]/
+└── route.ts (NextAuth API route handlers)
+```
+
+### Dependencies Added
+
+- next-auth@5.0.0-beta.30 (NextAuth v5/Auth.js)
+- @auth/prisma-adapter@^2.11.1
+- @prisma/client@^7.2.0
+
+### Features Implemented
+
+- NextAuth v5 configuration with Prisma adapter
+- Google OAuth provider with email verification
+- JWT session strategy (30-day expiry)
+- Custom callbacks: signIn, jwt, session
+- Admin email allowlist from ADMIN_EMAILS env var
+- Role-based access control (ADMIN/USER)
+- TypeScript declarations for User and Session extensions
+- Singleton auth instance exported from package
+
+### Authentication Flow
+
+1. User signs in with Google OAuth
+2. Email verification check in signIn callback
+3. User created/updated in database via Prisma adapter
+4. JWT token includes userId and role
+5. Session includes user.id and user.role
+6. Admin emails from env get ADMIN role, others get USER role
+
+### Notes
+
+- Uses NextAuth v5 beta (Auth.js) with new API
+- Prisma adapter handles Account, Session, User, VerificationToken models
+- Session strategy: JWT (stateless, no database sessions)
+- Auth config created per-app with prisma instance injection
+- Module augmentation for next-auth types
+- Ready for middleware protection on admin routes
