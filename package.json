@@ -12,12 +12,21 @@
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
-    "clean": "turbo run clean && rm -rf node_modules && rm -rf .turbo"
+    "clean": "turbo run clean && rm -rf node_modules && rm -rf .turbo",
+    "prepare": "husky"
   },
   "devDependencies": {
-    "turbo": "latest",
-    "typescript": "latest",
+    "@commitlint/cli": "^20.3.1",
+    "@commitlint/config-conventional": "^20.3.1",
+    "@typescript-eslint/eslint-plugin": "^8.52.0",
+    "@typescript-eslint/parser": "^8.52.0",
     "eslint": "latest",
-    "prettier": "latest"
+    "eslint-plugin-react": "^7.37.5",
+    "globals": "^17.0.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
+    "prettier": "latest",
+    "turbo": "latest",
+    "typescript": "latest"
   }
 }
