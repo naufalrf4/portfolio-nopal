@@ -1,0 +1,173 @@
+generator client {
+  provider = "prisma-client"
+  output   = "./generated/client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  ADMIN
+  USER
+}
+
+enum ProjectContextType {
+  CONTEXT
+  ROLE
+  DECISIONS
+  TRADEOFFS
+  RESULT
+  ARCHITECTURE
+  OPERATIONS
+  METRICS
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  image     String?
+  role      UserRole @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  guestbookEntries GuestbookEntry[]
+
+  @@map("users")
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  summary     String   @db.Text
+  description String   @db.Text
+  category    String
+  techStack   String[]
+  liveUrl     String?
+  repoUrl     String?
+  imageUrl    String?
+  featured    Boolean  @default(false)
+  visible     Boolean  @default(true)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  contexts ProjectContext[]
+
+  @@index([slug])
+  @@index([category])
+  @@index([featured])
+  @@index([visible])
+  @@index([order])
+  @@map("projects")
+}
+
+model ProjectContext {
+  id        String             @id @default(cuid())
+  projectId String
+  type      ProjectContextType
+  title     String
+  content   String             @db.Text
+  order     Int                @default(0)
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@index([type])
+  @@index([order])
+  @@map("project_contexts")
+}
+
+model BlogLink {
+  id          String    @id @default(cuid())
+  url         String    @unique
+  title       String
+  description String?   @db.Text
+  imageUrl    String?
+  source      String
+  publishedAt DateTime?
+  visible     Boolean   @default(true)
+  order       Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([source])
+  @@index([visible])
+  @@index([order])
+  @@index([publishedAt])
+  @@map("blog_links")
+}
+
+model GuestbookEntry {
+  id        String   @id @default(cuid())
+  userId    String
+  message   String   @db.Text
+  reactions Json     @default("[]")
+  visible   Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([visible])
+  @@index([createdAt])
+  @@map("guestbook_entries")
+}
+
+model AnonymousMessage {
+  id        String   @id @default(cuid())
+  content   String   @db.Text
+  ipHash    String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([read])
+  @@index([createdAt])
+  @@map("anonymous_messages")
+}
+
+model ChatLog {
+  id        String   @id @default(cuid())
+  sessionId String   @unique
+  messages  Json     @default("[]")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([sessionId])
+  @@index([createdAt])
+  @@map("chat_logs")
+}
+
+model ProfileLink {
+  id        String   @id @default(cuid())
+  label     String
+  url       String
+  icon      String?
+  visible   Boolean  @default(true)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([visible])
+  @@index([order])
+  @@map("profile_links")
+}
+
+model KnowledgeDoc {
+  id        String   @id @default(cuid())
+  filename  String   @unique
+  content   String   @db.Text
+  indexed   Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([filename])
+  @@index([indexed])
+  @@map("knowledge_docs")
+}
