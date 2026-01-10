@@ -422,3 +422,63 @@ apps/admin/src/
 - Optional fields (description, liveUrl, repoUrl) handled correctly
 - Contexts included in responses via Prisma include
 - Build successful with no TypeScript errors
+
+---
+
+## Task 1.5: Admin API - Context Sections
+
+- **Status**: Completed
+- **Date**: 2026-01-10
+- **Completed By**: Agent
+
+### Subtasks Completed
+
+- [x] Create ProjectContext CRUD API routes
+- [x] Create ProjectContext service
+- [x] Create ProjectContext validation schemas
+- [x] Implement context reordering endpoint
+
+### Notes
+
+- Created `apps/admin/src/lib/validations/project-context.schema.ts` with Zod schemas for create, update, query, and reorder operations
+- Created `apps/admin/src/lib/api/handlers/project-contexts.service.ts` with full CRUD operations and reordering logic
+- Created API routes:
+  - `/api/v1/admin/contexts` (GET, POST)
+  - `/api/v1/admin/contexts/[id]` (GET, PUT, DELETE)
+  - `/api/v1/admin/contexts/reorder` (POST)
+- All endpoints require admin authentication
+- TypeScript type checking passed
+- Build successful
+
+---
+
+## Task 1.7: Public Read API
+
+- **Status**: Completed
+- **Date**: 2026-01-10
+- **Completed By**: Agent
+
+### Subtasks Completed
+
+- [x] GET /api/v1/public/projects (list with filters)
+- [x] GET /api/v1/public/projects/[slug] (detail)
+- [x] GET /api/v1/public/blogs (list)
+- [x] GET /api/v1/public/guestbook (list)
+- [x] GET /api/v1/public/links (profile links)
+
+### Notes
+
+- Created services for blog-links, guestbook, and profile-links:
+  - `apps/admin/src/lib/api/handlers/blog-links.service.ts`
+  - `apps/admin/src/lib/api/handlers/guestbook.service.ts`
+  - `apps/admin/src/lib/api/handlers/profile-links.service.ts`
+- Created public API routes:
+  - `/api/v1/public/projects` - List projects with pagination, category, and featured filters
+  - `/api/v1/public/projects/[slug]` - Get project by slug with contexts
+  - `/api/v1/public/blogs` - List blog links filtered by source
+  - `/api/v1/public/guestbook` - List visible guestbook entries with user info
+  - `/api/v1/public/links` - List visible profile links ordered
+- All public endpoints filter for visible=true items only
+- No authentication required for public read endpoints
+- TypeScript type checking passed
+- Build successful
