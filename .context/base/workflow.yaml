@@ -1,0 +1,576 @@
+# Workflow
+
+# =============================================================================
+# DEVELOPMENT, DEPLOYMENT, AND GOVERNANCE WORKFLOWS
+# =============================================================================
+# Defines the complete lifecycle processes for the NaufalRF Portfolio Ecosystem.
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# DEVELOPMENT WORKFLOW
+# -----------------------------------------------------------------------------
+development:
+
+  # ---------------------------------------------------------------------------
+  # Local Development Setup
+  # ---------------------------------------------------------------------------
+  setup:
+    prerequisites:
+      - name: Node.js
+        version: ">=20.0.0"
+        check_command: node --version
+
+      - name: pnpm
+        version: ">=8.0.0"
+        check_command: pnpm --version
+
+      - name: Docker
+        version: ">=24.0.0"
+        check_command: docker --version
+
+      - name: Docker Compose
+        version: ">=2.20.0"
+        check_command: docker compose version
+
+    initial_setup:
+      steps:
+        - name: Clone repository
+          command: git clone <repo-url> && cd naufalrf-portfolio
+
+        - name: Install dependencies
+          command: pnpm install
+
+        - name: Setup environment files
+          command: cp .env.example .env.local
+          notes: Fill in required environment variables
+
+        - name: Start infrastructure services
+          command: docker compose up -d postgres qdrant
+          services:
+            - postgres (local development only)
+            - qdrant
+
+        - name: Run database migrations
+          command: pnpm --filter admin db:migrate
+
+        - name: Seed database (optional)
+          command: pnpm --filter admin db:seed
+
+        - name: Start development servers
+          command: pnpm dev
+
+    environment_files:
+      - path: .env.local
+        scope: root (all apps)
+        contains:
+          - DATABASE_URL
+          - DIRECT_URL
+          - NEXTAUTH_SECRET
+          - NEXTAUTH_URL
+          - GOOGLE_CLIENT_ID
+          - GOOGLE_CLIENT_SECRET
+
+      - path: apps/admin/.env.local
+        scope: admin app
+        contains:
+          - ADMIN_EMAILS (comma-separated allowlist)
+
+      - path: apps/rag-service/.env.local
+        scope: rag service
+        contains:
+          - OPENAI_API_KEY
+          - GEMINI_API_KEY
+          - GROQ_API_KEY
+          - DEEPSEEK_API_KEY
+          - PRIMARY_LLM
+          - FALLBACK_LLM
+          - ADMIN_SERVICE_TOKEN
+          - QDRANT_URL
+
+  # ---------------------------------------------------------------------------
+  # Development Commands
+  # ---------------------------------------------------------------------------
+  commands:
+    monorepo:
+      - command: pnpm dev
+        description: Start all apps in development mode
+        parallel: true
+
+      - command: pnpm build
+        description: Build all apps and packages
+        parallel: true (respects dependency graph)
+
+      - command: pnpm lint
+        description: Lint all apps and packages
+        parallel: true
+
+      - command: pnpm typecheck
+        description: TypeScript type checking across monorepo
+        parallel: true
+
+      - command: pnpm test
+        description: Run all tests
+        parallel: true
+
+      - command: pnpm clean
+        description: Remove all build artifacts and node_modules
+        parallel: true
+
+    app_specific:
+      - command: pnpm --filter <app-name> dev
+        description: Start specific app in development mode
+
+      - command: pnpm --filter <app-name> build
+        description: Build specific app
+
+      - command: pnpm --filter <app-name> test
+        description: Run tests for specific app
+
+    database:
+      - command: pnpm --filter admin db:migrate
+        description: Run Prisma migrations
+
+      - command: pnpm --filter admin db:push
+        description: Push schema changes (dev only)
+
+      - command: pnpm --filter admin db:studio
+        description: Open Prisma Studio
+
+      - command: pnpm --filter admin db:generate
+        description: Generate Prisma client
+
+      - command: pnpm --filter admin db:seed
+        description: Seed database with initial data
+
+  # ---------------------------------------------------------------------------
+  # Branching Strategy
+  # ---------------------------------------------------------------------------
+  branching:
+    strategy: trunk_based_with_feature_branches
+
+    branches:
+      main:
+        purpose: production_ready_code
+        protection:
+          - require_pull_request
+          - require_status_checks
+          - require_up_to_date
+          - no_force_push
+        auto_deploy: production
+
+      develop:
+        purpose: integration_branch_optional
+        notes: May be skipped for small team; merge directly to main
+
+      feature/*:
+        purpose: new_features
+        naming: feature/<issue-number>-<short-description>
+        example: feature/42-add-guestbook-reactions
+        lifecycle:
+          - branch_from: main
+          - merge_to: main
+          - delete_after_merge: true
+
+      fix/*:
+        purpose: bug_fixes
+        naming: fix/<issue-number>-<short-description>
+        example: fix/57-rate-limit-bypass
+        lifecycle:
+          - branch_from: main
+          - merge_to: main
+          - delete_after_merge: true
+
+      hotfix/*:
+        purpose: urgent_production_fixes
+        naming: hotfix/<issue-number>-<short-description>
+        lifecycle:
+          - branch_from: main
+          - merge_to: main
+          - deploy_immediately: true
+          - delete_after_merge: true
+
+      chore/*:
+        purpose: maintenance_tasks
+        naming: chore/<short-description>
+        example: chore/upgrade-dependencies
+
+  # ---------------------------------------------------------------------------
+  # Commit Conventions
+  # ---------------------------------------------------------------------------
+  commits:
+    convention: conventional_commits
+    format: "<type>(<scope>): <description>"
+
+    types:
+      - feat: new feature
+      - fix: bug fix
+      - docs: documentation only
+      - style: formatting, no code change
+      - refactor: code refactoring
+      - perf: performance improvement
+      - test: adding/updating tests
+      - build: build system changes
+      - ci: CI configuration changes
+      - chore: maintenance tasks
+      - revert: revert previous commit
+
+    scopes:
+      - public: apps/public
+      - admin: apps/admin
+      - links: apps/links
+      - ngl: apps/ngl
+      - rag: apps/rag-service
+      - ui: packages/ui
+      - types: packages/types
+      - sdk: packages/sdk
+      - config: packages/config
+      - auth: packages/auth
+      - infra: infrastructure
+      - deps: dependencies
+
+    examples:
+      - "feat(public): add project context section rendering"
+      - "fix(admin): resolve rate limiting bypass vulnerability"
+      - "chore(deps): upgrade Next.js to 14.1.0"
+
+    enforcement:
+      tool: commitlint
+      hook: commit-msg
+
+  # ---------------------------------------------------------------------------
+  # Code Review Process
+  # ---------------------------------------------------------------------------
+  code_review:
+    required: true
+    platform: GitHub Pull Requests
+
+    pull_request_template:
+      sections:
+        - description: What does this PR do?
+        - type: "feat | fix | refactor | chore | docs"
+        - testing: How was this tested?
+        - checklist:
+            - Lint passes
+            - Types check
+            - Tests pass
+            - Documentation updated (if applicable)
+
+    review_criteria:
+      - code_quality: clean, readable, maintainable
+      - type_safety: no any types without justification
+      - test_coverage: new features have tests
+      - security: no secrets, proper validation
+      - performance: no obvious regressions
+      - accessibility: UI changes are accessible
+
+    merge_requirements:
+      - approvals_required: 1
+      - status_checks_required:
+          - lint
+          - typecheck
+          - test
+          - build
+      - up_to_date_with_base: true
+
+    merge_strategy: squash_and_merge
+    delete_branch_after_merge: true
+
+
+# -----------------------------------------------------------------------------
+# DEPLOYMENT WORKFLOW
+# -----------------------------------------------------------------------------
+deployment:
+
+  # ---------------------------------------------------------------------------
+  # Environments
+  # ---------------------------------------------------------------------------
+  environments:
+    production:
+      url_pattern: "*.naufalrf.tech"
+      domains:
+        - naufalrf.tech
+        - admin.naufalrf.tech
+        - links.naufalrf.tech
+        - ngl.naufalrf.tech
+        - rag.naufalrf.tech
+      trigger: push_to_main
+      approval: none (auto-deploy after CI passes)
+
+    staging:
+      enabled: false
+      notes: Optional for future; currently deploy directly to production
+
+  # ---------------------------------------------------------------------------
+  # CI/CD Pipeline
+  # ---------------------------------------------------------------------------
+  ci_pipeline:
+    platform: GitHub Actions
+    trigger:
+      - push to main
+      - pull request to main
+
+    stages:
+      - name: Install
+        steps:
+          - checkout code
+          - setup pnpm
+          - install dependencies (cached)
+
+      - name: Validate
+        parallel: true
+        steps:
+          - lint: pnpm lint
+          - typecheck: pnpm typecheck
+          - test: pnpm test
+
+      - name: Build
+        steps:
+          - build: pnpm build
+        artifacts:
+          - apps/*/dist
+          - apps/*/.next
+
+      - name: Docker Build
+        condition: push_to_main
+        steps:
+          - build images for each app
+          - tag with commit sha and latest
+          - push to container registry
+
+      - name: Deploy
+        condition: push_to_main
+        steps:
+          - SSH to production server
+          - Pull latest images
+          - docker compose up -d
+          - Health check verification
+
+    caching:
+      - pnpm store
+      - turbo cache
+      - docker layers
+      - next.js cache
+
+  # ---------------------------------------------------------------------------
+  # Container Build
+  # ---------------------------------------------------------------------------
+  container_build:
+    registry: GitHub Container Registry (ghcr.io)
+    images:
+      - name: ghcr.io/naufalrf/portfolio-public
+        context: .
+        dockerfile: apps/public/Dockerfile
+
+      - name: ghcr.io/naufalrf/portfolio-admin
+        context: .
+        dockerfile: apps/admin/Dockerfile
+
+      - name: ghcr.io/naufalrf/portfolio-links
+        context: .
+        dockerfile: apps/links/Dockerfile
+
+      - name: ghcr.io/naufalrf/portfolio-ngl
+        context: .
+        dockerfile: apps/ngl/Dockerfile
+
+      - name: ghcr.io/naufalrf/portfolio-rag
+        context: .
+        dockerfile: apps/rag-service/Dockerfile
+
+    dockerfile_pattern:
+      base: node:20-alpine
+      stages:
+        - deps: install dependencies
+        - builder: build application
+        - runner: production runtime
+      optimizations:
+        - multi-stage builds
+        - layer caching
+        - minimal runtime image
+
+  # ---------------------------------------------------------------------------
+  # Production Deployment
+  # ---------------------------------------------------------------------------
+  production_deployment:
+    method: docker_compose_on_vps
+    
+    steps:
+      - name: Pre-deployment checks
+        actions:
+          - verify CI passed
+          - verify images built
+          - backup database (optional)
+
+      - name: Pull latest images
+        command: docker compose pull
+
+      - name: Apply database migrations
+        command: docker compose exec admin npx prisma migrate deploy
+        notes: Run before starting new containers
+
+      - name: Rolling update
+        command: docker compose up -d --no-deps --build <service>
+        strategy: one service at a time
+
+      - name: Health verification
+        checks:
+          - all containers running
+          - health endpoints responding
+          - no error spike in logs
+
+      - name: Rollback (if needed)
+        command: docker compose up -d --no-deps <service>:<previous-tag>
+
+    zero_downtime:
+      strategy: traefik_health_checks
+      notes: Traefik routes to healthy containers only
+
+  # ---------------------------------------------------------------------------
+  # Rollback Procedure
+  # ---------------------------------------------------------------------------
+  rollback:
+    triggers:
+      - health check failures
+      - error rate spike > 5%
+      - manual decision
+
+    procedure:
+      - name: Identify failing service
+        command: docker compose ps
+
+      - name: Check logs
+        command: docker compose logs <service> --tail 100
+
+      - name: Rollback to previous image
+        command: docker compose up -d --no-deps <service>:<previous-sha>
+
+      - name: Verify recovery
+        checks:
+          - health endpoints
+          - error rates
+          - user-facing functionality
+
+      - name: Post-mortem
+        actions:
+          - document incident
+          - identify root cause
+          - create fix ticket
+
+
+# -----------------------------------------------------------------------------
+# GOVERNANCE
+# -----------------------------------------------------------------------------
+governance:
+
+  # ---------------------------------------------------------------------------
+  # Quality Gates
+  # ---------------------------------------------------------------------------
+  quality_gates:
+    pre_commit:
+      tool: husky + lint-staged
+      checks:
+        - eslint --fix on staged files
+        - prettier --write on staged files
+        - commitlint on commit message
+
+    pre_push:
+      checks:
+        - pnpm typecheck
+        - pnpm test (optional, can be CI-only)
+
+    ci_required:
+      checks:
+        - lint: zero errors
+        - typecheck: zero errors
+        - test: all passing
+        - build: successful
+      blocking: true (cannot merge without passing)
+
+    deployment_gates:
+      checks:
+        - all CI checks passed
+        - docker images built
+        - no critical vulnerabilities
+
+  # ---------------------------------------------------------------------------
+  # Dependency Management
+  # ---------------------------------------------------------------------------
+  dependency_management:
+    tool: Dependabot
+    schedule: weekly
+
+    update_rules:
+      - scope: dependencies
+        frequency: weekly
+        auto_merge: patch versions only
+
+      - scope: devDependencies
+        frequency: weekly
+        auto_merge: minor versions
+
+      - scope: security
+        frequency: daily
+        auto_merge: none (manual review)
+
+    review_process:
+      - check changelog for breaking changes
+      - run full test suite
+      - verify build succeeds
+      - manual approval for major versions
+
+  # ---------------------------------------------------------------------------
+  # Security Scanning
+  # ---------------------------------------------------------------------------
+  security_scanning:
+    dependency_audit:
+      command: pnpm audit
+      frequency: weekly
+      severity_threshold: high
+      blocking: true for high/critical
+
+    secret_scanning:
+      tool: GitHub Secret Scanning
+      enabled: true
+      push_protection: true
+
+    container_scanning:
+      tool: Trivy
+      frequency: on_build
+      severity_threshold: high
+
+  # ---------------------------------------------------------------------------
+  # Documentation Requirements
+  # ---------------------------------------------------------------------------
+  documentation:
+    required_for:
+      - new features (update relevant docs)
+      - API changes (update types and SDK)
+      - breaking changes (migration guide)
+      - configuration changes (update .env.example)
+
+    locations:
+      - README.md: project overview
+      - .context/: architectural documentation
+      - packages/*/README.md: package documentation
+      - apps/*/README.md: app-specific documentation
+
+  # ---------------------------------------------------------------------------
+  # Release Process
+  # ---------------------------------------------------------------------------
+  release:
+    versioning: semantic_versioning
+    changelog: auto_generated_from_commits
+
+    process:
+      - ensure main is stable
+      - create release tag
+      - generate changelog
+      - deploy to production
+      - announce if significant
+
+    tagging:
+      format: "v<major>.<minor>.<patch>"
+      examples:
+        - v1.0.0
+        - v1.1.0
+        - v1.1.1

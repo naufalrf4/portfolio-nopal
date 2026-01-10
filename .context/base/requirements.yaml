@@ -1,0 +1,557 @@
+# Requirements
+
+# =============================================================================
+# FUNCTIONAL REQUIREMENTS
+# =============================================================================
+# Organized by application/feature domain with stable identifiers.
+# Each requirement is verifiable and testable.
+# =============================================================================
+
+functional:
+
+  # ---------------------------------------------------------------------------
+  # PUBLIC PORTFOLIO (apps/public)
+  # ---------------------------------------------------------------------------
+  
+  - id: FR-PUB-001
+    domain: public_portfolio
+    feature: home_page
+    description: System shall display a home page with positioning statement, featured projects grid, and navigation to all sections.
+    acceptance_criteria:
+      - Home page loads within 2 seconds on 3G connection
+      - Featured projects display title, summary, and category
+      - Navigation links to projects, blogs, guestbook, and contact sections
+    priority: high
+
+  - id: FR-PUB-002
+    domain: public_portfolio
+    feature: projects_listing
+    description: System shall display a filterable, paginated list of projects with category tags and depth indicators.
+    acceptance_criteria:
+      - Projects can be filtered by category
+      - Each project shows title, summary, category, and depth indicator (number of context sections)
+      - Pagination with 10 projects per page
+      - Only visible projects are displayed
+    priority: high
+
+  - id: FR-PUB-003
+    domain: public_portfolio
+    feature: project_detail
+    description: System shall render project detail pages dynamically from structured context sections without hard-coded layouts.
+    acceptance_criteria:
+      - Context sections (Context, Role, Decisions, Trade-offs, Result) render in order
+      - Optional sections (Architecture, Operations, Metrics) render if present
+      - Section types are distinguished visually
+      - New context types can be added without frontend code changes
+    priority: high
+
+  - id: FR-PUB-004
+    domain: public_portfolio
+    feature: blog_links
+    description: System shall display a curated list of external blog links with metadata fetched from URLs.
+    acceptance_criteria:
+      - Blog links show title, description, source, and thumbnail
+      - Links open in new tab
+      - Only visible links are displayed
+      - Links are ordered by admin-defined order
+    priority: medium
+
+  - id: FR-PUB-005
+    domain: public_portfolio
+    feature: guestbook
+    description: System shall provide a guestbook where Google-authenticated users can leave messages and reactions.
+    acceptance_criteria:
+      - Users must authenticate with Google to post
+      - Entries display user name, avatar, message, and timestamp
+      - Reactions can be added to entries
+      - Entries are moderated (visible flag controlled by admin)
+    priority: medium
+
+  - id: FR-PUB-006
+    domain: public_portfolio
+    feature: chatbot_ui
+    description: System shall provide a floating chatbot interface that connects to the RAG service for Q&A.
+    acceptance_criteria:
+      - Chatbot UI is accessible from all pages
+      - Messages are sent to RAG service and responses displayed
+      - Session context is maintained during conversation
+      - Deep links suggested by chatbot are clickable
+    priority: high
+
+  - id: FR-PUB-007
+    domain: public_portfolio
+    feature: contact
+    description: System shall provide a contact entry point for visitors to reach the owner.
+    acceptance_criteria:
+      - Contact section displays email or contact form
+      - Social links are displayed
+    priority: low
+
+  # ---------------------------------------------------------------------------
+  # ADMIN DASHBOARD & API (apps/admin)
+  # ---------------------------------------------------------------------------
+
+  - id: FR-ADM-001
+    domain: admin
+    feature: authentication
+    description: System shall authenticate users via Google OAuth and enforce admin allowlist.
+    acceptance_criteria:
+      - Only Google OAuth is available
+      - Users not in allowlist receive user role
+      - Users in allowlist receive admin role
+      - Allowlist is configured via environment variable
+    priority: high
+
+  - id: FR-ADM-002
+    domain: admin
+    feature: project_crud
+    description: System shall provide CRUD operations for projects via dashboard and API.
+    acceptance_criteria:
+      - Admin can create, read, update, delete projects
+      - Projects have title, slug, summary, category, featured flag, visible flag, order
+      - Slug is unique and URL-safe
+      - Changes are persisted immediately
+    priority: high
+
+  - id: FR-ADM-003
+    domain: admin
+    feature: context_crud
+    description: System shall provide CRUD operations for project context sections.
+    acceptance_criteria:
+      - Admin can create, read, update, delete context sections
+      - Context sections belong to a project
+      - Context sections have type (enum), content (markdown), and order
+      - Required types: Context, Role, Decisions, Trade-offs, Result
+      - Optional types: Architecture, Operations, Metrics
+    priority: high
+
+  - id: FR-ADM-004
+    domain: admin
+    feature: blog_crud
+    description: System shall provide CRUD operations for blog links with automatic metadata fetching.
+    acceptance_criteria:
+      - Admin can create, read, update, delete blog links
+      - System fetches title, description, and image from URL on create
+      - Admin can override fetched metadata
+      - Visible and order flags are controllable
+    priority: medium
+
+  - id: FR-ADM-005
+    domain: admin
+    feature: guestbook_moderation
+    description: System shall allow admin to moderate guestbook entries.
+    acceptance_criteria:
+      - Admin can view all entries (including hidden)
+      - Admin can toggle visibility of entries
+      - Admin can delete entries
+    priority: medium
+
+  - id: FR-ADM-006
+    domain: admin
+    feature: message_inbox
+    description: System shall provide an inbox for anonymous messages with read status.
+    acceptance_criteria:
+      - Admin can view all anonymous messages
+      - Messages show content, timestamp, and IP hash
+      - Admin can mark messages as read
+      - Admin can delete messages
+    priority: medium
+
+  - id: FR-ADM-007
+    domain: admin
+    feature: knowledge_management
+    description: System shall allow admin to upload knowledge documents and trigger RAG ingestion.
+    acceptance_criteria:
+      - Admin can upload text/markdown documents
+      - Admin can view list of uploaded documents with indexed status
+      - Admin can trigger ingestion to update RAG index
+      - Admin can delete documents
+    priority: high
+
+  - id: FR-ADM-008
+    domain: admin
+    feature: chat_logs
+    description: System shall store and display chat logs from RAG service.
+    acceptance_criteria:
+      - Chat logs are received via internal API
+      - Logs show session ID, messages, and timestamps
+      - Admin can view conversation history
+      - Admin can delete logs
+    priority: medium
+
+  - id: FR-ADM-009
+    domain: admin
+    feature: profile_links
+    description: System shall provide CRUD for profile links displayed in Links Hub.
+    acceptance_criteria:
+      - Admin can create, read, update, delete profile links
+      - Links have label, URL, icon, visible flag, and order
+    priority: medium
+
+  - id: FR-ADM-010
+    domain: admin
+    feature: public_api
+    description: System shall expose public read endpoints for consumption by other apps.
+    acceptance_criteria:
+      - GET /api/public/projects returns visible projects
+      - GET /api/public/projects/:slug returns project with contexts
+      - GET /api/public/blogs returns visible blog links
+      - GET /api/public/guestbook returns visible entries
+      - GET /api/public/links returns visible profile links
+      - All endpoints support pagination and filtering
+    priority: high
+
+  - id: FR-ADM-011
+    domain: admin
+    feature: public_write_api
+    description: System shall expose rate-limited public write endpoints.
+    acceptance_criteria:
+      - POST /api/public-write/guestbook creates entry (requires auth)
+      - POST /api/public-write/messages creates anonymous message
+      - All write endpoints are rate-limited
+      - Validation errors return 400 with details
+    priority: high
+
+  - id: FR-ADM-012
+    domain: admin
+    feature: internal_api
+    description: System shall expose internal API for service-to-service communication.
+    acceptance_criteria:
+      - POST /api/internal/chat-logs stores chat logs (token auth)
+      - GET /api/internal/content exports content for RAG ingestion (token auth)
+      - Invalid token returns 401
+    priority: high
+
+  # ---------------------------------------------------------------------------
+  # LINKS HUB (apps/links)
+  # ---------------------------------------------------------------------------
+
+  - id: FR-LNK-001
+    domain: links_hub
+    feature: display
+    description: System shall display a Linktree-like page with curated profile links.
+    acceptance_criteria:
+      - Page displays profile info (name, title, avatar)
+      - Links are displayed in admin-defined order
+      - Each link shows label and icon
+      - Links open in new tab
+    priority: medium
+
+  # ---------------------------------------------------------------------------
+  # ANONYMOUS FEEDBACK (apps/ngl)
+  # ---------------------------------------------------------------------------
+
+  - id: FR-NGL-001
+    domain: ngl
+    feature: submission
+    description: System shall accept anonymous message submissions with abuse protection.
+    acceptance_criteria:
+      - Form accepts message text (max 1000 characters)
+      - Submission is rate-limited per IP
+      - Success confirmation is displayed
+      - No message history is shown publicly
+    priority: medium
+
+  - id: FR-NGL-002
+    domain: ngl
+    feature: rate_limiting
+    description: System shall enforce rate limiting on anonymous submissions.
+    acceptance_criteria:
+      - Maximum 5 submissions per IP per hour
+      - Rate limit exceeded returns 429 with retry-after header
+      - Rate limiting is enforced server-side
+    priority: high
+
+  # ---------------------------------------------------------------------------
+  # RAG CHATBOT SERVICE (apps/rag-service)
+  # ---------------------------------------------------------------------------
+
+  - id: FR-RAG-001
+    domain: rag_service
+    feature: chat_endpoint
+    description: System shall provide a public chat endpoint for conversational Q&A.
+    acceptance_criteria:
+      - POST /chat accepts message and optional session_id
+      - Response includes answer and suggested deep links
+      - Session ID is returned for context continuity
+      - Rate limiting is enforced
+    priority: high
+
+  - id: FR-RAG-002
+    domain: rag_service
+    feature: session_memory
+    description: System shall maintain session-aware conversation memory with pruning.
+    acceptance_criteria:
+      - Messages within session are contextually aware
+      - Sessions expire after 30 minutes of inactivity
+      - Long sessions are pruned to maintain context window
+    priority: high
+
+  - id: FR-RAG-003
+    domain: rag_service
+    feature: retrieval
+    description: System shall retrieve relevant content from vector store for context.
+    acceptance_criteria:
+      - User query is embedded using OpenAI embeddings
+      - Top-k similar documents are retrieved from Qdrant
+      - Retrieved context is included in LLM prompt
+    priority: high
+
+  - id: FR-RAG-004
+    domain: rag_service
+    feature: llm_routing
+    description: System shall route LLM requests to primary provider with fallback.
+    acceptance_criteria:
+      - Primary LLM is configured via PRIMARY_LLM env var
+      - Fallback LLM is configured via FALLBACK_LLM env var
+      - If primary fails, request is routed to fallback
+      - Supported providers: gemini, groq, openai, deepseek
+    priority: high
+
+  - id: FR-RAG-005
+    domain: rag_service
+    feature: deep_links
+    description: System shall suggest deep links to relevant portfolio pages in responses.
+    acceptance_criteria:
+      - Response includes array of suggested page URLs
+      - Links are based on retrieved context relevance
+      - Links are validated against Admin API content
+    priority: medium
+
+  - id: FR-RAG-006
+    domain: rag_service
+    feature: ingestion
+    description: System shall ingest and index content when triggered by Admin.
+    acceptance_criteria:
+      - POST /api/internal/ingest triggers ingestion (token auth)
+      - Content is fetched from Admin internal API
+      - Documents are chunked and embedded
+      - Embeddings are stored in Qdrant
+    priority: high
+
+  - id: FR-RAG-007
+    domain: rag_service
+    feature: log_forwarding
+    description: System shall forward raw chat logs to Admin API.
+    acceptance_criteria:
+      - After each conversation turn, log is sent to Admin
+      - Log includes session_id, messages, timestamps
+      - Failures are logged but do not block response
+    priority: medium
+
+
+# =============================================================================
+# NON-FUNCTIONAL REQUIREMENTS
+# =============================================================================
+# Performance, security, reliability, and operational requirements.
+# =============================================================================
+
+non_functional:
+
+  # ---------------------------------------------------------------------------
+  # PERFORMANCE
+  # ---------------------------------------------------------------------------
+
+  - id: NFR-PERF-001
+    category: performance
+    description: System shall achieve Lighthouse performance score > 90 on public pages.
+    measurement: Lighthouse CI on main branch
+    target: "> 90"
+
+  - id: NFR-PERF-002
+    category: performance
+    description: System shall respond to API requests within 500ms at p95.
+    measurement: Application metrics
+    target: "p95 < 500ms"
+
+  - id: NFR-PERF-003
+    category: performance
+    description: System shall support up to 20 concurrent API requests without degradation.
+    measurement: Load testing
+    target: "20 RPS sustained"
+
+  - id: NFR-PERF-004
+    category: performance
+    description: RAG chat responses shall complete within 5 seconds at p95.
+    measurement: Application metrics
+    target: "p95 < 5000ms"
+
+  - id: NFR-PERF-005
+    category: performance
+    description: System shall render SSR pages with Time to First Byte < 800ms.
+    measurement: Synthetic monitoring
+    target: "TTFB < 800ms"
+
+  # ---------------------------------------------------------------------------
+  # RELIABILITY
+  # ---------------------------------------------------------------------------
+
+  - id: NFR-REL-001
+    category: reliability
+    description: System shall maintain 99.5% uptime measured monthly.
+    measurement: Uptime monitoring
+    target: "99.5%"
+
+  - id: NFR-REL-002
+    category: reliability
+    description: System shall automatically restart failed containers.
+    measurement: Docker health checks
+    target: "Auto-recovery < 60s"
+
+  - id: NFR-REL-003
+    category: reliability
+    description: RAG service shall fallback to secondary LLM on primary failure.
+    measurement: Integration tests
+    target: "100% fallback success"
+
+  - id: NFR-REL-004
+    category: reliability
+    description: System shall handle database connection pool exhaustion gracefully.
+    measurement: Chaos testing
+    target: "Queue requests, no crashes"
+
+  # ---------------------------------------------------------------------------
+  # SECURITY
+  # ---------------------------------------------------------------------------
+
+  - id: NFR-SEC-001
+    category: security
+    description: System shall not expose database credentials to any application except Admin.
+    measurement: Environment audit
+    target: "Zero exposure"
+
+  - id: NFR-SEC-002
+    category: security
+    description: System shall rate-limit all public write endpoints.
+    measurement: Security testing
+    target: "All endpoints protected"
+
+  - id: NFR-SEC-003
+    category: security
+    description: System shall validate internal service tokens on all internal API calls.
+    measurement: Security testing
+    target: "100% validation"
+
+  - id: NFR-SEC-004
+    category: security
+    description: System shall hash IP addresses before storage for anonymous messages.
+    measurement: Code review
+    target: "No raw IPs stored"
+
+  - id: NFR-SEC-005
+    category: security
+    description: System shall enforce admin allowlist for admin role assignment.
+    measurement: Security testing
+    target: "100% enforcement"
+
+  - id: NFR-SEC-006
+    category: security
+    description: System shall use HTTPS for all external traffic.
+    measurement: TLS scanner
+    target: "A+ rating"
+
+  - id: NFR-SEC-007
+    category: security
+    description: System shall not include secrets in client-side bundles.
+    measurement: Bundle analysis
+    target: "Zero secrets exposed"
+
+  # ---------------------------------------------------------------------------
+  # SCALABILITY
+  # ---------------------------------------------------------------------------
+
+  - id: NFR-SCL-001
+    category: scalability
+    description: System shall support up to 50,000 monthly visits across all public apps.
+    measurement: Analytics
+    target: "50k/month"
+
+  - id: NFR-SCL-002
+    category: scalability
+    description: System shall support up to 10,000 total content records without performance degradation.
+    measurement: Load testing
+    target: "10k records"
+
+  - id: NFR-SCL-003
+    category: scalability
+    description: Vector store shall support up to 100,000 embeddings.
+    measurement: Qdrant metrics
+    target: "100k embeddings"
+
+  # ---------------------------------------------------------------------------
+  # MAINTAINABILITY
+  # ---------------------------------------------------------------------------
+
+  - id: NFR-MNT-001
+    category: maintainability
+    description: System shall use TypeScript with strict mode across all packages.
+    measurement: Build checks
+    target: "100% strict compliance"
+
+  - id: NFR-MNT-002
+    category: maintainability
+    description: System shall enforce consistent code style via ESLint and Prettier.
+    measurement: CI checks
+    target: "Zero lint errors"
+
+  - id: NFR-MNT-003
+    category: maintainability
+    description: System shall maintain API contracts via shared types package.
+    measurement: Type checking
+    target: "All APIs typed"
+
+  - id: NFR-MNT-004
+    category: maintainability
+    description: New projects shall be addable without frontend code changes.
+    measurement: Feature verification
+    target: "Content-driven only"
+
+  - id: NFR-MNT-005
+    category: maintainability
+    description: System shall use feature-based directory structure for frontend apps.
+    measurement: Architecture review
+    target: "100% compliance"
+
+  # ---------------------------------------------------------------------------
+  # OBSERVABILITY
+  # ---------------------------------------------------------------------------
+
+  - id: NFR-OBS-001
+    category: observability
+    description: System shall log all API requests with correlation IDs.
+    measurement: Log audit
+    target: "100% coverage"
+
+  - id: NFR-OBS-002
+    category: observability
+    description: System shall expose health check endpoints for all services.
+    measurement: Health monitoring
+    target: "All services monitored"
+
+  - id: NFR-OBS-003
+    category: observability
+    description: System shall track key metrics (request count, latency, error rate).
+    measurement: Metrics dashboard
+    target: "Dashboard available"
+
+  # ---------------------------------------------------------------------------
+  # ACCESSIBILITY
+  # ---------------------------------------------------------------------------
+
+  - id: NFR-ACC-001
+    category: accessibility
+    description: Public pages shall achieve WCAG 2.1 AA compliance.
+    measurement: Accessibility audit
+    target: "AA compliant"
+
+  - id: NFR-ACC-002
+    category: accessibility
+    description: All interactive elements shall be keyboard navigable.
+    measurement: Manual testing
+    target: "100% navigable"
+
+  - id: NFR-ACC-003
+    category: accessibility
+    description: All images shall have appropriate alt text.
+    measurement: Automated scan
+    target: "100% coverage"

@@ -1,0 +1,1208 @@
+# =============================================================================
+# Portfolio Ecosystem Database Schema Specification
+# =============================================================================
+# Version: 1.0.0
+# Database: PostgreSQL (via Prisma ORM)
+# Last Updated: 2024
+# =============================================================================
+
+metadata:
+  name: "Portfolio Ecosystem Database"
+  version: "1.0.0"
+  database: "PostgreSQL"
+  orm: "Prisma"
+  description: |
+    Comprehensive database schema for a personal portfolio ecosystem including
+    projects, blog links, guestbook, anonymous messages, chat logs, and more.
+
+# =============================================================================
+# ENTITY RELATIONSHIP DIAGRAM (Text-Based)
+# =============================================================================
+
+relationship_diagram: |
+  ┌─────────────────────────────────────────────────────────────────────────────┐
+  │                        PORTFOLIO ECOSYSTEM ERD                              │
+  └─────────────────────────────────────────────────────────────────────────────┘
+  
+  ┌──────────────────┐         ┌──────────────────────┐
+  │      User        │         │      Project         │
+  ├──────────────────┤         ├──────────────────────┤
+  │ PK id            │         │ PK id                │
+  │    email (unique)│         │    title             │
+  │    name          │         │    slug (unique)     │
+  │    image         │         │    summary           │
+  │    role (enum)   │         │    description       │
+  │    createdAt     │         │    category          │
+  │    updatedAt     │         │    techStack[]       │
+  └────────┬─────────┘         │    liveUrl           │
+           │                   │    repoUrl           │
+           │ 1:N               │    featured          │
+           │                   │    visible           │
+           ▼                   │    order             │
+  ┌──────────────────┐         │    createdAt         │
+  │  GuestbookEntry  │         │    updatedAt         │
+  ├──────────────────┤         └──────────┬───────────┘
+  │ PK id            │                    │
+  │ FK userId ───────┼────────────────────┤ 1:N
+  │    message       │                    │
+  │    reactions     │                    ▼
+  │    visible       │         ┌──────────────────────┐
+  │    createdAt     │         │   ProjectContext     │
+  │    updatedAt     │         ├──────────────────────┤
+  └──────────────────┘         │ PK id                │
+                               │ FK projectId ────────┤
+                               │    type (enum)       │
+                               │    title             │
+                               │    content (markdown)│
+                               │    order             │
+                               │    createdAt         │
+                               │    updatedAt         │
+                               └──────────────────────┘
+  
+  ┌──────────────────┐         ┌──────────────────────┐
+  │    BlogLink      │         │  AnonymousMessage    │
+  ├──────────────────┤         ├──────────────────────┤
+  │ PK id            │         │ PK id                │
+  │    url (unique)  │         │    content           │
+  │    title         │         │    ipHash            │
+  │    description   │         │    read              │
+  │    imageUrl      │         │    createdAt         │
+  │    source        │         │    updatedAt         │
+  │    publishedAt   │         └──────────────────────┘
+  │    visible       │
+  │    order         │         ┌──────────────────────┐
+  │    createdAt     │         │      ChatLog         │
+  │    updatedAt     │         ├──────────────────────┤
+  └──────────────────┘         │ PK id                │
+                               │    sessionId (unique)│
+                               │    messages (JSON[]) │
+                               │    createdAt         │
+                               │    updatedAt         │
+                               └──────────────────────┘
+  
+  ┌──────────────────┐         ┌──────────────────────┐
+  │   ProfileLink    │         │   KnowledgeDoc       │
+  ├──────────────────┤         ├──────────────────────┤
+  │ PK id            │         │ PK id                │
+  │    label         │         │    filename (unique) │
+  │    url           │         │    content           │
+  │    icon          │         │    indexed           │
+  │    visible       │         │    createdAt         │
+  │    order         │         │    updatedAt         │
+  │    createdAt     │         └──────────────────────┘
+  │    updatedAt     │
+  └──────────────────┘
+  
+  ═══════════════════════════════════════════════════════════════════════════════
+  LEGEND:
+    PK = Primary Key
+    FK = Foreign Key
+    1:N = One-to-Many Relationship
+    ──► = Foreign Key Reference
+  ═══════════════════════════════════════════════════════════════════════════════
+
+# =============================================================================
+# ENUM DEFINITIONS
+# =============================================================================
+
+enums:
+  UserRole:
+    description: "Defines user permission levels"
+    values:
+      - name: ADMIN
+        description: "Full access to all features including content management"
+      - name: USER
+        description: "Standard user access for guestbook and interactions"
+    default: USER
+
+  ProjectContextType:
+    description: "Categories for project context sections"
+    values:
+      - name: CONTEXT
+        description: "Background and problem statement"
+      - name: ROLE
+        description: "Personal role and responsibilities"
+      - name: DECISIONS
+        description: "Key technical and design decisions"
+      - name: TRADEOFFS
+        description: "Tradeoffs considered and made"
+      - name: RESULT
+        description: "Outcomes and achievements"
+      - name: ARCHITECTURE
+        description: "System architecture and design patterns"
+      - name: OPERATIONS
+        description: "Deployment, monitoring, and maintenance"
+      - name: METRICS
+        description: "Performance metrics and KPIs"
+
+# =============================================================================
+# JSON FIELD STRUCTURES
+# =============================================================================
+
+json_structures:
+  GuestbookReactions:
+    description: "Structure for storing emoji reactions on guestbook entries"
+    schema:
+      type: object
+      properties:
+        emoji:
+          type: string
+          description: "Emoji character or code"
+        count:
+          type: integer
+          description: "Number of times this reaction was used"
+        userIds:
+          type: array
+          items:
+            type: string
+          description: "List of user IDs who reacted"
+    example: |
+      {
+        "reactions": [
+          { "emoji": "heart", "count": 5, "userIds": ["user1", "user2", "user3", "user4", "user5"] },
+          { "emoji": "fire", "count": 3, "userIds": ["user1", "user6", "user7"] },
+          { "emoji": "thumbsup", "count": 2, "userIds": ["user2", "user8"] }
+        ]
+      }
+
+  ChatMessages:
+    description: "Structure for storing chat conversation messages"
+    schema:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: string
+            format: uuid
+          role:
+            type: string
+            enum: [user, assistant, system]
+          content:
+            type: string
+          timestamp:
+            type: string
+            format: datetime
+          metadata:
+            type: object
+            properties:
+              model:
+                type: string
+              tokens:
+                type: integer
+              duration:
+                type: number
+    example: |
+      {
+        "messages": [
+          {
+            "id": "msg_001",
+            "role": "user",
+            "content": "Tell me about your experience with React",
+            "timestamp": "2024-01-15T10:30:00Z",
+            "metadata": null
+          },
+          {
+            "id": "msg_002",
+            "role": "assistant",
+            "content": "I have extensive experience with React...",
+            "timestamp": "2024-01-15T10:30:02Z",
+            "metadata": {
+              "model": "gpt-4",
+              "tokens": 150,
+              "duration": 1.2
+            }
+          }
+        ]
+      }
+
+# =============================================================================
+# PRISMA SCHEMA DEFINITION
+# =============================================================================
+
+prisma_schema: |
+  // ==========================================================================
+  // Prisma Schema for Portfolio Ecosystem
+  // ==========================================================================
+  // Run: npx prisma generate
+  // Run: npx prisma migrate dev --name init
+  // ==========================================================================
+
+  generator client {
+    provider        = "prisma-client-js"
+    previewFeatures = ["fullTextSearch", "fullTextIndex"]
+  }
+
+  datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+  }
+
+  // --------------------------------------------------------------------------
+  // ENUMS
+  // --------------------------------------------------------------------------
+
+  enum UserRole {
+    ADMIN
+    USER
+  }
+
+  enum ProjectContextType {
+    CONTEXT
+    ROLE
+    DECISIONS
+    TRADEOFFS
+    RESULT
+    ARCHITECTURE
+    OPERATIONS
+    METRICS
+  }
+
+  // --------------------------------------------------------------------------
+  // USER MODEL
+  // --------------------------------------------------------------------------
+
+  /// User accounts for authentication and guestbook entries
+  model User {
+    id        String   @id @default(cuid())
+    email     String   @unique
+    name      String?
+    image     String?
+    role      UserRole @default(USER)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    // Relations
+    guestbookEntries GuestbookEntry[]
+
+    // Indexes
+    @@index([email])
+    @@index([role])
+    @@index([createdAt])
+    @@map("users")
+  }
+
+  // --------------------------------------------------------------------------
+  // PROJECT MODEL
+  // --------------------------------------------------------------------------
+
+  /// Portfolio projects with full details
+  model Project {
+    id          String   @id @default(cuid())
+    title       String
+    slug        String   @unique
+    summary     String   @db.Text
+    description String   @db.Text
+    category    String
+    techStack   String[] // Array of technology names
+    liveUrl     String?
+    repoUrl     String?
+    featured    Boolean  @default(false)
+    visible     Boolean  @default(true)
+    order       Int      @default(0)
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+
+    // Relations
+    contexts ProjectContext[]
+
+    // Indexes
+    @@index([slug])
+    @@index([category])
+    @@index([featured])
+    @@index([visible])
+    @@index([order])
+    @@index([createdAt])
+    @@index([visible, featured, order])
+    @@map("projects")
+  }
+
+  // --------------------------------------------------------------------------
+  // PROJECT CONTEXT MODEL
+  // --------------------------------------------------------------------------
+
+  /// Detailed context sections for each project
+  model ProjectContext {
+    id        String             @id @default(cuid())
+    projectId String
+    type      ProjectContextType
+    title     String
+    content   String             @db.Text // Markdown content
+    order     Int                @default(0)
+    createdAt DateTime           @default(now())
+    updatedAt DateTime           @updatedAt
+
+    // Relations
+    project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+    // Indexes
+    @@index([projectId])
+    @@index([type])
+    @@index([order])
+    @@index([projectId, type])
+    @@index([projectId, order])
+    @@map("project_contexts")
+  }
+
+  // --------------------------------------------------------------------------
+  // BLOG LINK MODEL
+  // --------------------------------------------------------------------------
+
+  /// External blog posts and articles
+  model BlogLink {
+    id          String    @id @default(cuid())
+    url         String    @unique
+    title       String
+    description String?   @db.Text
+    imageUrl    String?
+    source      String    // e.g., "medium", "dev.to", "hashnode"
+    publishedAt DateTime?
+    visible     Boolean   @default(true)
+    order       Int       @default(0)
+    createdAt   DateTime  @default(now())
+    updatedAt   DateTime  @updatedAt
+
+    // Indexes
+    @@index([url])
+    @@index([source])
+    @@index([visible])
+    @@index([order])
+    @@index([publishedAt])
+    @@index([visible, order])
+    @@map("blog_links")
+  }
+
+  // --------------------------------------------------------------------------
+  // GUESTBOOK ENTRY MODEL
+  // --------------------------------------------------------------------------
+
+  /// Guestbook messages from authenticated users
+  model GuestbookEntry {
+    id        String   @id @default(cuid())
+    userId    String
+    message   String   @db.Text
+    reactions Json     @default("{}") // JSON structure for reactions
+    visible   Boolean  @default(true)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    // Relations
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    // Indexes
+    @@index([userId])
+    @@index([visible])
+    @@index([createdAt])
+    @@index([visible, createdAt])
+    @@map("guestbook_entries")
+  }
+
+  // --------------------------------------------------------------------------
+  // ANONYMOUS MESSAGE MODEL
+  // --------------------------------------------------------------------------
+
+  /// Anonymous messages from visitors (contact form alternative)
+  model AnonymousMessage {
+    id        String   @id @default(cuid())
+    content   String   @db.Text
+    ipHash    String   // Hashed IP for rate limiting, not identification
+    read      Boolean  @default(false)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    // Indexes
+    @@index([ipHash])
+    @@index([read])
+    @@index([createdAt])
+    @@index([read, createdAt])
+    @@map("anonymous_messages")
+  }
+
+  // --------------------------------------------------------------------------
+  // CHAT LOG MODEL
+  // --------------------------------------------------------------------------
+
+  /// AI chat conversation logs
+  model ChatLog {
+    id        String   @id @default(cuid())
+    sessionId String   @unique
+    messages  Json     @default("[]") // Array of chat messages
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    // Indexes
+    @@index([sessionId])
+    @@index([createdAt])
+    @@index([updatedAt])
+    @@map("chat_logs")
+  }
+
+  // --------------------------------------------------------------------------
+  // PROFILE LINK MODEL
+  // --------------------------------------------------------------------------
+
+  /// Social and professional profile links
+  model ProfileLink {
+    id        String   @id @default(cuid())
+    label     String   // Display name (e.g., "GitHub", "LinkedIn")
+    url       String
+    icon      String?  // Icon identifier or URL
+    visible   Boolean  @default(true)
+    order     Int      @default(0)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    // Indexes
+    @@index([visible])
+    @@index([order])
+    @@index([visible, order])
+    @@map("profile_links")
+  }
+
+  // --------------------------------------------------------------------------
+  // KNOWLEDGE DOC MODEL
+  // --------------------------------------------------------------------------
+
+  /// Documents for RAG/knowledge base for AI assistant
+  model KnowledgeDoc {
+    id        String   @id @default(cuid())
+    filename  String   @unique
+    content   String   @db.Text // Full document content
+    indexed   Boolean  @default(false) // Whether it's been indexed for vector search
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    // Indexes
+    @@index([filename])
+    @@index([indexed])
+    @@index([createdAt])
+    @@index([indexed, updatedAt])
+    @@map("knowledge_docs")
+  }
+
+# =============================================================================
+# INDEX STRATEGY
+# =============================================================================
+
+indexes:
+  description: |
+    Indexes are designed to optimize common query patterns while balancing
+    write performance. Composite indexes are used for frequently combined filters.
+
+  strategy:
+    primary_keys:
+      - description: "All tables use CUID as primary key for distributed-friendly IDs"
+        reason: "CUIDs are collision-resistant and sortable by creation time"
+
+    unique_indexes:
+      - table: User
+        columns: [email]
+        reason: "Email must be unique for authentication"
+      - table: Project
+        columns: [slug]
+        reason: "URL-friendly unique identifier for routing"
+      - table: BlogLink
+        columns: [url]
+        reason: "Prevent duplicate blog link entries"
+      - table: ChatLog
+        columns: [sessionId]
+        reason: "Unique session identification"
+      - table: KnowledgeDoc
+        columns: [filename]
+        reason: "Unique document identification"
+
+    performance_indexes:
+      User:
+        - columns: [email]
+          reason: "Fast lookup during authentication"
+        - columns: [role]
+          reason: "Filter users by permission level"
+        - columns: [createdAt]
+          reason: "Sort users by registration date"
+
+      Project:
+        - columns: [slug]
+          reason: "Fast project lookup by URL slug"
+        - columns: [category]
+          reason: "Filter projects by category"
+        - columns: [featured]
+          reason: "Quick access to featured projects"
+        - columns: [visible]
+          reason: "Filter published projects"
+        - columns: [order]
+          reason: "Custom ordering of projects"
+        - columns: [visible, featured, order]
+          reason: "Composite index for homepage project listing"
+
+      ProjectContext:
+        - columns: [projectId]
+          reason: "Fast retrieval of all contexts for a project"
+        - columns: [type]
+          reason: "Filter contexts by type"
+        - columns: [projectId, type]
+          reason: "Get specific context type for a project"
+        - columns: [projectId, order]
+          reason: "Ordered retrieval of project contexts"
+
+      BlogLink:
+        - columns: [visible, order]
+          reason: "Efficient listing of visible blog links"
+        - columns: [publishedAt]
+          reason: "Sort by publication date"
+
+      GuestbookEntry:
+        - columns: [userId]
+          reason: "Find all entries by a user"
+        - columns: [visible, createdAt]
+          reason: "List visible entries chronologically"
+
+      AnonymousMessage:
+        - columns: [ipHash]
+          reason: "Rate limiting by IP"
+        - columns: [read, createdAt]
+          reason: "Admin inbox filtering"
+
+      ChatLog:
+        - columns: [sessionId]
+          reason: "Session lookup"
+        - columns: [updatedAt]
+          reason: "Recent activity sorting"
+
+      KnowledgeDoc:
+        - columns: [indexed, updatedAt]
+          reason: "Find documents needing re-indexing"
+
+# =============================================================================
+# MIGRATION STRATEGY
+# =============================================================================
+
+migration:
+  approach: "Incremental migrations with Prisma Migrate"
+  
+  initial_setup:
+    steps:
+      - step: 1
+        action: "Initialize Prisma"
+        command: "npx prisma init"
+        
+      - step: 2
+        action: "Configure DATABASE_URL in .env"
+        example: |
+          DATABASE_URL="postgresql://user:password@localhost:5432/portfolio?schema=public"
+          
+      - step: 3
+        action: "Create initial migration"
+        command: "npx prisma migrate dev --name init"
+        
+      - step: 4
+        action: "Generate Prisma Client"
+        command: "npx prisma generate"
+
+  versioning:
+    naming_convention: "YYYYMMDDHHMMSS_descriptive_name"
+    examples:
+      - "20240115120000_init"
+      - "20240120093000_add_project_contexts"
+      - "20240125140000_add_reactions_to_guestbook"
+
+  production_workflow:
+    steps:
+      - step: 1
+        description: "Create migration in development"
+        command: "npx prisma migrate dev --name descriptive_name"
+        
+      - step: 2
+        description: "Review generated SQL"
+        location: "prisma/migrations/[timestamp]_name/migration.sql"
+        
+      - step: 3
+        description: "Test migration on staging"
+        command: "npx prisma migrate deploy"
+        
+      - step: 4
+        description: "Deploy to production"
+        command: "npx prisma migrate deploy"
+
+  rollback_strategy:
+    description: |
+      Prisma doesn't support automatic rollbacks. For production:
+      1. Always backup database before migrations
+      2. Create reverse migration scripts manually
+      3. Test migrations thoroughly on staging
+      4. Use database snapshots for critical migrations
+
+  zero_downtime_considerations:
+    - "Add new columns as nullable first"
+    - "Create new indexes concurrently when possible"
+    - "Use multi-phase migrations for breaking changes"
+    - "Deploy code that handles both old and new schema"
+
+# =============================================================================
+# SEEDING APPROACH
+# =============================================================================
+
+seeding:
+  file_location: "prisma/seed.ts"
+  
+  command:
+    development: "npx prisma db seed"
+    configuration: |
+      // In package.json
+      {
+        "prisma": {
+          "seed": "tsx prisma/seed.ts"
+        }
+      }
+
+  seed_script: |
+    // prisma/seed.ts
+    import { PrismaClient, UserRole, ProjectContextType } from '@prisma/client';
+
+    const prisma = new PrismaClient();
+
+    async function main() {
+      console.log('Starting database seed...');
+
+      // ---------------------------------------------------------------------------
+      // Seed Admin User
+      // ---------------------------------------------------------------------------
+      const adminUser = await prisma.user.upsert({
+        where: { email: 'admin@example.com' },
+        update: {},
+        create: {
+          email: 'admin@example.com',
+          name: 'Admin User',
+          role: UserRole.ADMIN,
+          image: 'https://avatars.githubusercontent.com/u/1234567',
+        },
+      });
+      console.log('Created admin user:', adminUser.id);
+
+      // ---------------------------------------------------------------------------
+      // Seed Profile Links
+      // ---------------------------------------------------------------------------
+      const profileLinks = [
+        { label: 'GitHub', url: 'https://github.com/username', icon: 'github', order: 1 },
+        { label: 'LinkedIn', url: 'https://linkedin.com/in/username', icon: 'linkedin', order: 2 },
+        { label: 'Twitter', url: 'https://twitter.com/username', icon: 'twitter', order: 3 },
+        { label: 'Email', url: 'mailto:hello@example.com', icon: 'mail', order: 4 },
+      ];
+
+      for (const link of profileLinks) {
+        await prisma.profileLink.upsert({
+          where: { id: link.label.toLowerCase() },
+          update: link,
+          create: { ...link, id: link.label.toLowerCase() },
+        });
+      }
+      console.log('Created profile links');
+
+      // ---------------------------------------------------------------------------
+      // Seed Sample Project
+      // ---------------------------------------------------------------------------
+      const sampleProject = await prisma.project.upsert({
+        where: { slug: 'sample-project' },
+        update: {},
+        create: {
+          title: 'Sample Portfolio Project',
+          slug: 'sample-project',
+          summary: 'A comprehensive example project showcasing full-stack development skills.',
+          description: `
+    # Sample Project
+
+    This is a detailed description of the sample project with **markdown** support.
+
+    ## Features
+    - Feature 1
+    - Feature 2
+    - Feature 3
+
+    ## Tech Stack
+    Built with modern technologies for optimal performance.
+          `.trim(),
+          category: 'Web Application',
+          techStack: ['Next.js', 'TypeScript', 'Prisma', 'PostgreSQL', 'Tailwind CSS'],
+          liveUrl: 'https://example.com',
+          repoUrl: 'https://github.com/username/sample-project',
+          featured: true,
+          visible: true,
+          order: 1,
+        },
+      });
+      console.log('Created sample project:', sampleProject.id);
+
+      // ---------------------------------------------------------------------------
+      // Seed Project Contexts
+      // ---------------------------------------------------------------------------
+      const projectContexts = [
+        {
+          type: ProjectContextType.CONTEXT,
+          title: 'Project Background',
+          content: 'The context and background for this project...',
+          order: 1,
+        },
+        {
+          type: ProjectContextType.ROLE,
+          title: 'My Role',
+          content: 'As the lead developer, I was responsible for...',
+          order: 2,
+        },
+        {
+          type: ProjectContextType.DECISIONS,
+          title: 'Key Decisions',
+          content: 'Major technical decisions included...',
+          order: 3,
+        },
+        {
+          type: ProjectContextType.ARCHITECTURE,
+          title: 'System Architecture',
+          content: 'The system follows a microservices architecture...',
+          order: 4,
+        },
+        {
+          type: ProjectContextType.RESULT,
+          title: 'Results & Impact',
+          content: 'The project achieved significant improvements...',
+          order: 5,
+        },
+      ];
+
+      for (const ctx of projectContexts) {
+        await prisma.projectContext.create({
+          data: {
+            ...ctx,
+            projectId: sampleProject.id,
+          },
+        });
+      }
+      console.log('Created project contexts');
+
+      // ---------------------------------------------------------------------------
+      // Seed Sample Blog Links
+      // ---------------------------------------------------------------------------
+      const blogLinks = [
+        {
+          url: 'https://dev.to/username/sample-article',
+          title: 'Building Scalable Applications with Next.js',
+          description: 'A deep dive into building production-ready applications.',
+          source: 'dev.to',
+          publishedAt: new Date('2024-01-10'),
+          order: 1,
+        },
+        {
+          url: 'https://medium.com/@username/another-article',
+          title: 'The Future of Web Development',
+          description: 'Exploring emerging trends and technologies.',
+          source: 'medium',
+          publishedAt: new Date('2024-01-05'),
+          order: 2,
+        },
+      ];
+
+      for (const blog of blogLinks) {
+        await prisma.blogLink.upsert({
+          where: { url: blog.url },
+          update: blog,
+          create: blog,
+        });
+      }
+      console.log('Created blog links');
+
+      // ---------------------------------------------------------------------------
+      // Seed Knowledge Documents
+      // ---------------------------------------------------------------------------
+      const knowledgeDocs = [
+        {
+          filename: 'about-me.md',
+          content: `
+    # About Me
+
+    I am a full-stack developer with expertise in modern web technologies.
+
+    ## Skills
+    - Frontend: React, Next.js, TypeScript
+    - Backend: Node.js, Python, Go
+    - Database: PostgreSQL, MongoDB, Redis
+    - DevOps: Docker, Kubernetes, AWS
+          `.trim(),
+          indexed: false,
+        },
+        {
+          filename: 'experience.md',
+          content: `
+    # Professional Experience
+
+    ## Senior Software Engineer - Tech Company (2022-Present)
+    - Led development of microservices architecture
+    - Improved system performance by 40%
+
+    ## Software Engineer - Startup (2020-2022)
+    - Built MVP from scratch
+    - Scaled to 100k+ users
+          `.trim(),
+          indexed: false,
+        },
+      ];
+
+      for (const doc of knowledgeDocs) {
+        await prisma.knowledgeDoc.upsert({
+          where: { filename: doc.filename },
+          update: doc,
+          create: doc,
+        });
+      }
+      console.log('Created knowledge documents');
+
+      console.log('Database seeding completed!');
+    }
+
+    main()
+      .catch((e) => {
+        console.error('Seeding error:', e);
+        process.exit(1);
+      })
+      .finally(async () => {
+        await prisma.$disconnect();
+      });
+
+  environment_specific_seeds:
+    development:
+      - "Full seed data including test users"
+      - "Sample projects and content"
+      - "Mock guestbook entries"
+    
+    staging:
+      - "Sanitized production-like data"
+      - "Test accounts for QA"
+    
+    production:
+      - "Admin user only"
+      - "Essential profile links"
+      - "No sample content"
+
+# =============================================================================
+# COMMON QUERY PATTERNS
+# =============================================================================
+
+query_patterns:
+  description: |
+    Common query patterns optimized for performance with proper indexing.
+    All examples use Prisma Client syntax.
+
+  user_queries:
+    find_by_email:
+      description: "Authenticate user by email"
+      query: |
+        const user = await prisma.user.findUnique({
+          where: { email: 'user@example.com' },
+          include: {
+            guestbookEntries: {
+              where: { visible: true },
+              orderBy: { createdAt: 'desc' },
+              take: 5,
+            },
+          },
+        });
+
+    list_admin_users:
+      description: "Get all admin users"
+      query: |
+        const admins = await prisma.user.findMany({
+          where: { role: 'ADMIN' },
+          orderBy: { createdAt: 'asc' },
+        });
+
+  project_queries:
+    get_featured_projects:
+      description: "Homepage featured projects"
+      query: |
+        const featuredProjects = await prisma.project.findMany({
+          where: {
+            visible: true,
+            featured: true,
+          },
+          orderBy: { order: 'asc' },
+          include: {
+            contexts: {
+              where: { type: 'RESULT' },
+              take: 1,
+            },
+          },
+        });
+
+    get_project_by_slug:
+      description: "Full project page with all contexts"
+      query: |
+        const project = await prisma.project.findUnique({
+          where: { slug: 'project-slug' },
+          include: {
+            contexts: {
+              orderBy: { order: 'asc' },
+            },
+          },
+        });
+
+    list_projects_by_category:
+      description: "Filter projects by category"
+      query: |
+        const projects = await prisma.project.findMany({
+          where: {
+            visible: true,
+            category: 'Web Application',
+          },
+          orderBy: [
+            { featured: 'desc' },
+            { order: 'asc' },
+          ],
+        });
+
+    search_projects:
+      description: "Full-text search on projects"
+      query: |
+        const results = await prisma.project.findMany({
+          where: {
+            visible: true,
+            OR: [
+              { title: { contains: searchTerm, mode: 'insensitive' } },
+              { summary: { contains: searchTerm, mode: 'insensitive' } },
+              { description: { contains: searchTerm, mode: 'insensitive' } },
+              { techStack: { hasSome: [searchTerm] } },
+            ],
+          },
+          orderBy: { order: 'asc' },
+        });
+
+  blog_queries:
+    get_visible_posts:
+      description: "List all visible blog links"
+      query: |
+        const blogLinks = await prisma.blogLink.findMany({
+          where: { visible: true },
+          orderBy: [
+            { order: 'asc' },
+            { publishedAt: 'desc' },
+          ],
+        });
+
+    get_posts_by_source:
+      description: "Filter blog links by platform"
+      query: |
+        const mediumPosts = await prisma.blogLink.findMany({
+          where: {
+            visible: true,
+            source: 'medium',
+          },
+          orderBy: { publishedAt: 'desc' },
+        });
+
+  guestbook_queries:
+    get_recent_entries:
+      description: "Paginated guestbook entries"
+      query: |
+        const entries = await prisma.guestbookEntry.findMany({
+          where: { visible: true },
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                image: true,
+              },
+            },
+          },
+          orderBy: { createdAt: 'desc' },
+          take: 20,
+          skip: page * 20,
+        });
+
+    add_reaction:
+      description: "Add reaction to guestbook entry"
+      query: |
+        // Using raw query for JSON manipulation
+        const updated = await prisma.$executeRaw`
+          UPDATE guestbook_entries
+          SET reactions = jsonb_set(
+            COALESCE(reactions, '{}'),
+            '{reactions}',
+            (
+              COALESCE(reactions->'reactions', '[]')::jsonb || 
+              ${JSON.stringify({ emoji, userId })}::jsonb
+            )
+          )
+          WHERE id = ${entryId}
+        `;
+
+  anonymous_message_queries:
+    get_unread_messages:
+      description: "Admin inbox - unread messages"
+      query: |
+        const unreadMessages = await prisma.anonymousMessage.findMany({
+          where: { read: false },
+          orderBy: { createdAt: 'desc' },
+        });
+
+    mark_as_read:
+      description: "Mark message as read"
+      query: |
+        const message = await prisma.anonymousMessage.update({
+          where: { id: messageId },
+          data: { read: true },
+        });
+
+    rate_limit_check:
+      description: "Check rate limit by IP hash"
+      query: |
+        const recentMessages = await prisma.anonymousMessage.count({
+          where: {
+            ipHash: hashedIp,
+            createdAt: {
+              gte: new Date(Date.now() - 60 * 60 * 1000), // Last hour
+            },
+          },
+        });
+
+  chat_queries:
+    get_or_create_session:
+      description: "Get existing or create new chat session"
+      query: |
+        const chatLog = await prisma.chatLog.upsert({
+          where: { sessionId },
+          create: {
+            sessionId,
+            messages: [],
+          },
+          update: {},
+        });
+
+    append_message:
+      description: "Add message to chat log"
+      query: |
+        const updated = await prisma.chatLog.update({
+          where: { sessionId },
+          data: {
+            messages: {
+              push: newMessage,
+            },
+          },
+        });
+
+    cleanup_old_sessions:
+      description: "Remove sessions older than 30 days"
+      query: |
+        const deleted = await prisma.chatLog.deleteMany({
+          where: {
+            updatedAt: {
+              lt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+            },
+          },
+        });
+
+  knowledge_queries:
+    get_unindexed_docs:
+      description: "Find documents needing indexing"
+      query: |
+        const unindexedDocs = await prisma.knowledgeDoc.findMany({
+          where: { indexed: false },
+          orderBy: { createdAt: 'asc' },
+        });
+
+    mark_as_indexed:
+      description: "Update document indexed status"
+      query: |
+        const doc = await prisma.knowledgeDoc.update({
+          where: { id: docId },
+          data: { indexed: true },
+        });
+
+    search_knowledge:
+      description: "Search knowledge base content"
+      query: |
+        const results = await prisma.knowledgeDoc.findMany({
+          where: {
+            content: {
+              contains: searchTerm,
+              mode: 'insensitive',
+            },
+          },
+        });
+
+# =============================================================================
+# PERFORMANCE CONSIDERATIONS
+# =============================================================================
+
+performance:
+  connection_pooling:
+    description: "Configure connection pool for production"
+    config: |
+      // In production, configure pool settings
+      const prisma = new PrismaClient({
+        datasources: {
+          db: {
+            url: process.env.DATABASE_URL,
+          },
+        },
+        log: process.env.NODE_ENV === 'development' 
+          ? ['query', 'error', 'warn'] 
+          : ['error'],
+      });
+
+  query_optimization:
+    tips:
+      - "Use `select` to fetch only needed fields"
+      - "Use `include` sparingly; prefer separate queries for complex relations"
+      - "Implement cursor-based pagination for large datasets"
+      - "Use raw queries for complex aggregations"
+      - "Cache frequently accessed, rarely changed data (profile links, etc.)"
+
+  caching_strategy:
+    static_content:
+      - "Profile links: Cache for 1 hour"
+      - "Featured projects: Cache for 15 minutes"
+      - "Blog links: Cache for 30 minutes"
+    
+    dynamic_content:
+      - "Guestbook: No caching or short TTL (1 minute)"
+      - "Anonymous messages: No caching"
+      - "Chat logs: No caching"
+
+# =============================================================================
+# BACKUP AND RECOVERY
+# =============================================================================
+
+backup:
+  strategy: "Automated daily backups with point-in-time recovery"
+  
+  tools:
+    - name: "pg_dump"
+      usage: "pg_dump -Fc portfolio > backup_$(date +%Y%m%d).dump"
+      
+    - name: "Prisma"
+      usage: "For data export, use Prisma Client to export to JSON"
+
+  retention:
+    daily: "7 days"
+    weekly: "4 weeks"
+    monthly: "12 months"
+
+# =============================================================================
+# SECURITY CONSIDERATIONS
+# =============================================================================
+
+security:
+  data_protection:
+    - "Hash IP addresses before storing (AnonymousMessage.ipHash)"
+    - "Never store raw passwords; use OAuth providers"
+    - "Sanitize all user inputs before database insertion"
+    - "Use parameterized queries (Prisma handles this)"
+
+  access_control:
+    - "Implement row-level security where needed"
+    - "Use UserRole enum for permission checks"
+    - "Validate user ownership before updates/deletes"
+
+  audit_logging:
+    recommendation: |
+      Consider adding an AuditLog table for sensitive operations:
+      - User role changes
+      - Content visibility changes
+      - Bulk deletions

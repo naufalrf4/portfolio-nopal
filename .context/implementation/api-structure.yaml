@@ -1,0 +1,2736 @@
+# API Structure Specification
+
+# =============================================================================
+# ADMIN APP API GATEWAY (apps/admin)
+# =============================================================================
+# This specification defines the complete API structure for the Admin app,
+# which serves as the central API gateway for the NaufalRF Portfolio Ecosystem.
+# =============================================================================
+
+version: "1.0.0"
+base_path: /api
+content_type: application/json
+
+# =============================================================================
+# API NAMESPACES
+# =============================================================================
+# Each namespace has distinct authentication and rate limiting requirements.
+# =============================================================================
+
+namespaces:
+  public:
+    prefix: /api/public
+    description: Public read-only endpoints, no authentication required
+    authentication: none
+    rate_limit:
+      requests: 100
+      window: 60s
+      by: ip
+    cors:
+      origins: ["*"]
+      methods: ["GET", "OPTIONS"]
+      headers: ["Content-Type", "Accept"]
+    caching:
+      default_ttl: 60s
+      stale_while_revalidate: 300s
+
+  public_write:
+    prefix: /api/public-write
+    description: Public write endpoints with rate limiting, optional auth
+    authentication: optional # none or user
+    rate_limit:
+      requests: 10
+      window: 60s
+      by: ip
+    cors:
+      origins: ["*"]
+      methods: ["POST", "OPTIONS"]
+      headers: ["Content-Type", "Accept", "Authorization"]
+    caching:
+      enabled: false
+
+  user:
+    prefix: /api/user
+    description: User-authenticated endpoints
+    authentication: required
+    required_role: user
+    rate_limit:
+      requests: 60
+      window: 60s
+      by: user_id
+    cors:
+      origins:
+        - ${PUBLIC_APP_URL}
+        - ${ADMIN_APP_URL}
+      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+      headers: ["Content-Type", "Accept", "Authorization"]
+    caching:
+      enabled: false
+
+  admin:
+    prefix: /api/admin
+    description: Admin-only endpoints for content management
+    authentication: required
+    required_role: admin
+    rate_limit:
+      requests: 120
+      window: 60s
+      by: user_id
+    cors:
+      origins:
+        - ${ADMIN_APP_URL}
+      methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
+      headers: ["Content-Type", "Accept", "Authorization"]
+    caching:
+      enabled: false
+
+  internal:
+    prefix: /api/internal
+    description: Service-to-service communication, token authentication
+    authentication: service_token
+    rate_limit:
+      requests: 1000
+      window: 60s
+      by: service_token
+    cors:
+      enabled: false # Internal services only
+    caching:
+      enabled: false
+
+# =============================================================================
+# AUTHENTICATION CONFIGURATION
+# =============================================================================
+
+authentication:
+  providers:
+    nextauth:
+      type: session
+      description: NextAuth.js session-based authentication via cookies
+      session_strategy: jwt
+      max_age: 2592000 # 30 days in seconds
+      cookie_name: next-auth.session-token
+      secure_cookie: true # In production
+
+    bearer:
+      type: bearer_token
+      description: JWT Bearer token for API clients
+      header: Authorization
+      prefix: Bearer
+      validate_with: nextauth_jwt_secret
+
+    service_token:
+      type: static_token
+      description: Pre-shared token for internal service communication
+      header: X-Service-Token
+      env_var: INTERNAL_SERVICE_TOKEN
+
+  roles:
+    user:
+      description: Authenticated user via Google OAuth
+      permissions:
+        - read:public
+        - write:guestbook
+        - read:own_entries
+
+    admin:
+      description: User in admin allowlist
+      inherits: user
+      permissions:
+        - read:all
+        - write:all
+        - delete:all
+        - manage:users
+      allowlist_env: ADMIN_ALLOWLIST
+
+# =============================================================================
+# ZOD SCHEMAS - SHARED
+# =============================================================================
+
+schemas:
+  # ---------------------------------------------------------------------------
+  # PAGINATION
+  # ---------------------------------------------------------------------------
+  pagination:
+    request:
+      name: PaginationQuerySchema
+      zod: |
+        z.object({
+          page: z.coerce.number().int().min(1).default(1),
+          limit: z.coerce.number().int().min(1).max(100).default(10),
+          sort: z.string().optional(),
+          order: z.enum(['asc', 'desc']).default('desc'),
+        })
+    response:
+      name: PaginationMetaSchema
+      zod: |
+        z.object({
+          page: z.number(),
+          limit: z.number(),
+          total: z.number(),
+          totalPages: z.number(),
+          hasNext: z.boolean(),
+          hasPrev: z.boolean(),
+        })
+
+  # ---------------------------------------------------------------------------
+  # ERROR RESPONSE
+  # ---------------------------------------------------------------------------
+  error:
+    name: ApiErrorSchema
+    zod: |
+      z.object({
+        success: z.literal(false),
+        error: z.object({
+          code: z.string(),
+          message: z.string(),
+          details: z.array(z.object({
+            field: z.string().optional(),
+            message: z.string(),
+            code: z.string().optional(),
+          })).optional(),
+          requestId: z.string(),
+          timestamp: z.string().datetime(),
+        }),
+      })
+
+  # ---------------------------------------------------------------------------
+  # SUCCESS RESPONSE WRAPPER
+  # ---------------------------------------------------------------------------
+  success:
+    single:
+      name: SingleResponseSchema
+      zod: |
+        z.object({
+          success: z.literal(true),
+          data: z.unknown(), // Replaced with specific schema per endpoint
+          meta: z.object({
+            requestId: z.string(),
+            timestamp: z.string().datetime(),
+          }).optional(),
+        })
+    list:
+      name: ListResponseSchema
+      zod: |
+        z.object({
+          success: z.literal(true),
+          data: z.array(z.unknown()), // Replaced with specific schema per endpoint
+          meta: z.object({
+            pagination: PaginationMetaSchema,
+            requestId: z.string(),
+            timestamp: z.string().datetime(),
+          }),
+        })
+
+  # ---------------------------------------------------------------------------
+  # ENTITY SCHEMAS
+  # ---------------------------------------------------------------------------
+  project:
+    base:
+      name: ProjectBaseSchema
+      zod: |
+        z.object({
+          id: z.string().cuid(),
+          title: z.string().min(1).max(200),
+          slug: z.string().regex(/^[a-z0-9-]+$/).min(1).max(100),
+          summary: z.string().min(1).max(500),
+          category: z.enum(['WEB', 'MOBILE', 'BACKEND', 'DEVOPS', 'ML', 'OTHER']),
+          thumbnailUrl: z.string().url().nullable(),
+          featured: z.boolean().default(false),
+          visible: z.boolean().default(true),
+          order: z.number().int().default(0),
+          createdAt: z.string().datetime(),
+          updatedAt: z.string().datetime(),
+        })
+    create:
+      name: ProjectCreateSchema
+      zod: |
+        z.object({
+          title: z.string().min(1).max(200),
+          slug: z.string().regex(/^[a-z0-9-]+$/).min(1).max(100),
+          summary: z.string().min(1).max(500),
+          category: z.enum(['WEB', 'MOBILE', 'BACKEND', 'DEVOPS', 'ML', 'OTHER']),
+          thumbnailUrl: z.string().url().nullable().optional(),
+          featured: z.boolean().optional().default(false),
+          visible: z.boolean().optional().default(true),
+          order: z.number().int().optional().default(0),
+        })
+    update:
+      name: ProjectUpdateSchema
+      zod: |
+        z.object({
+          title: z.string().min(1).max(200).optional(),
+          slug: z.string().regex(/^[a-z0-9-]+$/).min(1).max(100).optional(),
+          summary: z.string().min(1).max(500).optional(),
+          category: z.enum(['WEB', 'MOBILE', 'BACKEND', 'DEVOPS', 'ML', 'OTHER']).optional(),
+          thumbnailUrl: z.string().url().nullable().optional(),
+          featured: z.boolean().optional(),
+          visible: z.boolean().optional(),
+          order: z.number().int().optional(),
+        })
+
+  project_context:
+    base:
+      name: ProjectContextBaseSchema
+      zod: |
+        z.object({
+          id: z.string().cuid(),
+          projectId: z.string().cuid(),
+          type: z.enum([
+            'CONTEXT',
+            'ROLE',
+            'DECISIONS',
+            'TRADEOFFS',
+            'RESULT',
+            'ARCHITECTURE',
+            'OPERATIONS',
+            'METRICS',
+          ]),
+          content: z.string().min(1).max(50000),
+          order: z.number().int().default(0),
+          createdAt: z.string().datetime(),
+          updatedAt: z.string().datetime(),
+        })
+    create:
+      name: ProjectContextCreateSchema
+      zod: |
+        z.object({
+          projectId: z.string().cuid(),
+          type: z.enum([
+            'CONTEXT',
+            'ROLE',
+            'DECISIONS',
+            'TRADEOFFS',
+            'RESULT',
+            'ARCHITECTURE',
+            'OPERATIONS',
+            'METRICS',
+          ]),
+          content: z.string().min(1).max(50000),
+          order: z.number().int().optional().default(0),
+        })
+    update:
+      name: ProjectContextUpdateSchema
+      zod: |
+        z.object({
+          type: z.enum([
+            'CONTEXT',
+            'ROLE',
+            'DECISIONS',
+            'TRADEOFFS',
+            'RESULT',
+            'ARCHITECTURE',
+            'OPERATIONS',
+            'METRICS',
+          ]).optional(),
+          content: z.string().min(1).max(50000).optional(),
+          order: z.number().int().optional(),
+        })
+
+  blog_link:
+    base:
+      name: BlogLinkBaseSchema
+      zod: |
+        z.object({
+          id: z.string().cuid(),
+          url: z.string().url(),
+          title: z.string().min(1).max(200),
+          description: z.string().max(500).nullable(),
+          thumbnailUrl: z.string().url().nullable(),
+          source: z.string().max(100).nullable(),
+          publishedAt: z.string().datetime().nullable(),
+          visible: z.boolean().default(true),
+          order: z.number().int().default(0),
+          createdAt: z.string().datetime(),
+          updatedAt: z.string().datetime(),
+        })
+    create:
+      name: BlogLinkCreateSchema
+      zod: |
+        z.object({
+          url: z.string().url(),
+          title: z.string().min(1).max(200).optional(),
+          description: z.string().max(500).nullable().optional(),
+          thumbnailUrl: z.string().url().nullable().optional(),
+          source: z.string().max(100).nullable().optional(),
+          publishedAt: z.string().datetime().nullable().optional(),
+          visible: z.boolean().optional().default(true),
+          order: z.number().int().optional().default(0),
+        })
+    update:
+      name: BlogLinkUpdateSchema
+      zod: |
+        z.object({
+          url: z.string().url().optional(),
+          title: z.string().min(1).max(200).optional(),
+          description: z.string().max(500).nullable().optional(),
+          thumbnailUrl: z.string().url().nullable().optional(),
+          source: z.string().max(100).nullable().optional(),
+          publishedAt: z.string().datetime().nullable().optional(),
+          visible: z.boolean().optional(),
+          order: z.number().int().optional(),
+        })
+
+  guestbook:
+    base:
+      name: GuestbookEntryBaseSchema
+      zod: |
+        z.object({
+          id: z.string().cuid(),
+          userId: z.string().cuid(),
+          message: z.string().min(1).max(1000),
+          visible: z.boolean().default(true),
+          createdAt: z.string().datetime(),
+          updatedAt: z.string().datetime(),
+          user: z.object({
+            id: z.string().cuid(),
+            name: z.string().nullable(),
+            image: z.string().url().nullable(),
+          }),
+          reactions: z.array(z.object({
+            type: z.string(),
+            count: z.number().int(),
+          })).optional(),
+        })
+    create:
+      name: GuestbookEntryCreateSchema
+      zod: |
+        z.object({
+          message: z.string().min(1).max(1000).trim(),
+        })
+    update:
+      name: GuestbookEntryUpdateSchema
+      zod: |
+        z.object({
+          message: z.string().min(1).max(1000).trim().optional(),
+          visible: z.boolean().optional(),
+        })
+    reaction:
+      name: GuestbookReactionSchema
+      zod: |
+        z.object({
+          type: z.enum(['LIKE', 'HEART', 'FIRE', 'CLAP', 'LAUGH']),
+        })
+
+  anonymous_message:
+    base:
+      name: AnonymousMessageBaseSchema
+      zod: |
+        z.object({
+          id: z.string().cuid(),
+          content: z.string().min(1).max(1000),
+          ipHash: z.string(),
+          isRead: z.boolean().default(false),
+          createdAt: z.string().datetime(),
+        })
+    create:
+      name: AnonymousMessageCreateSchema
+      zod: |
+        z.object({
+          content: z.string().min(1).max(1000).trim(),
+        })
+
+  chat_log:
+    base:
+      name: ChatLogBaseSchema
+      zod: |
+        z.object({
+          id: z.string().cuid(),
+          sessionId: z.string(),
+          messages: z.array(z.object({
+            role: z.enum(['user', 'assistant', 'system']),
+            content: z.string(),
+            timestamp: z.string().datetime(),
+          })),
+          ipHash: z.string().nullable(),
+          userAgent: z.string().nullable(),
+          createdAt: z.string().datetime(),
+          updatedAt: z.string().datetime(),
+        })
+    create:
+      name: ChatLogCreateSchema
+      zod: |
+        z.object({
+          sessionId: z.string().min(1),
+          messages: z.array(z.object({
+            role: z.enum(['user', 'assistant', 'system']),
+            content: z.string(),
+            timestamp: z.string().datetime(),
+          })).min(1),
+          ipHash: z.string().nullable().optional(),
+          userAgent: z.string().nullable().optional(),
+        })
+
+  profile_link:
+    base:
+      name: ProfileLinkBaseSchema
+      zod: |
+        z.object({
+          id: z.string().cuid(),
+          label: z.string().min(1).max(100),
+          url: z.string().url(),
+          icon: z.string().max(50).nullable(),
+          visible: z.boolean().default(true),
+          order: z.number().int().default(0),
+          createdAt: z.string().datetime(),
+          updatedAt: z.string().datetime(),
+        })
+    create:
+      name: ProfileLinkCreateSchema
+      zod: |
+        z.object({
+          label: z.string().min(1).max(100),
+          url: z.string().url(),
+          icon: z.string().max(50).nullable().optional(),
+          visible: z.boolean().optional().default(true),
+          order: z.number().int().optional().default(0),
+        })
+    update:
+      name: ProfileLinkUpdateSchema
+      zod: |
+        z.object({
+          label: z.string().min(1).max(100).optional(),
+          url: z.string().url().optional(),
+          icon: z.string().max(50).nullable().optional(),
+          visible: z.boolean().optional(),
+          order: z.number().int().optional(),
+        })
+
+  knowledge_doc:
+    base:
+      name: KnowledgeDocBaseSchema
+      zod: |
+        z.object({
+          id: z.string().cuid(),
+          title: z.string().min(1).max(200),
+          content: z.string().min(1).max(100000),
+          contentType: z.enum(['TEXT', 'MARKDOWN', 'HTML']),
+          source: z.string().max(500).nullable(),
+          indexed: z.boolean().default(false),
+          indexedAt: z.string().datetime().nullable(),
+          createdAt: z.string().datetime(),
+          updatedAt: z.string().datetime(),
+        })
+    create:
+      name: KnowledgeDocCreateSchema
+      zod: |
+        z.object({
+          title: z.string().min(1).max(200),
+          content: z.string().min(1).max(100000),
+          contentType: z.enum(['TEXT', 'MARKDOWN', 'HTML']).default('MARKDOWN'),
+          source: z.string().max(500).nullable().optional(),
+        })
+    update:
+      name: KnowledgeDocUpdateSchema
+      zod: |
+        z.object({
+          title: z.string().min(1).max(200).optional(),
+          content: z.string().min(1).max(100000).optional(),
+          contentType: z.enum(['TEXT', 'MARKDOWN', 'HTML']).optional(),
+          source: z.string().max(500).nullable().optional(),
+        })
+
+# =============================================================================
+# ENDPOINT CATALOG
+# =============================================================================
+
+endpoints:
+
+  # ---------------------------------------------------------------------------
+  # PUBLIC ENDPOINTS - /api/public/*
+  # ---------------------------------------------------------------------------
+
+  # Projects - Public Read
+  - namespace: public
+    resource: projects
+    endpoints:
+      - method: GET
+        path: /api/public/projects
+        summary: List visible projects
+        auth: none
+        rate_limit:
+          requests: 100
+          window: 60s
+        request:
+          query:
+            schema: |
+              PaginationQuerySchema.extend({
+                category: z.enum(['WEB', 'MOBILE', 'BACKEND', 'DEVOPS', 'ML', 'OTHER']).optional(),
+                featured: z.coerce.boolean().optional(),
+              })
+        response:
+          status: 200
+          schema: "ListResponseSchema.extend({ data: z.array(ProjectBaseSchema) })"
+          example:
+            success: true
+            data:
+              - id: "clx1234567890abcdef"
+                title: "E-Commerce Platform"
+                slug: "ecommerce-platform"
+                summary: "Full-stack e-commerce solution with Next.js"
+                category: "WEB"
+                thumbnailUrl: "https://example.com/thumb.jpg"
+                featured: true
+                visible: true
+                order: 0
+                createdAt: "2024-01-15T10:30:00.000Z"
+                updatedAt: "2024-01-20T14:22:00.000Z"
+            meta:
+              pagination:
+                page: 1
+                limit: 10
+                total: 25
+                totalPages: 3
+                hasNext: true
+                hasPrev: false
+              requestId: "req_abc123"
+              timestamp: "2024-01-20T15:00:00.000Z"
+        errors:
+          - code: VALIDATION_ERROR
+            status: 400
+            description: Invalid query parameters
+          - code: RATE_LIMIT_EXCEEDED
+            status: 429
+            description: Too many requests
+
+      - method: GET
+        path: /api/public/projects/:slug
+        summary: Get project by slug with contexts
+        auth: none
+        rate_limit:
+          requests: 100
+          window: 60s
+        request:
+          params:
+            slug:
+              type: string
+              required: true
+              pattern: "^[a-z0-9-]+$"
+        response:
+          status: 200
+          schema: |
+            SingleResponseSchema.extend({
+              data: ProjectBaseSchema.extend({
+                contexts: z.array(ProjectContextBaseSchema),
+              }),
+            })
+        errors:
+          - code: NOT_FOUND
+            status: 404
+            description: Project not found or not visible
+
+  # Blog Links - Public Read
+  - namespace: public
+    resource: blogs
+    endpoints:
+      - method: GET
+        path: /api/public/blogs
+        summary: List visible blog links
+        auth: none
+        rate_limit:
+          requests: 100
+          window: 60s
+        request:
+          query:
+            schema: PaginationQuerySchema
+        response:
+          status: 200
+          schema: "ListResponseSchema.extend({ data: z.array(BlogLinkBaseSchema) })"
+        errors:
+          - code: VALIDATION_ERROR
+            status: 400
+
+  # Guestbook - Public Read
+  - namespace: public
+    resource: guestbook
+    endpoints:
+      - method: GET
+        path: /api/public/guestbook
+        summary: List visible guestbook entries
+        auth: none
+        rate_limit:
+          requests: 100
+          window: 60s
+        request:
+          query:
+            schema: PaginationQuerySchema
+        response:
+          status: 200
+          schema: "ListResponseSchema.extend({ data: z.array(GuestbookEntryBaseSchema) })"
+
+  # Profile Links - Public Read
+  - namespace: public
+    resource: links
+    endpoints:
+      - method: GET
+        path: /api/public/links
+        summary: List visible profile links
+        auth: none
+        rate_limit:
+          requests: 100
+          window: 60s
+        response:
+          status: 200
+          schema: "ListResponseSchema.extend({ data: z.array(ProfileLinkBaseSchema) })"
+
+  # ---------------------------------------------------------------------------
+  # PUBLIC WRITE ENDPOINTS - /api/public-write/*
+  # ---------------------------------------------------------------------------
+
+  # Guestbook - Public Write
+  - namespace: public_write
+    resource: guestbook
+    endpoints:
+      - method: POST
+        path: /api/public-write/guestbook
+        summary: Create guestbook entry (requires user auth)
+        auth: required
+        required_role: user
+        rate_limit:
+          requests: 5
+          window: 3600s # 1 hour
+          by: user_id
+        request:
+          body:
+            schema: GuestbookEntryCreateSchema
+            example:
+              message: "Great portfolio! Love the design."
+        response:
+          status: 201
+          schema: "SingleResponseSchema.extend({ data: GuestbookEntryBaseSchema })"
+        errors:
+          - code: UNAUTHORIZED
+            status: 401
+            description: User not authenticated
+          - code: VALIDATION_ERROR
+            status: 400
+            description: Invalid message format
+          - code: RATE_LIMIT_EXCEEDED
+            status: 429
+            description: Too many submissions
+
+      - method: POST
+        path: /api/public-write/guestbook/:id/reactions
+        summary: Add reaction to guestbook entry
+        auth: required
+        required_role: user
+        rate_limit:
+          requests: 30
+          window: 60s
+          by: user_id
+        request:
+          params:
+            id:
+              type: string
+              required: true
+          body:
+            schema: GuestbookReactionSchema
+        response:
+          status: 200
+          schema: |
+            SingleResponseSchema.extend({
+              data: z.object({
+                entryId: z.string().cuid(),
+                reactions: z.array(z.object({
+                  type: z.string(),
+                  count: z.number().int(),
+                })),
+              }),
+            })
+
+  # Anonymous Messages - Public Write
+  - namespace: public_write
+    resource: messages
+    endpoints:
+      - method: POST
+        path: /api/public-write/messages
+        summary: Submit anonymous message
+        auth: none
+        rate_limit:
+          requests: 5
+          window: 3600s # 1 hour
+          by: ip
+        request:
+          body:
+            schema: AnonymousMessageCreateSchema
+            example:
+              content: "Just wanted to say your projects are inspiring!"
+        response:
+          status: 201
+          schema: |
+            SingleResponseSchema.extend({
+              data: z.object({
+                message: z.literal('Message submitted successfully'),
+              }),
+            })
+        errors:
+          - code: VALIDATION_ERROR
+            status: 400
+            description: Invalid message content
+          - code: RATE_LIMIT_EXCEEDED
+            status: 429
+            description: Too many submissions from this IP
+
+  # ---------------------------------------------------------------------------
+  # USER ENDPOINTS - /api/user/*
+  # ---------------------------------------------------------------------------
+
+  - namespace: user
+    resource: profile
+    endpoints:
+      - method: GET
+        path: /api/user/me
+        summary: Get current user profile
+        auth: required
+        required_role: user
+        response:
+          status: 200
+          schema: |
+            SingleResponseSchema.extend({
+              data: z.object({
+                id: z.string().cuid(),
+                name: z.string().nullable(),
+                email: z.string().email(),
+                image: z.string().url().nullable(),
+                role: z.enum(['user', 'admin']),
+              }),
+            })
+
+      - method: GET
+        path: /api/user/guestbook
+        summary: Get current user's guestbook entries
+        auth: required
+        required_role: user
+        response:
+          status: 200
+          schema: "ListResponseSchema.extend({ data: z.array(GuestbookEntryBaseSchema) })"
+
+      - method: DELETE
+        path: /api/user/guestbook/:id
+        summary: Delete own guestbook entry
+        auth: required
+        required_role: user
+        request:
+          params:
+            id:
+              type: string
+              required: true
+        response:
+          status: 200
+          schema: |
+            SingleResponseSchema.extend({
+              data: z.object({ deleted: z.boolean() }),
+            })
+        errors:
+          - code: FORBIDDEN
+            status: 403
+            description: Cannot delete entry owned by another user
+
+  # ---------------------------------------------------------------------------
+  # ADMIN ENDPOINTS - /api/admin/*
+  # ---------------------------------------------------------------------------
+
+  # Projects - Admin CRUD
+  - namespace: admin
+    resource: projects
+    endpoints:
+      - method: GET
+        path: /api/admin/projects
+        summary: List all projects (including hidden)
+        auth: required
+        required_role: admin
+        request:
+          query:
+            schema: |
+              PaginationQuerySchema.extend({
+                category: z.enum(['WEB', 'MOBILE', 'BACKEND', 'DEVOPS', 'ML', 'OTHER']).optional(),
+                visible: z.coerce.boolean().optional(),
+                featured: z.coerce.boolean().optional(),
+                search: z.string().optional(),
+              })
+        response:
+          status: 200
+          schema: |
+            ListResponseSchema.extend({
+              data: z.array(ProjectBaseSchema.extend({
+                _count: z.object({
+                  contexts: z.number().int(),
+                }).optional(),
+              })),
+            })
+
+      - method: GET
+        path: /api/admin/projects/:id
+        summary: Get project by ID
+        auth: required
+        required_role: admin
+        request:
+          params:
+            id:
+              type: string
+              required: true
+        response:
+          status: 200
+          schema: |
+            SingleResponseSchema.extend({
+              data: ProjectBaseSchema.extend({
+                contexts: z.array(ProjectContextBaseSchema),
+              }),
+            })
+
+      - method: POST
+        path: /api/admin/projects
+        summary: Create new project
+        auth: required
+        required_role: admin
+        request:
+          body:
+            schema: ProjectCreateSchema
+        response:
+          status: 201
+          schema: "SingleResponseSchema.extend({ data: ProjectBaseSchema })"
+        errors:
+          - code: CONFLICT
+            status: 409
+            description: Slug already exists
+
+      - method: PUT
+        path: /api/admin/projects/:id
+        summary: Update project
+        auth: required
+        required_role: admin
+        request:
+          params:
+            id:
+              type: string
+              required: true
+          body:
+            schema: ProjectUpdateSchema
+        response:
+          status: 200
+          schema: "SingleResponseSchema.extend({ data: ProjectBaseSchema })"
+        errors:
+          - code: NOT_FOUND
+            status: 404
+          - code: CONFLICT
+            status: 409
+            description: Slug already exists
+
+      - method: DELETE
+        path: /api/admin/projects/:id
+        summary: Delete project and all contexts
+        auth: required
+        required_role: admin
+        request:
+          params:
+            id:
+              type: string
+              required: true
+        response:
+          status: 200
+          schema: |
+            SingleResponseSchema.extend({
+              data: z.object({ deleted: z.boolean() }),
+            })
+        errors:
+          - code: NOT_FOUND
+            status: 404
+
+      - method: POST
+        path: /api/admin/projects/reorder
+        summary: Bulk reorder projects
+        auth: required
+        required_role: admin
+        request:
+          body:
+            schema: |
+              z.object({
+                items: z.array(z.object({
+                  id: z.string().cuid(),
+                  order: z.number().int(),
+                })),
+              })
+        response:
+          status: 200
+          schema: |
+            SingleResponseSchema.extend({
+              data: z.object({ updated: z.number().int() }),
+            })
+
+  # Project Contexts - Admin CRUD
+  - namespace: admin
+    resource: contexts
+    endpoints:
+      - method: GET
+        path: /api/admin/contexts
+        summary: List contexts (optionally by project)
+        auth: required
+        required_role: admin
+        request:
+          query:
+            schema: |
+              PaginationQuerySchema.extend({
+                projectId: z.string().cuid().optional(),
+                type: z.enum([
+                  'CONTEXT', 'ROLE', 'DECISIONS', 'TRADEOFFS',
+                  'RESULT', 'ARCHITECTURE', 'OPERATIONS', 'METRICS',
+                ]).optional(),
+              })
+        response:
+          status: 200
+          schema: "ListResponseSchema.extend({ data: z.array(ProjectContextBaseSchema) })"
+
+      - method: GET
+        path: /api/admin/contexts/:id
+        summary: Get context by ID
+        auth: required
+        required_role: admin
+        request:
+          params:
+            id:
+              type: string
+              required: true
+        response:
+          status: 200
+          schema: "SingleResponseSchema.extend({ data: ProjectContextBaseSchema })"
+
+      - method: POST
+        path: /api/admin/contexts
+        summary: Create context section
+        auth: required
+        required_role: admin
+        request:
+          body:
+            schema: ProjectContextCreateSchema
+        response:
+          status: 201
+          schema: "SingleResponseSchema.extend({ data: ProjectContextBaseSchema })"
+        errors:
+          - code: NOT_FOUND
+            status: 404
+            description: Project not found
+
+      - method: PUT
+        path: /api/admin/contexts/:id
+        summary: Update context section
+        auth: required
+        required_role: admin
+        request:
+          params:
+            id:
+              type: string
+              required: true
+          body:
+            schema: ProjectContextUpdateSchema
+        response:
+          status: 200
+          schema: "SingleResponseSchema.extend({ data: ProjectContextBaseSchema })"
+
+      - method: DELETE
+        path: /api/admin/contexts/:id
+        summary: Delete context section
+        auth: required
+        required_role: admin
+        request:
+          params:
+            id:
+              type: string
+              required: true
+        response:
+          status: 200
+          schema: |
+            SingleResponseSchema.extend({
+              data: z.object({ deleted: z.boolean() }),
+            })
+
+      - method: POST
+        path: /api/admin/contexts/reorder
+        summary: Bulk reorder contexts within a project
+        auth: required
+        required_role: admin
+        request:
+          body:
+            schema: |
+              z.object({
+                projectId: z.string().cuid(),
+                items: z.array(z.object({
+                  id: z.string().cuid(),
+                  order: z.number().int(),
+                })),
+              })
+        response:
+          status: 200
+          schema: |
+            SingleResponseSchema.extend({
+              data: z.object({ updated: z.number().int() }),
+            })
+
+  # Blog Links - Admin CRUD
+  - namespace: admin
+    resource: blogs
+    endpoints:
+      - method: GET
+        path: /api/admin/blogs
+        summary: List all blog links
+        auth: required
+        required_role: admin
+        request:
+          query:
+            schema: |
+              PaginationQuerySchema.extend({
+                visible: z.coerce.boolean().optional(),
+                search: z.string().optional(),
+              })
+        response:
+          status: 200
+          schema: "ListResponseSchema.extend({ data: z.array(BlogLinkBaseSchema) })"
+
+      - method: GET
+        path: /api/admin/blogs/:id
+        summary: Get blog link by ID
+        auth: required
+        required_role: admin
+        response:
+          status: 200
+          schema: "SingleResponseSchema.extend({ data: BlogLinkBaseSchema })"
+
+      - method: POST
+        path: /api/admin/blogs
+        summary: Create blog link (auto-fetches metadata)
+        auth: required
+        required_role: admin
+        request:
+          body:
+            schema: BlogLinkCreateSchema
+        response:
+          status: 201
+          schema: "SingleResponseSchema.extend({ data: BlogLinkBaseSchema })"
+
+      - method: PUT
+        path: /api/admin/blogs/:id
+        summary: Update blog link
+        auth: required
+        required_role: admin
+        request:
+          body:
+            schema: BlogLinkUpdateSchema
+        response:
+          status: 200
+          schema: "SingleResponseSchema.extend({ data: BlogLinkBaseSchema })"
+
+      - method: DELETE
+        path: /api/admin/blogs/:id
+        summary: Delete blog link
+        auth: required
+        required_role: admin
+        response:
+          status: 200
+          schema: |
+            SingleResponseSchema.extend({
+              data: z.object({ deleted: z.boolean() }),
+            })
+
+      - method: POST
+        path: /api/admin/blogs/:id/refresh
+        summary: Refresh metadata from URL
+        auth: required
+        required_role: admin
+        response:
+          status: 200
+          schema: "SingleResponseSchema.extend({ data: BlogLinkBaseSchema })"
+
+      - method: POST
+        path: /api/admin/blogs/reorder
+        summary: Bulk reorder blog links
+        auth: required
+        required_role: admin
+        request:
+          body:
+            schema: |
+              z.object({
+                items: z.array(z.object({
+                  id: z.string().cuid(),
+                  order: z.number().int(),
+                })),
+              })
+        response:
+          status: 200
+          schema: |
+            SingleResponseSchema.extend({
+              data: z.object({ updated: z.number().int() }),
+            })
+
+  # Guestbook - Admin CRUD
+  - namespace: admin
+    resource: guestbook
+    endpoints:
+      - method: GET
+        path: /api/admin/guestbook
+        summary: List all guestbook entries
+        auth: required
+        required_role: admin
+        request:
+          query:
+            schema: |
+              PaginationQuerySchema.extend({
+                visible: z.coerce.boolean().optional(),
+                userId: z.string().cuid().optional(),
+              })
+        response:
+          status: 200
+          schema: "ListResponseSchema.extend({ data: z.array(GuestbookEntryBaseSchema) })"
+
+      - method: GET
+        path: /api/admin/guestbook/:id
+        summary: Get guestbook entry by ID
+        auth: required
+        required_role: admin
+        response:
+          status: 200
+          schema: "SingleResponseSchema.extend({ data: GuestbookEntryBaseSchema })"
+
+      - method: PATCH
+        path: /api/admin/guestbook/:id
+        summary: Update guestbook entry (visibility)
+        auth: required
+        required_role: admin
+        request:
+          body:
+            schema: |
+              z.object({
+                visible: z.boolean(),
+              })
+        response:
+          status: 200
+          schema: "SingleResponseSchema.extend({ data: GuestbookEntryBaseSchema })"
+
+      - method: DELETE
+        path: /api/admin/guestbook/:id
+        summary: Delete guestbook entry
+        auth: required
+        required_role: admin
+        response:
+          status: 200
+          schema: |
+            SingleResponseSchema.extend({
+              data: z.object({ deleted: z.boolean() }),
+            })
+
+      - method: POST
+        path: /api/admin/guestbook/bulk
+        summary: Bulk update visibility
+        auth: required
+        required_role: admin
+        request:
+          body:
+            schema: |
+              z.object({
+                ids: z.array(z.string().cuid()),
+                visible: z.boolean(),
+              })
+        response:
+          status: 200
+          schema: |
+            SingleResponseSchema.extend({
+              data: z.object({ updated: z.number().int() }),
+            })
+
+  # Anonymous Messages - Admin Read
+  - namespace: admin
+    resource: messages
+    endpoints:
+      - method: GET
+        path: /api/admin/messages
+        summary: List anonymous messages
+        auth: required
+        required_role: admin
+        request:
+          query:
+            schema: |
+              PaginationQuerySchema.extend({
+                isRead: z.coerce.boolean().optional(),
+              })
+        response:
+          status: 200
+          schema: "ListResponseSchema.extend({ data: z.array(AnonymousMessageBaseSchema) })"
+
+      - method: GET
+        path: /api/admin/messages/:id
+        summary: Get anonymous message by ID
+        auth: required
+        required_role: admin
+        response:
+          status: 200
+          schema: "SingleResponseSchema.extend({ data: AnonymousMessageBaseSchema })"
+
+      - method: PATCH
+        path: /api/admin/messages/:id
+        summary: Mark message as read/unread
+        auth: required
+        required_role: admin
+        request:
+          body:
+            schema: |
+              z.object({
+                isRead: z.boolean(),
+              })
+        response:
+          status: 200
+          schema: "SingleResponseSchema.extend({ data: AnonymousMessageBaseSchema })"
+
+      - method: DELETE
+        path: /api/admin/messages/:id
+        summary: Delete anonymous message
+        auth: required
+        required_role: admin
+        response:
+          status: 200
+          schema: |
+            SingleResponseSchema.extend({
+              data: z.object({ deleted: z.boolean() }),
+            })
+
+      - method: POST
+        path: /api/admin/messages/bulk-read
+        summary: Bulk mark messages as read
+        auth: required
+        required_role: admin
+        request:
+          body:
+            schema: |
+              z.object({
+                ids: z.array(z.string().cuid()),
+              })
+        response:
+          status: 200
+          schema: |
+            SingleResponseSchema.extend({
+              data: z.object({ updated: z.number().int() }),
+            })
+
+      - method: GET
+        path: /api/admin/messages/stats
+        summary: Get message statistics
+        auth: required
+        required_role: admin
+        response:
+          status: 200
+          schema: |
+            SingleResponseSchema.extend({
+              data: z.object({
+                total: z.number().int(),
+                unread: z.number().int(),
+                todayCount: z.number().int(),
+              }),
+            })
+
+  # Chat Logs - Admin Read
+  - namespace: admin
+    resource: chat-logs
+    endpoints:
+      - method: GET
+        path: /api/admin/chat-logs
+        summary: List chat logs
+        auth: required
+        required_role: admin
+        request:
+          query:
+            schema: |
+              PaginationQuerySchema.extend({
+                sessionId: z.string().optional(),
+                dateFrom: z.string().datetime().optional(),
+                dateTo: z.string().datetime().optional(),
+              })
+        response:
+          status: 200
+          schema: "ListResponseSchema.extend({ data: z.array(ChatLogBaseSchema) })"
+
+      - method: GET
+        path: /api/admin/chat-logs/:id
+        summary: Get chat log by ID
+        auth: required
+        required_role: admin
+        response:
+          status: 200
+          schema: "SingleResponseSchema.extend({ data: ChatLogBaseSchema })"
+
+      - method: GET
+        path: /api/admin/chat-logs/session/:sessionId
+        summary: Get all logs for a session
+        auth: required
+        required_role: admin
+        response:
+          status: 200
+          schema: "ListResponseSchema.extend({ data: z.array(ChatLogBaseSchema) })"
+
+      - method: DELETE
+        path: /api/admin/chat-logs/:id
+        summary: Delete chat log
+        auth: required
+        required_role: admin
+        response:
+          status: 200
+          schema: |
+            SingleResponseSchema.extend({
+              data: z.object({ deleted: z.boolean() }),
+            })
+
+      - method: DELETE
+        path: /api/admin/chat-logs/session/:sessionId
+        summary: Delete all logs for a session
+        auth: required
+        required_role: admin
+        response:
+          status: 200
+          schema: |
+            SingleResponseSchema.extend({
+              data: z.object({ deleted: z.number().int() }),
+            })
+
+      - method: GET
+        path: /api/admin/chat-logs/stats
+        summary: Get chat statistics
+        auth: required
+        required_role: admin
+        response:
+          status: 200
+          schema: |
+            SingleResponseSchema.extend({
+              data: z.object({
+                totalSessions: z.number().int(),
+                totalMessages: z.number().int(),
+                averageMessagesPerSession: z.number(),
+                sessionsToday: z.number().int(),
+              }),
+            })
+
+  # Profile Links - Admin CRUD
+  - namespace: admin
+    resource: links
+    endpoints:
+      - method: GET
+        path: /api/admin/links
+        summary: List all profile links
+        auth: required
+        required_role: admin
+        request:
+          query:
+            schema: |
+              PaginationQuerySchema.extend({
+                visible: z.coerce.boolean().optional(),
+              })
+        response:
+          status: 200
+          schema: "ListResponseSchema.extend({ data: z.array(ProfileLinkBaseSchema) })"
+
+      - method: GET
+        path: /api/admin/links/:id
+        summary: Get profile link by ID
+        auth: required
+        required_role: admin
+        response:
+          status: 200
+          schema: "SingleResponseSchema.extend({ data: ProfileLinkBaseSchema })"
+
+      - method: POST
+        path: /api/admin/links
+        summary: Create profile link
+        auth: required
+        required_role: admin
+        request:
+          body:
+            schema: ProfileLinkCreateSchema
+        response:
+          status: 201
+          schema: "SingleResponseSchema.extend({ data: ProfileLinkBaseSchema })"
+
+      - method: PUT
+        path: /api/admin/links/:id
+        summary: Update profile link
+        auth: required
+        required_role: admin
+        request:
+          body:
+            schema: ProfileLinkUpdateSchema
+        response:
+          status: 200
+          schema: "SingleResponseSchema.extend({ data: ProfileLinkBaseSchema })"
+
+      - method: DELETE
+        path: /api/admin/links/:id
+        summary: Delete profile link
+        auth: required
+        required_role: admin
+        response:
+          status: 200
+          schema: |
+            SingleResponseSchema.extend({
+              data: z.object({ deleted: z.boolean() }),
+            })
+
+      - method: POST
+        path: /api/admin/links/reorder
+        summary: Bulk reorder profile links
+        auth: required
+        required_role: admin
+        request:
+          body:
+            schema: |
+              z.object({
+                items: z.array(z.object({
+                  id: z.string().cuid(),
+                  order: z.number().int(),
+                })),
+              })
+        response:
+          status: 200
+          schema: |
+            SingleResponseSchema.extend({
+              data: z.object({ updated: z.number().int() }),
+            })
+
+  # Knowledge Documents - Admin CRUD
+  - namespace: admin
+    resource: knowledge
+    endpoints:
+      - method: GET
+        path: /api/admin/knowledge
+        summary: List knowledge documents
+        auth: required
+        required_role: admin
+        request:
+          query:
+            schema: |
+              PaginationQuerySchema.extend({
+                indexed: z.coerce.boolean().optional(),
+                search: z.string().optional(),
+              })
+        response:
+          status: 200
+          schema: "ListResponseSchema.extend({ data: z.array(KnowledgeDocBaseSchema) })"
+
+      - method: GET
+        path: /api/admin/knowledge/:id
+        summary: Get knowledge document by ID
+        auth: required
+        required_role: admin
+        response:
+          status: 200
+          schema: "SingleResponseSchema.extend({ data: KnowledgeDocBaseSchema })"
+
+      - method: POST
+        path: /api/admin/knowledge
+        summary: Create knowledge document
+        auth: required
+        required_role: admin
+        request:
+          body:
+            schema: KnowledgeDocCreateSchema
+        response:
+          status: 201
+          schema: "SingleResponseSchema.extend({ data: KnowledgeDocBaseSchema })"
+
+      - method: PUT
+        path: /api/admin/knowledge/:id
+        summary: Update knowledge document
+        auth: required
+        required_role: admin
+        request:
+          body:
+            schema: KnowledgeDocUpdateSchema
+        response:
+          status: 200
+          schema: "SingleResponseSchema.extend({ data: KnowledgeDocBaseSchema })"
+
+      - method: DELETE
+        path: /api/admin/knowledge/:id
+        summary: Delete knowledge document
+        auth: required
+        required_role: admin
+        response:
+          status: 200
+          schema: |
+            SingleResponseSchema.extend({
+              data: z.object({ deleted: z.boolean() }),
+            })
+
+      - method: POST
+        path: /api/admin/knowledge/ingest
+        summary: Trigger RAG ingestion for all documents
+        auth: required
+        required_role: admin
+        response:
+          status: 202
+          schema: |
+            SingleResponseSchema.extend({
+              data: z.object({
+                jobId: z.string(),
+                status: z.literal('queued'),
+                documentsCount: z.number().int(),
+              }),
+            })
+
+      - method: POST
+        path: /api/admin/knowledge/:id/ingest
+        summary: Trigger RAG ingestion for single document
+        auth: required
+        required_role: admin
+        response:
+          status: 202
+          schema: |
+            SingleResponseSchema.extend({
+              data: z.object({
+                jobId: z.string(),
+                status: z.literal('queued'),
+              }),
+            })
+
+  # ---------------------------------------------------------------------------
+  # INTERNAL ENDPOINTS - /api/internal/*
+  # ---------------------------------------------------------------------------
+
+  # Chat Logs - Internal Write
+  - namespace: internal
+    resource: chat-logs
+    endpoints:
+      - method: POST
+        path: /api/internal/chat-logs
+        summary: Store chat log from RAG service
+        auth: service_token
+        rate_limit:
+          requests: 1000
+          window: 60s
+        request:
+          headers:
+            X-Service-Token:
+              type: string
+              required: true
+          body:
+            schema: ChatLogCreateSchema
+        response:
+          status: 201
+          schema: |
+            SingleResponseSchema.extend({
+              data: z.object({
+                id: z.string().cuid(),
+                sessionId: z.string(),
+              }),
+            })
+        errors:
+          - code: UNAUTHORIZED
+            status: 401
+            description: Invalid or missing service token
+
+  # Content Export - Internal Read
+  - namespace: internal
+    resource: content
+    endpoints:
+      - method: GET
+        path: /api/internal/content
+        summary: Export all content for RAG ingestion
+        auth: service_token
+        rate_limit:
+          requests: 10
+          window: 60s
+        request:
+          headers:
+            X-Service-Token:
+              type: string
+              required: true
+          query:
+            schema: |
+              z.object({
+                includeProjects: z.coerce.boolean().default(true),
+                includeKnowledge: z.coerce.boolean().default(true),
+                updatedAfter: z.string().datetime().optional(),
+              })
+        response:
+          status: 200
+          schema: |
+            SingleResponseSchema.extend({
+              data: z.object({
+                projects: z.array(ProjectBaseSchema.extend({
+                  contexts: z.array(ProjectContextBaseSchema),
+                })),
+                knowledgeDocs: z.array(KnowledgeDocBaseSchema),
+                exportedAt: z.string().datetime(),
+              }),
+            })
+
+      - method: GET
+        path: /api/internal/content/projects
+        summary: Export projects for RAG
+        auth: service_token
+        response:
+          status: 200
+          schema: |
+            SingleResponseSchema.extend({
+              data: z.array(ProjectBaseSchema.extend({
+                contexts: z.array(ProjectContextBaseSchema),
+              })),
+            })
+
+      - method: GET
+        path: /api/internal/content/knowledge
+        summary: Export knowledge documents for RAG
+        auth: service_token
+        response:
+          status: 200
+          schema: "SingleResponseSchema.extend({ data: z.array(KnowledgeDocBaseSchema) })"
+
+  # Health Check - Internal
+  - namespace: internal
+    resource: health
+    endpoints:
+      - method: GET
+        path: /api/internal/health
+        summary: Service health check
+        auth: none
+        response:
+          status: 200
+          schema: |
+            z.object({
+              status: z.enum(['healthy', 'degraded', 'unhealthy']),
+              timestamp: z.string().datetime(),
+              version: z.string(),
+              services: z.object({
+                database: z.enum(['connected', 'disconnected']),
+                cache: z.enum(['connected', 'disconnected']).optional(),
+              }),
+              uptime: z.number(),
+            })
+
+# =============================================================================
+# MIDDLEWARE PATTERNS
+# =============================================================================
+
+middleware:
+  # ---------------------------------------------------------------------------
+  # AUTHENTICATION MIDDLEWARE
+  # ---------------------------------------------------------------------------
+  auth:
+    name: withAuth
+    description: Validates session and extracts user information
+    implementation: |
+      import { auth } from '@/auth'
+      import { NextResponse } from 'next/server'
+      
+      export async function withAuth(
+        handler: AuthenticatedHandler,
+        options: { requireAdmin?: boolean } = {}
+      ) {
+        return async (request: Request) => {
+          const session = await auth()
+          
+          if (!session?.user) {
+            return NextResponse.json({
+              success: false,
+              error: {
+                code: 'UNAUTHORIZED',
+                message: 'Authentication required',
+                requestId: crypto.randomUUID(),
+                timestamp: new Date().toISOString(),
+              },
+            }, { status: 401 })
+          }
+          
+          if (options.requireAdmin && session.user.role !== 'admin') {
+            return NextResponse.json({
+              success: false,
+              error: {
+                code: 'FORBIDDEN',
+                message: 'Admin access required',
+                requestId: crypto.randomUUID(),
+                timestamp: new Date().toISOString(),
+              },
+            }, { status: 403 })
+          }
+          
+          return handler(request, { session })
+        }
+      }
+    usage: |
+      export const GET = withAuth(async (req, { session }) => {
+        // Handler code
+      }, { requireAdmin: true })
+
+  # ---------------------------------------------------------------------------
+  # SERVICE TOKEN MIDDLEWARE
+  # ---------------------------------------------------------------------------
+  service_auth:
+    name: withServiceAuth
+    description: Validates internal service token
+    implementation: |
+      import { NextResponse } from 'next/server'
+      
+      export function withServiceAuth(handler: ServiceHandler) {
+        return async (request: Request) => {
+          const token = request.headers.get('X-Service-Token')
+          const expectedToken = process.env.INTERNAL_SERVICE_TOKEN
+          
+          if (!token || token !== expectedToken) {
+            return NextResponse.json({
+              success: false,
+              error: {
+                code: 'UNAUTHORIZED',
+                message: 'Invalid service token',
+                requestId: crypto.randomUUID(),
+                timestamp: new Date().toISOString(),
+              },
+            }, { status: 401 })
+          }
+          
+          return handler(request)
+        }
+      }
+
+  # ---------------------------------------------------------------------------
+  # RATE LIMITING MIDDLEWARE
+  # ---------------------------------------------------------------------------
+  rate_limit:
+    name: withRateLimit
+    description: Enforces rate limiting per IP or user
+    implementation: |
+      import { Ratelimit } from '@upstash/ratelimit'
+      import { Redis } from '@upstash/redis'
+      import { NextResponse } from 'next/server'
+      
+      const redis = new Redis({
+        url: process.env.UPSTASH_REDIS_URL!,
+        token: process.env.UPSTASH_REDIS_TOKEN!,
+      })
+      
+      const createRateLimiter = (requests: number, window: string) =>
+        new Ratelimit({
+          redis,
+          limiter: Ratelimit.slidingWindow(requests, window),
+          analytics: true,
+        })
+      
+      export function withRateLimit(
+        handler: Handler,
+        options: { requests: number; window: string; keyPrefix?: string }
+      ) {
+        const limiter = createRateLimiter(options.requests, options.window)
+        
+        return async (request: Request) => {
+          const ip = request.headers.get('x-forwarded-for') ?? '127.0.0.1'
+          const key = `${options.keyPrefix ?? 'api'}:${ip}`
+          
+          const { success, limit, reset, remaining } = await limiter.limit(key)
+          
+          if (!success) {
+            return NextResponse.json({
+              success: false,
+              error: {
+                code: 'RATE_LIMIT_EXCEEDED',
+                message: 'Too many requests',
+                requestId: crypto.randomUUID(),
+                timestamp: new Date().toISOString(),
+              },
+            }, {
+              status: 429,
+              headers: {
+                'X-RateLimit-Limit': limit.toString(),
+                'X-RateLimit-Remaining': remaining.toString(),
+                'X-RateLimit-Reset': reset.toString(),
+                'Retry-After': Math.ceil((reset - Date.now()) / 1000).toString(),
+              },
+            })
+          }
+          
+          const response = await handler(request)
+          response.headers.set('X-RateLimit-Limit', limit.toString())
+          response.headers.set('X-RateLimit-Remaining', remaining.toString())
+          response.headers.set('X-RateLimit-Reset', reset.toString())
+          
+          return response
+        }
+      }
+    fallback_implementation: |
+      // In-memory rate limiting (for development/no Redis)
+      import { LRUCache } from 'lru-cache'
+      
+      const rateLimitCache = new LRUCache<string, number[]>({
+        max: 10000,
+        ttl: 60000, // 1 minute
+      })
+      
+      export function withInMemoryRateLimit(
+        handler: Handler,
+        options: { requests: number; windowMs: number }
+      ) {
+        return async (request: Request) => {
+          const ip = request.headers.get('x-forwarded-for') ?? '127.0.0.1'
+          const now = Date.now()
+          const windowStart = now - options.windowMs
+          
+          const requests = rateLimitCache.get(ip) ?? []
+          const recentRequests = requests.filter(time => time > windowStart)
+          
+          if (recentRequests.length >= options.requests) {
+            return NextResponse.json({
+              success: false,
+              error: {
+                code: 'RATE_LIMIT_EXCEEDED',
+                message: 'Too many requests',
+                requestId: crypto.randomUUID(),
+                timestamp: new Date().toISOString(),
+              },
+            }, { status: 429 })
+          }
+          
+          recentRequests.push(now)
+          rateLimitCache.set(ip, recentRequests)
+          
+          return handler(request)
+        }
+      }
+
+  # ---------------------------------------------------------------------------
+  # VALIDATION MIDDLEWARE
+  # ---------------------------------------------------------------------------
+  validation:
+    name: withValidation
+    description: Validates request body/query against Zod schema
+    implementation: |
+      import { NextResponse } from 'next/server'
+      import { ZodSchema, ZodError } from 'zod'
+      
+      export function withValidation<T>(
+        handler: (request: Request, data: T) => Promise<Response>,
+        schema: ZodSchema<T>,
+        source: 'body' | 'query' = 'body'
+      ) {
+        return async (request: Request) => {
+          try {
+            let rawData: unknown
+            
+            if (source === 'body') {
+              rawData = await request.json()
+            } else {
+              const url = new URL(request.url)
+              rawData = Object.fromEntries(url.searchParams)
+            }
+            
+            const data = schema.parse(rawData)
+            return handler(request, data)
+          } catch (error) {
+            if (error instanceof ZodError) {
+              return NextResponse.json({
+                success: false,
+                error: {
+                  code: 'VALIDATION_ERROR',
+                  message: 'Invalid request data',
+                  details: error.errors.map(e => ({
+                    field: e.path.join('.'),
+                    message: e.message,
+                    code: e.code,
+                  })),
+                  requestId: crypto.randomUUID(),
+                  timestamp: new Date().toISOString(),
+                },
+              }, { status: 400 })
+            }
+            throw error
+          }
+        }
+      }
+
+  # ---------------------------------------------------------------------------
+  # ERROR HANDLING MIDDLEWARE
+  # ---------------------------------------------------------------------------
+  error_handler:
+    name: withErrorHandler
+    description: Global error handler for API routes
+    implementation: |
+      import { NextResponse } from 'next/server'
+      import { Prisma } from '@prisma/client'
+      import { logger } from '@/lib/logger'
+      
+      export class ApiError extends Error {
+        constructor(
+          public code: string,
+          public message: string,
+          public status: number = 500,
+          public details?: Array<{ field?: string; message: string }>
+        ) {
+          super(message)
+          this.name = 'ApiError'
+        }
+      }
+      
+      export function withErrorHandler(handler: Handler) {
+        return async (request: Request) => {
+          const requestId = crypto.randomUUID()
+          
+          try {
+            return await handler(request)
+          } catch (error) {
+            logger.error('API Error', {
+              requestId,
+              error,
+              path: new URL(request.url).pathname,
+              method: request.method,
+            })
+            
+            // Handle known error types
+            if (error instanceof ApiError) {
+              return NextResponse.json({
+                success: false,
+                error: {
+                  code: error.code,
+                  message: error.message,
+                  details: error.details,
+                  requestId,
+                  timestamp: new Date().toISOString(),
+                },
+              }, { status: error.status })
+            }
+            
+            // Prisma errors
+            if (error instanceof Prisma.PrismaClientKnownRequestError) {
+              if (error.code === 'P2002') {
+                return NextResponse.json({
+                  success: false,
+                  error: {
+                    code: 'CONFLICT',
+                    message: 'Resource already exists',
+                    requestId,
+                    timestamp: new Date().toISOString(),
+                  },
+                }, { status: 409 })
+              }
+              if (error.code === 'P2025') {
+                return NextResponse.json({
+                  success: false,
+                  error: {
+                    code: 'NOT_FOUND',
+                    message: 'Resource not found',
+                    requestId,
+                    timestamp: new Date().toISOString(),
+                  },
+                }, { status: 404 })
+              }
+            }
+            
+            // Generic error
+            return NextResponse.json({
+              success: false,
+              error: {
+                code: 'INTERNAL_ERROR',
+                message: 'An unexpected error occurred',
+                requestId,
+                timestamp: new Date().toISOString(),
+              },
+            }, { status: 500 })
+          }
+        }
+      }
+
+  # ---------------------------------------------------------------------------
+  # CORS MIDDLEWARE
+  # ---------------------------------------------------------------------------
+  cors:
+    name: withCors
+    description: CORS headers for cross-origin requests
+    implementation: |
+      import { NextResponse } from 'next/server'
+      
+      type CorsOptions = {
+        origins: string[] | '*'
+        methods: string[]
+        headers: string[]
+        credentials?: boolean
+        maxAge?: number
+      }
+      
+      export function withCors(handler: Handler, options: CorsOptions) {
+        return async (request: Request) => {
+          const origin = request.headers.get('origin')
+          
+          // Handle preflight
+          if (request.method === 'OPTIONS') {
+            return new NextResponse(null, {
+              status: 204,
+              headers: getCorsHeaders(origin, options),
+            })
+          }
+          
+          const response = await handler(request)
+          const corsHeaders = getCorsHeaders(origin, options)
+          
+          Object.entries(corsHeaders).forEach(([key, value]) => {
+            response.headers.set(key, value)
+          })
+          
+          return response
+        }
+      }
+      
+      function getCorsHeaders(origin: string | null, options: CorsOptions) {
+        const headers: Record<string, string> = {}
+        
+        if (options.origins === '*') {
+          headers['Access-Control-Allow-Origin'] = '*'
+        } else if (origin && options.origins.includes(origin)) {
+          headers['Access-Control-Allow-Origin'] = origin
+          headers['Vary'] = 'Origin'
+        }
+        
+        headers['Access-Control-Allow-Methods'] = options.methods.join(', ')
+        headers['Access-Control-Allow-Headers'] = options.headers.join(', ')
+        
+        if (options.credentials) {
+          headers['Access-Control-Allow-Credentials'] = 'true'
+        }
+        
+        if (options.maxAge) {
+          headers['Access-Control-Max-Age'] = options.maxAge.toString()
+        }
+        
+        return headers
+      }
+
+  # ---------------------------------------------------------------------------
+  # COMBINED MIDDLEWARE
+  # ---------------------------------------------------------------------------
+  compose:
+    name: composeMiddleware
+    description: Compose multiple middleware functions
+    implementation: |
+      type Middleware = (handler: Handler) => Handler
+      
+      export function composeMiddleware(...middlewares: Middleware[]) {
+        return (handler: Handler): Handler => {
+          return middlewares.reduceRight(
+            (acc, middleware) => middleware(acc),
+            handler
+          )
+        }
+      }
+      
+      // Example usage:
+      const protectedRoute = composeMiddleware(
+        withErrorHandler,
+        withCors({ origins: ['https://admin.example.com'], methods: ['GET', 'POST'], headers: ['Content-Type'] }),
+        withRateLimit({ requests: 60, window: '1m' }),
+        withAuth({ requireAdmin: true })
+      )
+      
+      export const POST = protectedRoute(async (request, { session }) => {
+        // Handler code
+      })
+
+# =============================================================================
+# RESPONSE FORMAT STANDARDS
+# =============================================================================
+
+response_standards:
+  # ---------------------------------------------------------------------------
+  # SUCCESS RESPONSES
+  # ---------------------------------------------------------------------------
+  success:
+    single_resource:
+      description: Response for single resource operations
+      format:
+        success: true
+        data: "{ ...resource }"
+        meta:
+          requestId: "string"
+          timestamp: "ISO 8601 datetime"
+      example:
+        success: true
+        data:
+          id: "clx1234567890abcdef"
+          title: "My Project"
+          slug: "my-project"
+        meta:
+          requestId: "req_abc123def456"
+          timestamp: "2024-01-20T15:30:00.000Z"
+
+    list_resource:
+      description: Response for list operations
+      format:
+        success: true
+        data: "[...resources]"
+        meta:
+          pagination:
+            page: "number"
+            limit: "number"
+            total: "number"
+            totalPages: "number"
+            hasNext: "boolean"
+            hasPrev: "boolean"
+          requestId: "string"
+          timestamp: "ISO 8601 datetime"
+
+    created:
+      status: 201
+      description: Resource created successfully
+
+    accepted:
+      status: 202
+      description: Request accepted for async processing
+      format:
+        success: true
+        data:
+          jobId: "string"
+          status: "queued"
+
+    no_content:
+      status: 204
+      description: Operation successful, no content returned
+
+  # ---------------------------------------------------------------------------
+  # ERROR RESPONSES
+  # ---------------------------------------------------------------------------
+  errors:
+    format:
+      success: false
+      error:
+        code: "UPPER_SNAKE_CASE error code"
+        message: "Human-readable message"
+        details: "[{ field?, message, code? }]"
+        requestId: "string"
+        timestamp: "ISO 8601 datetime"
+
+    codes:
+      - code: VALIDATION_ERROR
+        status: 400
+        description: Request validation failed
+        example:
+          success: false
+          error:
+            code: "VALIDATION_ERROR"
+            message: "Invalid request data"
+            details:
+              - field: "email"
+                message: "Invalid email format"
+                code: "invalid_string"
+            requestId: "req_abc123"
+            timestamp: "2024-01-20T15:30:00.000Z"
+
+      - code: UNAUTHORIZED
+        status: 401
+        description: Authentication required or invalid
+
+      - code: FORBIDDEN
+        status: 403
+        description: User lacks required permissions
+
+      - code: NOT_FOUND
+        status: 404
+        description: Requested resource not found
+
+      - code: CONFLICT
+        status: 409
+        description: Resource conflict (e.g., duplicate slug)
+
+      - code: RATE_LIMIT_EXCEEDED
+        status: 429
+        description: Too many requests
+        headers:
+          - X-RateLimit-Limit
+          - X-RateLimit-Remaining
+          - X-RateLimit-Reset
+          - Retry-After
+
+      - code: INTERNAL_ERROR
+        status: 500
+        description: Unexpected server error
+
+      - code: SERVICE_UNAVAILABLE
+        status: 503
+        description: Service temporarily unavailable
+
+# =============================================================================
+# PAGINATION PATTERNS
+# =============================================================================
+
+pagination:
+  default_limit: 10
+  max_limit: 100
+  
+  strategies:
+    offset:
+      description: Page-based pagination using offset
+      query_params:
+        page: "Page number (1-indexed)"
+        limit: "Items per page"
+      implementation: |
+        const page = Math.max(1, params.page)
+        const limit = Math.min(100, Math.max(1, params.limit))
+        const skip = (page - 1) * limit
+        
+        const [data, total] = await Promise.all([
+          prisma.model.findMany({ skip, take: limit, ...query }),
+          prisma.model.count({ where: query.where }),
+        ])
+        
+        return {
+          data,
+          meta: {
+            pagination: {
+              page,
+              limit,
+              total,
+              totalPages: Math.ceil(total / limit),
+              hasNext: page * limit < total,
+              hasPrev: page > 1,
+            },
+          },
+        }
+
+    cursor:
+      description: Cursor-based pagination for large datasets
+      query_params:
+        cursor: "Last item ID from previous page"
+        limit: "Items per page"
+      implementation: |
+        const limit = Math.min(100, Math.max(1, params.limit))
+        const cursor = params.cursor
+        
+        const data = await prisma.model.findMany({
+          take: limit + 1, // Fetch one extra to check hasNext
+          ...(cursor && {
+            skip: 1,
+            cursor: { id: cursor },
+          }),
+          ...query,
+        })
+        
+        const hasNext = data.length > limit
+        if (hasNext) data.pop()
+        
+        return {
+          data,
+          meta: {
+            pagination: {
+              nextCursor: hasNext ? data[data.length - 1].id : null,
+              hasNext,
+            },
+          },
+        }
+
+  sorting:
+    description: Sorting configuration
+    default_field: createdAt
+    default_order: desc
+    allowed_fields:
+      projects: [createdAt, updatedAt, title, order]
+      blogs: [createdAt, publishedAt, order]
+      guestbook: [createdAt]
+      messages: [createdAt, isRead]
+      chat_logs: [createdAt, updatedAt]
+    implementation: |
+      const sortField = allowedFields.includes(params.sort) ? params.sort : 'createdAt'
+      const sortOrder = params.order === 'asc' ? 'asc' : 'desc'
+      
+      return {
+        orderBy: { [sortField]: sortOrder },
+      }
+
+# =============================================================================
+# SDK INTEGRATION PATTERNS
+# =============================================================================
+
+sdk:
+  package_location: packages/sdk
+  
+  structure:
+    - src/
+      - admin-api/
+        - client.ts
+        - types.ts
+        - projects.ts
+        - contexts.ts
+        - blogs.ts
+        - guestbook.ts
+        - messages.ts
+        - chat-logs.ts
+        - links.ts
+        - knowledge.ts
+      - public-api/
+        - client.ts
+        - types.ts
+      - internal-api/
+        - client.ts
+        - types.ts
+      - index.ts
+
+  client_pattern:
+    description: Type-safe API client pattern
+    implementation: |
+      // packages/sdk/src/admin-api/client.ts
+      import type { 
+        Project, ProjectCreate, ProjectUpdate,
+        PaginationParams, PaginatedResponse, ApiResponse,
+      } from './types'
+      
+      export class AdminApiClient {
+        private baseUrl: string
+        private getToken: () => Promise<string>
+        
+        constructor(config: { baseUrl: string; getToken: () => Promise<string> }) {
+          this.baseUrl = config.baseUrl
+          this.getToken = config.getToken
+        }
+        
+        private async fetch<T>(
+          path: string,
+          options: RequestInit = {}
+        ): Promise<ApiResponse<T>> {
+          const token = await this.getToken()
+          
+          const response = await fetch(`${this.baseUrl}${path}`, {
+            ...options,
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+              ...options.headers,
+            },
+          })
+          
+          const data = await response.json()
+          
+          if (!response.ok) {
+            throw new ApiError(data.error.code, data.error.message, response.status)
+          }
+          
+          return data
+        }
+        
+        // Projects
+        projects = {
+          list: (params?: PaginationParams) =>
+            this.fetch<PaginatedResponse<Project>>(`/api/admin/projects?${new URLSearchParams(params)}`),
+          
+          get: (id: string) =>
+            this.fetch<Project>(`/api/admin/projects/${id}`),
+          
+          create: (data: ProjectCreate) =>
+            this.fetch<Project>('/api/admin/projects', {
+              method: 'POST',
+              body: JSON.stringify(data),
+            }),
+          
+          update: (id: string, data: ProjectUpdate) =>
+            this.fetch<Project>(`/api/admin/projects/${id}`, {
+              method: 'PUT',
+              body: JSON.stringify(data),
+            }),
+          
+          delete: (id: string) =>
+            this.fetch<{ deleted: boolean }>(`/api/admin/projects/${id}`, {
+              method: 'DELETE',
+            }),
+        }
+        
+        // ... other resources
+      }
+
+  usage_example: |
+    // In apps/admin
+    import { AdminApiClient } from '@naufalrf/sdk'
+    import { auth } from '@/auth'
+    
+    const client = new AdminApiClient({
+      baseUrl: process.env.NEXT_PUBLIC_API_URL!,
+      getToken: async () => {
+        const session = await auth()
+        return session?.accessToken ?? ''
+      },
+    })
+    
+    // Usage
+    const projects = await client.projects.list({ page: 1, limit: 10 })
+    const project = await client.projects.create({ title: 'New Project', slug: 'new-project', ... })
+
+  public_client_pattern:
+    description: Public API client (no auth)
+    implementation: |
+      // packages/sdk/src/public-api/client.ts
+      export class PublicApiClient {
+        private baseUrl: string
+        
+        constructor(baseUrl: string) {
+          this.baseUrl = baseUrl
+        }
+        
+        private async fetch<T>(path: string): Promise<ApiResponse<T>> {
+          const response = await fetch(`${this.baseUrl}${path}`, {
+            next: { revalidate: 60 }, // Next.js caching
+          })
+          
+          if (!response.ok) {
+            throw new Error(`API Error: ${response.status}`)
+          }
+          
+          return response.json()
+        }
+        
+        projects = {
+          list: (params?: { category?: string; featured?: boolean }) =>
+            this.fetch<PaginatedResponse<Project>>(
+              `/api/public/projects?${new URLSearchParams(params)}`
+            ),
+          
+          getBySlug: (slug: string) =>
+            this.fetch<ProjectWithContexts>(`/api/public/projects/${slug}`),
+        }
+        
+        blogs = {
+          list: () => this.fetch<PaginatedResponse<BlogLink>>('/api/public/blogs'),
+        }
+        
+        guestbook = {
+          list: () => this.fetch<PaginatedResponse<GuestbookEntry>>('/api/public/guestbook'),
+        }
+        
+        links = {
+          list: () => this.fetch<PaginatedResponse<ProfileLink>>('/api/public/links'),
+        }
+      }
+
+  internal_client_pattern:
+    description: Internal API client with service token
+    implementation: |
+      // packages/sdk/src/internal-api/client.ts
+      export class InternalApiClient {
+        private baseUrl: string
+        private serviceToken: string
+        
+        constructor(config: { baseUrl: string; serviceToken: string }) {
+          this.baseUrl = config.baseUrl
+          this.serviceToken = config.serviceToken
+        }
+        
+        private async fetch<T>(
+          path: string,
+          options: RequestInit = {}
+        ): Promise<ApiResponse<T>> {
+          const response = await fetch(`${this.baseUrl}${path}`, {
+            ...options,
+            headers: {
+              'Content-Type': 'application/json',
+              'X-Service-Token': this.serviceToken,
+              ...options.headers,
+            },
+          })
+          
+          if (!response.ok) {
+            throw new Error(`Internal API Error: ${response.status}`)
+          }
+          
+          return response.json()
+        }
+        
+        chatLogs = {
+          create: (data: ChatLogCreate) =>
+            this.fetch<{ id: string; sessionId: string }>('/api/internal/chat-logs', {
+              method: 'POST',
+              body: JSON.stringify(data),
+            }),
+        }
+        
+        content = {
+          export: () =>
+            this.fetch<ContentExport>('/api/internal/content'),
+          
+          projects: () =>
+            this.fetch<ProjectWithContexts[]>('/api/internal/content/projects'),
+          
+          knowledge: () =>
+            this.fetch<KnowledgeDoc[]>('/api/internal/content/knowledge'),
+        }
+      }
+
+# =============================================================================
+# API ROUTE FILE STRUCTURE
+# =============================================================================
+
+file_structure:
+  description: Next.js App Router API route organization
+  layout:
+    apps/admin/app/api/:
+      public/:
+        projects/:
+          route.ts: "GET /api/public/projects"
+          "[slug]/":
+            route.ts: "GET /api/public/projects/:slug"
+        blogs/:
+          route.ts: "GET /api/public/blogs"
+        guestbook/:
+          route.ts: "GET /api/public/guestbook"
+        links/:
+          route.ts: "GET /api/public/links"
+      
+      public-write/:
+        guestbook/:
+          route.ts: "POST /api/public-write/guestbook"
+          "[id]/":
+            reactions/:
+              route.ts: "POST /api/public-write/guestbook/:id/reactions"
+        messages/:
+          route.ts: "POST /api/public-write/messages"
+      
+      user/:
+        me/:
+          route.ts: "GET /api/user/me"
+        guestbook/:
+          route.ts: "GET /api/user/guestbook"
+          "[id]/":
+            route.ts: "DELETE /api/user/guestbook/:id"
+      
+      admin/:
+        projects/:
+          route.ts: "GET, POST /api/admin/projects"
+          reorder/:
+            route.ts: "POST /api/admin/projects/reorder"
+          "[id]/":
+            route.ts: "GET, PUT, DELETE /api/admin/projects/:id"
+        
+        contexts/:
+          route.ts: "GET, POST /api/admin/contexts"
+          reorder/:
+            route.ts: "POST /api/admin/contexts/reorder"
+          "[id]/":
+            route.ts: "GET, PUT, DELETE /api/admin/contexts/:id"
+        
+        blogs/:
+          route.ts: "GET, POST /api/admin/blogs"
+          reorder/:
+            route.ts: "POST /api/admin/blogs/reorder"
+          "[id]/":
+            route.ts: "GET, PUT, DELETE /api/admin/blogs/:id"
+            refresh/:
+              route.ts: "POST /api/admin/blogs/:id/refresh"
+        
+        guestbook/:
+          route.ts: "GET /api/admin/guestbook"
+          bulk/:
+            route.ts: "POST /api/admin/guestbook/bulk"
+          "[id]/":
+            route.ts: "GET, PATCH, DELETE /api/admin/guestbook/:id"
+        
+        messages/:
+          route.ts: "GET /api/admin/messages"
+          stats/:
+            route.ts: "GET /api/admin/messages/stats"
+          bulk-read/:
+            route.ts: "POST /api/admin/messages/bulk-read"
+          "[id]/":
+            route.ts: "GET, PATCH, DELETE /api/admin/messages/:id"
+        
+        chat-logs/:
+          route.ts: "GET /api/admin/chat-logs"
+          stats/:
+            route.ts: "GET /api/admin/chat-logs/stats"
+          "[id]/":
+            route.ts: "GET, DELETE /api/admin/chat-logs/:id"
+          session/:
+            "[sessionId]/":
+              route.ts: "GET, DELETE /api/admin/chat-logs/session/:sessionId"
+        
+        links/:
+          route.ts: "GET, POST /api/admin/links"
+          reorder/:
+            route.ts: "POST /api/admin/links/reorder"
+          "[id]/":
+            route.ts: "GET, PUT, DELETE /api/admin/links/:id"
+        
+        knowledge/:
+          route.ts: "GET, POST /api/admin/knowledge"
+          ingest/:
+            route.ts: "POST /api/admin/knowledge/ingest"
+          "[id]/":
+            route.ts: "GET, PUT, DELETE /api/admin/knowledge/:id"
+            ingest/:
+              route.ts: "POST /api/admin/knowledge/:id/ingest"
+      
+      internal/:
+        chat-logs/:
+          route.ts: "POST /api/internal/chat-logs"
+        content/:
+          route.ts: "GET /api/internal/content"
+          projects/:
+            route.ts: "GET /api/internal/content/projects"
+          knowledge/:
+            route.ts: "GET /api/internal/content/knowledge"
+        health/:
+          route.ts: "GET /api/internal/health"
+
+  route_example:
+    path: apps/admin/app/api/admin/projects/route.ts
+    content: |
+      import { NextResponse } from 'next/server'
+      import { prisma } from '@/lib/prisma'
+      import { withAuth, withErrorHandler, withValidation } from '@/lib/middleware'
+      import { ProjectCreateSchema, PaginationQuerySchema } from '@/lib/schemas'
+      import { composeMiddleware } from '@/lib/middleware/compose'
+      
+      // GET /api/admin/projects
+      export const GET = composeMiddleware(
+        withErrorHandler,
+        withAuth({ requireAdmin: true })
+      )(async (request, { session }) => {
+        const url = new URL(request.url)
+        const params = PaginationQuerySchema.parse(Object.fromEntries(url.searchParams))
+        
+        const where = {
+          ...(params.category && { category: params.category }),
+          ...(params.visible !== undefined && { visible: params.visible }),
+          ...(params.search && {
+            OR: [
+              { title: { contains: params.search, mode: 'insensitive' } },
+              { summary: { contains: params.search, mode: 'insensitive' } },
+            ],
+          }),
+        }
+        
+        const [data, total] = await Promise.all([
+          prisma.project.findMany({
+            where,
+            skip: (params.page - 1) * params.limit,
+            take: params.limit,
+            orderBy: { [params.sort || 'createdAt']: params.order },
+            include: { _count: { select: { contexts: true } } },
+          }),
+          prisma.project.count({ where }),
+        ])
+        
+        return NextResponse.json({
+          success: true,
+          data,
+          meta: {
+            pagination: {
+              page: params.page,
+              limit: params.limit,
+              total,
+              totalPages: Math.ceil(total / params.limit),
+              hasNext: params.page * params.limit < total,
+              hasPrev: params.page > 1,
+            },
+            requestId: crypto.randomUUID(),
+            timestamp: new Date().toISOString(),
+          },
+        })
+      })
+      
+      // POST /api/admin/projects
+      export const POST = composeMiddleware(
+        withErrorHandler,
+        withAuth({ requireAdmin: true }),
+        withValidation(ProjectCreateSchema)
+      )(async (request, data) => {
+        const project = await prisma.project.create({ data })
+        
+        return NextResponse.json({
+          success: true,
+          data: project,
+          meta: {
+            requestId: crypto.randomUUID(),
+            timestamp: new Date().toISOString(),
+          },
+        }, { status: 201 })
+      })

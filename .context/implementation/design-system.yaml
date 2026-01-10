@@ -1,0 +1,904 @@
+# Design System
+
+# =============================================================================
+# NEUMORPHISM (SOFT UI) DESIGN SYSTEM WITH SHADCN/UI
+# =============================================================================
+# Defines the visual language, component patterns, and design tokens for the
+# NaufalRF Portfolio Ecosystem. Based on shadcn/ui with neumorphism modifications.
+# Uses OKLCH color space for Tailwind 4 compatibility.
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# DESIGN PHILOSOPHY
+# -----------------------------------------------------------------------------
+philosophy:
+  style: neumorphism
+  description: |
+    Neumorphism creates the illusion of physical depth through carefully balanced 
+    dual shadows—one light source from the top-left, one dark shadow falling 
+    bottom-right—on monochromatic backgrounds. Elements appear to either extrude 
+    from the surface (convex/raised) or be pressed into it (concave/inset). 
+    The effect mimics soft, pillowed physical objects with realistic lighting, 
+    creating a "molded from the same material" aesthetic.
+
+  principles:
+    - tactile_depth: Dual opposing RGB shadows create realistic physical depth
+    - monochromatic_discipline: Cool grey palette where shadows do visual heavy lifting
+    - same_surface_illusion: Elements molded from same material as background
+    - deep_inset_states: Wells and inputs feel significantly deeper than standard pressed states
+    - hyper_rounded_corners: 32px for containers, 16px for elements - pillowed aesthetic
+    - complex_nested_depth: Showcase physics through nested elements (Extruded → Inset → Extruded)
+    - smooth_microinteractions: 300ms transitions with scale, rotation, shadow depth changes
+    - accessible_first: WCAG AA contrast (7.5:1 primary, 4.6:1 secondary) despite soft aesthetics
+    - mobile_first_responsive: Touch-friendly 44px targets, maintained aesthetic on all screens
+
+  vibe: |
+    Tactile, calm, modern, and physically grounded. UI that feels like cooler matte 
+    plastic or soft ceramic. Satisfying and tangible. Deliberately restrained with 
+    a cooler grey palette to feel fresh and distinct from warm legacy neumorphism.
+
+  inspiration:
+    - neumorphism.io
+    - dribbble.com/tags/neumorphism
+    - modern portfolio sites with depth
+    - physical product design (ceramic, molded plastic)
+
+
+# -----------------------------------------------------------------------------
+# COLOR SYSTEM
+# -----------------------------------------------------------------------------
+colors:
+  approach: OKLCH-based with CSS custom properties (Tailwind 4 compatible)
+  
+  philosophy: |
+    Monochromatic "Cool Grey" discipline where shadows and highlights do all 
+    visual heavy lifting. No flat backgrounds. Elements appear part of the same 
+    material as the background—molded, not placed.
+
+  light_mode:
+    # Base surface - The "cool clay" everything is molded from
+    background:
+      hex: "#E0E5EC"
+      oklch: "oklch(0.92 0.008 240)"
+      description: The base cool grey surface - all elements molded from this
+    
+    surface:
+      hex: "#E0E5EC"
+      oklch: "oklch(0.92 0.008 240)"
+      description: Same as background for same-surface illusion
+    
+    surface_raised:
+      hex: "#E0E5EC"
+      oklch: "oklch(0.92 0.008 240)"
+      description: Elevated elements (depth from shadows, not color)
+    
+    surface_inset:
+      hex: "#E0E5EC"
+      oklch: "oklch(0.92 0.008 240)"
+      description: Pressed elements (depth from inset shadows)
+
+    # Text colors - WCAG compliant
+    foreground:
+      hex: "#3D4852"
+      oklch: "oklch(0.35 0.015 240)"
+      contrast_ratio: "7.5:1"
+      description: Primary text - dark blue-grey, WCAG AAA
+    
+    foreground_muted:
+      hex: "#6B7280"
+      oklch: "oklch(0.52 0.012 240)"
+      contrast_ratio: "4.6:1"
+      description: Secondary text - cool grey, WCAG AA
+    
+    foreground_subtle:
+      hex: "#A0AEC0"
+      oklch: "oklch(0.72 0.010 240)"
+      description: Placeholders, disabled text
+
+    # Accent colors - Used sparingly
+    accent:
+      hex: "#6C63FF"
+      oklch: "oklch(0.58 0.20 280)"
+      description: Soft violet for CTAs and focus states
+    
+    accent_light:
+      hex: "#8B84FF"
+      oklch: "oklch(0.68 0.18 280)"
+      description: Lighter violet for gradients and hover
+    
+    accent_secondary:
+      hex: "#38B2AC"
+      oklch: "oklch(0.68 0.10 190)"
+      description: Teal for success states and positive indicators
+
+    # Semantic colors
+    success:
+      hex: "#38B2AC"
+      oklch: "oklch(0.68 0.10 190)"
+    
+    warning:
+      hex: "#F59E0B"
+      oklch: "oklch(0.75 0.15 70)"
+    
+    error:
+      hex: "#EF4444"
+      oklch: "oklch(0.62 0.22 25)"
+
+    # Shadow colors - CRITICAL: RGBA for smooth blending
+    shadow_light:
+      rgba: "rgba(255, 255, 255, 0.5)"
+      description: Pure white with transparency for top-left light source
+    
+    shadow_light_strong:
+      rgba: "rgba(255, 255, 255, 0.6)"
+      description: Stronger highlight for hover states
+    
+    shadow_dark:
+      rgba: "rgb(163, 177, 198, 0.6)"
+      hex_reference: "#A3B1C6"
+      description: Cool blue-grey shadow for bottom-right, matches background tone
+    
+    shadow_dark_strong:
+      rgba: "rgb(163, 177, 198, 0.7)"
+      description: Deeper shadow for hover and inset states
+
+  dark_mode:
+    note: |
+      Dark mode implementation TBD. Current focus is perfecting light mode 
+      neumorphism. Dark mode requires careful shadow color adjustments to 
+      maintain the same tactile quality.
+
+  css_variables:
+    implementation: |
+      @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=DM+Sans:wght@400;500;700&display=swap');
+
+      @layer base {
+        :root {
+          /* Base surface - cool grey */
+          --background: oklch(0.92 0.008 240);
+          --surface: oklch(0.92 0.008 240);
+          
+          /* Text colors */
+          --foreground: oklch(0.35 0.015 240);
+          --foreground-muted: oklch(0.52 0.012 240);
+          --foreground-subtle: oklch(0.72 0.010 240);
+          
+          /* Accent colors */
+          --accent: oklch(0.58 0.20 280);
+          --accent-light: oklch(0.68 0.18 280);
+          --accent-secondary: oklch(0.68 0.10 190);
+          
+          /* Semantic */
+          --success: oklch(0.68 0.10 190);
+          --warning: oklch(0.75 0.15 70);
+          --error: oklch(0.62 0.22 25);
+          
+          /* Shadow colors - use rgba directly in shadows */
+          --shadow-light: rgba(255, 255, 255, 0.5);
+          --shadow-light-strong: rgba(255, 255, 255, 0.6);
+          --shadow-dark: rgb(163, 177, 198, 0.6);
+          --shadow-dark-strong: rgb(163, 177, 198, 0.7);
+          
+          /* Border radius */
+          --radius-container: 32px;
+          --radius-base: 16px;
+          --radius-inner: 12px;
+        }
+        
+        * {
+          @apply border-transparent;
+        }
+        
+        body {
+          @apply bg-[--background] text-[--foreground] font-sans;
+          scroll-behavior: smooth;
+        }
+      }
+
+
+# -----------------------------------------------------------------------------
+# TYPOGRAPHY
+# -----------------------------------------------------------------------------
+typography:
+  font_families:
+    display:
+      name: "Plus Jakarta Sans"
+      fallback: "system-ui, sans-serif"
+      source: Google Fonts
+      weights: [500, 600, 700, 800]
+      usage: Display headings, hero text
+      class: font-display
+    
+    sans:
+      name: "DM Sans"
+      fallback: "system-ui, -apple-system, sans-serif"
+      source: Google Fonts
+      weights: [400, 500, 700]
+      usage: Body text, UI elements, all non-display text
+      class: font-sans
+    
+    mono:
+      name: "JetBrains Mono"
+      fallback: "Consolas, monospace"
+      source: Google Fonts
+      weights: [400, 500]
+      usage: Code blocks, technical content
+
+  google_fonts_url: |
+    https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=DM+Sans:wght@400;500;700&display=swap
+
+  scale:
+    xs:
+      size: 0.75rem
+      line_height: 1rem
+    sm:
+      size: 0.875rem
+      line_height: 1.25rem
+    base:
+      size: 1rem
+      line_height: 1.5rem
+    lg:
+      size: 1.125rem
+      line_height: 1.75rem
+    xl:
+      size: 1.25rem
+      line_height: 1.75rem
+    2xl:
+      size: 1.5rem
+      line_height: 2rem
+    3xl:
+      size: 1.875rem
+      line_height: 2.25rem
+    4xl:
+      size: 2.25rem
+      line_height: 2.5rem
+    5xl:
+      size: 3rem
+      line_height: 1.2
+    6xl:
+      size: 3.75rem
+      line_height: 1.1
+    7xl:
+      size: 4.5rem
+      line_height: 1.1
+
+  heading_styles:
+    h1_hero:
+      font: display
+      size: 7xl (mobile: 5xl)
+      weight: 800 (extrabold)
+      tracking: tight (-0.02em)
+      class: "font-display font-extrabold tracking-tight text-7xl md:text-7xl"
+    
+    h1:
+      font: display
+      size: 5xl to 6xl (responsive)
+      weight: 700 (bold)
+      tracking: tight
+      class: "font-display font-bold tracking-tight text-5xl md:text-6xl"
+    
+    h2:
+      font: display
+      size: 3xl to 4xl
+      weight: 700
+      tracking: tight
+      class: "font-display font-bold tracking-tight text-3xl md:text-4xl"
+    
+    h3:
+      font: display
+      size: 2xl to 3xl
+      weight: 600
+      class: "font-display font-semibold text-2xl md:text-3xl"
+    
+    h4:
+      font: sans
+      size: xl to 2xl
+      weight: 600
+      class: "font-sans font-semibold text-xl md:text-2xl"
+    
+    body:
+      font: sans
+      size: base
+      weight: 400 to 500
+      line_height: relaxed (1.625)
+      class: "font-sans font-normal text-base"
+    
+    body_medium:
+      font: sans
+      size: base
+      weight: 500
+      class: "font-sans font-medium text-base"
+
+  color_usage:
+    primary_text:
+      color: "#3D4852"
+      oklch: "oklch(0.35 0.015 240)"
+      usage: Headings, body text, primary content
+    
+    secondary_text:
+      color: "#6B7280"
+      oklch: "oklch(0.52 0.012 240)"
+      usage: Subheadings, captions, secondary content
+    
+    placeholder:
+      color: "#A0AEC0"
+      oklch: "oklch(0.72 0.010 240)"
+      usage: Input placeholders, disabled text
+
+
+# -----------------------------------------------------------------------------
+# SPACING & LAYOUT
+# -----------------------------------------------------------------------------
+spacing:
+  scale:
+    0: 0
+    px: 1px
+    0.5: 0.125rem
+    1: 0.25rem
+    1.5: 0.375rem
+    2: 0.5rem
+    2.5: 0.625rem
+    3: 0.75rem
+    3.5: 0.875rem
+    4: 1rem
+    5: 1.25rem
+    6: 1.5rem
+    7: 1.75rem
+    8: 2rem
+    9: 2.25rem
+    10: 2.5rem
+    11: 2.75rem
+    12: 3rem
+    14: 3.5rem
+    16: 4rem
+    20: 5rem
+    24: 6rem
+    28: 7rem
+    32: 8rem
+    36: 9rem
+    40: 10rem
+    44: 11rem
+    48: 12rem
+
+  semantic:
+    section_y: 32 (8rem) - Open and airy for shadow breathing room
+    container_x: 4 to 8 (1rem to 2rem)
+    card_padding: 8 to 20 (2rem to 5rem) depending on prominence
+    input_padding_y: 2.5 (0.625rem)
+    input_padding_x: 4 (1rem)
+    button_padding_y: 3 (0.75rem)
+    button_padding_x: 6 (1.5rem)
+    gap_tight: 4 (1rem)
+    gap_normal: 8 (2rem)
+    gap_loose: 12 (3rem)
+
+layout:
+  container:
+    max_width: 1280px (max-w-7xl)
+    padding: 1rem to 2rem
+    note: Wide, modern feel
+  
+  breakpoints:
+    sm: 640px
+    md: 768px
+    lg: 1024px
+    xl: 1280px
+    2xl: 1536px
+
+  grid:
+    columns: 12
+    gap: 1rem to 1.5rem
+    mobile: 1 column
+    tablet: 2-3 columns
+    desktop: full grid
+
+  responsive_strategy:
+    approach: Mobile-first
+    mobile: 0-767px (base styles)
+    tablet: 768-1023px (md:)
+    desktop: 1024px+ (lg:)
+
+
+# -----------------------------------------------------------------------------
+# NEUMORPHIC EFFECTS (THE PHYSICS)
+# -----------------------------------------------------------------------------
+neumorphism:
+  description: |
+    Core neumorphic effects using dual RGBA shadows to create soft, tactile surfaces.
+    Light source from top-left, dark shadow bottom-right. Shadows use transparency
+    for premium, smooth blending (never opaque hex colors).
+
+  border_radius:
+    container: 32px (rounded-[32px]) - Very soft, friendly corners for cards
+    base: 16px (rounded-2xl) - Buttons, inputs, standard elements
+    inner: 12px (rounded-xl) - Nested elements
+    full: 9999px (rounded-full) - Pills, circular elements
+    note: Neumorphism works best with generous border radius
+
+  shadows:
+    extruded_standard:
+      description: Default resting state for buttons, cards
+      css: "box-shadow: 9px 9px 16px rgb(163,177,198,0.6), -9px -9px 16px rgba(255,255,255,0.5);"
+      tailwind: "shadow-[9px_9px_16px_rgb(163,177,198,0.6),-9px_-9px_16px_rgba(255,255,255,0.5)]"
+      usage: Cards, buttons at rest, raised panels
+    
+    extruded_hover:
+      description: Lifted state on hover - increased depth
+      css: "box-shadow: 12px 12px 20px rgb(163,177,198,0.7), -12px -12px 20px rgba(255,255,255,0.6);"
+      tailwind: "shadow-[12px_12px_20px_rgb(163,177,198,0.7),-12px_-12px_20px_rgba(255,255,255,0.6)]"
+      usage: Hover states for cards and buttons
+      combine_with: "translate-y-[-2px] for cards, translate-y-[-1px] for buttons"
+    
+    extruded_small:
+      description: Subtle depth for smaller elements
+      css: "box-shadow: 5px 5px 10px rgb(163,177,198,0.6), -5px -5px 10px rgba(255,255,255,0.5);"
+      tailwind: "shadow-[5px_5px_10px_rgb(163,177,198,0.6),-5px_-5px_10px_rgba(255,255,255,0.5)]"
+      usage: Small buttons, badges, pills
+
+    inset_standard:
+      description: Pressed state or shallow wells
+      css: "box-shadow: inset 6px 6px 10px rgb(163,177,198,0.6), inset -6px -6px 10px rgba(255,255,255,0.5);"
+      tailwind: "shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)]"
+      usage: Active button press, toggle switches
+    
+    inset_deep:
+      description: Deep carved elements - inputs, icon wells
+      css: "box-shadow: inset 10px 10px 20px rgb(163,177,198,0.7), inset -10px -10px 20px rgba(255,255,255,0.6);"
+      tailwind: "shadow-[inset_10px_10px_20px_rgb(163,177,198,0.7),inset_-10px_-10px_20px_rgba(255,255,255,0.6)]"
+      usage: Input fields (especially on focus), icon containers, deep wells
+    
+    inset_small:
+      description: Subtle inset for tracks and pills
+      css: "box-shadow: inset 3px 3px 6px rgb(163,177,198,0.6), inset -3px -3px 6px rgba(255,255,255,0.5);"
+      tailwind: "shadow-[inset_3px_3px_6px_rgb(163,177,198,0.6),inset_-3px_-3px_6px_rgba(255,255,255,0.5)]"
+      usage: Progress tracks, subtle pressed states
+
+    flat:
+      description: No shadow - disabled or subtle elements
+      css: "box-shadow: none;"
+      tailwind: "shadow-none"
+      usage: Disabled states, ghost buttons
+
+  mobile_adaptations:
+    note: Reduce shadow distance on mobile for subtler effect
+    extruded_mobile: "4px 4px 10px rgb(163,177,198,0.6), -4px -4px 10px rgba(255,255,255,0.5)"
+    inset_mobile: "inset 4px 4px 8px rgb(163,177,198,0.6), inset -4px -4px 8px rgba(255,255,255,0.5)"
+
+  tailwind_utilities:
+    plugin_code: |
+      // tailwind.config.js plugin
+      plugin(function({ addUtilities }) {
+        addUtilities({
+          '.neu-extruded': {
+            boxShadow: '9px 9px 16px rgb(163,177,198,0.6), -9px -9px 16px rgba(255,255,255,0.5)',
+          },
+          '.neu-extruded-hover': {
+            boxShadow: '12px 12px 20px rgb(163,177,198,0.7), -12px -12px 20px rgba(255,255,255,0.6)',
+          },
+          '.neu-extruded-sm': {
+            boxShadow: '5px 5px 10px rgb(163,177,198,0.6), -5px -5px 10px rgba(255,255,255,0.5)',
+          },
+          '.neu-inset': {
+            boxShadow: 'inset 6px 6px 10px rgb(163,177,198,0.6), inset -6px -6px 10px rgba(255,255,255,0.5)',
+          },
+          '.neu-inset-deep': {
+            boxShadow: 'inset 10px 10px 20px rgb(163,177,198,0.7), inset -10px -10px 20px rgba(255,255,255,0.6)',
+          },
+          '.neu-inset-sm': {
+            boxShadow: 'inset 3px 3px 6px rgb(163,177,198,0.6), inset -3px -3px 6px rgba(255,255,255,0.5)',
+          },
+          '.neu-flat': {
+            boxShadow: 'none',
+          },
+        })
+      })
+
+  nested_depth_pattern:
+    description: |
+      Showcase the physics by nesting elements with alternating depth states.
+      Example: Card (Extruded) → Icon Well (Inset Deep) → Icon (Extruded Small)
+    
+    example: |
+      <div class="neu-extruded rounded-[32px] p-8">
+        <div class="neu-inset-deep rounded-2xl p-4 w-16 h-16 flex items-center justify-center">
+          <div class="neu-extruded-sm rounded-xl p-2">
+            <Icon />
+          </div>
+        </div>
+      </div>
+
+
+# -----------------------------------------------------------------------------
+# COMPONENT MODIFICATIONS (SHADCN/UI)
+# -----------------------------------------------------------------------------
+components:
+  approach: |
+    Start with shadcn/ui components, apply neumorphic modifications.
+    Keep accessibility features, modify visual styling only.
+    All components use #E0E5EC background to maintain same-surface illusion.
+
+  button:
+    base_modifications:
+      - remove default border (border-transparent)
+      - apply neu-extruded shadow
+      - increase border-radius to 16px (rounded-2xl)
+      - add transition for shadow and transform (duration-300)
+      - minimum touch target 44x44px (h-12 for default)
+    
+    states:
+      default: neu-extruded
+      hover: translate-y-[-1px] + neu-extruded-hover
+      active: translate-y-[0.5px] + neu-inset (physical press)
+      disabled: neu-flat with opacity-50
+      focus: ring-2 ring-[#6C63FF] ring-offset-2 ring-offset-[#E0E5EC]
+    
+    variants:
+      primary:
+        background: "#6C63FF" (accent)
+        text: white
+        shadow: custom colored shadow for accent bg
+        active: specific rgba inset for colored surface
+      
+      secondary:
+        background: "#E0E5EC" (matches page)
+        text: "#3D4852"
+        shadow: standard neu-extruded
+      
+      ghost:
+        background: transparent
+        shadow: none
+        hover: bg-[#E0E5EC]/50 + neu-extruded
+      
+      outline:
+        background: transparent
+        border: 2px solid with gradient or accent
+        shadow: none
+
+    code_example: |
+      // components/ui/button.tsx
+      import { cva, type VariantProps } from "class-variance-authority"
+      
+      const buttonVariants = cva(
+        "inline-flex items-center justify-center rounded-2xl font-medium transition-all duration-300 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6C63FF] focus-visible:ring-offset-2 focus-visible:ring-offset-[#E0E5EC] disabled:pointer-events-none disabled:opacity-50 border-transparent",
+        {
+          variants: {
+            variant: {
+              default: "bg-[#6C63FF] text-white shadow-[9px_9px_16px_rgb(163,177,198,0.6),-9px_-9px_16px_rgba(255,255,255,0.5)] hover:-translate-y-[1px] hover:shadow-[12px_12px_20px_rgb(163,177,198,0.7),-12px_-12px_20px_rgba(255,255,255,0.6)] active:translate-y-[0.5px] active:shadow-[inset_3px_3px_6px_rgba(0,0,0,0.2),inset_-3px_-3px_6px_rgba(255,255,255,0.1)]",
+              secondary: "bg-[#E0E5EC] text-[#3D4852] shadow-[9px_9px_16px_rgb(163,177,198,0.6),-9px_-9px_16px_rgba(255,255,255,0.5)] hover:-translate-y-[1px] hover:shadow-[12px_12px_20px_rgb(163,177,198,0.7),-12px_-12px_20px_rgba(255,255,255,0.6)] active:translate-y-[0.5px] active:shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)]",
+              ghost: "bg-transparent hover:bg-[#E0E5EC]/50 hover:shadow-[9px_9px_16px_rgb(163,177,198,0.6),-9px_-9px_16px_rgba(255,255,255,0.5)]",
+              outline: "border-2 border-[#6C63FF]/30 bg-transparent hover:border-[#6C63FF]",
+            },
+            size: {
+              default: "h-12 px-6 py-3",
+              sm: "h-10 px-4 py-2 text-sm",
+              lg: "h-14 px-8 py-4 text-lg",
+              icon: "h-12 w-12",
+            },
+          },
+          defaultVariants: {
+            variant: "default",
+            size: "default",
+          },
+        }
+      )
+
+  card:
+    modifications:
+      - apply neu-extruded shadow
+      - generous border-radius (32px - rounded-[32px])
+      - background #E0E5EC (same as page)
+      - remove hard borders
+      - generous padding (p-8 to p-20)
+    
+    states:
+      default: neu-extruded
+      hover: translate-y-[-2px] + neu-extruded-hover
+    
+    code_example: |
+      // components/ui/card.tsx
+      const Card = React.forwardRef<HTMLDivElement, CardProps>(
+        ({ className, ...props }, ref) => (
+          <div
+            ref={ref}
+            className={cn(
+              "rounded-[32px] bg-[#E0E5EC] p-8",
+              "shadow-[9px_9px_16px_rgb(163,177,198,0.6),-9px_-9px_16px_rgba(255,255,255,0.5)]",
+              "transition-all duration-300 ease-out",
+              "hover:-translate-y-[2px] hover:shadow-[12px_12px_20px_rgb(163,177,198,0.7),-12px_-12px_20px_rgba(255,255,255,0.6)]",
+              className
+            )}
+            {...props}
+          />
+        )
+      )
+
+  input:
+    modifications:
+      - apply neu-inset shadow (appears recessed)
+      - remove border (border-transparent)
+      - generous border-radius (16px - rounded-2xl)
+      - background #E0E5EC
+    
+    states:
+      default: neu-inset
+      focus: neu-inset-deep + ring-2 ring-[#6C63FF] ring-offset-2
+      error: red-tinted inset shadow
+      disabled: neu-flat, opacity-50
+
+    code_example: |
+      // components/ui/input.tsx
+      const Input = React.forwardRef<HTMLInputElement, InputProps>(
+        ({ className, ...props }, ref) => (
+          <input
+            ref={ref}
+            className={cn(
+              "flex h-12 w-full rounded-2xl bg-[#E0E5EC] px-4 py-3",
+              "shadow-[inset_6px_6px_10px_rgb(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)]",
+              "text-[#3D4852] placeholder:text-[#A0AEC0]",
+              "transition-all duration-300",
+              "focus:shadow-[inset_10px_10px_20px_rgb(163,177,198,0.7),inset_-10px_-10px_20px_rgba(255,255,255,0.6)]",
+              "focus:outline-none focus:ring-2 focus:ring-[#6C63FF] focus:ring-offset-2 focus:ring-offset-[#E0E5EC]",
+              "disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none",
+              "border-transparent",
+              className
+            )}
+            {...props}
+          />
+        )
+      )
+
+  navigation:
+    desktop:
+      style: horizontal nav with neu-extruded container
+      items: ghost buttons
+      active: neu-inset state
+      sticky: yes with backdrop-blur
+    
+    mobile:
+      style: hamburger menu (Menu/X icons)
+      menu: slide-down panel with neu-extruded
+      touch_targets: minimum 44x44px
+
+  dialog_modal:
+    modifications:
+      - neu-extruded on modal container
+      - backdrop blur-md
+      - generous padding (p-8) and radius (rounded-[32px])
+      - background #E0E5EC
+
+  tabs:
+    modifications:
+      - tab list as neu-inset container (track)
+      - active tab as neu-extruded element (raised)
+      - smooth transition between states
+
+  icon_wells:
+    description: |
+      Icon containers that appear "drilled" into cards using deep inset shadows.
+      Creates strong visual hierarchy and showcases nested depth.
+    
+    implementation: |
+      <div class="neu-inset-deep rounded-2xl p-4 w-16 h-16 flex items-center justify-center">
+        <Icon className="w-8 h-8 text-[#6C63FF]" />
+      </div>
+
+
+# -----------------------------------------------------------------------------
+# GEOMETRIC ACCENTS
+# -----------------------------------------------------------------------------
+geometric:
+  description: |
+    Playful geometric shapes used as decorative accents to add visual interest
+    and reinforce brand personality.
+
+  shapes:
+    circle:
+      usage: hero backgrounds, card accents
+      implementation: div with border-radius full
+    
+    triangle:
+      usage: decorative corners, pointers
+      implementation: CSS clip-path or SVG
+    
+    hexagon:
+      usage: skill badges, category icons
+      implementation: CSS clip-path
+    
+    blob:
+      usage: organic backgrounds, image masks
+      implementation: SVG with smooth curves
+
+  usage_patterns:
+    hero_section:
+      - large gradient circle (blurred) in background
+      - small geometric shapes floating with parallax
+      - grid pattern overlay (subtle)
+    
+    card_accents:
+      - small circle or dot in corner
+      - gradient line accent
+    
+    section_dividers:
+      - wave or curved SVG divider
+      - geometric pattern band
+
+  implementation_example: |
+    // components/decorative/geometric-bg.tsx
+    export function GeometricBackground() {
+      return (
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {/* Large gradient blob */}
+          <div 
+            className="absolute -top-1/4 -right-1/4 w-1/2 h-1/2 
+                       bg-gradient-to-br from-primary/20 to-secondary/20 
+                       rounded-full blur-3xl"
+          />
+          {/* Small floating shapes */}
+          <div className="absolute top-20 left-10 w-4 h-4 bg-accent/30 rounded-full animate-float" />
+          <div className="absolute bottom-32 right-20 w-6 h-6 bg-primary/20 rotate-45 animate-float-delayed" />
+        </div>
+      )
+    }
+
+
+# -----------------------------------------------------------------------------
+# ANIMATIONS & TRANSITIONS
+# -----------------------------------------------------------------------------
+animations:
+  principles:
+    - purposeful: animations convey meaning
+    - subtle: avoid overwhelming motion
+    - performant: use transform and opacity only
+    - accessible: respect prefers-reduced-motion
+
+  durations:
+    fast: 150ms
+    normal: 200ms
+    slow: 300ms
+    emphasis: 500ms
+
+  easings:
+    default: "cubic-bezier(0.4, 0, 0.2, 1)"
+    in: "cubic-bezier(0.4, 0, 1, 1)"
+    out: "cubic-bezier(0, 0, 0.2, 1)"
+    bounce: "cubic-bezier(0.34, 1.56, 0.64, 1)"
+
+  common_animations:
+    fade_in:
+      keyframes: "opacity: 0 -> 1"
+      duration: normal
+      usage: page transitions, modals
+    
+    slide_up:
+      keyframes: "translateY(10px), opacity: 0 -> translateY(0), opacity: 1"
+      duration: slow
+      usage: content reveal, list items
+    
+    scale_in:
+      keyframes: "scale(0.95), opacity: 0 -> scale(1), opacity: 1"
+      duration: normal
+      usage: cards, buttons on enter
+    
+    float:
+      keyframes: "translateY(0) -> translateY(-10px) -> translateY(0)"
+      duration: 3000ms
+      iteration: infinite
+      usage: decorative elements
+    
+    pulse_soft:
+      keyframes: "opacity: 1 -> opacity: 0.7 -> opacity: 1"
+      duration: 2000ms
+      usage: loading states, attention
+
+  framer_motion_variants:
+    stagger_children: |
+      const containerVariants = {
+        hidden: { opacity: 0 },
+        visible: {
+          opacity: 1,
+          transition: { staggerChildren: 0.1 }
+        }
+      }
+      
+      const itemVariants = {
+        hidden: { y: 20, opacity: 0 },
+        visible: { y: 0, opacity: 1 }
+      }
+
+  reduced_motion: |
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+
+# -----------------------------------------------------------------------------
+# ICONS
+# -----------------------------------------------------------------------------
+icons:
+  primary:
+    library: Lucide React
+    style: outline (2px stroke)
+    size_default: 20px (w-5 h-5)
+    size_small: 16px (w-4 h-4)
+    size_large: 24px (w-6 h-6)
+  
+  brand:
+    library: Simple Icons
+    usage: social links, tech logos
+
+  custom:
+    approach: SVG components in packages/ui/icons
+    naming: PascalCase (IconName.tsx)
+
+  usage_guidelines:
+    - always provide aria-label for standalone icons
+    - use currentColor for fill/stroke
+    - pair with text for clarity when possible
+
+
+# -----------------------------------------------------------------------------
+# RESPONSIVE DESIGN
+# -----------------------------------------------------------------------------
+responsive:
+  approach: mobile-first
+  
+  breakpoint_strategy:
+    mobile: 0-639px (base styles)
+    tablet: 640-1023px (sm and md)
+    desktop: 1024px+ (lg and up)
+
+  key_adaptations:
+    typography:
+      - headings scale down 20-30% on mobile
+      - body text remains same size
+    
+    spacing:
+      - section padding reduces on mobile
+      - card padding reduces slightly
+    
+    layout:
+      - single column on mobile
+      - 2-3 columns on tablet
+      - full grid on desktop
+    
+    navigation:
+      - hamburger menu on mobile
+      - horizontal nav on desktop
+    
+    neuromorphism:
+      - reduce shadow distance on mobile (4px vs 6px)
+      - keeps effect but more subtle
+
+
+# -----------------------------------------------------------------------------
+# ACCESSIBILITY
+# -----------------------------------------------------------------------------
+accessibility:
+  color_contrast:
+    target: WCAG AA (4.5:1 for normal text, 3:1 for large)
+    challenge: neuromorphism can reduce contrast
+    solution: ensure text colors have sufficient contrast despite soft shadows
+
+  focus_states:
+    style: visible focus ring (2px primary)
+    not_removed: focus-visible remains visible
+    custom: subtle glow effect for neuromorphic consistency
+
+  motion:
+    respect_preference: prefers-reduced-motion
+    fallback: instant transitions, no animation
+
+  semantic_markup:
+    - proper heading hierarchy
+    - button vs link distinction
+    - form labels always present
+    - alt text on images
+
+  keyboard_navigation:
+    - all interactive elements focusable
+    - logical tab order
+    - skip links for main content

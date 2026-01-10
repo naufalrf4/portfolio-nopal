@@ -1,0 +1,27 @@
+{
+  "name": "ngl",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3003",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf .next .turbo node_modules"
+  },
+  "dependencies": {
+    "next": "canary",
+    "react": "latest",
+    "react-dom": "latest",
+    "@naufalrf/ui": "workspace:*",
+    "@naufalrf/types": "workspace:*",
+    "@naufalrf/sdk": "workspace:*",
+    "@naufalrf/config": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "latest",
+    "@types/react": "latest",
+    "@types/node": "latest"
+  }
+}

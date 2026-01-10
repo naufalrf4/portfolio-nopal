@@ -1,0 +1,1802 @@
+# =============================================================================
+# DIRECTORY STRUCTURE SPECIFICATION
+# naufalrf-portfolio Turborepo Monorepo
+# =============================================================================
+#
+# This document defines the canonical directory structure, naming conventions,
+# and architectural patterns for the monorepo. All new code must conform to
+# these specifications.
+#
+# Architecture: Feature-Based Modular Architecture
+# Pattern: Vertical Slice + Shared Horizontal Layers
+# =============================================================================
+
+version: "1.0.0"
+last_updated: "2025-01-10"
+
+# =============================================================================
+# ROOT MONOREPO STRUCTURE
+# =============================================================================
+
+root:
+  description: |
+    The monorepo root contains configuration files, tooling setup, and
+    workspace definitions. All apps and packages are organized under their
+    respective directories.
+
+  structure:
+    # -------------------------------------------------------------------------
+    # Configuration Files
+    # -------------------------------------------------------------------------
+    configuration:
+      - file: package.json
+        purpose: Root package.json with workspace definitions
+        required: true
+
+      - file: turbo.json
+        purpose: Turborepo pipeline configuration
+        required: true
+
+      - file: pnpm-workspace.yaml
+        purpose: PNPM workspace configuration
+        required: true
+
+      - file: tsconfig.json
+        purpose: Base TypeScript configuration (extended by packages)
+        required: true
+
+      - file: .eslintrc.js
+        purpose: Root ESLint configuration
+        required: true
+
+      - file: .prettierrc
+        purpose: Prettier formatting rules
+        required: true
+
+      - file: .gitignore
+        purpose: Git ignore patterns
+        required: true
+
+      - file: .npmrc
+        purpose: NPM/PNPM configuration
+        required: true
+
+    # -------------------------------------------------------------------------
+    # Docker & Infrastructure
+    # -------------------------------------------------------------------------
+    infrastructure:
+      - file: docker-compose.yml
+        purpose: Development environment orchestration
+        required: true
+
+      - file: docker-compose.prod.yml
+        purpose: Production deployment configuration
+        required: false
+
+      - file: Dockerfile.base
+        purpose: Base image for all services
+        required: false
+
+      - directory: .docker/
+        purpose: Docker-related configurations and scripts
+        contents:
+          - nginx/
+          - postgres/
+          - redis/
+
+    # -------------------------------------------------------------------------
+    # CI/CD & Tooling
+    # -------------------------------------------------------------------------
+    tooling:
+      - directory: .github/
+        purpose: GitHub Actions workflows and templates
+        contents:
+          - workflows/
+          - ISSUE_TEMPLATE/
+          - PULL_REQUEST_TEMPLATE.md
+
+      - directory: .husky/
+        purpose: Git hooks (pre-commit, commit-msg, etc.)
+        required: true
+
+      - directory: scripts/
+        purpose: Build, deployment, and utility scripts
+        contents:
+          - build.sh
+          - deploy.sh
+          - seed-db.ts
+          - generate-types.ts
+
+    # -------------------------------------------------------------------------
+    # Documentation & Context
+    # -------------------------------------------------------------------------
+    documentation:
+      - directory: .context/
+        purpose: AI assistant context and project documentation
+        contents:
+          - architecture/
+          - implementation/
+          - decisions/
+
+      - file: README.md
+        purpose: Project overview and setup instructions
+        required: true
+
+  # Tree visualization
+  tree: |
+    /
+    ├── apps/                          # Application packages
+    │   ├── public/                    # Portfolio website
+    │   ├── admin/                     # Admin dashboard + API
+    │   ├── links/                     # Links hub
+    │   ├── ngl/                       # Anonymous feedback
+    │   └── rag-service/               # RAG chatbot service
+    │
+    ├── packages/                      # Shared packages
+    │   ├── ui/                        # Shared UI components
+    │   ├── types/                     # Shared TypeScript types
+    │   ├── sdk/                       # API clients
+    │   ├── config/                    # Shared configurations
+    │   └── auth/                      # NextAuth configuration
+    │
+    ├── .context/                      # AI context files
+    │   ├── architecture/
+    │   ├── implementation/
+    │   └── decisions/
+    │
+    ├── .docker/                       # Docker configurations
+    ├── .github/                       # GitHub workflows
+    ├── .husky/                        # Git hooks
+    ├── scripts/                       # Build/deploy scripts
+    │
+    ├── turbo.json                     # Turborepo config
+    ├── pnpm-workspace.yaml            # Workspace definition
+    ├── package.json                   # Root package.json
+    ├── tsconfig.json                  # Base TS config
+    ├── docker-compose.yml             # Dev environment
+    └── README.md
+
+# =============================================================================
+# NEXT.JS APP ARCHITECTURE
+# =============================================================================
+
+nextjs_app:
+  description: |
+    All Next.js applications follow a feature-based architecture pattern.
+    Features are self-contained modules that encapsulate related functionality.
+    Shared code lives in horizontal layers (components/ui, lib, etc.).
+
+  # ---------------------------------------------------------------------------
+  # App Router Structure (Next.js 14+)
+  # ---------------------------------------------------------------------------
+  app_router:
+    description: |
+      The app/ directory follows Next.js App Router conventions.
+      Route groups, layouts, and special files are organized logically.
+
+    structure:
+      - directory: app/
+        purpose: Next.js App Router root
+        contents:
+          # Route Groups
+          - directory: (public)/
+            purpose: Public-facing routes (no auth required)
+            note: Parentheses create route group without URL segment
+
+          - directory: (auth)/
+            purpose: Authentication routes (login, register, etc.)
+
+          - directory: (dashboard)/
+            purpose: Authenticated dashboard routes
+
+          # API Routes
+          - directory: api/
+            purpose: API route handlers
+            pattern: "api/[resource]/route.ts"
+
+          # Special Files
+          - file: layout.tsx
+            purpose: Root layout component
+
+          - file: page.tsx
+            purpose: Root page component
+
+          - file: loading.tsx
+            purpose: Loading UI for Suspense boundaries
+
+          - file: error.tsx
+            purpose: Error boundary component
+
+          - file: not-found.tsx
+            purpose: 404 page component
+
+          - file: globals.css
+            purpose: Global styles (imported in root layout)
+
+  # ---------------------------------------------------------------------------
+  # Feature-Based Architecture
+  # ---------------------------------------------------------------------------
+  features:
+    description: |
+      Features are self-contained modules organized by business domain.
+      Each feature encapsulates its own components, hooks, services, and types.
+      Features should be independent and loosely coupled.
+
+    location: src/features/
+
+    structure:
+      feature_module:
+        description: A single feature module structure
+        contents:
+          - directory: components/
+            purpose: Feature-specific React components
+            files:
+              - pattern: "{ComponentName}.tsx"
+                example: "ProjectCard.tsx"
+              - pattern: "{ComponentName}.test.tsx"
+                example: "ProjectCard.test.tsx"
+              - pattern: index.ts
+                purpose: Barrel export for components
+
+          - directory: hooks/
+            purpose: Feature-specific custom hooks
+            files:
+              - pattern: "use{HookName}.ts"
+                example: "useProjects.ts"
+              - pattern: "use{HookName}.test.ts"
+                example: "useProjects.test.ts"
+              - pattern: index.ts
+                purpose: Barrel export for hooks
+
+          - directory: services/
+            purpose: Feature-specific API calls and business logic
+            files:
+              - pattern: "{serviceName}.service.ts"
+                example: "projects.service.ts"
+              - pattern: "{serviceName}.service.test.ts"
+                example: "projects.service.test.ts"
+              - pattern: index.ts
+                purpose: Barrel export for services
+
+          - directory: types/
+            purpose: Feature-specific TypeScript types
+            files:
+              - pattern: "{typeName}.types.ts"
+                example: "project.types.ts"
+              - pattern: index.ts
+                purpose: Barrel export for types
+
+          - directory: utils/
+            purpose: Feature-specific utility functions
+            files:
+              - pattern: "{utilName}.util.ts"
+                example: "projectSlug.util.ts"
+              - pattern: index.ts
+                purpose: Barrel export for utils
+
+          - directory: stores/
+            purpose: Feature-specific state management (optional)
+            files:
+              - pattern: "{storeName}.store.ts"
+                example: "projectFilters.store.ts"
+              - pattern: index.ts
+                purpose: Barrel export for stores
+
+          - file: index.ts
+            purpose: Feature barrel export (public API)
+            note: Only export what should be used outside the feature
+
+    examples:
+      - name: projects
+        description: Project showcase feature
+        exports:
+          - ProjectGrid
+          - ProjectCard
+          - useProjects
+          - useProjectDetail
+          - projectsService
+
+      - name: blog
+        description: Blog/articles feature
+        exports:
+          - ArticleList
+          - ArticleCard
+          - ArticleContent
+          - useBlogPosts
+          - blogService
+
+      - name: contact
+        description: Contact form feature
+        exports:
+          - ContactForm
+          - useContactForm
+          - contactService
+
+  # ---------------------------------------------------------------------------
+  # Shared App-Level Directories
+  # ---------------------------------------------------------------------------
+  shared:
+    description: |
+      Shared directories contain code that is used across multiple features
+      within the same application. This is the horizontal layer of the architecture.
+
+    directories:
+      - directory: src/components/
+        purpose: Shared components within the app
+        subdirectories:
+          - directory: ui/
+            purpose: Base UI components (often wrapping @repo/ui)
+            examples:
+              - Button.tsx
+              - Input.tsx
+              - Card.tsx
+              - Modal.tsx
+
+          - directory: layout/
+            purpose: Layout components
+            examples:
+              - Header.tsx
+              - Footer.tsx
+              - Sidebar.tsx
+              - Container.tsx
+
+          - directory: common/
+            purpose: Common composite components
+            examples:
+              - SEOHead.tsx
+              - LoadingSpinner.tsx
+              - ErrorBoundary.tsx
+
+      - directory: src/lib/
+        purpose: Shared utilities and configurations
+        subdirectories:
+          - directory: utils/
+            purpose: Utility functions
+            examples:
+              - cn.ts          # classnames helper
+              - format.ts      # formatters
+              - validation.ts  # validation helpers
+
+          - directory: constants/
+            purpose: Application constants
+            examples:
+              - routes.ts
+              - config.ts
+              - seo.ts
+
+          - directory: api/
+            purpose: API client configuration
+            examples:
+              - client.ts
+              - interceptors.ts
+
+      - directory: src/styles/
+        purpose: Styling files
+        files:
+          - globals.css
+          - variables.css
+          - animations.css
+          - typography.css
+
+      - directory: src/hooks/
+        purpose: Shared custom hooks (app-wide)
+        examples:
+          - useMediaQuery.ts
+          - useLocalStorage.ts
+          - useDebounce.ts
+
+      - directory: src/providers/
+        purpose: React context providers
+        examples:
+          - ThemeProvider.tsx
+          - QueryProvider.tsx
+          - AuthProvider.tsx
+
+      - directory: src/types/
+        purpose: Shared app-level types
+        files:
+          - global.d.ts
+          - env.d.ts
+
+# =============================================================================
+# EXAMPLE: apps/public (Portfolio Site)
+# =============================================================================
+
+example_apps_public:
+  description: |
+    The public portfolio site showcasing projects, blog posts, and contact form.
+    Uses feature-based architecture with App Router.
+
+  tree: |
+    apps/public/
+    ├── app/                                    # Next.js App Router
+    │   ├── (public)/                           # Public routes group
+    │   │   ├── page.tsx                        # Homepage
+    │   │   ├── about/
+    │   │   │   └── page.tsx
+    │   │   ├── projects/
+    │   │   │   ├── page.tsx                    # Projects list
+    │   │   │   └── [slug]/
+    │   │   │       └── page.tsx                # Project detail
+    │   │   ├── blog/
+    │   │   │   ├── page.tsx                    # Blog list
+    │   │   │   └── [slug]/
+    │   │   │       └── page.tsx                # Blog post
+    │   │   └── contact/
+    │   │       └── page.tsx
+    │   │
+    │   ├── api/                                # API routes
+    │   │   ├── contact/
+    │   │   │   └── route.ts
+    │   │   ├── chat/
+    │   │   │   └── route.ts
+    │   │   └── revalidate/
+    │   │       └── route.ts
+    │   │
+    │   ├── layout.tsx                          # Root layout
+    │   ├── loading.tsx                         # Global loading
+    │   ├── error.tsx                           # Global error
+    │   ├── not-found.tsx                       # 404 page
+    │   └── globals.css                         # Global styles
+    │
+    ├── src/
+    │   ├── features/                           # Feature modules
+    │   │   ├── hero/                           # Hero section feature
+    │   │   │   ├── components/
+    │   │   │   │   ├── HeroSection.tsx
+    │   │   │   │   ├── HeroTitle.tsx
+    │   │   │   │   ├── HeroSubtitle.tsx
+    │   │   │   │   ├── HeroCTA.tsx
+    │   │   │   │   └── index.ts
+    │   │   │   ├── hooks/
+    │   │   │   │   ├── useTypewriter.ts
+    │   │   │   │   └── index.ts
+    │   │   │   └── index.ts                    # Feature barrel
+    │   │   │
+    │   │   ├── projects/                       # Projects feature
+    │   │   │   ├── components/
+    │   │   │   │   ├── ProjectGrid.tsx
+    │   │   │   │   ├── ProjectCard.tsx
+    │   │   │   │   ├── ProjectDetail.tsx
+    │   │   │   │   ├── ProjectTechStack.tsx
+    │   │   │   │   ├── ProjectFilters.tsx
+    │   │   │   │   └── index.ts
+    │   │   │   ├── hooks/
+    │   │   │   │   ├── useProjects.ts
+    │   │   │   │   ├── useProjectDetail.ts
+    │   │   │   │   ├── useProjectFilters.ts
+    │   │   │   │   └── index.ts
+    │   │   │   ├── services/
+    │   │   │   │   ├── projects.service.ts
+    │   │   │   │   └── index.ts
+    │   │   │   ├── types/
+    │   │   │   │   ├── project.types.ts
+    │   │   │   │   └── index.ts
+    │   │   │   ├── utils/
+    │   │   │   │   ├── projectSlug.util.ts
+    │   │   │   │   └── index.ts
+    │   │   │   └── index.ts
+    │   │   │
+    │   │   ├── blog/                           # Blog feature
+    │   │   │   ├── components/
+    │   │   │   │   ├── ArticleList.tsx
+    │   │   │   │   ├── ArticleCard.tsx
+    │   │   │   │   ├── ArticleContent.tsx
+    │   │   │   │   ├── ArticleMeta.tsx
+    │   │   │   │   ├── TableOfContents.tsx
+    │   │   │   │   └── index.ts
+    │   │   │   ├── hooks/
+    │   │   │   │   ├── useBlogPosts.ts
+    │   │   │   │   ├── useBlogPost.ts
+    │   │   │   │   └── index.ts
+    │   │   │   ├── services/
+    │   │   │   │   ├── blog.service.ts
+    │   │   │   │   └── index.ts
+    │   │   │   ├── types/
+    │   │   │   │   ├── article.types.ts
+    │   │   │   │   └── index.ts
+    │   │   │   └── index.ts
+    │   │   │
+    │   │   ├── contact/                        # Contact feature
+    │   │   │   ├── components/
+    │   │   │   │   ├── ContactForm.tsx
+    │   │   │   │   ├── ContactInfo.tsx
+    │   │   │   │   ├── SocialLinks.tsx
+    │   │   │   │   └── index.ts
+    │   │   │   ├── hooks/
+    │   │   │   │   ├── useContactForm.ts
+    │   │   │   │   └── index.ts
+    │   │   │   ├── services/
+    │   │   │   │   ├── contact.service.ts
+    │   │   │   │   └── index.ts
+    │   │   │   ├── types/
+    │   │   │   │   ├── contact.types.ts
+    │   │   │   │   └── index.ts
+    │   │   │   └── index.ts
+    │   │   │
+    │   │   ├── chat/                           # AI Chat feature
+    │   │   │   ├── components/
+    │   │   │   │   ├── ChatWidget.tsx
+    │   │   │   │   ├── ChatMessage.tsx
+    │   │   │   │   ├── ChatInput.tsx
+    │   │   │   │   ├── ChatToggle.tsx
+    │   │   │   │   └── index.ts
+    │   │   │   ├── hooks/
+    │   │   │   │   ├── useChat.ts
+    │   │   │   │   ├── useChatHistory.ts
+    │   │   │   │   └── index.ts
+    │   │   │   ├── services/
+    │   │   │   │   ├── chat.service.ts
+    │   │   │   │   └── index.ts
+    │   │   │   ├── stores/
+    │   │   │   │   ├── chat.store.ts
+    │   │   │   │   └── index.ts
+    │   │   │   ├── types/
+    │   │   │   │   ├── chat.types.ts
+    │   │   │   │   └── index.ts
+    │   │   │   └── index.ts
+    │   │   │
+    │   │   └── about/                          # About feature
+    │   │       ├── components/
+    │   │       │   ├── AboutSection.tsx
+    │   │       │   ├── SkillsGrid.tsx
+    │   │       │   ├── ExperienceTimeline.tsx
+    │   │       │   └── index.ts
+    │   │       ├── types/
+    │   │       │   ├── about.types.ts
+    │   │       │   └── index.ts
+    │   │       └── index.ts
+    │   │
+    │   ├── components/                         # Shared components
+    │   │   ├── ui/                             # Base UI components
+    │   │   │   ├── Button.tsx
+    │   │   │   ├── Card.tsx
+    │   │   │   ├── Input.tsx
+    │   │   │   ├── Badge.tsx
+    │   │   │   ├── Skeleton.tsx
+    │   │   │   └── index.ts
+    │   │   │
+    │   │   ├── layout/                         # Layout components
+    │   │   │   ├── Header.tsx
+    │   │   │   ├── Footer.tsx
+    │   │   │   ├── Navigation.tsx
+    │   │   │   ├── Container.tsx
+    │   │   │   ├── Section.tsx
+    │   │   │   └── index.ts
+    │   │   │
+    │   │   ├── common/                         # Common components
+    │   │   │   ├── SEOHead.tsx
+    │   │   │   ├── LoadingSpinner.tsx
+    │   │   │   ├── ErrorMessage.tsx
+    │   │   │   ├── AnimatedSection.tsx
+    │   │   │   └── index.ts
+    │   │   │
+    │   │   └── index.ts                        # Components barrel
+    │   │
+    │   ├── lib/                                # Utilities & config
+    │   │   ├── utils/
+    │   │   │   ├── cn.ts                       # className helper
+    │   │   │   ├── format.ts                   # formatters
+    │   │   │   └── index.ts
+    │   │   │
+    │   │   ├── constants/
+    │   │   │   ├── routes.ts                   # Route definitions
+    │   │   │   ├── seo.ts                      # SEO defaults
+    │   │   │   ├── config.ts                   # App config
+    │   │   │   └── index.ts
+    │   │   │
+    │   │   ├── api/
+    │   │   │   ├── client.ts                   # API client setup
+    │   │   │   └── index.ts
+    │   │   │
+    │   │   └── index.ts
+    │   │
+    │   ├── hooks/                              # Shared hooks
+    │   │   ├── useMediaQuery.ts
+    │   │   ├── useScrollPosition.ts
+    │   │   ├── useIntersectionObserver.ts
+    │   │   └── index.ts
+    │   │
+    │   ├── providers/                          # Context providers
+    │   │   ├── ThemeProvider.tsx
+    │   │   ├── QueryProvider.tsx
+    │   │   └── index.ts
+    │   │
+    │   ├── styles/                             # Styles
+    │   │   ├── globals.css
+    │   │   ├── variables.css
+    │   │   ├── animations.css
+    │   │   └── typography.css
+    │   │
+    │   └── types/                              # Shared types
+    │       ├── global.d.ts
+    │       └── env.d.ts
+    │
+    ├── public/                                 # Static assets
+    │   ├── images/
+    │   ├── fonts/
+    │   └── favicon.ico
+    │
+    ├── next.config.js
+    ├── tailwind.config.ts
+    ├── postcss.config.js
+    ├── tsconfig.json
+    └── package.json
+
+# =============================================================================
+# EXAMPLE: apps/admin (Admin Dashboard + API)
+# =============================================================================
+
+example_apps_admin:
+  description: |
+    The admin dashboard for content management and analytics.
+    Includes both frontend dashboard and API routes.
+
+  tree: |
+    apps/admin/
+    ├── app/                                    # Next.js App Router
+    │   ├── (auth)/                             # Auth routes (public)
+    │   │   ├── login/
+    │   │   │   └── page.tsx
+    │   │   ├── forgot-password/
+    │   │   │   └── page.tsx
+    │   │   └── layout.tsx                      # Auth layout (no sidebar)
+    │   │
+    │   ├── (dashboard)/                        # Dashboard routes (protected)
+    │   │   ├── layout.tsx                      # Dashboard layout (with sidebar)
+    │   │   ├── page.tsx                        # Dashboard home
+    │   │   │
+    │   │   ├── projects/
+    │   │   │   ├── page.tsx                    # Projects list
+    │   │   │   ├── new/
+    │   │   │   │   └── page.tsx                # Create project
+    │   │   │   └── [id]/
+    │   │   │       ├── page.tsx                # View project
+    │   │   │       └── edit/
+    │   │   │           └── page.tsx            # Edit project
+    │   │   │
+    │   │   ├── blog/
+    │   │   │   ├── page.tsx
+    │   │   │   ├── new/
+    │   │   │   │   └── page.tsx
+    │   │   │   └── [id]/
+    │   │   │       ├── page.tsx
+    │   │   │       └── edit/
+    │   │   │           └── page.tsx
+    │   │   │
+    │   │   ├── links/
+    │   │   │   ├── page.tsx
+    │   │   │   └── [id]/
+    │   │   │       └── page.tsx
+    │   │   │
+    │   │   ├── feedback/                       # NGL feedback management
+    │   │   │   ├── page.tsx
+    │   │   │   └── [id]/
+    │   │   │       └── page.tsx
+    │   │   │
+    │   │   ├── analytics/
+    │   │   │   └── page.tsx
+    │   │   │
+    │   │   ├── rag/                            # RAG management
+    │   │   │   ├── page.tsx
+    │   │   │   ├── documents/
+    │   │   │   │   └── page.tsx
+    │   │   │   └── conversations/
+    │   │   │       └── page.tsx
+    │   │   │
+    │   │   └── settings/
+    │   │       └── page.tsx
+    │   │
+    │   ├── api/                                # API routes
+    │   │   ├── auth/
+    │   │   │   └── [...nextauth]/
+    │   │   │       └── route.ts
+    │   │   │
+    │   │   ├── v1/                             # Versioned API
+    │   │   │   ├── projects/
+    │   │   │   │   ├── route.ts                # GET (list), POST (create)
+    │   │   │   │   └── [id]/
+    │   │   │   │       └── route.ts            # GET, PUT, DELETE
+    │   │   │   │
+    │   │   │   ├── blog/
+    │   │   │   │   ├── route.ts
+    │   │   │   │   └── [id]/
+    │   │   │   │       └── route.ts
+    │   │   │   │
+    │   │   │   ├── links/
+    │   │   │   │   ├── route.ts
+    │   │   │   │   └── [id]/
+    │   │   │   │       └── route.ts
+    │   │   │   │
+    │   │   │   ├── feedback/
+    │   │   │   │   ├── route.ts
+    │   │   │   │   └── [id]/
+    │   │   │   │       └── route.ts
+    │   │   │   │
+    │   │   │   ├── analytics/
+    │   │   │   │   └── route.ts
+    │   │   │   │
+    │   │   │   ├── rag/
+    │   │   │   │   ├── documents/
+    │   │   │   │   │   └── route.ts
+    │   │   │   │   └── query/
+    │   │   │   │       └── route.ts
+    │   │   │   │
+    │   │   │   └── upload/
+    │   │   │       └── route.ts
+    │   │   │
+    │   │   └── webhooks/
+    │   │       └── route.ts
+    │   │
+    │   ├── layout.tsx
+    │   ├── loading.tsx
+    │   ├── error.tsx
+    │   └── globals.css
+    │
+    ├── src/
+    │   ├── features/                           # Feature modules
+    │   │   ├── dashboard/                      # Dashboard home feature
+    │   │   │   ├── components/
+    │   │   │   │   ├── DashboardOverview.tsx
+    │   │   │   │   ├── StatsCard.tsx
+    │   │   │   │   ├── RecentActivity.tsx
+    │   │   │   │   ├── QuickActions.tsx
+    │   │   │   │   └── index.ts
+    │   │   │   ├── hooks/
+    │   │   │   │   ├── useDashboardStats.ts
+    │   │   │   │   └── index.ts
+    │   │   │   ├── services/
+    │   │   │   │   ├── dashboard.service.ts
+    │   │   │   │   └── index.ts
+    │   │   │   └── index.ts
+    │   │   │
+    │   │   ├── projects/                       # Projects management
+    │   │   │   ├── components/
+    │   │   │   │   ├── ProjectsTable.tsx
+    │   │   │   │   ├── ProjectForm.tsx
+    │   │   │   │   ├── ProjectActions.tsx
+    │   │   │   │   ├── ImageUploader.tsx
+    │   │   │   │   └── index.ts
+    │   │   │   ├── hooks/
+    │   │   │   │   ├── useProjects.ts
+    │   │   │   │   ├── useProjectMutations.ts
+    │   │   │   │   └── index.ts
+    │   │   │   ├── services/
+    │   │   │   │   ├── projects.service.ts
+    │   │   │   │   └── index.ts
+    │   │   │   ├── types/
+    │   │   │   │   ├── project.types.ts
+    │   │   │   │   └── index.ts
+    │   │   │   ├── validations/
+    │   │   │   │   ├── project.schema.ts       # Zod schemas
+    │   │   │   │   └── index.ts
+    │   │   │   └── index.ts
+    │   │   │
+    │   │   ├── blog/                           # Blog management
+    │   │   │   ├── components/
+    │   │   │   │   ├── ArticlesTable.tsx
+    │   │   │   │   ├── ArticleForm.tsx
+    │   │   │   │   ├── MarkdownEditor.tsx
+    │   │   │   │   ├── ArticlePreview.tsx
+    │   │   │   │   └── index.ts
+    │   │   │   ├── hooks/
+    │   │   │   │   ├── useArticles.ts
+    │   │   │   │   ├── useArticleMutations.ts
+    │   │   │   │   └── index.ts
+    │   │   │   ├── services/
+    │   │   │   │   ├── articles.service.ts
+    │   │   │   │   └── index.ts
+    │   │   │   └── index.ts
+    │   │   │
+    │   │   ├── links/                          # Links management
+    │   │   │   ├── components/
+    │   │   │   │   ├── LinksTable.tsx
+    │   │   │   │   ├── LinkForm.tsx
+    │   │   │   │   ├── LinkStats.tsx
+    │   │   │   │   └── index.ts
+    │   │   │   ├── hooks/
+    │   │   │   ├── services/
+    │   │   │   └── index.ts
+    │   │   │
+    │   │   ├── feedback/                       # Feedback management
+    │   │   │   ├── components/
+    │   │   │   │   ├── FeedbackList.tsx
+    │   │   │   │   ├── FeedbackCard.tsx
+    │   │   │   │   ├── FeedbackActions.tsx
+    │   │   │   │   └── index.ts
+    │   │   │   ├── hooks/
+    │   │   │   ├── services/
+    │   │   │   └── index.ts
+    │   │   │
+    │   │   ├── analytics/                      # Analytics feature
+    │   │   │   ├── components/
+    │   │   │   │   ├── AnalyticsDashboard.tsx
+    │   │   │   │   ├── VisitorsChart.tsx
+    │   │   │   │   ├── TrafficSources.tsx
+    │   │   │   │   ├── TopPages.tsx
+    │   │   │   │   └── index.ts
+    │   │   │   ├── hooks/
+    │   │   │   ├── services/
+    │   │   │   └── index.ts
+    │   │   │
+    │   │   ├── rag/                            # RAG management
+    │   │   │   ├── components/
+    │   │   │   │   ├── DocumentsList.tsx
+    │   │   │   │   ├── DocumentUpload.tsx
+    │   │   │   │   ├── ConversationsList.tsx
+    │   │   │   │   └── index.ts
+    │   │   │   ├── hooks/
+    │   │   │   ├── services/
+    │   │   │   └── index.ts
+    │   │   │
+    │   │   ├── auth/                           # Auth feature
+    │   │   │   ├── components/
+    │   │   │   │   ├── LoginForm.tsx
+    │   │   │   │   ├── ForgotPasswordForm.tsx
+    │   │   │   │   └── index.ts
+    │   │   │   ├── hooks/
+    │   │   │   │   ├── useAuth.ts
+    │   │   │   │   └── index.ts
+    │   │   │   └── index.ts
+    │   │   │
+    │   │   └── settings/                       # Settings feature
+    │   │       ├── components/
+    │   │       │   ├── SettingsForm.tsx
+    │   │       │   ├── ProfileSettings.tsx
+    │   │       │   ├── SiteSettings.tsx
+    │   │       │   └── index.ts
+    │   │       └── index.ts
+    │   │
+    │   ├── components/                         # Shared components
+    │   │   ├── ui/                             # Base UI (extend @repo/ui)
+    │   │   │   ├── DataTable.tsx
+    │   │   │   ├── Dialog.tsx
+    │   │   │   ├── DropdownMenu.tsx
+    │   │   │   ├── Form.tsx
+    │   │   │   ├── Toast.tsx
+    │   │   │   └── index.ts
+    │   │   │
+    │   │   ├── layout/                         # Layout components
+    │   │   │   ├── DashboardLayout.tsx
+    │   │   │   ├── Sidebar.tsx
+    │   │   │   ├── Header.tsx
+    │   │   │   ├── Breadcrumb.tsx
+    │   │   │   └── index.ts
+    │   │   │
+    │   │   └── common/
+    │   │       ├── PageHeader.tsx
+    │   │       ├── EmptyState.tsx
+    │   │       ├── ConfirmDialog.tsx
+    │   │       └── index.ts
+    │   │
+    │   ├── lib/
+    │   │   ├── utils/
+    │   │   ├── constants/
+    │   │   ├── api/
+    │   │   │   ├── handlers.ts                 # API route utilities
+    │   │   │   ├── middleware.ts               # API middleware
+    │   │   │   └── responses.ts                # Response helpers
+    │   │   ├── db/
+    │   │   │   ├── prisma.ts                   # Prisma client
+    │   │   │   └── queries/                    # Reusable queries
+    │   │   └── validations/
+    │   │       └── common.ts                   # Common Zod schemas
+    │   │
+    │   ├── hooks/
+    │   ├── providers/
+    │   ├── styles/
+    │   └── types/
+    │
+    ├── prisma/
+    │   ├── schema.prisma
+    │   ├── migrations/
+    │   └── seed.ts
+    │
+    ├── next.config.js
+    ├── tailwind.config.ts
+    ├── tsconfig.json
+    └── package.json
+
+# =============================================================================
+# SHARED PACKAGES STRUCTURE
+# =============================================================================
+
+packages:
+  # ---------------------------------------------------------------------------
+  # packages/ui - Shared UI Components
+  # ---------------------------------------------------------------------------
+  ui:
+    description: |
+      Shared UI component library used across all Next.js apps.
+      Built with React, Tailwind CSS, and optionally Radix UI primitives.
+
+    tree: |
+      packages/ui/
+      ├── src/
+      │   ├── components/                       # UI components
+      │   │   ├── button/
+      │   │   │   ├── Button.tsx
+      │   │   │   ├── Button.stories.tsx        # Storybook stories
+      │   │   │   ├── Button.test.tsx           # Tests
+      │   │   │   ├── button.styles.ts          # Variant styles
+      │   │   │   └── index.ts
+      │   │   │
+      │   │   ├── card/
+      │   │   │   ├── Card.tsx
+      │   │   │   ├── CardHeader.tsx
+      │   │   │   ├── CardContent.tsx
+      │   │   │   ├── CardFooter.tsx
+      │   │   │   └── index.ts
+      │   │   │
+      │   │   ├── input/
+      │   │   │   ├── Input.tsx
+      │   │   │   ├── TextArea.tsx
+      │   │   │   └── index.ts
+      │   │   │
+      │   │   ├── badge/
+      │   │   ├── avatar/
+      │   │   ├── skeleton/
+      │   │   ├── spinner/
+      │   │   ├── tooltip/
+      │   │   └── ... (other components)
+      │   │
+      │   ├── hooks/                            # Shared hooks
+      │   │   ├── useMediaQuery.ts
+      │   │   └── index.ts
+      │   │
+      │   ├── utils/                            # Utility functions
+      │   │   ├── cn.ts                         # classnames helper
+      │   │   └── index.ts
+      │   │
+      │   └── index.ts                          # Main barrel export
+      │
+      ├── tailwind.config.ts                    # Tailwind preset
+      ├── tsconfig.json
+      ├── package.json
+      └── README.md
+
+    exports:
+      pattern: "@repo/ui"
+      examples:
+        - "import { Button, Card, Input } from '@repo/ui'"
+        - "import { cn } from '@repo/ui/utils'"
+
+  # ---------------------------------------------------------------------------
+  # packages/types - Shared TypeScript Types
+  # ---------------------------------------------------------------------------
+  types:
+    description: |
+      Shared TypeScript type definitions used across all packages and apps.
+      Contains entity types, API types, and utility types.
+
+    tree: |
+      packages/types/
+      ├── src/
+      │   ├── entities/                         # Domain entity types
+      │   │   ├── project.ts
+      │   │   ├── article.ts
+      │   │   ├── link.ts
+      │   │   ├── feedback.ts
+      │   │   ├── user.ts
+      │   │   └── index.ts
+      │   │
+      │   ├── api/                              # API-related types
+      │   │   ├── requests.ts                   # Request types
+      │   │   ├── responses.ts                  # Response types
+      │   │   ├── errors.ts                     # Error types
+      │   │   └── index.ts
+      │   │
+      │   ├── common/                           # Common utility types
+      │   │   ├── pagination.ts
+      │   │   ├── filters.ts
+      │   │   ├── sorting.ts
+      │   │   └── index.ts
+      │   │
+      │   ├── rag/                              # RAG-specific types
+      │   │   ├── document.ts
+      │   │   ├── query.ts
+      │   │   ├── conversation.ts
+      │   │   └── index.ts
+      │   │
+      │   └── index.ts                          # Main barrel export
+      │
+      ├── tsconfig.json
+      └── package.json
+
+    exports:
+      pattern: "@repo/types"
+      examples:
+        - "import type { Project, Article } from '@repo/types'"
+        - "import type { ApiResponse, PaginatedResponse } from '@repo/types/api'"
+
+  # ---------------------------------------------------------------------------
+  # packages/sdk - API Clients
+  # ---------------------------------------------------------------------------
+  sdk:
+    description: |
+      Type-safe API clients for interacting with backend services.
+      Provides a consistent interface for all apps to communicate with APIs.
+
+    tree: |
+      packages/sdk/
+      ├── src/
+      │   ├── clients/                          # API clients
+      │   │   ├── admin/                        # Admin API client
+      │   │   │   ├── AdminClient.ts
+      │   │   │   ├── projects.ts
+      │   │   │   ├── articles.ts
+      │   │   │   ├── links.ts
+      │   │   │   ├── feedback.ts
+      │   │   │   └── index.ts
+      │   │   │
+      │   │   ├── rag/                          # RAG service client
+      │   │   │   ├── RagClient.ts
+      │   │   │   ├── query.ts
+      │   │   │   ├── documents.ts
+      │   │   │   └── index.ts
+      │   │   │
+      │   │   └── index.ts
+      │   │
+      │   ├── core/                             # Core client utilities
+      │   │   ├── BaseClient.ts                 # Base HTTP client
+      │   │   ├── interceptors.ts               # Request/response interceptors
+      │   │   ├── errors.ts                     # Error handling
+      │   │   └── index.ts
+      │   │
+      │   ├── types/                            # SDK-specific types
+      │   │   ├── config.ts
+      │   │   └── index.ts
+      │   │
+      │   └── index.ts
+      │
+      ├── tsconfig.json
+      └── package.json
+
+    exports:
+      pattern: "@repo/sdk"
+      examples:
+        - "import { AdminClient, RagClient } from '@repo/sdk'"
+        - "import { createAdminClient } from '@repo/sdk/admin'"
+
+  # ---------------------------------------------------------------------------
+  # packages/config - Shared Configurations
+  # ---------------------------------------------------------------------------
+  config:
+    description: |
+      Shared configuration files and presets for build tools, linting, etc.
+      Provides consistent tooling configuration across all packages.
+
+    tree: |
+      packages/config/
+      ├── eslint/
+      │   ├── base.js                           # Base ESLint config
+      │   ├── next.js                           # Next.js ESLint config
+      │   ├── react.js                          # React ESLint config
+      │   ├── node.js                           # Node.js ESLint config
+      │   └── index.js
+      │
+      ├── typescript/
+      │   ├── base.json                         # Base TS config
+      │   ├── nextjs.json                       # Next.js TS config
+      │   ├── node.json                         # Node.js TS config
+      │   ├── react-library.json                # React library TS config
+      │   └── index.js
+      │
+      ├── tailwind/
+      │   ├── base.config.ts                    # Base Tailwind config
+      │   ├── preset.ts                         # Shared Tailwind preset
+      │   └── index.ts
+      │
+      ├── prettier/
+      │   └── index.js                          # Prettier config
+      │
+      ├── jest/
+      │   ├── base.config.js                    # Base Jest config
+      │   └── index.js
+      │
+      └── package.json
+
+    exports:
+      pattern: "@repo/config/*"
+      examples:
+        - "extends: ['@repo/config/eslint/next']"
+        - "extends: '@repo/config/typescript/nextjs.json'"
+
+  # ---------------------------------------------------------------------------
+  # packages/auth - NextAuth Configuration
+  # ---------------------------------------------------------------------------
+  auth:
+    description: |
+      Shared NextAuth.js configuration and utilities.
+      Provides authentication setup for all Next.js apps that need auth.
+
+    tree: |
+      packages/auth/
+      ├── src/
+      │   ├── config/
+      │   │   ├── auth.config.ts                # NextAuth configuration
+      │   │   ├── providers.ts                  # Auth providers setup
+      │   │   └── index.ts
+      │   │
+      │   ├── adapters/
+      │   │   ├── prisma.ts                     # Prisma adapter
+      │   │   └── index.ts
+      │   │
+      │   ├── callbacks/
+      │   │   ├── jwt.ts                        # JWT callback
+      │   │   ├── session.ts                    # Session callback
+      │   │   └── index.ts
+      │   │
+      │   ├── utils/
+      │   │   ├── getSession.ts                 # Get session utilities
+      │   │   ├── requireAuth.ts                # Auth guards
+      │   │   └── index.ts
+      │   │
+      │   ├── types/
+      │   │   ├── next-auth.d.ts                # NextAuth type augmentation
+      │   │   └── index.ts
+      │   │
+      │   └── index.ts
+      │
+      ├── tsconfig.json
+      └── package.json
+
+    exports:
+      pattern: "@repo/auth"
+      examples:
+        - "import { authConfig } from '@repo/auth'"
+        - "import { getServerSession, requireAuth } from '@repo/auth'"
+
+# =============================================================================
+# OTHER APPS STRUCTURE
+# =============================================================================
+
+other_apps:
+  # ---------------------------------------------------------------------------
+  # apps/links - Links Hub
+  # ---------------------------------------------------------------------------
+  links:
+    description: Link-in-bio style links hub (like Linktree)
+    key_features:
+      - Public links page
+      - Click tracking
+      - Custom themes
+
+    tree: |
+      apps/links/
+      ├── app/
+      │   ├── page.tsx                          # Main links page
+      │   ├── [slug]/
+      │   │   └── page.tsx                      # Custom slug pages
+      │   ├── api/
+      │   │   └── click/
+      │   │       └── route.ts                  # Track clicks
+      │   ├── layout.tsx
+      │   └── globals.css
+      │
+      ├── src/
+      │   ├── features/
+      │   │   └── links/
+      │   │       ├── components/
+      │   │       │   ├── LinksList.tsx
+      │   │       │   ├── LinkButton.tsx
+      │   │       │   ├── SocialLinks.tsx
+      │   │       │   └── index.ts
+      │   │       ├── hooks/
+      │   │       ├── services/
+      │   │       └── index.ts
+      │   │
+      │   ├── components/
+      │   │   ├── ui/
+      │   │   └── layout/
+      │   │       ├── ProfileHeader.tsx
+      │   │       └── index.ts
+      │   │
+      │   └── lib/
+      │
+      ├── next.config.js
+      └── package.json
+
+  # ---------------------------------------------------------------------------
+  # apps/ngl - Anonymous Feedback
+  # ---------------------------------------------------------------------------
+  ngl:
+    description: Anonymous feedback/questions app (like NGL)
+    key_features:
+      - Anonymous question submission
+      - Question display
+      - Spam filtering
+
+    tree: |
+      apps/ngl/
+      ├── app/
+      │   ├── page.tsx                          # Submit question
+      │   ├── inbox/
+      │   │   └── page.tsx                      # View questions (protected)
+      │   ├── api/
+      │   │   ├── questions/
+      │   │   │   └── route.ts
+      │   │   └── spam-check/
+      │   │       └── route.ts
+      │   ├── layout.tsx
+      │   └── globals.css
+      │
+      ├── src/
+      │   ├── features/
+      │   │   ├── submit/
+      │   │   │   ├── components/
+      │   │   │   │   ├── QuestionForm.tsx
+      │   │   │   │   ├── SuccessMessage.tsx
+      │   │   │   │   └── index.ts
+      │   │   │   ├── hooks/
+      │   │   │   └── index.ts
+      │   │   │
+      │   │   └── inbox/
+      │   │       ├── components/
+      │   │       │   ├── QuestionsList.tsx
+      │   │       │   ├── QuestionCard.tsx
+      │   │       │   └── index.ts
+      │   │       └── index.ts
+      │   │
+      │   ├── components/
+      │   └── lib/
+      │
+      ├── next.config.js
+      └── package.json
+
+  # ---------------------------------------------------------------------------
+  # apps/rag-service - RAG Chatbot Service
+  # ---------------------------------------------------------------------------
+  rag_service:
+    description: |
+      Node.js/Fastify service for RAG-based AI chatbot.
+      Handles document ingestion, vector storage, and query processing.
+
+    tree: |
+      apps/rag-service/
+      ├── src/
+      │   ├── server.ts                         # Fastify server entry
+      │   ├── app.ts                            # App configuration
+      │   │
+      │   ├── routes/                           # API routes
+      │   │   ├── index.ts                      # Route registration
+      │   │   ├── health.route.ts               # Health check
+      │   │   ├── query.route.ts                # Query endpoint
+      │   │   ├── documents.route.ts            # Document management
+      │   │   └── conversations.route.ts        # Conversation history
+      │   │
+      │   ├── services/                         # Business logic
+      │   │   ├── rag.service.ts                # RAG orchestration
+      │   │   ├── embedding.service.ts          # Embedding generation
+      │   │   ├── vector-store.service.ts       # Vector DB operations
+      │   │   ├── llm.service.ts                # LLM interactions
+      │   │   ├── document.service.ts           # Document processing
+      │   │   └── index.ts
+      │   │
+      │   ├── processors/                       # Document processors
+      │   │   ├── markdown.processor.ts
+      │   │   ├── pdf.processor.ts
+      │   │   ├── text.processor.ts
+      │   │   └── index.ts
+      │   │
+      │   ├── db/                               # Database
+      │   │   ├── prisma.ts                     # Prisma client
+      │   │   ├── vector/                       # Vector DB (pgvector/pinecone)
+      │   │   │   ├── client.ts
+      │   │   │   └── queries.ts
+      │   │   └── index.ts
+      │   │
+      │   ├── lib/                              # Utilities
+      │   │   ├── chunker.ts                    # Text chunking
+      │   │   ├── prompts.ts                    # LLM prompts
+      │   │   ├── config.ts                     # Configuration
+      │   │   └── index.ts
+      │   │
+      │   ├── middleware/                       # Fastify middleware
+      │   │   ├── auth.ts                       # Authentication
+      │   │   ├── rateLimit.ts                  # Rate limiting
+      │   │   └── index.ts
+      │   │
+      │   ├── types/                            # TypeScript types
+      │   │   ├── query.types.ts
+      │   │   ├── document.types.ts
+      │   │   └── index.ts
+      │   │
+      │   └── plugins/                          # Fastify plugins
+      │       ├── cors.ts
+      │       ├── swagger.ts
+      │       └── index.ts
+      │
+      ├── prisma/
+      │   ├── schema.prisma
+      │   └── migrations/
+      │
+      ├── tests/
+      │   ├── unit/
+      │   ├── integration/
+      │   └── fixtures/
+      │
+      ├── Dockerfile
+      ├── tsconfig.json
+      └── package.json
+
+# =============================================================================
+# NAMING CONVENTIONS
+# =============================================================================
+
+naming_conventions:
+  description: |
+    Consistent naming conventions ensure code readability and maintainability.
+    All team members must follow these conventions strictly.
+
+  # ---------------------------------------------------------------------------
+  # Files & Directories
+  # ---------------------------------------------------------------------------
+  files_and_directories:
+    directories:
+      pattern: kebab-case
+      examples:
+        - src/features/
+        - src/components/ui/
+        - user-profile/
+        - api-clients/
+
+    react_components:
+      pattern: PascalCase.tsx
+      examples:
+        - Button.tsx
+        - ProjectCard.tsx
+        - DashboardLayout.tsx
+      note: Component filename must match the default export name
+
+    hooks:
+      pattern: use{HookName}.ts (camelCase with "use" prefix)
+      examples:
+        - useProjects.ts
+        - useMediaQuery.ts
+        - useLocalStorage.ts
+
+    services:
+      pattern: "{name}.service.ts"
+      examples:
+        - projects.service.ts
+        - auth.service.ts
+        - analytics.service.ts
+
+    types:
+      pattern: "{name}.types.ts"
+      examples:
+        - project.types.ts
+        - api.types.ts
+        - user.types.ts
+
+    utilities:
+      pattern: "{name}.util.ts or {name}.ts"
+      examples:
+        - format.util.ts
+        - validation.util.ts
+        - cn.ts
+
+    constants:
+      pattern: "{name}.ts (lowercase)"
+      examples:
+        - routes.ts
+        - config.ts
+        - seo.ts
+
+    tests:
+      pattern: "{name}.test.ts or {name}.spec.ts"
+      examples:
+        - Button.test.tsx
+        - useProjects.test.ts
+        - projects.service.test.ts
+
+    barrel_exports:
+      pattern: index.ts
+      purpose: Re-export all public APIs from a directory
+      example: |
+        // src/features/projects/components/index.ts
+        export { ProjectGrid } from './ProjectGrid'
+        export { ProjectCard } from './ProjectCard'
+        export { ProjectDetail } from './ProjectDetail'
+
+  # ---------------------------------------------------------------------------
+  # Code Naming
+  # ---------------------------------------------------------------------------
+  code:
+    components:
+      pattern: PascalCase
+      examples:
+        - Button
+        - ProjectCard
+        - DashboardLayout
+
+    hooks:
+      pattern: useCamelCase
+      examples:
+        - useProjects
+        - useAuth
+        - useMediaQuery
+
+    functions:
+      pattern: camelCase
+      examples:
+        - fetchProjects
+        - formatDate
+        - validateEmail
+
+    constants:
+      pattern: SCREAMING_SNAKE_CASE
+      examples:
+        - API_BASE_URL
+        - MAX_FILE_SIZE
+        - DEFAULT_PAGE_SIZE
+
+    types_and_interfaces:
+      pattern: PascalCase
+      prefix: None (avoid I prefix for interfaces)
+      examples:
+        - Project
+        - ApiResponse
+        - UserProfile
+        - CreateProjectRequest
+
+    enums:
+      pattern: PascalCase
+      values: SCREAMING_SNAKE_CASE or PascalCase
+      examples:
+        - "enum ProjectStatus { DRAFT, PUBLISHED, ARCHIVED }"
+        - "enum HttpMethod { Get, Post, Put, Delete }"
+
+    type_parameters:
+      pattern: Single uppercase letter or descriptive PascalCase
+      examples:
+        - T, K, V (for generics)
+        - TData, TError (for descriptive generics)
+
+  # ---------------------------------------------------------------------------
+  # API Naming
+  # ---------------------------------------------------------------------------
+  api:
+    routes:
+      pattern: kebab-case, plural nouns for resources
+      examples:
+        - /api/v1/projects
+        - /api/v1/blog-posts
+        - /api/v1/user-settings
+
+    query_parameters:
+      pattern: camelCase
+      examples:
+        - "?pageSize=10"
+        - "?sortBy=createdAt"
+        - "?includeArchived=true"
+
+    request_body:
+      pattern: camelCase
+      example: |
+        {
+          "title": "My Project",
+          "description": "...",
+          "techStack": ["React", "Node.js"]
+        }
+
+# =============================================================================
+# IMPORT/EXPORT PATTERNS
+# =============================================================================
+
+import_export_patterns:
+  description: |
+    Consistent import/export patterns improve code organization and prevent
+    circular dependencies. Follow these patterns strictly.
+
+  # ---------------------------------------------------------------------------
+  # Import Order
+  # ---------------------------------------------------------------------------
+  import_order:
+    description: Imports should be organized in the following order
+    order:
+      - group: External packages
+        examples:
+          - "import React from 'react'"
+          - "import { NextRequest } from 'next/server'"
+          - "import { z } from 'zod'"
+
+      - group: Monorepo packages
+        prefix: "@repo/"
+        examples:
+          - "import { Button } from '@repo/ui'"
+          - "import type { Project } from '@repo/types'"
+          - "import { AdminClient } from '@repo/sdk'"
+
+      - group: Absolute imports (app aliases)
+        prefix: "@/"
+        examples:
+          - "import { ProjectCard } from '@/features/projects'"
+          - "import { cn } from '@/lib/utils'"
+          - "import { Header } from '@/components/layout'"
+
+      - group: Relative imports
+        examples:
+          - "import { formatDate } from './utils'"
+          - "import { ProjectCard } from '../components'"
+
+      - group: Type imports (at the end)
+        examples:
+          - "import type { Project } from '@repo/types'"
+          - "import type { ComponentProps } from 'react'"
+
+    example: |
+      // External packages
+      import React, { useState, useCallback } from 'react'
+      import { useQuery } from '@tanstack/react-query'
+      import { z } from 'zod'
+
+      // Monorepo packages
+      import { Button, Card } from '@repo/ui'
+      import { AdminClient } from '@repo/sdk'
+
+      // Absolute imports
+      import { ProjectCard } from '@/features/projects'
+      import { cn } from '@/lib/utils'
+
+      // Relative imports
+      import { formatDate } from './utils'
+
+      // Type imports
+      import type { Project } from '@repo/types'
+      import type { ComponentProps } from 'react'
+
+  # ---------------------------------------------------------------------------
+  # Export Patterns
+  # ---------------------------------------------------------------------------
+  export_patterns:
+    # Named exports (preferred)
+    named_exports:
+      description: Prefer named exports for better refactoring and tree-shaking
+      example: |
+        // components/Button.tsx
+        export function Button(props: ButtonProps) { ... }
+
+        // hooks/useProjects.ts
+        export function useProjects() { ... }
+
+        // services/projects.service.ts
+        export const projectsService = { ... }
+
+    # Default exports (for pages and layouts)
+    default_exports:
+      description: Use default exports only for Next.js pages and layouts
+      example: |
+        // app/projects/page.tsx
+        export default function ProjectsPage() { ... }
+
+        // app/layout.tsx
+        export default function RootLayout({ children }) { ... }
+
+    # Barrel exports
+    barrel_exports:
+      description: Use index.ts files to re-export public APIs
+      rules:
+        - Only export items that should be used outside the directory
+        - Keep internal implementations private
+        - Use explicit named exports (avoid export *)
+
+      example: |
+        // src/features/projects/index.ts
+        // Components
+        export { ProjectGrid } from './components/ProjectGrid'
+        export { ProjectCard } from './components/ProjectCard'
+
+        // Hooks
+        export { useProjects } from './hooks/useProjects'
+        export { useProjectDetail } from './hooks/useProjectDetail'
+
+        // Services
+        export { projectsService } from './services/projects.service'
+
+        // Types (re-export from types/)
+        export type { Project, ProjectFilters } from './types'
+
+    # Type exports
+    type_exports:
+      description: Use explicit type exports for TypeScript types
+      example: |
+        // types/project.types.ts
+        export interface Project {
+          id: string
+          title: string
+          // ...
+        }
+
+        export type ProjectStatus = 'draft' | 'published' | 'archived'
+
+        // Re-export in index.ts
+        export type { Project, ProjectStatus } from './project.types'
+
+  # ---------------------------------------------------------------------------
+  # Path Aliases
+  # ---------------------------------------------------------------------------
+  path_aliases:
+    description: Configure path aliases in tsconfig.json for clean imports
+    configuration:
+      tsconfig: |
+        {
+          "compilerOptions": {
+            "baseUrl": ".",
+            "paths": {
+              "@/*": ["./src/*"],
+              "@/features/*": ["./src/features/*"],
+              "@/components/*": ["./src/components/*"],
+              "@/lib/*": ["./src/lib/*"],
+              "@/hooks/*": ["./src/hooks/*"],
+              "@/types/*": ["./src/types/*"]
+            }
+          }
+        }
+
+    usage:
+      - pattern: "@/features/{feature}"
+        example: "import { ProjectCard } from '@/features/projects'"
+
+      - pattern: "@/components/{category}"
+        example: "import { Button } from '@/components/ui'"
+
+      - pattern: "@/lib/{module}"
+        example: "import { cn } from '@/lib/utils'"
+
+  # ---------------------------------------------------------------------------
+  # Import Rules
+  # ---------------------------------------------------------------------------
+  import_rules:
+    feature_isolation:
+      description: Features should not import from other features directly
+      rule: Use shared components/hooks/services or elevate to shared layer
+      bad_example: |
+        // Bad: Direct import between features
+        // src/features/blog/components/ArticleCard.tsx
+        import { ProjectTechStack } from '@/features/projects'
+
+      good_example: |
+        // Good: Use shared component
+        // src/features/blog/components/ArticleCard.tsx
+        import { TechStack } from '@/components/common'
+
+    circular_dependency_prevention:
+      description: Prevent circular dependencies with proper layering
+      rules:
+        - Features can import from shared layers (components, lib, hooks)
+        - Shared layers should not import from features
+        - Lower layers should not import from higher layers
+
+      layer_order:
+        - level: 1
+          name: features
+          can_import_from: [components, lib, hooks, providers, types, "@repo/*"]
+
+        - level: 2
+          name: components
+          can_import_from: [lib, hooks, types, "@repo/*"]
+
+        - level: 3
+          name: hooks
+          can_import_from: [lib, types, "@repo/*"]
+
+        - level: 4
+          name: lib
+          can_import_from: [types, "@repo/*"]
+
+        - level: 5
+          name: types
+          can_import_from: ["@repo/types"]
+
+# =============================================================================
+# ADDITIONAL GUIDELINES
+# =============================================================================
+
+guidelines:
+  # ---------------------------------------------------------------------------
+  # Component Guidelines
+  # ---------------------------------------------------------------------------
+  components:
+    file_structure:
+      description: Each component file should follow this structure
+      template: |
+        // 1. Imports
+        import React from 'react'
+        import { cn } from '@/lib/utils'
+        import type { ComponentProps } from './types'
+
+        // 2. Types (if not in separate file)
+        interface Props {
+          // ...
+        }
+
+        // 3. Component
+        export function ComponentName({ prop1, prop2 }: Props) {
+          // Hooks
+          // State
+          // Effects
+          // Handlers
+          // Render
+          return (...)
+        }
+
+        // 4. Sub-components (if any)
+        function SubComponent() { ... }
+
+    colocation:
+      description: Keep related files close to components
+      example: |
+        components/
+        └── ProjectCard/
+            ├── ProjectCard.tsx        # Component
+            ├── ProjectCard.test.tsx   # Tests
+            ├── ProjectCard.stories.tsx # Storybook (optional)
+            └── index.ts               # Barrel export
+
+  # ---------------------------------------------------------------------------
+  # API Route Guidelines (Next.js)
+  # ---------------------------------------------------------------------------
+  api_routes:
+    structure:
+      description: API route handler structure
+      template: |
+        // app/api/v1/projects/route.ts
+        import { NextRequest, NextResponse } from 'next/server'
+        import { z } from 'zod'
+        import { prisma } from '@/lib/db'
+        import { requireAuth } from '@repo/auth'
+
+        // Validation schema
+        const createProjectSchema = z.object({
+          title: z.string().min(1),
+          description: z.string(),
+        })
+
+        // GET /api/v1/projects
+        export async function GET(request: NextRequest) {
+          try {
+            const projects = await prisma.project.findMany()
+            return NextResponse.json({ data: projects })
+          } catch (error) {
+            return NextResponse.json(
+              { error: 'Failed to fetch projects' },
+              { status: 500 }
+            )
+          }
+        }
+
+        // POST /api/v1/projects
+        export async function POST(request: NextRequest) {
+          try {
+            const session = await requireAuth()
+            const body = await request.json()
+            const data = createProjectSchema.parse(body)
+
+            const project = await prisma.project.create({ data })
+            return NextResponse.json({ data: project }, { status: 201 })
+          } catch (error) {
+            // Handle validation/auth/db errors
+          }
+        }
+
+  # ---------------------------------------------------------------------------
+  # Testing Guidelines
+  # ---------------------------------------------------------------------------
+  testing:
+    location:
+      unit_tests: Colocated with source files (.test.ts suffix)
+      integration_tests: tests/integration/ directory
+      e2e_tests: tests/e2e/ or e2e/ directory
+
+    naming:
+      pattern: "{filename}.test.ts or {filename}.spec.ts"
+      examples:
+        - Button.test.tsx
+        - useProjects.test.ts
+        - projects.service.test.ts
+
+# =============================================================================
+# END OF SPECIFICATION
+# =============================================================================

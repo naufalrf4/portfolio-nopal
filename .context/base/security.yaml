@@ -1,0 +1,647 @@
+# Security
+
+# =============================================================================
+# SECURITY POLICY AND CONTROLS
+# =============================================================================
+# Defines access control, data protection, and audit requirements for the
+# NaufalRF Portfolio Ecosystem.
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# SECURITY PRINCIPLES
+# -----------------------------------------------------------------------------
+principles:
+  - defense_in_depth: Multiple layers of security controls
+  - least_privilege: Grant minimum necessary access
+  - secure_by_default: Security enabled without configuration
+  - fail_secure: Deny access on security check failure
+  - separation_of_concerns: Isolate security-critical components
+
+
+# -----------------------------------------------------------------------------
+# ACCESS CONTROL
+# -----------------------------------------------------------------------------
+access_control:
+
+  # ---------------------------------------------------------------------------
+  # Authentication
+  # ---------------------------------------------------------------------------
+  authentication:
+    method: OAuth 2.0
+    provider: Google
+    library: NextAuth.js v5
+
+    configuration:
+      session_strategy: JWT
+      session_max_age: 2592000  # 30 days in seconds
+      jwt_secret: NEXTAUTH_SECRET environment variable
+      
+    scopes:
+      - email
+      - profile
+
+    token_handling:
+      storage: HTTP-only cookies
+      secure: true (HTTPS only)
+      same_site: lax
+
+    session_validation:
+      - verify JWT signature
+      - check expiration
+      - validate user exists in database
+
+  # ---------------------------------------------------------------------------
+  # Authorization
+  # ---------------------------------------------------------------------------
+  authorization:
+    model: Role-Based Access Control (RBAC)
+    
+    roles:
+      admin:
+        description: Full system access
+        assignment: Email in ADMIN_EMAILS allowlist
+        capabilities:
+          - all_crud_operations
+          - content_moderation
+          - system_configuration
+          - view_analytics
+          - manage_users
+
+      user:
+        description: Authenticated public user
+        assignment: Any Google-authenticated user not in allowlist
+        capabilities:
+          - post_guestbook_entries
+          - add_reactions
+          - view_own_profile
+
+      anonymous:
+        description: Unauthenticated visitor
+        assignment: Default for unauthenticated requests
+        capabilities:
+          - read_public_content
+          - submit_anonymous_messages
+          - use_chatbot
+
+    admin_allowlist:
+      enforcement: server-side only
+      source: ADMIN_EMAILS environment variable
+      format: comma-separated email addresses
+      emails:
+        - naufalrf32@gmail.com
+        - naufalrf4@gmail.com
+      update_process: environment variable change, service restart
+
+  # ---------------------------------------------------------------------------
+  # API Access Control
+  # ---------------------------------------------------------------------------
+  api_access:
+    namespaces:
+      public:
+        path_prefix: /api/public
+        authentication: none
+        rate_limiting: standard
+        allowed_methods:
+          - GET
+        examples:
+          - GET /api/public/projects
+          - GET /api/public/blogs
+          - GET /api/public/guestbook
+
+      public_write:
+        path_prefix: /api/public-write
+        authentication: varies by endpoint
+        rate_limiting: strict
+        allowed_methods:
+          - POST
+        examples:
+          - POST /api/public-write/guestbook (requires user auth)
+          - POST /api/public-write/messages (anonymous, rate-limited)
+
+      user:
+        path_prefix: /api/user
+        authentication: required (user or admin role)
+        rate_limiting: standard
+        allowed_methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+        examples:
+          - GET /api/user/profile
+          - PUT /api/user/profile
+
+      admin:
+        path_prefix: /api/admin
+        authentication: required (admin role only)
+        rate_limiting: relaxed
+        allowed_methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+        examples:
+          - GET /api/admin/projects
+          - POST /api/admin/projects
+          - DELETE /api/admin/guestbook/:id
+
+      internal:
+        path_prefix: /api/internal
+        authentication: service token
+        rate_limiting: none
+        allowed_methods:
+          - GET
+          - POST
+        examples:
+          - POST /api/internal/chat-logs
+          - GET /api/internal/content
+
+    middleware_order:
+      - cors_check
+      - rate_limit_check
+      - authentication_check
+      - authorization_check
+      - request_validation
+      - handler_execution
+
+  # ---------------------------------------------------------------------------
+  # Service-to-Service Authentication
+  # ---------------------------------------------------------------------------
+  service_auth:
+    method: shared secret token
+    header: X-Service-Token
+    
+    token_configuration:
+      source: ADMIN_SERVICE_TOKEN environment variable
+      length: minimum 32 characters
+      rotation: manual, on compromise
+
+    validation:
+      - check header presence
+      - constant-time comparison
+      - reject on mismatch with 401
+
+    authorized_services:
+      - rag_service_to_admin_api
+
+  # ---------------------------------------------------------------------------
+  # Rate Limiting
+  # ---------------------------------------------------------------------------
+  rate_limiting:
+    implementation: custom middleware or library (rate-limiter-flexible)
+    storage: in-memory (single instance) or Redis (multi-instance)
+
+    tiers:
+      standard:
+        requests: 100
+        window: 60 seconds
+        applies_to:
+          - /api/public/*
+          - /api/user/*
+
+      strict:
+        requests: 10
+        window: 60 seconds
+        applies_to:
+          - /api/public-write/*
+
+      anonymous_submission:
+        requests: 5
+        window: 3600 seconds  # 1 hour
+        key: hashed IP address
+        applies_to:
+          - POST /api/public-write/messages
+
+      chatbot:
+        requests: 30
+        window: 60 seconds
+        key: session ID or IP
+        applies_to:
+          - POST /chat (RAG service)
+
+    response_on_limit:
+      status: 429 Too Many Requests
+      headers:
+        Retry-After: seconds until reset
+        X-RateLimit-Limit: limit value
+        X-RateLimit-Remaining: remaining requests
+        X-RateLimit-Reset: reset timestamp
+
+
+# -----------------------------------------------------------------------------
+# DATA PROTECTION
+# -----------------------------------------------------------------------------
+data_protection:
+
+  # ---------------------------------------------------------------------------
+  # Data Classification
+  # ---------------------------------------------------------------------------
+  classification:
+    public:
+      description: Intentionally public content
+      examples:
+        - published projects
+        - visible blog links
+        - visible guestbook entries
+      controls: none required
+
+    internal:
+      description: Operational data not for public
+      examples:
+        - hidden projects
+        - chat logs
+        - anonymous messages
+      controls:
+        - admin access only
+        - no public API exposure
+
+    confidential:
+      description: Sensitive credentials and tokens
+      examples:
+        - API keys
+        - database credentials
+        - JWT secrets
+        - service tokens
+      controls:
+        - environment variables only
+        - never in code
+        - never in logs
+        - never in client bundles
+
+    personal:
+      description: User identifiable information
+      examples:
+        - email addresses
+        - names
+        - profile images (from Google)
+        - IP addresses (hashed)
+      controls:
+        - minimize collection
+        - hash where possible
+        - retention limits
+
+  # ---------------------------------------------------------------------------
+  # Secrets Management
+  # ---------------------------------------------------------------------------
+  secrets:
+    storage: environment variables
+    
+    never_store_in:
+      - source code
+      - git history
+      - client-side bundles
+      - logs
+      - error messages
+
+    required_secrets:
+      database:
+        - name: DATABASE_URL
+          purpose: Prisma connection to Neon
+          format: postgresql://user:pass@host/db
+
+        - name: DIRECT_URL
+          purpose: Direct connection for migrations
+          format: postgresql://user:pass@host/db
+
+      authentication:
+        - name: NEXTAUTH_SECRET
+          purpose: JWT signing
+          generation: openssl rand -base64 32
+
+        - name: NEXTAUTH_URL
+          purpose: Callback URL base
+          format: https://domain.com
+
+        - name: GOOGLE_CLIENT_ID
+          purpose: OAuth client ID
+          source: Google Cloud Console
+
+        - name: GOOGLE_CLIENT_SECRET
+          purpose: OAuth client secret
+          source: Google Cloud Console
+
+      llm_providers:
+        - name: OPENAI_API_KEY
+          purpose: Embeddings and optional LLM
+
+        - name: GEMINI_API_KEY
+          purpose: Primary/fallback LLM
+
+        - name: GROQ_API_KEY
+          purpose: Primary/fallback LLM
+
+        - name: DEEPSEEK_API_KEY
+          purpose: Primary/fallback LLM
+
+      service_communication:
+        - name: ADMIN_SERVICE_TOKEN
+          purpose: RAG to Admin API auth
+          generation: openssl rand -base64 32
+
+      llm_routing:
+        - name: PRIMARY_LLM
+          purpose: Primary LLM provider selection
+          allowed_values:
+            - gemini
+            - groq
+            - openai
+            - deepseek
+
+        - name: FALLBACK_LLM
+          purpose: Fallback LLM provider selection
+          allowed_values:
+            - gemini
+            - groq
+            - openai
+            - deepseek
+
+    rotation_policy:
+      frequency: on compromise or annually
+      process:
+        - generate new secret
+        - update environment variables
+        - restart affected services
+        - revoke old secret (where applicable)
+
+  # ---------------------------------------------------------------------------
+  # Data in Transit
+  # ---------------------------------------------------------------------------
+  transit:
+    external:
+      protocol: HTTPS only
+      tls_version: "1.2 minimum, 1.3 preferred"
+      certificate: Let's Encrypt (auto-renewed)
+      hsts: enabled with long max-age
+
+    internal:
+      protocol: HTTP (within Docker network)
+      justification: Traefik terminates TLS; internal network trusted
+      network_isolation: Docker bridge network
+
+  # ---------------------------------------------------------------------------
+  # Data at Rest
+  # ---------------------------------------------------------------------------
+  at_rest:
+    database:
+      provider: Neon
+      encryption: managed by provider (encrypted at rest)
+      backups: encrypted by provider
+
+    vector_store:
+      provider: self-hosted Qdrant
+      encryption: none (Docker volume)
+      sensitivity: low (derived from public content)
+
+    logs:
+      encryption: none (local Docker logs)
+      retention: 7 days
+      sensitive_data: filtered before logging
+
+  # ---------------------------------------------------------------------------
+  # Privacy Controls
+  # ---------------------------------------------------------------------------
+  privacy:
+    ip_address_handling:
+      anonymous_messages:
+        storage: hashed (SHA-256 with salt)
+        purpose: rate limiting and abuse correlation
+        never_store_raw: true
+
+      other_endpoints:
+        storage: none
+        logging: allowed for troubleshooting, rotate logs
+
+    user_data:
+      collection_scope: email, name, profile image (from Google)
+      purpose: authentication and guestbook attribution
+      retention: indefinite (user-generated content)
+      deletion: on user request
+
+    cookies:
+      session_cookie:
+        name: next-auth.session-token
+        http_only: true
+        secure: true
+        same_site: lax
+
+    third_party_data_sharing: none
+
+
+# -----------------------------------------------------------------------------
+# AUDIT
+# -----------------------------------------------------------------------------
+audit:
+
+  # ---------------------------------------------------------------------------
+  # Logging Requirements
+  # ---------------------------------------------------------------------------
+  logging:
+    format: structured JSON
+    library: Pino
+
+    required_fields:
+      - timestamp
+      - level
+      - message
+      - correlation_id
+      - service_name
+
+    log_events:
+      authentication:
+        - login_success
+        - login_failure
+        - logout
+        - session_refresh
+
+      authorization:
+        - access_granted
+        - access_denied
+        - role_assignment
+
+      data_access:
+        - admin_crud_operations
+        - content_moderation_actions
+
+      security:
+        - rate_limit_triggered
+        - invalid_token_attempt
+        - suspicious_activity
+
+    sensitive_data_filtering:
+      never_log:
+        - passwords
+        - tokens
+        - api_keys
+        - full_email_addresses (partial OK)
+        - raw_ip_addresses
+
+  # ---------------------------------------------------------------------------
+  # Audit Trail
+  # ---------------------------------------------------------------------------
+  audit_trail:
+    scope: admin actions only
+    
+    tracked_actions:
+      - create_project
+      - update_project
+      - delete_project
+      - create_context
+      - update_context
+      - delete_context
+      - moderate_guestbook
+      - delete_message
+      - trigger_ingestion
+      - delete_chat_log
+
+    storage: database audit_log table
+    
+    fields:
+      - id
+      - timestamp
+      - user_id
+      - user_email
+      - action
+      - resource_type
+      - resource_id
+      - details (JSON)
+      - ip_hash
+
+    retention: 1 year
+
+  # ---------------------------------------------------------------------------
+  # Security Monitoring
+  # ---------------------------------------------------------------------------
+  monitoring:
+    alerts:
+      - name: high_auth_failure_rate
+        condition: "> 10 login failures in 5 minutes"
+        action: log and alert
+
+      - name: rate_limit_abuse
+        condition: "> 100 rate limit hits from single IP in 1 hour"
+        action: log and consider block
+
+      - name: admin_access_attempt
+        condition: "non-allowlist email attempts admin route"
+        action: log
+
+      - name: service_token_failure
+        condition: "invalid service token used"
+        action: log and alert
+
+    review_frequency: weekly log review (manual)
+
+
+# -----------------------------------------------------------------------------
+# SECURITY HEADERS
+# -----------------------------------------------------------------------------
+headers:
+  implementation: Next.js middleware or Traefik
+
+  required:
+    Content-Security-Policy:
+      value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://rag.naufalrf.tech"
+      notes: Adjust CSP based on actual requirements
+
+    X-Content-Type-Options:
+      value: nosniff
+
+    X-Frame-Options:
+      value: DENY
+
+    X-XSS-Protection:
+      value: "1; mode=block"
+
+    Referrer-Policy:
+      value: strict-origin-when-cross-origin
+
+    Strict-Transport-Security:
+      value: "max-age=31536000; includeSubDomains"
+      notes: HSTS with 1-year max-age
+
+    Permissions-Policy:
+      value: "camera=(), microphone=(), geolocation=()"
+
+
+# -----------------------------------------------------------------------------
+# VULNERABILITY MANAGEMENT
+# -----------------------------------------------------------------------------
+vulnerability_management:
+
+  dependency_scanning:
+    tool: pnpm audit
+    frequency: weekly (Dependabot) and on CI
+    severity_threshold: high
+    action: block merge for high/critical
+
+  container_scanning:
+    tool: Trivy (optional)
+    frequency: on image build
+    severity_threshold: high
+    action: alert, block for critical
+
+  secret_scanning:
+    tool: GitHub Secret Scanning
+    push_protection: enabled
+    action: block push containing secrets
+
+  code_review:
+    security_checklist:
+      - no hardcoded secrets
+      - input validation present
+      - output encoding for XSS
+      - SQL injection prevention (Prisma handles)
+      - authorization checks on all protected routes
+      - rate limiting on write endpoints
+
+
+# -----------------------------------------------------------------------------
+# INCIDENT RESPONSE (SECURITY)
+# -----------------------------------------------------------------------------
+incident_response:
+
+  security_incidents:
+    - name: credential_exposure
+      response:
+        - immediately rotate exposed credential
+        - audit access logs for unauthorized use
+        - notify affected parties if applicable
+        - document incident and remediation
+
+    - name: unauthorized_access
+      response:
+        - block suspicious IP if identifiable
+        - review access logs
+        - assess data exposure
+        - strengthen access controls
+
+    - name: vulnerability_discovered
+      response:
+        - assess severity and exploitability
+        - develop and test patch
+        - deploy fix
+        - monitor for exploitation
+
+  contact:
+    security_issues: naufalrf32@gmail.com
+    response_time: best effort within 24 hours
+
+
+# -----------------------------------------------------------------------------
+# COMPLIANCE NOTES
+# -----------------------------------------------------------------------------
+compliance:
+  scope: best-practice implementation for personal project
+  
+  not_in_scope:
+    - SOC 2 certification
+    - HIPAA compliance
+    - PCI DSS compliance
+    - GDPR formal compliance (but follows principles)
+
+  gdpr_principles_followed:
+    - data minimization
+    - purpose limitation
+    - storage limitation
+    - integrity and confidentiality
+    - user rights (deletion on request)

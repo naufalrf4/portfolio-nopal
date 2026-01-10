@@ -1,0 +1,596 @@
+# Coding Conventions
+
+# =============================================================================
+# CODING CONVENTIONS AND PATTERNS
+# =============================================================================
+# Defines coding standards, patterns, and best practices for the NaufalRF
+# Portfolio Ecosystem TypeScript monorepo.
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# PHILOSOPHY
+# -----------------------------------------------------------------------------
+philosophy:
+  principles:
+    - separation_of_concerns
+    - single_responsibility
+    - composition_over_inheritance
+    - explicit_over_implicit
+    - fail_fast
+    - type_safety
+
+  code_quality_targets:
+    readability: Code is read 10x more than written
+    maintainability: Future you should understand current code
+    testability: Pure functions, dependency injection
+    performance: Fast enough, then optimize
+    consistency: Follow patterns, not personal preference
+
+
+# -----------------------------------------------------------------------------
+# REACT CONVENTIONS
+# -----------------------------------------------------------------------------
+react:
+
+  component_structure:
+    description: Standard file structure for React components
+    
+    single_file: ComponentName.tsx
+    
+    with_tests:
+      structure:
+        - ComponentName/
+        - index.ts (barrel export)
+        - ComponentName.tsx
+        - ComponentName.test.tsx
+        - ComponentName.stories.tsx (optional)
+        - types.ts
+        - utils.ts
+
+    component_template:
+      description: Standard component structure
+      order:
+        - imports
+        - type definitions
+        - component function
+        - hooks first
+        - event handlers
+        - early returns
+        - main render
+
+  props:
+    interface_vs_type:
+      rule: Use interface for props, type for unions
+      
+      interface_for_props: true
+      type_for_unions: true
+      type_for_intersections: true
+
+    optional_props:
+      pattern: Use optional modifier with defaults
+      use_question_mark: true
+      provide_default_values: true
+
+    children_prop:
+      type: React.ReactNode
+      always_explicit: true
+
+    extending_html_props:
+      pattern: Extend native HTML element props
+      spread_remaining: true
+
+  state_management:
+    local_state:
+      when_to_use:
+        - component-specific state
+        - UI state
+        - form state
+      
+      use_state_simple: For simple values
+      use_state_typed: For complex objects
+      use_reducer: For complex state with multiple sub-values
+
+    server_state:
+      next_cache: Default for Server Components
+      client_fetch: Custom hooks for Client Components
+
+    url_state:
+      approach: useSearchParams for filters and pagination
+      use_router: For navigation
+
+  component_types:
+    server_components:
+      default: true
+      when_to_use:
+        - fetching data
+        - accessing backend resources
+        - keeping sensitive info on server
+        - large dependencies
+      no_use_client_directive: true
+
+    client_components:
+      marker: use client directive at top
+      when_to_use:
+        - event listeners (onClick, onChange)
+        - state and lifecycle (useState, useEffect)
+        - browser-only APIs
+        - custom hooks
+      
+    composition_pattern: Pass client components as children to server components
+
+  error_boundaries:
+    next_js_error_file: error.tsx in app directory
+    custom_boundary: ErrorBoundary class component for reuse
+
+
+# -----------------------------------------------------------------------------
+# CUSTOM HOOKS PATTERNS
+# -----------------------------------------------------------------------------
+hooks:
+  
+  naming:
+    convention: Always prefix with use
+    examples:
+      - useProjects
+      - useAuth
+      - useDebounce
+      - useLocalStorage
+
+  organization:
+    location: features/*/hooks/ or app-level hooks/
+    file_naming: useHookName.ts
+    exports: named export
+
+  hook_types:
+    data_fetching:
+      pattern: Encapsulate API calls with loading/error states
+      return_object:
+        - data
+        - isLoading
+        - error
+        - refetch
+
+    form_handling:
+      pattern: Abstract form state and validation
+      return_object:
+        - values
+        - errors
+        - isSubmitting
+        - handleChange
+        - handleSubmit
+
+    utilities:
+      examples:
+        - useLocalStorage
+        - useDebounce
+        - useMediaQuery
+        - useClickOutside
+
+  when_to_create:
+    - reusable logic across multiple components
+    - complex stateful logic
+    - side effects abstraction
+    - third-party library integration
+
+
+# -----------------------------------------------------------------------------
+# BUSINESS LOGIC SEPARATION
+# -----------------------------------------------------------------------------
+business_logic:
+
+  architecture:
+    layers:
+      presentation: Components (UI only, no logic)
+      hooks: Component logic and state management
+      services: Business logic, API calls, data transformation
+      utils: Pure functions, no side effects
+      validation: Schema definitions with Zod
+
+  services_layer:
+    location: lib/services/ or features/*/services/
+    purpose: API calls, data transformation, business rules
+    pattern: Class-based services with methods
+    naming: EntityNameService (e.g., ProjectsService)
+    export: Singleton instance
+
+  utilities_layer:
+    location: lib/utils/ or features/*/utils/
+    purpose: Pure functions only
+    rules:
+      no_api_calls: true
+      no_state: true
+      deterministic: true
+      easily_testable: true
+
+  validation_layer:
+    library: Zod
+    location: lib/validation/ or features/*/validation/
+    pattern: Export schemas and inferred types
+    naming: entityNameSchema
+
+  no_logic_in_components:
+    rule: Components delegate to hooks and services
+    components_only_render: true
+    move_logic_to_hooks: true
+
+
+# -----------------------------------------------------------------------------
+# TYPESCRIPT PATTERNS
+# -----------------------------------------------------------------------------
+typescript:
+
+  type_vs_interface:
+    use_interface_for:
+      - object shapes
+      - component props
+      - class contracts
+      - extensible definitions
+
+    use_type_for:
+      - unions
+      - intersections
+      - mapped types
+      - utility types
+
+  generic_patterns:
+    api_response_wrapper: true
+    generic_functions: true
+    type_constraints: Use extends for constraints
+
+  type_inference:
+    prefer_inference: Let TypeScript infer when obvious
+    explicit_when_needed:
+      - function parameters
+      - useState with complex types
+      - API responses
+
+  strict_mode:
+    enabled: true
+    rules:
+      no_implicit_any: true
+      strict_null_checks: true
+      no_unused_locals: true
+      no_unused_parameters: Prefix with underscore if unavoidable
+
+
+# -----------------------------------------------------------------------------
+# API CLIENT PATTERNS
+# -----------------------------------------------------------------------------
+api_client:
+
+  approach: Class-based API client with interceptors
+  
+  features:
+    - automatic token injection
+    - error handling
+    - response transformation
+    - retry logic (optional)
+
+  methods:
+    - get
+    - post
+    - put
+    - delete
+    - patch
+
+  error_handling:
+    custom_error_class: true
+    extract_message_from_response: true
+    network_error_handling: true
+
+  retry_logic:
+    implementation: withRetry utility function
+    configurable_retries: true
+    exponential_backoff: true
+
+
+# -----------------------------------------------------------------------------
+# FORM HANDLING
+# -----------------------------------------------------------------------------
+forms:
+
+  library: React Hook Form
+  validation: Zod with zodResolver
+  
+  pattern:
+    - define Zod schema
+    - use useForm hook
+    - register inputs
+    - handle submit with async
+    - display errors
+
+  accessibility:
+    - label associations
+    - aria-invalid on errors
+    - role alert for error messages
+    - disabled state during submission
+
+
+# -----------------------------------------------------------------------------
+# ASYNC/AWAIT PATTERNS
+# -----------------------------------------------------------------------------
+async_await:
+
+  promise_handling:
+    always_use_try_catch: true
+    handle_errors_explicitly: true
+    re_throw_or_handle: true
+
+  loading_states:
+    use_boolean_flag: true
+    set_in_try: true
+    reset_in_finally: true
+
+  abort_controller:
+    use_for_fetch_in_effects: true
+    cleanup_in_return: true
+    handle_abort_error: true
+
+
+# -----------------------------------------------------------------------------
+# FILE ORGANIZATION
+# -----------------------------------------------------------------------------
+file_organization:
+
+  barrel_exports:
+    purpose: Create public API for directories
+    location: index.ts in each directory
+    export_public_items_only: true
+
+  import_order:
+    order:
+      - react_and_next
+      - third_party
+      - absolute_imports
+      - relative_imports
+      - type_imports
+      - styles
+
+  path_aliases:
+    root: "@/*"
+    components: "@/components"
+    lib: "@/lib"
+    hooks: "@/hooks"
+    types: "@/types"
+    features: "@/features"
+
+
+# -----------------------------------------------------------------------------
+# NAMING CONVENTIONS
+# -----------------------------------------------------------------------------
+naming:
+
+  variables_functions:
+    convention: camelCase
+    examples:
+      - userData
+      - fetchProjects
+      - handleSubmit
+
+  constants:
+    convention: SCREAMING_SNAKE_CASE
+    examples:
+      - API_BASE_URL
+      - MAX_RETRY_COUNT
+      - DEFAULT_PAGE_SIZE
+
+  types_interfaces:
+    convention: PascalCase
+    examples:
+      - User
+      - ProjectDTO
+      - ApiResponse
+      - ButtonProps
+
+  files_folders:
+    components: PascalCase
+    utilities: camelCase
+    hooks: camelCase with use prefix
+    pages: kebab-case for Next.js
+
+  boolean_variables:
+    prefixes:
+      - is (isLoading, isActive)
+      - has (hasError, hasPermission)
+      - should (shouldShow, shouldUpdate)
+      - can (canEdit, canDelete)
+
+
+# -----------------------------------------------------------------------------
+# CODE STYLE
+# -----------------------------------------------------------------------------
+code_style:
+
+  prettier_config:
+    printWidth: 100
+    tabWidth: 2
+    useTabs: false
+    semi: true
+    singleQuote: true
+    trailingComma: es5
+    bracketSpacing: true
+    arrowParens: always
+
+  eslint_rules:
+    no_console: warn (error in production)
+    no_unused_vars: error
+    prefer_const: error
+    no_var: error
+    eqeqeq: error
+
+  formatting_preferences:
+    - explicit return for clarity
+    - avoid nested ternaries
+    - max function length 50 lines
+    - max file length 300 lines
+    - extract complex logic to functions
+
+
+# -----------------------------------------------------------------------------
+# CODE EXAMPLES
+# -----------------------------------------------------------------------------
+examples:
+
+  component_example: |
+    // ProjectCard.tsx
+    'use client';
+    
+    import { Card } from '@/components/ui/Card';
+    import { Badge } from '@/components/ui/Badge';
+    import type { Project } from '@/types';
+    
+    interface ProjectCardProps {
+      project: Project;
+      onEdit?: (id: string) => void;
+    }
+    
+    export function ProjectCard({ project, onEdit }: ProjectCardProps) {
+      const handleEdit = () => {
+        onEdit?.(project.id);
+      };
+      
+      return (
+        <Card>
+          <h3>{project.title}</h3>
+          <p>{project.summary}</p>
+          <div>
+            {project.techStack.map((tech) => (
+              <Badge key={tech}>{tech}</Badge>
+            ))}
+          </div>
+          {onEdit && (
+            <button onClick={handleEdit}>Edit</button>
+          )}
+        </Card>
+      );
+    }
+
+  hook_example: |
+    // useProjects.ts
+    import { useState, useEffect } from 'react';
+    import { projectsService } from '@/lib/services/projects';
+    import type { Project } from '@/types';
+    
+    interface UseProjectsResult {
+      data: Project[] | null;
+      isLoading: boolean;
+      error: Error | null;
+      refetch: () => void;
+    }
+    
+    export function useProjects(): UseProjectsResult {
+      const [data, setData] = useState<Project[] | null>(null);
+      const [isLoading, setIsLoading] = useState(true);
+      const [error, setError] = useState<Error | null>(null);
+      
+      const fetchData = async () => {
+        try {
+          setIsLoading(true);
+          setError(null);
+          const projects = await projectsService.getAll();
+          setData(projects);
+        } catch (err) {
+          setError(err instanceof Error ? err : new Error('Unknown error'));
+        } finally {
+          setIsLoading(false);
+        }
+      };
+      
+      useEffect(() => {
+        fetchData();
+      }, []);
+      
+      return { data, isLoading, error, refetch: fetchData };
+    }
+
+  service_example: |
+    // lib/services/projects.ts
+    import { api } from '@/lib/api/client';
+    import type { Project, CreateProjectDTO } from '@/types';
+    
+    class ProjectsService {
+      async getAll(): Promise<Project[]> {
+        return api.get<Project[]>('/api/public/projects');
+      }
+      
+      async getBySlug(slug: string): Promise<Project> {
+        return api.get<Project>('/api/public/projects/' + slug);
+      }
+      
+      async create(data: CreateProjectDTO): Promise<Project> {
+        return api.post<Project>('/api/admin/projects', data);
+      }
+      
+      async update(id: string, data: Partial<CreateProjectDTO>): Promise<Project> {
+        return api.put<Project>('/api/admin/projects/' + id, data);
+      }
+      
+      async delete(id: string): Promise<void> {
+        await api.delete('/api/admin/projects/' + id);
+      }
+    }
+    
+    export const projectsService = new ProjectsService();
+
+  validation_example: |
+    // lib/validation/project.ts
+    import { z } from 'zod';
+    
+    export const createProjectSchema = z.object({
+      title: z.string().min(1).max(100),
+      slug: z.string().min(1).max(100).regex(/^[a-z0-9-]+$/),
+      summary: z.string().min(1).max(300),
+      category: z.enum(['web', 'mobile', 'backend', 'devops']),
+      techStack: z.array(z.string()).min(1),
+      featured: z.boolean().default(false),
+      visible: z.boolean().default(true),
+    });
+    
+    export type CreateProjectDTO = z.infer<typeof createProjectSchema>;
+
+  api_client_example: |
+    // lib/api/client.ts
+    import axios from 'axios';
+    
+    class ApiClient {
+      private client = axios.create({
+        baseURL: process.env.NEXT_PUBLIC_API_URL || '',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      
+      constructor() {
+        this.setupInterceptors();
+      }
+      
+      private setupInterceptors() {
+        this.client.interceptors.request.use((config) => {
+          const token = getToken();
+          if (token) {
+            config.headers.Authorization = 'Bearer ' + token;
+          }
+          return config;
+        });
+      }
+      
+      async get<T>(url: string): Promise<T> {
+        const response = await this.client.get<T>(url);
+        return response.data;
+      }
+      
+      async post<T>(url: string, data: unknown): Promise<T> {
+        const response = await this.client.post<T>(url, data);
+        return response.data;
+      }
+      
+      async put<T>(url: string, data: unknown): Promise<T> {
+        const response = await this.client.put<T>(url, data);
+        return response.data;
+      }
+      
+      async delete<T = void>(url: string): Promise<T> {
+        const response = await this.client.delete<T>(url);
+        return response.data;
+      }
+    }
+    
+    export const api = new ApiClient();

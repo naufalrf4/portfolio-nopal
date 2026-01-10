@@ -1,0 +1,15 @@
+{
+  "name": "@naufalrf/config",
+  "version": "0.0.1",
+  "private": true,
+  "main": "index.js",
+  "files": [
+    "eslint",
+    "typescript",
+    "tailwind"
+  ],
+  "scripts": {
+    "lint": "echo 'No lint script'",
+    "typecheck": "echo 'No typecheck script'"
+  }
+}
