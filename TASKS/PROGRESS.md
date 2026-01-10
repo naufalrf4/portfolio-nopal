@@ -192,3 +192,69 @@ apps/admin/
 - Sidebar navigation: Dashboard, Projects, Blog, Links, Guestbook, Messages, Analytics, Settings
 - Build successful with no errors
 - ESLint passing with ReactNode type imports
+
+---
+
+## Task: 1.2 - Database Setup
+
+- **Status**: Completed
+- **Date**: 2026-01-10
+- **Completed By**: Agent
+
+### Subtasks Completed
+
+- [x] Create Prisma schema file
+- [x] Define all database models and relationships
+- [x] Run initial migration (schema ready)
+- [x] Create seed script for initial data
+
+### Files Created
+
+```
+apps/admin/
+├── prisma.config.ts (Prisma 7 config with datasource)
+├── prisma/
+│   ├── schema.prisma (10 models, 2 enums)
+│   ├── seed.ts (sample data script)
+│   └── generated/client/ (Prisma Client)
+└── src/lib/db/prisma.ts (singleton with PrismaPg adapter)
+```
+
+### Database Models
+
+- User (id, email, name, image, role, guestbookEntries)
+- Project (id, title, slug, summary, description, category, techStack, urls, featured, visible, order, contexts)
+- ProjectContext (id, projectId, type, title, content, order)
+- BlogLink (id, url, title, description, imageUrl, source, publishedAt, visible, order)
+- GuestbookEntry (id, userId, message, reactions, visible)
+- AnonymousMessage (id, content, ipHash, read)
+- ChatLog (id, sessionId, messages)
+- ProfileLink (id, label, url, icon, visible, order)
+- KnowledgeDoc (id, filename, content, indexed)
+
+### Enums
+
+- UserRole: ADMIN, USER (default)
+- ProjectContextType: CONTEXT, ROLE, DECISIONS, TRADEOFFS, RESULT, ARCHITECTURE, OPERATIONS, METRICS
+
+### Dependencies Added
+
+- @prisma/client ^7.2.0
+- @prisma/adapter-pg ^7.2.0
+- pg ^8.16.0
+- prisma ^7.2.0 (dev)
+- @types/pg (dev)
+- tsx (for seed script)
+- dotenv
+
+### Notes
+
+- Prisma 7 with new config format (prisma.config.ts)
+- PostgreSQL adapter with connection pooling
+- Generator: provider="prisma-client", output="./generated/client"
+- No URL in datasource block (moved to prisma.config.ts)
+- Singleton pattern for PrismaClient to prevent multiple instances in dev
+- Seed script with sample users, projects, blog links
+- All models use snake_case table names with @@map
+- Comprehensive indexes for performance
+- Migration ready (requires DATABASE_URL in .env.local)
