@@ -82,9 +82,9 @@
 
 ### Task 1.5: Admin API - Context Sections
 
-- [ ] Create API routes for ProjectContext CRUD
-- [ ] Implement ordering support
-- [ ] Implement type enum enforcement
+- [x] Create API routes for ProjectContext CRUD
+- [x] Implement ordering support
+- [x] Implement type enum enforcement
 
 ### Task 1.6: Admin Dashboard UI - Projects
 
@@ -95,10 +95,13 @@
 
 ### Task 1.7: Public Read API
 
-- [ ] Create `GET /api/public/projects`
-- [ ] Create `GET /api/public/projects/:slug`
-- [ ] Implement pagination and filtering
-- [ ] Ensure only visible items returned
+- [x] Create `GET /api/v1/public/projects`
+- [x] Create `GET /api/v1/public/projects/:slug`
+- [x] Create `GET /api/v1/public/blogs`
+- [x] Create `GET /api/v1/public/guestbook`
+- [x] Create `GET /api/v1/public/links`
+- [x] Implement pagination and filtering
+- [x] Ensure only visible items returned
 
 ---
 
