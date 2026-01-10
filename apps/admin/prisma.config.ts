@@ -1,9 +1,10 @@
 import 'dotenv/config';
-import { defineConfig } from 'prisma/config';
 
-export default defineConfig({
+export default {
   schema: 'prisma/schema.prisma',
   datasource: {
-    url: process.env.DATABASE_URL!,
+    url:
+      process.env.DATABASE_URL ||
+      'postgresql://portfolio:portfolio_dev_password@localhost:5432/portfolio?schema=public',
   },
-});
+};
