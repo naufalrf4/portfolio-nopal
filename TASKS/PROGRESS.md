@@ -103,3 +103,40 @@ package.json:
 - Supported scopes: public, admin, links, ngl, rag, ui, types, sdk, config, auth, infra, deps
 - ESLint upgraded to v9 with flat config format
 - Successfully tested with commit: chore(infra): setup git hooks
+
+---
+
+## Task: 0.5 - Development Environment
+
+- **Status**: Completed
+- **Date**: 2026-01-10
+- **Completed By**: Agent
+
+### Subtasks Completed
+
+- [x] Create docker-compose.yaml for local services
+- [x] Configure PostgreSQL container
+- [x] Configure Qdrant container
+- [x] Create .env.example templates
+
+### Files Created
+
+```
+docker-compose.yaml (PostgreSQL 16 + Qdrant v1.7.4)
+scripts/init-db.sh (PostgreSQL extensions)
+.env.example (root)
+apps/admin/.env.example
+apps/public/.env.example
+apps/links/.env.example
+apps/ngl/.env.example
+apps/rag-service/.env.example
+```
+
+### Notes
+
+- PostgreSQL 16 with uuid-ossp, pg_trgm, citext extensions
+- Qdrant v1.7.4 with 1536-dimensional embeddings
+- All env files have minimal comments (self-documenting)
+- Health checks configured for both services
+- Named volumes for data persistence
+- Custom network for service communication
