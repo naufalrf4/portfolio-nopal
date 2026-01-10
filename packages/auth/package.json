@@ -1,11 +1,19 @@
 {
   "name": "@naufalrf/auth",
-  "version": "0.0.1",
+  "version": "0.0.0",
   "private": true,
-  "main": "index.ts",
-  "types": "index.ts",
-  "scripts": {
-    "lint": "echo 'No lint script'",
-    "typecheck": "echo 'No typecheck script'"
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./config": "./src/config.ts"
+  },
+  "dependencies": {
+    "@auth/prisma-adapter": "^2.11.1",
+    "@prisma/client": "^7.2.0",
+    "next-auth": "5.0.0-beta.30"
+  },
+  "devDependencies": {
+    "@naufalrf/config": "workspace:*",
+    "typescript": "^5"
   }
 }
