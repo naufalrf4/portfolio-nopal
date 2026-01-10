@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  # =============================================================================
+  # PostgreSQL Database
+  # =============================================================================
+  # Primary relational database for all structured data
+  # Accessed only by the Admin app
+  # =============================================================================
+  postgres:
+    image: postgres:16-alpine
+    container_name: portfolio-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-portfolio}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-portfolio_dev_password}
+      POSTGRES_DB: ${POSTGRES_DB:-portfolio}
+      POSTGRES_INITDB_ARGS: '--encoding=UTF-8 --lc-collate=C --lc-ctype=C'
+    ports:
+      - '${POSTGRES_PORT:-5432}:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-db.sh:/docker-entrypoint-initdb.d/init-db.sh:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-portfolio}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - portfolio-network
+
+  # =============================================================================
+  # Qdrant Vector Database
+  # =============================================================================
+  # Vector store for RAG embeddings
+  # Accessed only by the RAG service
+  # =============================================================================
+  qdrant:
+    image: qdrant/qdrant:v1.7.4
+    container_name: portfolio-qdrant
+    restart: unless-stopped
+    ports:
+      - '${QDRANT_PORT:-6333}:6333'
+      - '${QDRANT_GRPC_PORT:-6334}:6334'
+    volumes:
+      - qdrant_data:/qdrant/storage
+    environment:
+      QDRANT__SERVICE__GRPC_PORT: 6334
+    healthcheck:
+      test: ['CMD-SHELL', 'curl -f http://localhost:6333/health || exit 1']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - portfolio-network
+
+# =============================================================================
+# Volumes
+# =============================================================================
+volumes:
+  postgres_data:
+    name: portfolio-postgres-data
+    driver: local
+  qdrant_data:
+    name: portfolio-qdrant-data
+    driver: local
+
+# =============================================================================
+# Networks
+# =============================================================================
+networks:
+  portfolio-network:
+    name: portfolio-network
+    driver: bridge
