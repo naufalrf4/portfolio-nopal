@@ -1,12 +1,6 @@
 version: '3.8'
 
 services:
-  # =============================================================================
-  # PostgreSQL Database
-  # =============================================================================
-  # Primary relational database for all structured data
-  # Accessed only by the Admin app
-  # =============================================================================
   postgres:
     image: postgres:16-alpine
     container_name: portfolio-postgres
@@ -29,12 +23,6 @@ services:
     networks:
       - portfolio-network
 
-  # =============================================================================
-  # Qdrant Vector Database
-  # =============================================================================
-  # Vector store for RAG embeddings
-  # Accessed only by the RAG service
-  # =============================================================================
   qdrant:
     image: qdrant/qdrant:v1.7.4
     container_name: portfolio-qdrant
@@ -54,9 +42,6 @@ services:
     networks:
       - portfolio-network
 
-# =============================================================================
-# Volumes
-# =============================================================================
 volumes:
   postgres_data:
     name: portfolio-postgres-data
@@ -65,9 +50,6 @@ volumes:
     name: portfolio-qdrant-data
     driver: local
 
-# =============================================================================
-# Networks
-# =============================================================================
 networks:
   portfolio-network:
     name: portfolio-network
