@@ -324,3 +324,101 @@ apps/admin/src/app/api/auth/[...nextauth]/
 - Auth config created per-app with prisma instance injection
 - Module augmentation for next-auth types
 - Ready for middleware protection on admin routes
+
+---
+
+## Task: 1.4 - Admin API Projects CRUD
+
+- **Status**: Completed
+- **Date**: 2026-01-10
+- **Completed By**: Agent
+
+### Subtasks Completed
+
+- [x] Create API route: GET /api/v1/admin/projects
+- [x] Create API route: GET /api/v1/admin/projects/:id
+- [x] Create API route: POST /api/v1/admin/projects
+- [x] Create API route: PUT /api/v1/admin/projects/:id
+- [x] Create API route: DELETE /api/v1/admin/projects/:id
+- [x] Define Zod validation schemas
+
+### Files Created
+
+```
+apps/admin/src/
+├── app/api/v1/admin/projects/
+│   ├── route.ts (GET list, POST create)
+│   └── [id]/route.ts (GET by id, PUT update, DELETE)
+├── lib/
+│   ├── validations/project.schema.ts (Zod schemas)
+│   ├── api/
+│   │   ├── handlers/projects.service.ts (business logic)
+│   │   ├── middleware/auth.ts (withAuth, withAdminAuth)
+│   │   └── responses/index.ts (response helpers)
+│   └── types.d.ts (NextAuth type imports)
+```
+
+### Dependencies Added
+
+- zod ^3.23.8
+
+### API Endpoints Implemented
+
+**GET /api/v1/admin/projects**
+
+- Query params: page, limit, category, featured, visible, search
+- Returns paginated project list with contexts
+- Admin auth required
+
+**GET /api/v1/admin/projects/:id**
+
+- Returns single project by ID with contexts
+- Admin auth required
+
+**POST /api/v1/admin/projects**
+
+- Body: title, slug, summary, description, category, techStack, liveUrl, repoUrl, featured, visible, order
+- Validates slug uniqueness
+- Creates project with Zod validation
+- Admin auth required
+
+**PUT /api/v1/admin/projects/:id**
+
+- Partial update with Zod validation
+- Validates slug uniqueness (excluding current project)
+- Updates project fields
+- Admin auth required
+
+**DELETE /api/v1/admin/projects/:id**
+
+- Soft delete (Prisma cascade handles contexts)
+- Admin auth required
+
+### Features Implemented
+
+- **Zod Validation**: createProjectSchema, updateProjectSchema, projectQuerySchema
+- **Auth Middleware**: withAuth, withAdminAuth higher-order functions
+- **Response Helpers**: successResponse, errorResponse, notFoundResponse, validationErrorResponse, serverErrorResponse
+- **Service Layer**: ProjectsService with getAll, getById, create, update, delete, checkSlugExists
+- **Pagination**: Page-based with configurable limit (max 100)
+- **Filtering**: By category, featured, visible status
+- **Search**: Full-text search on title and summary
+- **Error Handling**: Try-catch with proper error responses
+- **Type Safety**: Full TypeScript support with Prisma types
+
+### Business Logic Separation
+
+- **routes/**: Request/response handling only
+- **services/**: Business logic and database operations
+- **middleware/**: Authentication checks
+- **validations/**: Zod schemas
+- **responses/**: Standardized API responses
+
+### Notes
+
+- All routes versioned under /api/v1/admin
+- Admin authentication enforced via middleware
+- Slug uniqueness validated before create/update
+- Optional fields (description, liveUrl, repoUrl) handled correctly
+- Contexts included in responses via Prisma include
+- Build successful with no TypeScript errors

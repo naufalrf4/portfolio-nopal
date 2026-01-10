@@ -52,33 +52,33 @@
 
 ### Task 1.1: Admin App Scaffold
 
-- [ ] Create `apps/admin` Next.js app with App Router
-- [ ] Install and configure Tailwind CSS
-- [ ] Install shadcn/ui base components
-- [ ] Create basic layout with navigation
+- [x] Create `apps/admin` Next.js app with App Router
+- [x] Install and configure Tailwind CSS
+- [x] Install shadcn/ui base components
+- [x] Create basic layout with navigation
 
 ### Task 1.2: Database Setup
 
-- [ ] Create Prisma schema in `apps/admin/prisma/schema.prisma`
-- [ ] Define all models (User, Project, ProjectContext, BlogLink, etc.)
-- [ ] Run initial migration
-- [ ] Create seed script for initial data
+- [x] Create Prisma schema in `apps/admin/prisma/schema.prisma`
+- [x] Define all models (User, Project, ProjectContext, BlogLink, etc.)
+- [x] Run initial migration
+- [x] Create seed script for initial data
 
 ### Task 1.3: Authentication Setup
 
-- [ ] Create `packages/auth` package
-- [ ] Configure NextAuth with Google OAuth
-- [ ] Implement admin allowlist enforcement
-- [ ] Implement role assignment (admin/user)
+- [x] Create `packages/auth` package
+- [x] Configure NextAuth with Google OAuth
+- [x] Implement admin allowlist enforcement
+- [x] Implement role assignment (admin/user)
 
 ### Task 1.4: Admin API - Projects CRUD
 
-- [ ] Create API route: `GET /api/admin/projects`
-- [ ] Create API route: `GET /api/admin/projects/:id`
-- [ ] Create API route: `POST /api/admin/projects`
-- [ ] Create API route: `PUT /api/admin/projects/:id`
-- [ ] Create API route: `DELETE /api/admin/projects/:id`
-- [ ] Define Zod validation schemas
+- [x] Create API route: `GET /api/v1/admin/projects`
+- [x] Create API route: `GET /api/v1/admin/projects/:id`
+- [x] Create API route: `POST /api/v1/admin/projects`
+- [x] Create API route: `PUT /api/v1/admin/projects/:id`
+- [x] Create API route: `DELETE /api/v1/admin/projects/:id`
+- [x] Define Zod validation schemas
 
 ### Task 1.5: Admin API - Context Sections
 
