@@ -88,10 +88,10 @@
 
 ### Task 1.6: Admin Dashboard UI - Projects
 
-- [ ] Create projects list table
-- [ ] Create project create/edit form
-- [ ] Create context section management UI
-- [ ] Implement visibility toggle
+- [x] Create projects list table
+- [x] Create project create/edit form
+- [x] Create context section management UI
+- [x] Implement visibility toggle
 
 ### Task 1.7: Public Read API
 
