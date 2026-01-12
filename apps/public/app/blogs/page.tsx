@@ -1,9 +1,10 @@
 import type { Metadata } from 'next';
 import { defaultClient } from '@naufalrf/sdk';
 import type { BlogLink } from '@naufalrf/types';
-import { BlogsHeader, BlogsContent } from '@/src/features/blogs/components';
+import { BlogsContent } from '@/src/features/blogs/components';
 import { Suspense } from 'react';
-import { LoadingState } from '@/src/features/shared/components';
+import { LoadingState, PageHeader } from '@/src/features/shared/components';
+import { BookOpen } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -34,8 +35,7 @@ async function getBlogs(): Promise<{ blogs: BlogLink[]; error?: string }> {
     const response = await defaultClient.blogs.getAll();
     const blogs = response.data || [];
     return { blogs };
-  } catch (error) {
-    console.error('Failed to fetch blogs:', error);
+  } catch {
     return {
       blogs: [],
       error: 'Failed to load articles. Please try again later.',
@@ -56,9 +56,13 @@ export default async function BlogsPage() {
     : [];
 
   return (
-    <div className="min-h-screen p-8">
+    <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        <BlogsHeader />
+        <PageHeader
+          title="Articles & Blog Posts"
+          subtitle="Thoughts, tutorials, and insights on web development, software engineering, and technology published on various platforms."
+          icon={BookOpen}
+        />
         <Suspense fallback={<LoadingState type="skeleton" count={6} height="h-64" />}>
           <BlogsContent initialBlogs={serializedBlogs} error={error} />
         </Suspense>

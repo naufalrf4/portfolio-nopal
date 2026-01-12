@@ -1,5 +1,6 @@
 export { Section } from './Section';
 export { SectionHeader } from './SectionHeader';
+export { PageHeader } from './PageHeader';
 export { NeuCard } from './NeuCard';
 export { NeuBadge } from './NeuBadge';
 export { NeuButton } from './NeuButton';
