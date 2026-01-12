@@ -1,62 +1,90 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { cn } from '@/src/lib/utils';
-import { Section, SectionHeader, NeuCard } from '@/src/features/shared/components';
+import { Section, NeuCard } from '@/src/features/shared/components';
 import { ContactForm } from './ContactForm';
 import { BookingCalendar } from './BookingCalendar';
+import { ContactInfo } from './ContactInfo';
 import { Mail, Calendar, ChevronDown, HelpCircle } from 'lucide-react';
 import { FAQS } from '@/src/lib/constants';
+import { api } from '@/src/lib/api';
 
 type Tab = 'form' | 'booking';
+
+interface AboutData {
+  location?: string;
+  email?: string;
+  socialLinks?: Array<{ platform: string; url: string }>;
+}
 
 export function ContactContent() {
   const [activeTab, setActiveTab] = useState<Tab>('form');
   const [openFaqId, setOpenFaqId] = useState<string | null>(null);
+  const [aboutData, setAboutData] = useState<AboutData | null>(null);
+
+  useEffect(() => {
+    const fetchAboutData = async () => {
+      try {
+        const data = await api.about.get();
+        setAboutData(data);
+      } catch (error) {
+        console.error('Failed to fetch about data:', error);
+      }
+    };
+    fetchAboutData();
+  }, []);
 
   const toggleFaq = (id: string) => {
     setOpenFaqId(openFaqId === id ? null : id);
   };
 
+  const socialLinks = aboutData?.socialLinks || [];
+
   return (
     <div className="py-8 md:py-16">
       <Section>
-        <SectionHeader
-          title="Get in Touch"
-          subtitle="Have a question or want to work together? I'd love to hear from you."
-        />
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 mb-16">
+            <div className="lg:col-span-5">
+              <ContactInfo
+                location={aboutData?.location}
+                email={aboutData?.email}
+                socialLinks={socialLinks}
+              />
+            </div>
 
-        <div className="max-w-3xl mx-auto">
-          <div className="flex gap-2 mb-8">
-            <button
-              onClick={() => setActiveTab('form')}
-              className={cn(
-                'flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-xl font-medium transition-all duration-200',
-                activeTab === 'form'
-                  ? 'text-[#3B82F6] shadow-[inset_4px_4px_8px_rgba(163,177,198,0.6),inset_-4px_-4px_8px_rgba(255,255,255,0.5)]'
-                  : 'text-[#6B7280] shadow-[4px_4px_8px_rgba(163,177,198,0.6),-4px_-4px_8px_rgba(255,255,255,0.5)] hover:text-[#3B82F6]'
-              )}
-            >
-              <Mail size={20} />
-              Send Message
-            </button>
-            <button
-              onClick={() => setActiveTab('booking')}
-              className={cn(
-                'flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-xl font-medium transition-all duration-200',
-                activeTab === 'booking'
-                  ? 'text-[#3B82F6] shadow-[inset_4px_4px_8px_rgba(163,177,198,0.6),inset_-4px_-4px_8px_rgba(255,255,255,0.5)]'
-                  : 'text-[#6B7280] shadow-[4px_4px_8px_rgba(163,177,198,0.6),-4px_-4px_8px_rgba(255,255,255,0.5)] hover:text-[#3B82F6]'
-              )}
-            >
-              <Calendar size={20} />
-              Book a Call
-            </button>
+            <div className="lg:col-span-7">
+              <div className="flex gap-2 mb-6">
+                <button
+                  onClick={() => setActiveTab('form')}
+                  className={cn(
+                    'flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-xl font-medium transition-all duration-200',
+                    activeTab === 'form'
+                      ? 'text-[#3B82F6] shadow-[inset_4px_4px_8px_rgba(163,177,198,0.6),inset_-4px_-4px_8px_rgba(255,255,255,0.5)]'
+                      : 'text-[#6B7280] shadow-[4px_4px_8px_rgba(163,177,198,0.6),-4px_-4px_8px_rgba(255,255,255,0.5)] hover:text-[#3B82F6]'
+                  )}
+                >
+                  <Mail size={20} />
+                  Send Message
+                </button>
+                <button
+                  onClick={() => setActiveTab('booking')}
+                  className={cn(
+                    'flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-xl font-medium transition-all duration-200',
+                    activeTab === 'booking'
+                      ? 'text-[#3B82F6] shadow-[inset_4px_4px_8px_rgba(163,177,198,0.6),inset_-4px_-4px_8px_rgba(255,255,255,0.5)]'
+                      : 'text-[#6B7280] shadow-[4px_4px_8px_rgba(163,177,198,0.6),-4px_-4px_8px_rgba(255,255,255,0.5)] hover:text-[#3B82F6]'
+                  )}
+                >
+                  <Calendar size={20} />
+                  Book a Call
+                </button>
+              </div>
+
+              <NeuCard>{activeTab === 'form' ? <ContactForm /> : <BookingCalendar />}</NeuCard>
+            </div>
           </div>
-
-          <NeuCard className="mb-16">
-            {activeTab === 'form' ? <ContactForm /> : <BookingCalendar />}
-          </NeuCard>
 
           <div>
             <div className="flex items-center gap-3 mb-8">
@@ -69,7 +97,7 @@ export function ContactContent() {
               </div>
             </div>
 
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {FAQS.map((faq) => {
                 const isOpen = openFaqId === faq.id;
                 return (
