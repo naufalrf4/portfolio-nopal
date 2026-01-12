@@ -7,6 +7,7 @@ import {
   serverErrorResponse,
   errorResponse,
 } from '@/lib/api/responses';
+import { verifyTurnstileToken, isTurnstileConfigured } from '@/lib/services/turnstile';
 import { createHash } from 'crypto';
 
 const publicContactSchema = z.object({
@@ -14,6 +15,7 @@ const publicContactSchema = z.object({
   email: z.string().email().max(255),
   subject: z.string().max(200).optional(),
   message: z.string().min(1).max(5000),
+  turnstileToken: z.string().min(1, 'CAPTCHA verification is required'),
 });
 
 function hashIp(ip: string): string {
@@ -27,6 +29,18 @@ export async function POST(request: NextRequest) {
 
     if (!parsed.success) {
       return validationErrorResponse(parsed.error.flatten().fieldErrors);
+    }
+
+    if (isTurnstileConfigured()) {
+      const turnstileResult = await verifyTurnstileToken(parsed.data.turnstileToken);
+
+      if (!turnstileResult.success) {
+        return errorResponse(
+          'CAPTCHA verification failed. Please try again.',
+          400,
+          'TURNSTILE_VERIFICATION_FAILED'
+        );
+      }
     }
 
     const forwarded = request.headers.get('x-forwarded-for');
