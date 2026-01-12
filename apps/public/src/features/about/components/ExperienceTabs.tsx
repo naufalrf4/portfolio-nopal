@@ -11,10 +11,10 @@ interface ExperienceTabsProps {
 }
 
 const tabConfig = [
-  { type: 'work', label: 'Work', icon: Briefcase },
+  { type: 'work', label: 'Experience', icon: Briefcase },
   { type: 'education', label: 'Education', icon: GraduationCap },
-  { type: 'certification', label: 'Certifications', icon: Award },
-  { type: 'organization', label: 'Organizations', icon: Users },
+  { type: 'certification', label: 'Work', icon: Award },
+  { type: 'organization', label: 'Organizational', icon: Users },
 ] as const;
 
 export function ExperienceTabs({ experience }: ExperienceTabsProps) {
@@ -46,14 +46,16 @@ export function ExperienceTabs({ experience }: ExperienceTabsProps) {
               key={tab.type}
               onClick={() => setActiveTab(tab.type)}
               className={cn(
-                'flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all duration-200',
+                'flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all duration-300',
                 isActive
                   ? 'text-[#3B82F6] shadow-[inset_4px_4px_8px_rgba(163,177,198,0.6),inset_-4px_-4px_8px_rgba(255,255,255,0.5)]'
-                  : 'text-[#6B7280] shadow-[4px_4px_8px_rgba(163,177,198,0.6),-4px_-4px_8px_rgba(255,255,255,0.5)] hover:text-[#3B82F6]'
+                  : 'text-[#6B7280] shadow-[4px_4px_8px_rgba(163,177,198,0.6),-4px_-4px_8px_rgba(255,255,255,0.5)] hover:text-[#3B82F6] hover:shadow-[6px_6px_10px_rgba(163,177,198,0.7),-6px_-6px_10px_rgba(255,255,255,0.6)]'
               )}
+              aria-pressed={isActive}
+              aria-label={`Show ${tab.label} entries`}
             >
               <Icon size={18} />
-              {tab.label}
+              <span className="hidden sm:inline">{tab.label}</span>
             </button>
           );
         })}
@@ -67,7 +69,7 @@ export function ExperienceTabs({ experience }: ExperienceTabsProps) {
             <div key={exp.id} className="relative pl-10">
               <div className="absolute left-2 top-6 w-4 h-4 rounded-full bg-[#3B82F6] shadow-[2px_2px_4px_rgba(59,130,246,0.3)]" />
 
-              <NeuCard>
+              <NeuCard className="p-5 md:p-6">
                 <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-2 mb-3">
                   <div>
                     <h4 className="text-lg font-bold text-[#3D4852]">{exp.title}</h4>
@@ -111,8 +113,9 @@ export function ExperienceTabs({ experience }: ExperienceTabsProps) {
 
         {filteredExperience.length === 0 && (
           <div className="pl-10">
-            <NeuCard className="text-center text-[#6B7280]">
-              No {activeTab} experience to display.
+            <NeuCard className="text-center text-[#6B7280] p-6">
+              No {tabConfig.find((t) => t.type === activeTab)?.label.toLowerCase()} entries to
+              display.
             </NeuCard>
           </div>
         )}

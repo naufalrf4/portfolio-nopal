@@ -6,6 +6,7 @@ import type { NextAuthConfig } from 'next-auth';
 const API_BASE = process.env.NEXT_PUBLIC_ADMIN_API_URL || 'http://localhost:3001';
 
 const authConfig: NextAuthConfig = {
+  secret: process.env.NEXTAUTH_SECRET,
   providers: [
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID!,
