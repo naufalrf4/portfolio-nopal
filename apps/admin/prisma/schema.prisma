@@ -166,11 +166,11 @@ model AnalyticsEvent {
   eventType   String   @db.VarChar(20)
   data        Json?
   userSession String?
-  ipAddress   String?   @db.VarChar(45)
-  countryCode String?   @db.VarChar(2)
-  city        String?   @db.VarChar(100)
+  ipAddress   String?  @db.VarChar(45)
+  countryCode String?  @db.VarChar(2)
+  city        String?  @db.VarChar(100)
   createdAt   DateTime @default(now())
-  
+
   @@index([page])
   @@index([eventType])
   @@index([entityType, entityId])
@@ -182,14 +182,14 @@ model AnonymousMessage {
   id          String   @id @default(cuid())
   content     String
   ipHash      String
-  ipAddress   String?
-  countryCode String?
-  country     String?
-  city        String?
-  region      String?
   read        Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  city        String?
+  country     String?
+  countryCode String?
+  ipAddress   String?
+  region      String?
 
   @@index([read])
   @@index([createdAt])
