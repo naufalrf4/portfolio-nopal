@@ -8,6 +8,7 @@ export interface ProjectContext {
 export interface ProjectImage {
   id: string;
   url: string;
+  order: number;
   alt?: string;
   caption?: string;
 }

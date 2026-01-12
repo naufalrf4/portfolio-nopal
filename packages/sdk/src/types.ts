@@ -17,6 +17,18 @@ export interface Project {
   createdAt: Date;
   updatedAt: Date;
   contexts?: ProjectContext[];
+  images?: ProjectImage[];
+}
+
+export interface ProjectImage {
+  id: string;
+  projectId: string;
+  url: string;
+  key: string;
+  order: number;
+  caption?: string;
+  alt?: string;
+  createdAt: Date;
 }
 
 export interface ProjectContext {
