@@ -13,6 +13,7 @@ interface ContactInfoProps {
   location?: string;
   email?: string;
   socialLinks?: SocialLink[];
+  availabilityStatus?: string;
 }
 
 const socialIcons: Record<string, ComponentType<{ size?: number; className?: string }>> = {
@@ -25,7 +26,12 @@ const socialIcons: Record<string, ComponentType<{ size?: number; className?: str
   website: Globe,
 };
 
-export function ContactInfo({ location, email, socialLinks = [] }: ContactInfoProps) {
+export function ContactInfo({
+  location,
+  email,
+  socialLinks = [],
+  availabilityStatus,
+}: ContactInfoProps) {
   return (
     <NeuCard className="p-6 md:p-8 h-full">
       <div className="flex flex-col h-full">
@@ -59,6 +65,18 @@ export function ContactInfo({ location, email, socialLinks = [] }: ContactInfoPr
                 </p>
               </div>
             </a>
+          )}
+
+          {availabilityStatus && (
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-[#E0E5EC] shadow-[4px_4px_8px_rgba(163,177,198,0.6),-4px_-4px_8px_rgba(255,255,255,0.5)] flex items-center justify-center">
+                <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse" />
+              </div>
+              <div>
+                <p className="text-sm text-[#6B7280]">Availability</p>
+                <p className="text-[#3D4852] font-medium">{availabilityStatus}</p>
+              </div>
+            </div>
           )}
         </div>
 

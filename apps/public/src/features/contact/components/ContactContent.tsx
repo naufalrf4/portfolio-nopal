@@ -49,6 +49,7 @@ export function ContactContent() {
                 location={aboutData?.location}
                 email={aboutData?.email}
                 socialLinks={socialLinks}
+                availabilityStatus={aboutData?.availabilityStatus}
               />
             </div>
 
@@ -95,7 +96,7 @@ export function ContactContent() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-4">
               {FAQS.map((faq) => {
                 const isOpen = openFaqId === faq.id;
                 return (

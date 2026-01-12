@@ -20,6 +20,7 @@ export interface AboutData {
   skills: string[];
   experience: Experience[];
   socialLinks: SocialLinks;
+  availabilityStatus?: string;
 }
 
 export interface Experience {
