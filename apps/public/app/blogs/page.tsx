@@ -14,6 +14,16 @@ export const metadata: Metadata = {
     description:
       'Thoughts, tutorials, and insights on web development, software engineering, and technology.',
     type: 'website',
+    url: 'https://naufalrf.tech/blogs',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Articles | NaufalRF',
+    description:
+      'Thoughts, tutorials, and insights on web development, software engineering, and technology.',
+  },
+  alternates: {
+    canonical: 'https://naufalrf.tech/blogs',
   },
 };
 

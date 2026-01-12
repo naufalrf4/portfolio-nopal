@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import type React from 'react';
 import Script from 'next/script';
 import { Plus_Jakarta_Sans, DM_Sans } from 'next/font/google';
 import { Navbar, Footer } from '@/src/features/layout/components';
@@ -22,6 +23,7 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://naufalrf.tech'),
   title: {
     default: 'NaufalRF | Full-Stack Engineer',
     template: '%s | NaufalRF',
@@ -37,6 +39,9 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     creator: '@naufalrf',
+  },
+  alternates: {
+    canonical: '/',
   },
 };
 

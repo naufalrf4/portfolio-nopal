@@ -13,6 +13,16 @@ export const metadata: Metadata = {
     description:
       'Learn more about my journey, skills, and professional experience as a Full-Stack Engineer',
     type: 'website',
+    url: 'https://naufalrf.tech/about',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'About | NaufalRF',
+    description:
+      'Learn more about my journey, skills, and professional experience as a Full-Stack Engineer',
+  },
+  alternates: {
+    canonical: 'https://naufalrf.tech/about',
   },
 };
 
