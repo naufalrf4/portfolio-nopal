@@ -102,7 +102,7 @@ export function ContactContent() {
                 return (
                   <NeuCard
                     key={faq.id}
-                    className="cursor-pointer"
+                    className="cursor-pointer overflow-hidden"
                     onClick={() => toggleFaq(faq.id)}
                   >
                     <div className="flex items-center justify-between">
@@ -110,12 +110,21 @@ export function ContactContent() {
                       <ChevronDown
                         size={20}
                         className={cn(
-                          'text-[#6B7280] flex-shrink-0 transition-transform duration-200',
+                          'text-[#6B7280] flex-shrink-0 transition-transform duration-300 ease-in-out',
                           isOpen && 'rotate-180'
                         )}
                       />
                     </div>
-                    {isOpen && <p className="mt-4 text-[#6B7280] leading-relaxed">{faq.answer}</p>}
+                    <div
+                      className={cn(
+                        'grid transition-all duration-300 ease-in-out',
+                        isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
+                      )}
+                    >
+                      <div className="overflow-hidden">
+                        <p className="mt-4 text-[#6B7280] leading-relaxed">{faq.answer}</p>
+                      </div>
+                    </div>
                   </NeuCard>
                 );
               })}
