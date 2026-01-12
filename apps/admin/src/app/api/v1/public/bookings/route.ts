@@ -9,6 +9,7 @@ import {
   errorResponse,
   notFoundResponse,
 } from '@/lib/api/responses';
+import { verifyTurnstileToken, isTurnstileConfigured } from '@/lib/services/turnstile';
 import { createHash } from 'crypto';
 
 const publicBookingSchema = z.object({
@@ -17,6 +18,7 @@ const publicBookingSchema = z.object({
   email: z.string().email().max(255),
   phone: z.string().max(20).optional(),
   notes: z.string().max(1000).optional(),
+  turnstileToken: z.string().min(1, 'CAPTCHA verification is required'),
 });
 
 function hashIp(ip: string): string {
@@ -30,6 +32,18 @@ export async function POST(request: NextRequest) {
 
     if (!parsed.success) {
       return validationErrorResponse(parsed.error.flatten().fieldErrors);
+    }
+
+    if (isTurnstileConfigured()) {
+      const turnstileResult = await verifyTurnstileToken(parsed.data.turnstileToken);
+
+      if (!turnstileResult.success) {
+        return errorResponse(
+          'CAPTCHA verification failed. Please try again.',
+          400,
+          'TURNSTILE_VERIFICATION_FAILED'
+        );
+      }
     }
 
     const { slotId, name, email, phone, notes } = parsed.data;
