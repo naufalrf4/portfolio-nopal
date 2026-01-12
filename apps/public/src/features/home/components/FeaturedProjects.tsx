@@ -1,4 +1,3 @@
-import { cn } from '@/src/lib/utils';
 import Image from 'next/image';
 import Link from 'next/link';
 import {
@@ -8,7 +7,7 @@ import {
   NeuBadge,
   NeuButton,
 } from '@/src/features/shared/components';
-import { ArrowRight, ExternalLink } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import type { Project } from './types';
 
 interface FeaturedProjectsProps {
@@ -16,7 +15,7 @@ interface FeaturedProjectsProps {
 }
 
 export function FeaturedProjects({ projects }: FeaturedProjectsProps) {
-  const featuredProjects = projects.filter((p) => p.featured).slice(0, 4);
+  const featuredProjects = projects.filter((p) => p.featured).slice(0, 6);
 
   if (featuredProjects.length === 0) {
     return null;
@@ -29,11 +28,11 @@ export function FeaturedProjects({ projects }: FeaturedProjectsProps) {
         subtitle="A selection of projects that showcase my skills and passion for building"
       />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {featuredProjects.map((project) => (
           <Link key={project.id} href={`/projects/${project.slug}`}>
-            <NeuCard hover className="h-full group">
-              <div className="relative aspect-video rounded-xl overflow-hidden mb-4 shadow-[inset_4px_4px_8px_rgba(163,177,198,0.6),inset_-4px_-4px_8px_rgba(255,255,255,0.5)]">
+            <NeuCard hover className="h-full group p-4">
+              <div className="relative aspect-[16/10] rounded-lg overflow-hidden mb-3 shadow-[inset_3px_3px_6px_rgba(163,177,198,0.6),inset_-3px_-3px_6px_rgba(255,255,255,0.5)]">
                 {project.imageUrl ? (
                   <Image
                     src={project.imageUrl}
@@ -43,13 +42,13 @@ export function FeaturedProjects({ projects }: FeaturedProjectsProps) {
                   />
                 ) : (
                   <div className="w-full h-full bg-gradient-to-br from-[#3B82F6] to-[#8B5CF6] flex items-center justify-center">
-                    <span className="text-4xl text-white font-bold">{project.title.charAt(0)}</span>
+                    <span className="text-3xl text-white font-bold">{project.title.charAt(0)}</span>
                   </div>
                 )}
               </div>
 
-              <div className="flex items-start justify-between gap-4 mb-3">
-                <h3 className="text-xl font-bold text-[#3D4852] group-hover:text-[#3B82F6] transition-colors">
+              <div className="flex items-start justify-between gap-2 mb-2">
+                <h3 className="text-lg font-bold text-[#3D4852] group-hover:text-[#3B82F6] transition-colors line-clamp-1">
                   {project.title}
                 </h3>
                 <NeuBadge variant="accent" size="sm">
@@ -57,16 +56,16 @@ export function FeaturedProjects({ projects }: FeaturedProjectsProps) {
                 </NeuBadge>
               </div>
 
-              <p className="text-[#6B7280] mb-4 line-clamp-2">{project.summary}</p>
+              <p className="text-sm text-[#6B7280] mb-3 line-clamp-2">{project.summary}</p>
 
-              <div className="flex flex-wrap gap-2">
-                {project.techStack.slice(0, 4).map((tech, index) => (
+              <div className="flex flex-wrap gap-1.5">
+                {project.techStack.slice(0, 3).map((tech, index) => (
                   <NeuBadge key={index} size="sm">
                     {tech}
                   </NeuBadge>
                 ))}
-                {project.techStack.length > 4 && (
-                  <NeuBadge size="sm">+{project.techStack.length - 4}</NeuBadge>
+                {project.techStack.length > 3 && (
+                  <NeuBadge size="sm">+{project.techStack.length - 3}</NeuBadge>
                 )}
               </div>
             </NeuCard>
@@ -74,7 +73,7 @@ export function FeaturedProjects({ projects }: FeaturedProjectsProps) {
         ))}
       </div>
 
-      <div className="mt-12 text-center">
+      <div className="mt-10 text-center">
         <Link href="/projects">
           <NeuButton variant="default" size="lg">
             View All Projects
