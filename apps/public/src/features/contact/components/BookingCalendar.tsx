@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Turnstile, type TurnstileInstance } from '@marsidev/react-turnstile';
 import { cn } from '@/src/lib/utils';
 import { NeuCard, NeuInput, NeuButton } from '@/src/features/shared/components';
 import { api } from '@/src/lib/api';
@@ -23,6 +24,8 @@ interface BookingFormData {
   notes: string;
 }
 
+const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '';
+
 export function BookingCalendar() {
   const [slots, setSlots] = useState<FlatSlot[]>([]);
   const [selectedSlot, setSelectedSlot] = useState<FlatSlot | null>(null);
@@ -30,6 +33,9 @@ export function BookingCalendar() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [turnstileError, setTurnstileError] = useState(false);
+  const turnstileRef = useRef<TurnstileInstance>(null);
   const [formData, setFormData] = useState<BookingFormData>({
     name: '',
     email: '',
@@ -63,9 +69,29 @@ export function BookingCalendar() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleTurnstileSuccess = (token: string) => {
+    setTurnstileToken(token);
+    setTurnstileError(false);
+  };
+
+  const handleTurnstileError = () => {
+    setTurnstileToken(null);
+    setTurnstileError(true);
+  };
+
+  const handleTurnstileExpire = () => {
+    setTurnstileToken(null);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedSlot) return;
+
+    if (TURNSTILE_SITE_KEY && !turnstileToken) {
+      setStatus('error');
+      setErrorMessage('Please complete the verification');
+      return;
+    }
 
     setIsSubmitting(true);
     setStatus('idle');
@@ -76,13 +102,17 @@ export function BookingCalendar() {
         ...formData,
         date: selectedSlot.date,
         time: selectedSlot.time,
+        turnstileToken: turnstileToken || undefined,
       });
       setStatus('success');
       setFormData({ name: '', email: '', phone: '', notes: '' });
       setSelectedSlot(null);
+      setTurnstileToken(null);
+      turnstileRef.current?.reset();
     } catch (error) {
       setStatus('error');
       setErrorMessage(error instanceof Error ? error.message : 'Failed to book slot');
+      turnstileRef.current?.reset();
     } finally {
       setIsSubmitting(false);
     }
@@ -181,6 +211,28 @@ export function BookingCalendar() {
               />
             </div>
           </NeuCard>
+
+          {TURNSTILE_SITE_KEY && (
+            <div className="flex justify-center">
+              <Turnstile
+                ref={turnstileRef}
+                siteKey={TURNSTILE_SITE_KEY}
+                onSuccess={handleTurnstileSuccess}
+                onError={handleTurnstileError}
+                onExpire={handleTurnstileExpire}
+                options={{
+                  theme: 'light',
+                }}
+              />
+            </div>
+          )}
+
+          {turnstileError && (
+            <div className="flex items-center gap-2 text-red-600 bg-red-50 p-4 rounded-xl">
+              <AlertCircle size={20} />
+              <span>Verification failed. Please try again.</span>
+            </div>
+          )}
 
           {status === 'success' && (
             <div className="flex items-center gap-2 text-green-600 bg-green-50 p-4 rounded-xl">
