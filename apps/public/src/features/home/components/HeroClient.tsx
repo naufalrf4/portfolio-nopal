@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { cn } from '@/src/lib/utils';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Github, Linkedin, Twitter, Mail, Download, ArrowRight } from 'lucide-react';
 import { NeuButton } from '@/src/features/shared/components';
-import { GREETINGS, LANGUAGES } from '@/src/lib/constants';
+import { GREETINGS } from '@/src/lib/constants';
 import type { AboutData } from './types';
 
 interface HeroClientProps {
@@ -20,27 +20,28 @@ const socialIcons: Record<string, React.ComponentType<{ size?: number; className
   email: Mail,
 };
 
+const GREETING_KEYS = Object.keys(GREETINGS) as (keyof typeof GREETINGS)[];
+
 export function HeroClient({ about }: HeroClientProps) {
-  const [languageIndex, setLanguageIndex] = useState(0);
+  const [greetingIndex, setGreetingIndex] = useState(0);
   const [currentRoleIndex, setCurrentRoleIndex] = useState(0);
   const [isRoleVisible, setIsRoleVisible] = useState(true);
   const [isGreetingVisible, setIsGreetingVisible] = useState(true);
 
   const roles = about.roles || ['Full-Stack Engineer'];
-  const languageCodes = LANGUAGES.map((l) => l.code);
-  const currentLanguage = languageCodes[languageIndex];
+  const firstName = about.fullName.split(' ')[0];
 
   useEffect(() => {
     const interval = setInterval(() => {
       setIsGreetingVisible(false);
       setTimeout(() => {
-        setLanguageIndex((prev) => (prev + 1) % languageCodes.length);
+        setGreetingIndex((prev) => (prev + 1) % GREETING_KEYS.length);
         setIsGreetingVisible(true);
       }, 300);
     }, 3000);
 
     return () => clearInterval(interval);
-  }, [languageCodes.length]);
+  }, []);
 
   useEffect(() => {
     if (roles.length <= 1) return;
@@ -82,23 +83,16 @@ export function HeroClient({ about }: HeroClientProps) {
           </div>
         </div>
 
-        <div className="mb-6">
-          <div
+        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#3D4852] mb-4">
+          <span
             className={cn(
-              'inline-flex items-center gap-2 text-xl md:text-2xl text-[#6B7280] transition-all duration-300',
+              'inline-block transition-all duration-300',
               isGreetingVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'
             )}
           >
-            <span className="text-2xl">
-              {LANGUAGES.find((l) => l.code === currentLanguage)?.flag}
-            </span>
-            <span>{GREETINGS[currentLanguage]}</span>
-          </div>
-        </div>
-
-        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#3D4852] mb-2">
-          {about.fullName}
-          <span className="inline-block ml-3 animate-wave origin-[70%_70%]">👋</span>
+            {GREETINGS[GREETING_KEYS[greetingIndex]]}
+          </span>{' '}
+          {firstName} <span className="inline-block animate-wave origin-[70%_70%]">👋</span>
         </h1>
 
         <div className="h-12 md:h-14 flex items-center justify-center mb-6">
