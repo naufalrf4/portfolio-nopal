@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { prisma } from '@/lib/db/prisma';
+import { successResponse, notFoundResponse, serverErrorResponse } from '@/lib/api/responses';
 
 type RouteContext = {
   params: Promise<{ slug: string }>;
@@ -22,32 +23,11 @@ export async function GET(req: NextRequest, context: RouteContext) {
     });
 
     if (!project || !project.visible) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: {
-            message: 'Project not found',
-            code: 'NOT_FOUND',
-          },
-        },
-        { status: 404 }
-      );
+      return notFoundResponse('Project');
     }
 
-    return NextResponse.json({
-      success: true,
-      data: project,
-    });
+    return successResponse(project);
   } catch {
-    return NextResponse.json(
-      {
-        success: false,
-        error: {
-          message: 'Internal server error',
-          code: 'INTERNAL_ERROR',
-        },
-      },
-      { status: 500 }
-    );
+    return serverErrorResponse();
   }
 }

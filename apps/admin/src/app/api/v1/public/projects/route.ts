@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { prisma } from '@/lib/db/prisma';
+import { successResponse, serverErrorResponse } from '@/lib/api/responses';
 
 export async function GET(req: NextRequest) {
   try {
@@ -37,24 +38,14 @@ export async function GET(req: NextRequest) {
       prisma.project.count({ where: { visible: true, featured: true } }),
     ]);
 
-    return NextResponse.json({
-      success: true,
-      data: projects,
+    return successResponse({
+      projects,
       meta: {
         total,
         featured: featuredCount,
       },
     });
   } catch {
-    return NextResponse.json(
-      {
-        success: false,
-        error: {
-          message: 'Internal server error',
-          code: 'INTERNAL_ERROR',
-        },
-      },
-      { status: 500 }
-    );
+    return serverErrorResponse();
   }
 }

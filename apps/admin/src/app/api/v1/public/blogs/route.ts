@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { serverErrorResponse } from '@/lib/api/responses';
+import { NextRequest } from 'next/server';
+import { successResponse, serverErrorResponse } from '@/lib/api/responses';
 import { prisma } from '@/lib/db/prisma';
 
 const DEFAULT_LIMIT = 6;
@@ -33,11 +33,7 @@ export async function GET(req: NextRequest) {
       prisma.blogLink.count({ where }),
     ]);
 
-    return NextResponse.json({
-      success: true,
-      data: blogs,
-      meta: { total },
-    });
+    return successResponse({ blogs, meta: { total } });
   } catch {
     return serverErrorResponse();
   }
