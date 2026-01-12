@@ -69,7 +69,7 @@ export function ProjectDetail({ project }: ProjectDetailProps) {
     : [];
 
   return (
-    <div className="py-8 md:py-16">
+    <div className="py-8 md:py-16 animate-fade-in">
       <Section>
         <Link
           href="/projects"

@@ -16,14 +16,18 @@ export function ContactContent() {
   const [activeTab, setActiveTab] = useState<Tab>('form');
   const [openFaqId, setOpenFaqId] = useState<string | null>(null);
   const [aboutData, setAboutData] = useState<ApiAboutData | null>(null);
+  const [aboutDataError, setAboutDataError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchAboutData = async () => {
       try {
+        setAboutDataError(null);
         const data = await api.about.get();
         setAboutData(data);
       } catch (error) {
-        console.error('Failed to fetch about data:', error);
+        const errorMessage =
+          error instanceof Error ? error.message : 'Failed to load contact information';
+        setAboutDataError(errorMessage);
       }
     };
     fetchAboutData();
@@ -40,7 +44,7 @@ export function ContactContent() {
     : [];
 
   return (
-    <div className="py-8 md:py-16">
+    <div className="py-8 md:py-16 animate-fade-in">
       <Section>
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 mb-16">
@@ -50,6 +54,7 @@ export function ContactContent() {
                 email={aboutData?.email}
                 socialLinks={socialLinks}
                 availabilityStatus={aboutData?.availabilityStatus}
+                error={aboutDataError}
               />
             </div>
 

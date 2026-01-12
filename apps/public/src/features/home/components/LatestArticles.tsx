@@ -23,7 +23,7 @@ export function LatestArticles({ blogs }: LatestArticlesProps) {
   }
 
   return (
-    <Section className="bg-[#E0E5EC]">
+    <Section className="bg-[#E0E5EC] animate-fade-in">
       <SectionHeader
         title="Latest Articles"
         subtitle="Thoughts, tutorials, and insights on software development and technology"

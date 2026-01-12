@@ -2,7 +2,13 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useSession, signIn } from 'next-auth/react';
-import { Section, SectionHeader, NeuCard, NeuButton } from '@/src/features/shared/components';
+import {
+  Section,
+  SectionHeader,
+  NeuCard,
+  NeuButton,
+  ErrorState,
+} from '@/src/features/shared/components';
 import { GuestbookList } from './GuestbookList';
 import { GuestbookForm } from './GuestbookForm';
 import { api } from '@/src/lib/api';
@@ -14,6 +20,7 @@ export function Guestbook() {
   const { data: session, status } = useSession();
   const [entries, setEntries] = useState<GuestbookEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [authConfigError, setAuthConfigError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -23,9 +30,13 @@ export function Guestbook() {
 
   const fetchEntries = useCallback(async () => {
     try {
+      setIsLoading(true);
+      setError(null);
       const response = await api.guestbook.getAll();
       const entries = response?.entries || [];
       setEntries(Array.isArray(entries) ? entries : []);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load guestbook entries');
     } finally {
       setIsLoading(false);
     }
@@ -93,6 +104,13 @@ export function Guestbook() {
             <NeuCard className="text-center py-8">
               <div className="animate-pulse text-[#6B7280]">Loading messages...</div>
             </NeuCard>
+          ) : error ? (
+            <ErrorState
+              title="Failed to load messages"
+              message={error}
+              onRetry={fetchEntries}
+              showRetry={true}
+            />
           ) : entries.length === 0 ? (
             <NeuCard className="text-center py-12 space-y-4">
               <MessageSquare className="w-16 h-16 mx-auto text-[#6B7280] opacity-50" />

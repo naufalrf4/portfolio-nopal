@@ -58,7 +58,7 @@ export function HeroClient({ about }: HeroClientProps) {
   }, [roles.length]);
 
   return (
-    <section className="min-h-[85vh] flex items-center justify-center py-16 md:py-24 px-4 md:px-8">
+    <section className="min-h-[85vh] flex items-center justify-center py-16 md:py-24 px-4 md:px-8 animate-fade-in">
       <div className="mx-auto max-w-4xl w-full text-center">
         <div className="flex justify-center mb-8">
           <div className="relative w-40 h-40 md:w-52 md:h-52 rounded-full shadow-[12px_12px_24px_rgba(163,177,198,0.6),-12px_-12px_24px_rgba(255,255,255,0.5)] p-2 bg-[#E0E5EC]">

@@ -2,7 +2,17 @@
 
 import type { ComponentType } from 'react';
 import { NeuCard } from '@/src/features/shared/components';
-import { MapPin, Mail, Github, Linkedin, Twitter, Instagram, Youtube, Globe } from 'lucide-react';
+import {
+  MapPin,
+  Mail,
+  Github,
+  Linkedin,
+  Twitter,
+  Instagram,
+  Youtube,
+  Globe,
+  AlertCircle,
+} from 'lucide-react';
 
 interface SocialLink {
   platform: string;
@@ -14,6 +24,7 @@ interface ContactInfoProps {
   email?: string;
   socialLinks?: SocialLink[];
   availabilityStatus?: string;
+  error?: string | null;
 }
 
 const socialIcons: Record<string, ComponentType<{ size?: number; className?: string }>> = {
@@ -31,6 +42,7 @@ export function ContactInfo({
   email,
   socialLinks = [],
   availabilityStatus,
+  error,
 }: ContactInfoProps) {
   return (
     <NeuCard className="p-6 md:p-8 h-full">
@@ -39,6 +51,16 @@ export function ContactInfo({
         <p className="text-[#6B7280] mb-8">
           Have a question or want to work together? I&apos;d love to hear from you.
         </p>
+
+        {error ? (
+          <div className="flex items-start gap-3 p-4 rounded-lg bg-red-50 border border-red-200 mb-6">
+            <AlertCircle size={20} className="text-red-500 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-medium text-red-800">Failed to load contact information</p>
+              <p className="text-xs text-red-600 mt-1">{error}</p>
+            </div>
+          </div>
+        ) : null}
 
         <div className="space-y-4 mb-8">
           {location && (

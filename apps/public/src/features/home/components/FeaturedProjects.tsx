@@ -22,7 +22,7 @@ export function FeaturedProjects({ projects }: FeaturedProjectsProps) {
   }
 
   return (
-    <Section>
+    <Section className="animate-fade-in">
       <SectionHeader
         title="Featured Projects"
         subtitle="A selection of projects that showcase my skills and passion for building"

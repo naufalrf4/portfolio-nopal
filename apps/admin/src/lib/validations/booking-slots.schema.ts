@@ -1,22 +1,36 @@
 import { z } from 'zod';
 
 export const createBookingSlotSchema = z.object({
-  date: z.string().refine((val) => !isNaN(Date.parse(val)), 'Invalid date'),
+  date: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format')
+    .refine((val) => !isNaN(Date.parse(val)), 'Invalid date format'),
   time: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, 'Time must be HH:MM format'),
-  duration: z.number().int().min(15).max(120).default(60),
+  duration: z
+    .number()
+    .int()
+    .min(15, 'Duration must be between 15-120 minutes')
+    .max(120, 'Duration must be between 15-120 minutes')
+    .default(60),
 });
 
 export const bulkCreateSlotsSchema = z.object({
   slots: z
     .array(
       z.object({
-        date: z.string().refine((val) => !isNaN(Date.parse(val)), {
-          message: 'Invalid date format',
-        }),
+        date: z
+          .string()
+          .regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format')
+          .refine((val) => !isNaN(Date.parse(val)), 'Invalid date format'),
         time: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, {
-          message: 'Time must be in HH:mm format',
+          message: 'Time must be HH:MM format',
         }),
-        duration: z.number().int().min(15).max(120).default(60),
+        duration: z
+          .number()
+          .int()
+          .min(15, 'Duration must be between 15-120 minutes')
+          .max(120, 'Duration must be between 15-120 minutes')
+          .default(60),
       })
     )
     .min(1, 'At least one slot is required')

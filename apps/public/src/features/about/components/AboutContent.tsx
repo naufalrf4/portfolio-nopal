@@ -53,7 +53,7 @@ export function AboutContent({ about }: AboutContentProps) {
   const socialLinksList = normalizeSocialLinks(about.socialLinks);
 
   return (
-    <div className="py-8 md:py-16">
+    <div className="py-8 md:py-16 animate-fade-in">
       <Section>
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">

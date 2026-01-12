@@ -1,3 +1,6 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import { cn } from '@/src/lib/utils';
 
 interface LoadingStateProps {
@@ -6,6 +9,7 @@ interface LoadingStateProps {
   height?: string;
   width?: string;
   className?: string;
+  showSlowMessage?: boolean;
 }
 
 export function LoadingState({
@@ -14,10 +18,22 @@ export function LoadingState({
   height = 'h-12',
   width = 'w-full',
   className,
+  showSlowMessage = true,
 }: LoadingStateProps) {
+  const [showMessage, setShowMessage] = useState(false);
+
+  useEffect(() => {
+    if (!showSlowMessage) return;
+
+    const timer = setTimeout(() => {
+      setShowMessage(true);
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [showSlowMessage]);
   if (type === 'spinner') {
     return (
-      <div className={cn('flex items-center justify-center py-12', className)}>
+      <div className={cn('flex flex-col items-center justify-center py-12', className)}>
         <div className="relative">
           <div
             className={cn(
@@ -47,6 +63,11 @@ export function LoadingState({
             </svg>
           </div>
         </div>
+        {showMessage && (
+          <p className="mt-4 text-sm text-[#6B7280] animate-fade-in">
+            Still loading... This is taking longer than expected.
+          </p>
+        )}
       </div>
     );
   }

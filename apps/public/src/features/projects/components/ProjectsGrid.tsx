@@ -25,7 +25,7 @@ export function ProjectsGrid({ projects }: ProjectsGridProps) {
   const projectCount = filteredProjects.length;
 
   return (
-    <div>
+    <div className="animate-fade-in">
       <div className="flex flex-wrap justify-center gap-3 mb-8">
         {categories.map((category) => {
           const isActive = activeCategory === category;
