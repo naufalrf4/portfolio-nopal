@@ -18,6 +18,12 @@ interface AddSlotModalProps {
   prefilledDate: string | null;
 }
 
+interface ValidationErrors {
+  date?: string;
+  startTime?: string;
+  duration?: string;
+}
+
 export function AddSlotModal({
   isOpen,
   onClose,
@@ -31,6 +37,7 @@ export function AddSlotModal({
     duration: 60,
   });
   const [saving, setSaving] = useState(false);
+  const [errors, setErrors] = useState<ValidationErrors>({});
 
   useEffect(() => {
     if (slot) {
@@ -52,11 +59,35 @@ export function AddSlotModal({
         duration: 60,
       });
     }
+    setErrors({});
   }, [slot, prefilledDate, isOpen]);
 
+  function validateForm(): boolean {
+    const newErrors: ValidationErrors = {};
+
+    if (!form.date) {
+      newErrors.date = 'Date is required';
+    } else if (!/^\d{4}-\d{2}-\d{2}$/.test(form.date)) {
+      newErrors.date = 'Invalid date format';
+    }
+
+    if (!form.startTime) {
+      newErrors.startTime = 'Time is required';
+    } else if (!/^([01]\d|2[0-3]):([0-5]\d)$/.test(form.startTime)) {
+      newErrors.startTime = 'Time must be HH:MM format';
+    }
+
+    if (!form.duration || form.duration < 15 || form.duration > 120) {
+      newErrors.duration = 'Duration must be between 15-120 minutes';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  }
+
   async function handleSubmit() {
-    if (!form.date || !form.startTime) {
-      toast.error('Please fill in all fields');
+    if (!validateForm()) {
+      toast.error('Please fix the validation errors');
       return;
     }
 
@@ -72,7 +103,7 @@ export function AddSlotModal({
         body: JSON.stringify({
           date: form.date,
           time: form.startTime,
-          duration: form.duration || 60,
+          duration: form.duration,
         }),
       });
 
@@ -80,6 +111,7 @@ export function AddSlotModal({
 
       if (data.success) {
         toast.success(slot?.id ? 'Slot updated successfully' : 'Slot created successfully');
+        onClose();
         onSuccess();
       } else {
         toast.error(getErrorMessage(data.error, 'Failed to save slot'));
@@ -115,8 +147,15 @@ export function AddSlotModal({
             id="slotDate"
             type="date"
             value={form.date}
-            onChange={(e) => setForm({ ...form, date: e.target.value })}
+            onChange={(e) => {
+              setForm({ ...form, date: e.target.value });
+              if (errors.date) {
+                setErrors({ ...errors, date: undefined });
+              }
+            }}
+            className={errors.date ? 'border-red-500' : ''}
           />
+          {errors.date && <p className="text-sm text-red-500 mt-1">{errors.date}</p>}
         </div>
 
         <div className="space-y-2">
@@ -125,8 +164,15 @@ export function AddSlotModal({
             id="slotTime"
             type="time"
             value={form.startTime}
-            onChange={(e) => setForm({ ...form, startTime: e.target.value })}
+            onChange={(e) => {
+              setForm({ ...form, startTime: e.target.value });
+              if (errors.startTime) {
+                setErrors({ ...errors, startTime: undefined });
+              }
+            }}
+            className={errors.startTime ? 'border-red-500' : ''}
           />
+          {errors.startTime && <p className="text-sm text-red-500 mt-1">{errors.startTime}</p>}
         </div>
 
         <div className="space-y-2">
@@ -134,8 +180,15 @@ export function AddSlotModal({
           <select
             id="slotDuration"
             value={form.duration}
-            onChange={(e) => setForm({ ...form, duration: Number(e.target.value) })}
-            className="w-full px-3 py-2 rounded-xl border-none outline-none transition-all duration-200 focus:ring-2 focus:ring-[#3B82F6]/30 bg-[#E0E5EC]"
+            onChange={(e) => {
+              setForm({ ...form, duration: Number(e.target.value) });
+              if (errors.duration) {
+                setErrors({ ...errors, duration: undefined });
+              }
+            }}
+            className={`w-full px-3 py-2 rounded-xl border-none outline-none transition-all duration-200 focus:ring-2 focus:ring-[#3B82F6]/30 bg-[#E0E5EC] ${
+              errors.duration ? 'ring-2 ring-red-500' : ''
+            }`}
             style={{
               boxShadow:
                 'inset 6px 6px 10px rgba(163,177,198,0.6), inset -6px -6px 10px rgba(255,255,255,0.5)',
@@ -149,6 +202,7 @@ export function AddSlotModal({
             <option value={90}>90 minutes</option>
             <option value={120}>120 minutes</option>
           </select>
+          {errors.duration && <p className="text-sm text-red-500 mt-1">{errors.duration}</p>}
         </div>
       </div>
     </ResponsiveModal>
