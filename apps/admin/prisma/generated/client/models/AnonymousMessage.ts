@@ -31,6 +31,11 @@ export type AnonymousMessageMinAggregateOutputType = {
   read: boolean | null;
   createdAt: Date | null;
   updatedAt: Date | null;
+  city: string | null;
+  country: string | null;
+  countryCode: string | null;
+  ipAddress: string | null;
+  region: string | null;
 };
 
 export type AnonymousMessageMaxAggregateOutputType = {
@@ -40,6 +45,11 @@ export type AnonymousMessageMaxAggregateOutputType = {
   read: boolean | null;
   createdAt: Date | null;
   updatedAt: Date | null;
+  city: string | null;
+  country: string | null;
+  countryCode: string | null;
+  ipAddress: string | null;
+  region: string | null;
 };
 
 export type AnonymousMessageCountAggregateOutputType = {
@@ -49,6 +59,11 @@ export type AnonymousMessageCountAggregateOutputType = {
   read: number;
   createdAt: number;
   updatedAt: number;
+  city: number;
+  country: number;
+  countryCode: number;
+  ipAddress: number;
+  region: number;
   _all: number;
 };
 
@@ -59,6 +74,11 @@ export type AnonymousMessageMinAggregateInputType = {
   read?: true;
   createdAt?: true;
   updatedAt?: true;
+  city?: true;
+  country?: true;
+  countryCode?: true;
+  ipAddress?: true;
+  region?: true;
 };
 
 export type AnonymousMessageMaxAggregateInputType = {
@@ -68,6 +88,11 @@ export type AnonymousMessageMaxAggregateInputType = {
   read?: true;
   createdAt?: true;
   updatedAt?: true;
+  city?: true;
+  country?: true;
+  countryCode?: true;
+  ipAddress?: true;
+  region?: true;
 };
 
 export type AnonymousMessageCountAggregateInputType = {
@@ -77,6 +102,11 @@ export type AnonymousMessageCountAggregateInputType = {
   read?: true;
   createdAt?: true;
   updatedAt?: true;
+  city?: true;
+  country?: true;
+  countryCode?: true;
+  ipAddress?: true;
+  region?: true;
   _all?: true;
 };
 
@@ -164,6 +194,11 @@ export type AnonymousMessageGroupByOutputType = {
   read: boolean;
   createdAt: Date;
   updatedAt: Date;
+  city: string | null;
+  country: string | null;
+  countryCode: string | null;
+  ipAddress: string | null;
+  region: string | null;
   _count: AnonymousMessageCountAggregateOutputType | null;
   _min: AnonymousMessageMinAggregateOutputType | null;
   _max: AnonymousMessageMaxAggregateOutputType | null;
@@ -192,6 +227,11 @@ export type AnonymousMessageWhereInput = {
   read?: Prisma.BoolFilter<'AnonymousMessage'> | boolean;
   createdAt?: Prisma.DateTimeFilter<'AnonymousMessage'> | Date | string;
   updatedAt?: Prisma.DateTimeFilter<'AnonymousMessage'> | Date | string;
+  city?: Prisma.StringNullableFilter<'AnonymousMessage'> | string | null;
+  country?: Prisma.StringNullableFilter<'AnonymousMessage'> | string | null;
+  countryCode?: Prisma.StringNullableFilter<'AnonymousMessage'> | string | null;
+  ipAddress?: Prisma.StringNullableFilter<'AnonymousMessage'> | string | null;
+  region?: Prisma.StringNullableFilter<'AnonymousMessage'> | string | null;
 };
 
 export type AnonymousMessageOrderByWithRelationInput = {
@@ -201,6 +241,11 @@ export type AnonymousMessageOrderByWithRelationInput = {
   read?: Prisma.SortOrder;
   createdAt?: Prisma.SortOrder;
   updatedAt?: Prisma.SortOrder;
+  city?: Prisma.SortOrderInput | Prisma.SortOrder;
+  country?: Prisma.SortOrderInput | Prisma.SortOrder;
+  countryCode?: Prisma.SortOrderInput | Prisma.SortOrder;
+  ipAddress?: Prisma.SortOrderInput | Prisma.SortOrder;
+  region?: Prisma.SortOrderInput | Prisma.SortOrder;
 };
 
 export type AnonymousMessageWhereUniqueInput = Prisma.AtLeast<
@@ -214,6 +259,11 @@ export type AnonymousMessageWhereUniqueInput = Prisma.AtLeast<
     read?: Prisma.BoolFilter<'AnonymousMessage'> | boolean;
     createdAt?: Prisma.DateTimeFilter<'AnonymousMessage'> | Date | string;
     updatedAt?: Prisma.DateTimeFilter<'AnonymousMessage'> | Date | string;
+    city?: Prisma.StringNullableFilter<'AnonymousMessage'> | string | null;
+    country?: Prisma.StringNullableFilter<'AnonymousMessage'> | string | null;
+    countryCode?: Prisma.StringNullableFilter<'AnonymousMessage'> | string | null;
+    ipAddress?: Prisma.StringNullableFilter<'AnonymousMessage'> | string | null;
+    region?: Prisma.StringNullableFilter<'AnonymousMessage'> | string | null;
   },
   'id'
 >;
@@ -225,6 +275,11 @@ export type AnonymousMessageOrderByWithAggregationInput = {
   read?: Prisma.SortOrder;
   createdAt?: Prisma.SortOrder;
   updatedAt?: Prisma.SortOrder;
+  city?: Prisma.SortOrderInput | Prisma.SortOrder;
+  country?: Prisma.SortOrderInput | Prisma.SortOrder;
+  countryCode?: Prisma.SortOrderInput | Prisma.SortOrder;
+  ipAddress?: Prisma.SortOrderInput | Prisma.SortOrder;
+  region?: Prisma.SortOrderInput | Prisma.SortOrder;
   _count?: Prisma.AnonymousMessageCountOrderByAggregateInput;
   _max?: Prisma.AnonymousMessageMaxOrderByAggregateInput;
   _min?: Prisma.AnonymousMessageMinOrderByAggregateInput;
@@ -244,6 +299,11 @@ export type AnonymousMessageScalarWhereWithAggregatesInput = {
   read?: Prisma.BoolWithAggregatesFilter<'AnonymousMessage'> | boolean;
   createdAt?: Prisma.DateTimeWithAggregatesFilter<'AnonymousMessage'> | Date | string;
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<'AnonymousMessage'> | Date | string;
+  city?: Prisma.StringNullableWithAggregatesFilter<'AnonymousMessage'> | string | null;
+  country?: Prisma.StringNullableWithAggregatesFilter<'AnonymousMessage'> | string | null;
+  countryCode?: Prisma.StringNullableWithAggregatesFilter<'AnonymousMessage'> | string | null;
+  ipAddress?: Prisma.StringNullableWithAggregatesFilter<'AnonymousMessage'> | string | null;
+  region?: Prisma.StringNullableWithAggregatesFilter<'AnonymousMessage'> | string | null;
 };
 
 export type AnonymousMessageCreateInput = {
@@ -253,6 +313,11 @@ export type AnonymousMessageCreateInput = {
   read?: boolean;
   createdAt?: Date | string;
   updatedAt?: Date | string;
+  city?: string | null;
+  country?: string | null;
+  countryCode?: string | null;
+  ipAddress?: string | null;
+  region?: string | null;
 };
 
 export type AnonymousMessageUncheckedCreateInput = {
@@ -262,6 +327,11 @@ export type AnonymousMessageUncheckedCreateInput = {
   read?: boolean;
   createdAt?: Date | string;
   updatedAt?: Date | string;
+  city?: string | null;
+  country?: string | null;
+  countryCode?: string | null;
+  ipAddress?: string | null;
+  region?: string | null;
 };
 
 export type AnonymousMessageUpdateInput = {
@@ -271,6 +341,11 @@ export type AnonymousMessageUpdateInput = {
   read?: Prisma.BoolFieldUpdateOperationsInput | boolean;
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+  countryCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+  ipAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+  region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
 };
 
 export type AnonymousMessageUncheckedUpdateInput = {
@@ -280,6 +355,11 @@ export type AnonymousMessageUncheckedUpdateInput = {
   read?: Prisma.BoolFieldUpdateOperationsInput | boolean;
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+  countryCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+  ipAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+  region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
 };
 
 export type AnonymousMessageCreateManyInput = {
@@ -289,6 +369,11 @@ export type AnonymousMessageCreateManyInput = {
   read?: boolean;
   createdAt?: Date | string;
   updatedAt?: Date | string;
+  city?: string | null;
+  country?: string | null;
+  countryCode?: string | null;
+  ipAddress?: string | null;
+  region?: string | null;
 };
 
 export type AnonymousMessageUpdateManyMutationInput = {
@@ -298,6 +383,11 @@ export type AnonymousMessageUpdateManyMutationInput = {
   read?: Prisma.BoolFieldUpdateOperationsInput | boolean;
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+  countryCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+  ipAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+  region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
 };
 
 export type AnonymousMessageUncheckedUpdateManyInput = {
@@ -307,6 +397,11 @@ export type AnonymousMessageUncheckedUpdateManyInput = {
   read?: Prisma.BoolFieldUpdateOperationsInput | boolean;
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+  countryCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+  ipAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+  region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
 };
 
 export type AnonymousMessageCountOrderByAggregateInput = {
@@ -316,6 +411,11 @@ export type AnonymousMessageCountOrderByAggregateInput = {
   read?: Prisma.SortOrder;
   createdAt?: Prisma.SortOrder;
   updatedAt?: Prisma.SortOrder;
+  city?: Prisma.SortOrder;
+  country?: Prisma.SortOrder;
+  countryCode?: Prisma.SortOrder;
+  ipAddress?: Prisma.SortOrder;
+  region?: Prisma.SortOrder;
 };
 
 export type AnonymousMessageMaxOrderByAggregateInput = {
@@ -325,6 +425,11 @@ export type AnonymousMessageMaxOrderByAggregateInput = {
   read?: Prisma.SortOrder;
   createdAt?: Prisma.SortOrder;
   updatedAt?: Prisma.SortOrder;
+  city?: Prisma.SortOrder;
+  country?: Prisma.SortOrder;
+  countryCode?: Prisma.SortOrder;
+  ipAddress?: Prisma.SortOrder;
+  region?: Prisma.SortOrder;
 };
 
 export type AnonymousMessageMinOrderByAggregateInput = {
@@ -334,6 +439,11 @@ export type AnonymousMessageMinOrderByAggregateInput = {
   read?: Prisma.SortOrder;
   createdAt?: Prisma.SortOrder;
   updatedAt?: Prisma.SortOrder;
+  city?: Prisma.SortOrder;
+  country?: Prisma.SortOrder;
+  countryCode?: Prisma.SortOrder;
+  ipAddress?: Prisma.SortOrder;
+  region?: Prisma.SortOrder;
 };
 
 export type AnonymousMessageSelect<
@@ -346,6 +456,11 @@ export type AnonymousMessageSelect<
     read?: boolean;
     createdAt?: boolean;
     updatedAt?: boolean;
+    city?: boolean;
+    country?: boolean;
+    countryCode?: boolean;
+    ipAddress?: boolean;
+    region?: boolean;
   },
   ExtArgs['result']['anonymousMessage']
 >;
@@ -360,6 +475,11 @@ export type AnonymousMessageSelectCreateManyAndReturn<
     read?: boolean;
     createdAt?: boolean;
     updatedAt?: boolean;
+    city?: boolean;
+    country?: boolean;
+    countryCode?: boolean;
+    ipAddress?: boolean;
+    region?: boolean;
   },
   ExtArgs['result']['anonymousMessage']
 >;
@@ -374,6 +494,11 @@ export type AnonymousMessageSelectUpdateManyAndReturn<
     read?: boolean;
     createdAt?: boolean;
     updatedAt?: boolean;
+    city?: boolean;
+    country?: boolean;
+    countryCode?: boolean;
+    ipAddress?: boolean;
+    region?: boolean;
   },
   ExtArgs['result']['anonymousMessage']
 >;
@@ -385,12 +510,27 @@ export type AnonymousMessageSelectScalar = {
   read?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
+  city?: boolean;
+  country?: boolean;
+  countryCode?: boolean;
+  ipAddress?: boolean;
+  region?: boolean;
 };
 
 export type AnonymousMessageOmit<
   ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
 > = runtime.Types.Extensions.GetOmit<
-  'id' | 'content' | 'ipHash' | 'read' | 'createdAt' | 'updatedAt',
+  | 'id'
+  | 'content'
+  | 'ipHash'
+  | 'read'
+  | 'createdAt'
+  | 'updatedAt'
+  | 'city'
+  | 'country'
+  | 'countryCode'
+  | 'ipAddress'
+  | 'region',
   ExtArgs['result']['anonymousMessage']
 >;
 
@@ -407,6 +547,11 @@ export type $AnonymousMessagePayload<
       read: boolean;
       createdAt: Date;
       updatedAt: Date;
+      city: string | null;
+      country: string | null;
+      countryCode: string | null;
+      ipAddress: string | null;
+      region: string | null;
     },
     ExtArgs['result']['anonymousMessage']
   >;
@@ -985,6 +1130,11 @@ export interface AnonymousMessageFieldRefs {
   readonly read: Prisma.FieldRef<'AnonymousMessage', 'Boolean'>;
   readonly createdAt: Prisma.FieldRef<'AnonymousMessage', 'DateTime'>;
   readonly updatedAt: Prisma.FieldRef<'AnonymousMessage', 'DateTime'>;
+  readonly city: Prisma.FieldRef<'AnonymousMessage', 'String'>;
+  readonly country: Prisma.FieldRef<'AnonymousMessage', 'String'>;
+  readonly countryCode: Prisma.FieldRef<'AnonymousMessage', 'String'>;
+  readonly ipAddress: Prisma.FieldRef<'AnonymousMessage', 'String'>;
+  readonly region: Prisma.FieldRef<'AnonymousMessage', 'String'>;
 }
 
 // Custom InputTypes

@@ -1,0 +1,75 @@
+import { Section, SectionHeader, NeuCard } from '@/src/features/shared/components';
+import { Globe, Brain, Cpu } from 'lucide-react';
+
+const expertiseAreas = [
+  {
+    icon: Globe,
+    title: 'Web Development',
+    description:
+      'Building modern, responsive web applications with cutting-edge technologies. Expertise in creating scalable frontend architectures and intuitive user experiences.',
+    technologies: ['React', 'Next.js', 'TypeScript', 'Node.js', 'TailwindCSS'],
+  },
+  {
+    icon: Brain,
+    title: 'AI & Automation',
+    description:
+      'Implementing intelligent solutions using Large Language Models, RAG systems, and automation pipelines. Creating AI-powered applications that streamline workflows and solve real-world problems.',
+    technologies: ['LLMs', 'RAG', 'Python', 'LangChain', 'Automation'],
+  },
+  {
+    icon: Cpu,
+    title: 'IoT & Hardware',
+    description:
+      'Designing embedded systems and IoT solutions that bridge the physical and digital worlds. Building connected devices with sensors, microcontrollers, and real-time communication.',
+    technologies: ['Arduino', 'ESP32', 'Raspberry Pi', 'MQTT', 'Sensors'],
+  },
+];
+
+export function TechnicalExpertise() {
+  return (
+    <Section className="bg-[#E0E5EC]">
+      <SectionHeader
+        title="Technical Expertise"
+        subtitle="Areas of specialization and technical skills I bring to every project"
+      />
+
+      <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-6 md:overflow-visible md:pb-0">
+        {expertiseAreas.map((area, index) => {
+          const Icon = area.icon;
+          return (
+            <div
+              key={index}
+              className="min-w-[280px] w-[280px] flex-shrink-0 snap-start md:min-w-0 md:w-auto md:flex-shrink stagger-item"
+              style={{ animationDelay: `${index * 0.15}s` }}
+            >
+              <NeuCard hover className="h-full">
+                <div className="flex flex-col h-full">
+                  <div className="w-12 h-12 rounded-xl bg-[#E0E5EC] shadow-[inset_3px_3px_6px_rgba(163,177,198,0.6),inset_-3px_-3px_6px_rgba(255,255,255,0.5)] flex items-center justify-center mb-4">
+                    <Icon className="w-6 h-6 text-[#3B82F6]" />
+                  </div>
+
+                  <h3 className="text-lg font-bold text-[#3D4852] mb-2">{area.title}</h3>
+
+                  <p className="text-sm text-[#6B7280] leading-relaxed mb-4 flex-1">
+                    {area.description}
+                  </p>
+
+                  <div className="flex flex-wrap gap-1.5">
+                    {area.technologies.map((tech, techIndex) => (
+                      <span
+                        key={techIndex}
+                        className="px-2.5 py-1 text-xs font-medium text-[#3B82F6] bg-[#E0E5EC] rounded-full shadow-[2px_2px_4px_rgba(163,177,198,0.6),-2px_-2px_4px_rgba(255,255,255,0.5)]"
+                      >
+                        {tech}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </NeuCard>
+            </div>
+          );
+        })}
+      </div>
+    </Section>
+  );
+}

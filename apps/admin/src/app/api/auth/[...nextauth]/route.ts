@@ -1,6 +1,3 @@
-import { createAuthConfig } from '@naufalrf/auth/config';
-import { prisma } from '@/lib/db/prisma';
-
-const { handlers } = createAuthConfig(prisma);
+import { handlers } from '@/lib/auth';
 
 export const { GET, POST } = handlers;

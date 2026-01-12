@@ -25,8 +25,7 @@ export async function GET(req: NextRequest, context: RouteContext) {
       }
 
       return successResponse(project);
-    } catch (error) {
-      console.error('GET /api/v1/admin/projects/:id error:', error);
+    } catch {
       return serverErrorResponse();
     }
   })(req);
@@ -57,8 +56,7 @@ export async function PUT(req: NextRequest, context: RouteContext) {
 
       const project = await projectsService.update(id, validation.data);
       return successResponse(project, 'Project updated successfully');
-    } catch (error) {
-      console.error('PUT /api/v1/admin/projects/:id error:', error);
+    } catch {
       return serverErrorResponse();
     }
   })(req);
@@ -75,8 +73,7 @@ export async function DELETE(req: NextRequest, context: RouteContext) {
 
       await projectsService.delete(id);
       return successResponse(null, 'Project deleted successfully');
-    } catch (error) {
-      console.error('DELETE /api/v1/admin/projects/:id error:', error);
+    } catch {
       return serverErrorResponse();
     }
   })(req);

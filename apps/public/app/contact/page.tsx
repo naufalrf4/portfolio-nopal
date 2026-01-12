@@ -1,0 +1,28 @@
+import type { Metadata } from 'next';
+import { ContactContent } from '@/src/features/contact/components';
+
+export const metadata: Metadata = {
+  title: 'Contact',
+  description:
+    'Get in touch with NaufalRF. Send a message or book a call to discuss your project, collaboration, or job opportunity.',
+  openGraph: {
+    title: 'Contact | NaufalRF',
+    description:
+      'Get in touch with NaufalRF. Send a message or book a call to discuss your project, collaboration, or job opportunity.',
+    type: 'website',
+    url: 'https://naufalrf.tech/contact',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Contact | NaufalRF',
+    description:
+      'Get in touch with NaufalRF. Send a message or book a call to discuss your project, collaboration, or job opportunity.',
+  },
+  alternates: {
+    canonical: 'https://naufalrf.tech/contact',
+  },
+};
+
+export default function ContactPage() {
+  return <ContactContent />;
+}

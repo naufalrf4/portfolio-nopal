@@ -49,14 +49,26 @@ export const AnyNull = runtime.AnyNull;
 
 export const ModelName = {
   User: 'User',
+  Account: 'Account',
+  Session: 'Session',
+  VerificationToken: 'VerificationToken',
   Project: 'Project',
   ProjectContext: 'ProjectContext',
+  ProjectImage: 'ProjectImage',
   BlogLink: 'BlogLink',
   GuestbookEntry: 'GuestbookEntry',
+  AnalyticsEvent: 'AnalyticsEvent',
   AnonymousMessage: 'AnonymousMessage',
   ChatLog: 'ChatLog',
   ProfileLink: 'ProfileLink',
   KnowledgeDoc: 'KnowledgeDoc',
+  ContactForm: 'ContactForm',
+  ContactSettings: 'ContactSettings',
+  BookingSlot: 'BookingSlot',
+  Booking: 'Booking',
+  BookingSettings: 'BookingSettings',
+  BookingAvailability: 'BookingAvailability',
+  AboutMe: 'AboutMe',
 } as const;
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName];
@@ -87,6 +99,43 @@ export const UserScalarFieldEnum = {
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum];
 
+export const AccountScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  type: 'type',
+  provider: 'provider',
+  providerAccountId: 'providerAccountId',
+  refresh_token: 'refresh_token',
+  access_token: 'access_token',
+  expires_at: 'expires_at',
+  token_type: 'token_type',
+  scope: 'scope',
+  id_token: 'id_token',
+  session_state: 'session_state',
+} as const;
+
+export type AccountScalarFieldEnum =
+  (typeof AccountScalarFieldEnum)[keyof typeof AccountScalarFieldEnum];
+
+export const SessionScalarFieldEnum = {
+  id: 'id',
+  sessionToken: 'sessionToken',
+  userId: 'userId',
+  expires: 'expires',
+} as const;
+
+export type SessionScalarFieldEnum =
+  (typeof SessionScalarFieldEnum)[keyof typeof SessionScalarFieldEnum];
+
+export const VerificationTokenScalarFieldEnum = {
+  identifier: 'identifier',
+  token: 'token',
+  expires: 'expires',
+} as const;
+
+export type VerificationTokenScalarFieldEnum =
+  (typeof VerificationTokenScalarFieldEnum)[keyof typeof VerificationTokenScalarFieldEnum];
+
 export const ProjectScalarFieldEnum = {
   id: 'id',
   title: 'title',
@@ -103,6 +152,8 @@ export const ProjectScalarFieldEnum = {
   order: 'order',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
+  content: 'content',
+  thumbnailId: 'thumbnailId',
 } as const;
 
 export type ProjectScalarFieldEnum =
@@ -121,6 +172,20 @@ export const ProjectContextScalarFieldEnum = {
 
 export type ProjectContextScalarFieldEnum =
   (typeof ProjectContextScalarFieldEnum)[keyof typeof ProjectContextScalarFieldEnum];
+
+export const ProjectImageScalarFieldEnum = {
+  id: 'id',
+  projectId: 'projectId',
+  url: 'url',
+  key: 'key',
+  order: 'order',
+  caption: 'caption',
+  alt: 'alt',
+  createdAt: 'createdAt',
+} as const;
+
+export type ProjectImageScalarFieldEnum =
+  (typeof ProjectImageScalarFieldEnum)[keyof typeof ProjectImageScalarFieldEnum];
 
 export const BlogLinkScalarFieldEnum = {
   id: 'id',
@@ -152,6 +217,23 @@ export const GuestbookEntryScalarFieldEnum = {
 export type GuestbookEntryScalarFieldEnum =
   (typeof GuestbookEntryScalarFieldEnum)[keyof typeof GuestbookEntryScalarFieldEnum];
 
+export const AnalyticsEventScalarFieldEnum = {
+  id: 'id',
+  page: 'page',
+  entityType: 'entityType',
+  entityId: 'entityId',
+  eventType: 'eventType',
+  data: 'data',
+  userSession: 'userSession',
+  ipAddress: 'ipAddress',
+  countryCode: 'countryCode',
+  city: 'city',
+  createdAt: 'createdAt',
+} as const;
+
+export type AnalyticsEventScalarFieldEnum =
+  (typeof AnalyticsEventScalarFieldEnum)[keyof typeof AnalyticsEventScalarFieldEnum];
+
 export const AnonymousMessageScalarFieldEnum = {
   id: 'id',
   content: 'content',
@@ -159,6 +241,11 @@ export const AnonymousMessageScalarFieldEnum = {
   read: 'read',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
+  city: 'city',
+  country: 'country',
+  countryCode: 'countryCode',
+  ipAddress: 'ipAddress',
+  region: 'region',
 } as const;
 
 export type AnonymousMessageScalarFieldEnum =
@@ -201,6 +288,110 @@ export const KnowledgeDocScalarFieldEnum = {
 export type KnowledgeDocScalarFieldEnum =
   (typeof KnowledgeDocScalarFieldEnum)[keyof typeof KnowledgeDocScalarFieldEnum];
 
+export const ContactFormScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  email: 'email',
+  subject: 'subject',
+  message: 'message',
+  ipHash: 'ipHash',
+  read: 'read',
+  replied: 'replied',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+} as const;
+
+export type ContactFormScalarFieldEnum =
+  (typeof ContactFormScalarFieldEnum)[keyof typeof ContactFormScalarFieldEnum];
+
+export const ContactSettingsScalarFieldEnum = {
+  id: 'id',
+  notificationEmail: 'notificationEmail',
+  blockedKeywords: 'blockedKeywords',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+} as const;
+
+export type ContactSettingsScalarFieldEnum =
+  (typeof ContactSettingsScalarFieldEnum)[keyof typeof ContactSettingsScalarFieldEnum];
+
+export const BookingSlotScalarFieldEnum = {
+  id: 'id',
+  date: 'date',
+  time: 'time',
+  duration: 'duration',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+} as const;
+
+export type BookingSlotScalarFieldEnum =
+  (typeof BookingSlotScalarFieldEnum)[keyof typeof BookingSlotScalarFieldEnum];
+
+export const BookingScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  email: 'email',
+  phone: 'phone',
+  notes: 'notes',
+  status: 'status',
+  slotId: 'slotId',
+  ipHash: 'ipHash',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+} as const;
+
+export type BookingScalarFieldEnum =
+  (typeof BookingScalarFieldEnum)[keyof typeof BookingScalarFieldEnum];
+
+export const BookingSettingsScalarFieldEnum = {
+  id: 'id',
+  notificationEmail: 'notificationEmail',
+  reminderEnabled: 'reminderEnabled',
+  reminderDay: 'reminderDay',
+  reminderTime: 'reminderTime',
+  timezone: 'timezone',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+} as const;
+
+export type BookingSettingsScalarFieldEnum =
+  (typeof BookingSettingsScalarFieldEnum)[keyof typeof BookingSettingsScalarFieldEnum];
+
+export const BookingAvailabilityScalarFieldEnum = {
+  id: 'id',
+  dayOfWeek: 'dayOfWeek',
+  startTime: 'startTime',
+  endTime: 'endTime',
+  enabled: 'enabled',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+} as const;
+
+export type BookingAvailabilityScalarFieldEnum =
+  (typeof BookingAvailabilityScalarFieldEnum)[keyof typeof BookingAvailabilityScalarFieldEnum];
+
+export const AboutMeScalarFieldEnum = {
+  id: 'id',
+  fullName: 'fullName',
+  tagline: 'tagline',
+  roles: 'roles',
+  bio: 'bio',
+  email: 'email',
+  phone: 'phone',
+  location: 'location',
+  avatarUrl: 'avatarUrl',
+  resumeUrl: 'resumeUrl',
+  skills: 'skills',
+  experience: 'experience',
+  socialLinks: 'socialLinks',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+} as const;
+
+export type AboutMeScalarFieldEnum =
+  (typeof AboutMeScalarFieldEnum)[keyof typeof AboutMeScalarFieldEnum];
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc',
@@ -213,6 +404,14 @@ export const JsonNullValueInput = {
 } as const;
 
 export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput];
+
+export const NullableJsonNullValueInput = {
+  DbNull: 'DbNull',
+  JsonNull: 'JsonNull',
+} as const;
+
+export type NullableJsonNullValueInput =
+  (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput];
 
 export const QueryMode = {
   default: 'default',
