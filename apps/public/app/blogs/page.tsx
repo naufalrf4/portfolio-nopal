@@ -1,7 +1,9 @@
 import type { Metadata } from 'next';
 import { defaultClient } from '@naufalrf/sdk';
 import type { BlogLink } from '@naufalrf/types';
-import { BlogsHeader, BlogsGrid } from '@/src/features/blogs/components';
+import { BlogsHeader, BlogsContent } from '@/src/features/blogs/components';
+import { Suspense } from 'react';
+import { LoadingState } from '@/src/features/shared/components';
 
 export const dynamic = 'force-dynamic';
 
@@ -27,18 +29,22 @@ export const metadata: Metadata = {
   },
 };
 
-async function getBlogs(): Promise<BlogLink[]> {
+async function getBlogs(): Promise<{ blogs: BlogLink[]; error?: string }> {
   try {
     const response = await defaultClient.blogs.getAll();
     const blogs = response.data || [];
-    return blogs.length > 0 ? blogs : [];
-  } catch {
-    return [];
+    return { blogs };
+  } catch (error) {
+    console.error('Failed to fetch blogs:', error);
+    return {
+      blogs: [],
+      error: 'Failed to load articles. Please try again later.',
+    };
   }
 }
 
 export default async function BlogsPage() {
-  const blogs = await getBlogs();
+  const { blogs, error } = await getBlogs();
 
   const serializedBlogs = blogs.map((blog) => ({
     ...blog,
@@ -51,7 +57,9 @@ export default async function BlogsPage() {
     <div className="min-h-screen p-8">
       <div className="max-w-7xl mx-auto">
         <BlogsHeader />
-        <BlogsGrid blogs={serializedBlogs} />
+        <Suspense fallback={<LoadingState type="skeleton" count={6} height="h-64" />}>
+          <BlogsContent initialBlogs={serializedBlogs} error={error} />
+        </Suspense>
       </div>
     </div>
   );

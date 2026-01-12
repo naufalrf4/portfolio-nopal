@@ -1,5 +1,5 @@
 import { BlogCard } from './BlogCard';
-import { NeuCard } from '@/src/features/shared/components';
+import { EmptyState } from '@/src/features/shared/components';
 import type { BlogLink } from './types';
 
 interface BlogsGridProps {
@@ -9,9 +9,10 @@ interface BlogsGridProps {
 export function BlogsGrid({ blogs }: BlogsGridProps) {
   if (blogs.length === 0) {
     return (
-      <NeuCard className="text-center py-12">
-        <p className="text-[#6B7280]">No articles available yet.</p>
-      </NeuCard>
+      <EmptyState
+        title="No articles found"
+        message="No articles are available at the moment. Check back later for new content!"
+      />
     );
   }
 
