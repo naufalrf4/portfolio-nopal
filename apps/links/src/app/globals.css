@@ -35,7 +35,6 @@ body {
   position: relative;
 }
 
-/* Background container to prevent overflow */
 .bg-shapes-container {
   position: fixed;
   inset: 0;
@@ -44,17 +43,15 @@ body {
   z-index: 0;
 }
 
-/* Gradient overlay for depth */
 .bg-gradient-overlay {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(108, 99, 255, 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(59, 130, 246, 0.06) 0%, transparent 50%),
     radial-gradient(ellipse 60% 50% at 100% 100%, rgba(56, 178, 172, 0.05) 0%, transparent 50%),
     radial-gradient(ellipse 50% 40% at 0% 50%, rgba(163, 177, 198, 0.08) 0%, transparent 50%);
 }
 
-/* Floating background shapes - contained within viewport */
 .floating-shape {
   position: absolute;
   border-radius: 50%;
@@ -70,8 +67,8 @@ body {
   left: 5%;
   background: radial-gradient(
     circle,
-    rgba(108, 99, 255, 0.12) 0%,
-    rgba(108, 99, 255, 0.04) 60%,
+    rgba(59, 130, 246, 0.12) 0%,
+    rgba(59, 130, 246, 0.04) 60%,
     transparent 100%
   );
   box-shadow:
@@ -108,7 +105,7 @@ body {
   right: 8%;
   background: radial-gradient(
     circle,
-    rgba(108, 99, 255, 0.08) 0%,
+    rgba(59, 130, 246, 0.08) 0%,
     rgba(163, 177, 198, 0.04) 60%,
     transparent 100%
   );
@@ -128,7 +125,7 @@ body {
   background: radial-gradient(
     circle,
     rgba(56, 178, 172, 0.08) 0%,
-    rgba(108, 99, 255, 0.03) 60%,
+    rgba(59, 130, 246, 0.03) 60%,
     transparent 100%
   );
   box-shadow:
@@ -147,7 +144,7 @@ body {
   background: radial-gradient(
     circle,
     rgba(163, 177, 198, 0.1) 0%,
-    rgba(108, 99, 255, 0.04) 60%,
+    rgba(59, 130, 246, 0.04) 60%,
     transparent 100%
   );
   box-shadow:
@@ -165,7 +162,7 @@ body {
   left: 15%;
   background: radial-gradient(
     circle,
-    rgba(108, 99, 255, 0.06) 0%,
+    rgba(59, 130, 246, 0.06) 0%,
     rgba(56, 178, 172, 0.03) 60%,
     transparent 100%
   );
@@ -175,7 +172,6 @@ body {
   animation: gentleFloat6 14s ease-in-out infinite;
 }
 
-/* Gentle animations that stay within bounds */
 @keyframes gentleFloat1 {
   0%,
   100% {
@@ -236,7 +232,6 @@ body {
   }
 }
 
-/* Avatar neuromorphism */
 .neu-avatar-ring {
   width: 130px;
   height: 130px;
@@ -274,7 +269,6 @@ body {
     -4px -4px 8px rgba(255, 255, 255, 0.4);
 }
 
-/* Status badge */
 .neu-status-badge {
   display: flex;
   align-items: center;
@@ -287,7 +281,6 @@ body {
     -6px -6px 12px rgba(255, 255, 255, 0.35);
 }
 
-/* Social icon - individual circles */
 .neu-social-icon {
   width: 50px;
   height: 50px;
@@ -316,7 +309,6 @@ body {
   transform: translateY(0);
 }
 
-/* Link button - full width rounded rectangle */
 .neu-link-button {
   width: 100%;
   display: flex;
@@ -367,7 +359,6 @@ body {
     inset -4px -4px 8px rgba(255, 255, 255, 0.3);
 }
 
-/* Animations */
 @keyframes fadeInUp {
   from {
     opacity: 0;
