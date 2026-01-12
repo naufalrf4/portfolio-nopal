@@ -33,25 +33,31 @@ export function TechnicalExpertise() {
         subtitle="Areas of specialization and technical skills I bring to every project"
       />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-6 md:overflow-visible md:pb-0">
         {expertiseAreas.map((area, index) => {
           const Icon = area.icon;
           return (
-            <NeuCard key={index} hover className="h-full">
+            <NeuCard
+              key={index}
+              hover
+              className="min-w-[280px] w-[280px] flex-shrink-0 snap-start md:min-w-0 md:w-auto md:flex-shrink"
+            >
               <div className="flex flex-col h-full">
-                <div className="w-14 h-14 rounded-xl bg-[#E0E5EC] shadow-[inset_4px_4px_8px_rgba(163,177,198,0.6),inset_-4px_-4px_8px_rgba(255,255,255,0.5)] flex items-center justify-center mb-6">
-                  <Icon className="w-7 h-7 text-[#3B82F6]" />
+                <div className="w-12 h-12 rounded-xl bg-[#E0E5EC] shadow-[inset_3px_3px_6px_rgba(163,177,198,0.6),inset_-3px_-3px_6px_rgba(255,255,255,0.5)] flex items-center justify-center mb-4">
+                  <Icon className="w-6 h-6 text-[#3B82F6]" />
                 </div>
 
-                <h3 className="text-xl font-bold text-[#3D4852] mb-3">{area.title}</h3>
+                <h3 className="text-lg font-bold text-[#3D4852] mb-2">{area.title}</h3>
 
-                <p className="text-[#6B7280] leading-relaxed mb-6 flex-1">{area.description}</p>
+                <p className="text-sm text-[#6B7280] leading-relaxed mb-4 flex-1">
+                  {area.description}
+                </p>
 
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-1.5">
                   {area.technologies.map((tech, techIndex) => (
                     <span
                       key={techIndex}
-                      className="px-3 py-1 text-xs font-medium text-[#3B82F6] bg-[#E0E5EC] rounded-full shadow-[2px_2px_4px_rgba(163,177,198,0.6),-2px_-2px_4px_rgba(255,255,255,0.5)]"
+                      className="px-2.5 py-1 text-xs font-medium text-[#3B82F6] bg-[#E0E5EC] rounded-full shadow-[2px_2px_4px_rgba(163,177,198,0.6),-2px_-2px_4px_rgba(255,255,255,0.5)]"
                     >
                       {tech}
                     </span>
