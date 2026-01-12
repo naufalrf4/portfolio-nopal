@@ -74,7 +74,11 @@ export function ExperienceTabs({ experience }: ExperienceTabsProps) {
 
         <div className="space-y-6">
           {filteredExperience.map((exp, index) => (
-            <div key={exp.id || `${exp.title}-${index}`} className="relative pl-10">
+            <div
+              key={exp.id || `${exp.title}-${index}`}
+              className="relative pl-10 stagger-item"
+              style={{ animationDelay: `${index * 0.1}s` }}
+            >
               <div className="absolute left-2 top-6 w-4 h-4 rounded-full bg-[#3B82F6] shadow-[2px_2px_4px_rgba(59,130,246,0.3)]" />
 
               <NeuCard className="p-5 md:p-6">

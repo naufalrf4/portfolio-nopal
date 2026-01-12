@@ -33,15 +33,21 @@ export function SkillBadges({ skills }: SkillBadgesProps) {
     return (
       <div className="space-y-6">
         {categories.map((category) => (
-          <div key={category}>
+          <div key={category} className="animate-fade-in-up">
             <h4 className="text-sm font-semibold text-[#6B7280] uppercase tracking-wide mb-3">
               {category}
             </h4>
             <div className="flex flex-wrap gap-2">
               {groupedSkills[category].map((skill, index) => (
-                <NeuBadge key={index} size="md" variant="default">
-                  {skill.name}
-                </NeuBadge>
+                <div
+                  key={index}
+                  className="stagger-item"
+                  style={{ animationDelay: `${index * 0.03}s` }}
+                >
+                  <NeuBadge size="md" variant="default">
+                    {skill.name}
+                  </NeuBadge>
+                </div>
               ))}
             </div>
           </div>
@@ -54,9 +60,11 @@ export function SkillBadges({ skills }: SkillBadgesProps) {
   return (
     <div className="flex flex-wrap gap-2">
       {skillStrings.map((skill, index) => (
-        <NeuBadge key={index} size="md" variant="default">
-          {skill}
-        </NeuBadge>
+        <div key={index} className="stagger-item" style={{ animationDelay: `${index * 0.03}s` }}>
+          <NeuBadge size="md" variant="default">
+            {skill}
+          </NeuBadge>
+        </div>
       ))}
     </div>
   );

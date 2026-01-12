@@ -30,13 +30,14 @@ export function LatestArticles({ blogs }: LatestArticlesProps) {
       />
 
       <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-6 md:overflow-visible md:pb-0">
-        {latestBlogs.map((blog) => (
+        {latestBlogs.map((blog, index) => (
           <a
             key={blog.id}
             href={blog.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="min-w-[280px] w-[280px] flex-shrink-0 snap-start md:min-w-0 md:w-auto md:flex-shrink"
+            className="min-w-[280px] w-[280px] flex-shrink-0 snap-start md:min-w-0 md:w-auto md:flex-shrink stagger-item"
+            style={{ animationDelay: `${index * 0.1}s` }}
           >
             <NeuCard hover className="h-full group p-4">
               <div className="relative aspect-[16/10] rounded-lg overflow-hidden mb-3 shadow-[inset_3px_3px_6px_rgba(163,177,198,0.6),inset_-3px_-3px_6px_rgba(255,255,255,0.5)]">

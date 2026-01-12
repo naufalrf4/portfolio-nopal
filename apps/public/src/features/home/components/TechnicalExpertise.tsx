@@ -37,34 +37,36 @@ export function TechnicalExpertise() {
         {expertiseAreas.map((area, index) => {
           const Icon = area.icon;
           return (
-            <NeuCard
+            <div
               key={index}
-              hover
-              className="min-w-[280px] w-[280px] flex-shrink-0 snap-start md:min-w-0 md:w-auto md:flex-shrink"
+              className="min-w-[280px] w-[280px] flex-shrink-0 snap-start md:min-w-0 md:w-auto md:flex-shrink stagger-item"
+              style={{ animationDelay: `${index * 0.15}s` }}
             >
-              <div className="flex flex-col h-full">
-                <div className="w-12 h-12 rounded-xl bg-[#E0E5EC] shadow-[inset_3px_3px_6px_rgba(163,177,198,0.6),inset_-3px_-3px_6px_rgba(255,255,255,0.5)] flex items-center justify-center mb-4">
-                  <Icon className="w-6 h-6 text-[#3B82F6]" />
+              <NeuCard hover className="h-full">
+                <div className="flex flex-col h-full">
+                  <div className="w-12 h-12 rounded-xl bg-[#E0E5EC] shadow-[inset_3px_3px_6px_rgba(163,177,198,0.6),inset_-3px_-3px_6px_rgba(255,255,255,0.5)] flex items-center justify-center mb-4">
+                    <Icon className="w-6 h-6 text-[#3B82F6]" />
+                  </div>
+
+                  <h3 className="text-lg font-bold text-[#3D4852] mb-2">{area.title}</h3>
+
+                  <p className="text-sm text-[#6B7280] leading-relaxed mb-4 flex-1">
+                    {area.description}
+                  </p>
+
+                  <div className="flex flex-wrap gap-1.5">
+                    {area.technologies.map((tech, techIndex) => (
+                      <span
+                        key={techIndex}
+                        className="px-2.5 py-1 text-xs font-medium text-[#3B82F6] bg-[#E0E5EC] rounded-full shadow-[2px_2px_4px_rgba(163,177,198,0.6),-2px_-2px_4px_rgba(255,255,255,0.5)]"
+                      >
+                        {tech}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-
-                <h3 className="text-lg font-bold text-[#3D4852] mb-2">{area.title}</h3>
-
-                <p className="text-sm text-[#6B7280] leading-relaxed mb-4 flex-1">
-                  {area.description}
-                </p>
-
-                <div className="flex flex-wrap gap-1.5">
-                  {area.technologies.map((tech, techIndex) => (
-                    <span
-                      key={techIndex}
-                      className="px-2.5 py-1 text-xs font-medium text-[#3B82F6] bg-[#E0E5EC] rounded-full shadow-[2px_2px_4px_rgba(163,177,198,0.6),-2px_-2px_4px_rgba(255,255,255,0.5)]"
-                    >
-                      {tech}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </NeuCard>
+              </NeuCard>
+            </div>
           );
         })}
       </div>

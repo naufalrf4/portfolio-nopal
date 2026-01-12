@@ -67,8 +67,14 @@ export function ProjectsGrid({ projects }: ProjectsGridProps) {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredProjects.map((project) => (
-            <ProjectCard key={project.id} project={project} />
+          {filteredProjects.map((project, index) => (
+            <div
+              key={project.id}
+              className="stagger-item"
+              style={{ animationDelay: `${index * 0.05}s` }}
+            >
+              <ProjectCard project={project} />
+            </div>
           ))}
         </div>
       )}

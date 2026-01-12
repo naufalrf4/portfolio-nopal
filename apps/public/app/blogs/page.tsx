@@ -46,12 +46,14 @@ async function getBlogs(): Promise<{ blogs: BlogLink[]; error?: string }> {
 export default async function BlogsPage() {
   const { blogs, error } = await getBlogs();
 
-  const serializedBlogs = blogs.map((blog) => ({
-    ...blog,
-    publishedAt: blog.publishedAt ? new Date(blog.publishedAt) : undefined,
-    createdAt: new Date(blog.createdAt),
-    updatedAt: new Date(blog.updatedAt),
-  }));
+  const serializedBlogs = Array.isArray(blogs)
+    ? blogs.map((blog) => ({
+        ...blog,
+        publishedAt: blog.publishedAt ? new Date(blog.publishedAt) : undefined,
+        createdAt: new Date(blog.createdAt),
+        updatedAt: new Date(blog.updatedAt),
+      }))
+    : [];
 
   return (
     <div className="min-h-screen p-8">
