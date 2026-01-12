@@ -7,13 +7,6 @@ export const GREETINGS = {
 
 export type LanguageCode = keyof typeof GREETINGS;
 
-export const LANGUAGES: { code: LanguageCode; label: string; flag: string }[] = [
-  { code: 'en', label: 'English', flag: '🇺🇸' },
-  { code: 'ja', label: '日本語', flag: '🇯🇵' },
-  { code: 'ko', label: '한국어', flag: '🇰🇷' },
-  { code: 'zh', label: '中文', flag: '🇨🇳' },
-];
-
 export const FAQS = [
   {
     id: '1',
