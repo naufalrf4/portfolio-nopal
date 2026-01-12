@@ -1,13 +1,18 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
+import Map, { Marker, Popup, NavigationControl } from 'react-map-gl/mapbox';
+import 'mapbox-gl/dist/mapbox-gl.css';
 import { MapPin, Loader2 } from 'lucide-react';
 import type { AnonymousMessage } from '../types/messages.types';
 
 interface LocationStat {
   countryCode: string;
   country: string;
+  city?: string;
   count: number;
+  lat: number;
+  lng: number;
 }
 
 interface LocationMapProps {
@@ -17,85 +22,164 @@ interface LocationMapProps {
   height?: string;
 }
 
+const countryCoordinates: Record<string, { lat: number; lng: number }> = {
+  US: { lat: 37.0902, lng: -95.7129 },
+  GB: { lat: 55.3781, lng: -3.436 },
+  ID: { lat: -0.7893, lng: 113.9213 },
+  AU: { lat: -25.2744, lng: 133.7751 },
+  CA: { lat: 56.1304, lng: -106.3468 },
+  DE: { lat: 51.1657, lng: 10.4515 },
+  FR: { lat: 46.2276, lng: 2.2137 },
+  JP: { lat: 36.2048, lng: 138.2529 },
+  KR: { lat: 35.9078, lng: 127.7669 },
+  CN: { lat: 35.8617, lng: 104.1954 },
+  BR: { lat: -14.235, lng: -51.9253 },
+  IN: { lat: 20.5937, lng: 78.9629 },
+  MY: { lat: 4.2105, lng: 101.9758 },
+  SG: { lat: 1.3521, lng: 103.8198 },
+  NL: { lat: 52.1326, lng: 5.2913 },
+  ES: { lat: 40.4637, lng: -3.7492 },
+  IT: { lat: 41.8719, lng: 12.5674 },
+  RU: { lat: 61.524, lng: 105.3188 },
+  MX: { lat: 23.6345, lng: -102.5528 },
+  ZA: { lat: -30.5595, lng: 22.9375 },
+  PH: { lat: 12.8797, lng: 121.774 },
+  VN: { lat: 14.0583, lng: 108.2772 },
+  TH: { lat: 15.87, lng: 100.9925 },
+  NZ: { lat: -40.9006, lng: 174.886 },
+};
+
+const flagMap: Record<string, string> = {
+  US: '🇺🇸',
+  GB: '🇬🇧',
+  ID: '🇮🇩',
+  AU: '🇦🇺',
+  CA: '🇨🇦',
+  DE: '🇩🇪',
+  FR: '🇫🇷',
+  JP: '🇯🇵',
+  KR: '🇰🇷',
+  CN: '🇨🇳',
+  BR: '🇧🇷',
+  IN: '🇮🇳',
+  MY: '🇲🇾',
+  SG: '🇸🇬',
+  NL: '🇳🇱',
+  ES: '🇪🇸',
+  IT: '🇮🇹',
+  RU: '🇷🇺',
+  MX: '🇲🇽',
+  ZA: '🇿🇦',
+  PH: '🇵🇭',
+  VN: '🇻🇳',
+  TH: '🇹🇭',
+  NZ: '🇳🇿',
+};
+
 export function LocationMap({
   messages,
   onCountrySelect,
   selectedCountry,
   height = '400px',
 }: LocationMapProps) {
-  const mapRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(true);
-  const [mapboxToken, setMapboxToken] = useState<string | null>(null);
   const [locationStats, setLocationStats] = useState<LocationStat[]>([]);
+  const [selectedLocation, setSelectedLocation] = useState<LocationStat | null>(null);
+  const [viewState, setViewState] = useState({
+    longitude: 0,
+    latitude: 20,
+    zoom: 1.5,
+  });
+
+  const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
   useEffect(() => {
-    const token = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
-    setMapboxToken(token || null);
+    const statsMap: Record<string, LocationStat> = {};
 
-    const stats = new Map<string, LocationStat>();
     messages.forEach((msg) => {
       if (msg.countryCode && msg.country) {
-        const existing = stats.get(msg.countryCode);
-        if (existing) {
-          existing.count++;
-        } else {
-          stats.set(msg.countryCode, {
-            countryCode: msg.countryCode,
-            country: msg.country,
-            count: 1,
-          });
+        const coords = countryCoordinates[msg.countryCode];
+        if (coords) {
+          const existing = statsMap[msg.countryCode];
+          if (existing) {
+            existing.count++;
+          } else {
+            statsMap[msg.countryCode] = {
+              countryCode: msg.countryCode,
+              country: msg.country,
+              city: msg.city ?? undefined,
+              count: 1,
+              lat: coords.lat,
+              lng: coords.lng,
+            };
+          }
         }
       }
     });
-    setLocationStats(Array.from(stats.values()).sort((a, b) => b.count - a.count));
+
+    const sortedStats = Object.values(statsMap).sort((a, b) => b.count - a.count);
+    setLocationStats(sortedStats);
     setLoading(false);
   }, [messages]);
 
   const getFlagEmoji = (countryCode: string) => {
-    const flagMap: Record<string, string> = {
-      US: '🇺🇸',
-      GB: '🇬🇧',
-      ID: '🇮🇩',
-      AU: '🇦🇺',
-      CA: '🇨🇦',
-      DE: '🇩🇪',
-      FR: '🇫🇷',
-      JP: '🇯🇵',
-      KR: '🇰🇷',
-      CN: '🇨🇳',
-      BR: '🇧🇷',
-      IN: '🇮🇳',
-      MY: '🇲🇾',
-      SG: '🇸🇬',
-      NL: '🇳🇱',
-      ES: '🇪🇸',
-      IT: '🇮🇹',
-      RU: '🇷🇺',
-      MX: '🇲🇽',
-      ZA: '🇿🇦',
-      PH: '🇵🇭',
-      VN: '🇻🇳',
-      TH: '🇹🇭',
-      NZ: '🇳🇿',
-    };
     return flagMap[countryCode] || '🌍';
   };
 
-  const getMarkerSize = (count: number) => {
-    const maxCount = Math.max(...locationStats.map((s) => s.count), 1);
-    const normalized = count / maxCount;
-    const minSize = 24;
-    const maxSize = 48;
-    return minSize + normalized * (maxSize - minSize);
-  };
+  const getMarkerSize = useCallback(
+    (count: number) => {
+      const maxCount = Math.max(...locationStats.map((s) => s.count), 1);
+      const normalized = count / maxCount;
+      const minSize = 24;
+      const maxSize = 48;
+      return minSize + normalized * (maxSize - minSize);
+    },
+    [locationStats]
+  );
 
-  const handleMarkerClick = (countryCode: string) => {
-    onCountrySelect?.(countryCode === selectedCountry ? null : countryCode);
+  const handleMarkerClick = (stat: LocationStat) => {
+    setSelectedLocation(stat);
+    onCountrySelect?.(stat.countryCode === selectedCountry ? null : stat.countryCode);
   };
 
   const handleClearFilter = () => {
     onCountrySelect?.(null);
+    setSelectedLocation(null);
   };
+
+  if (!mapboxToken) {
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="text-base font-semibold text-[#3D4852] flex items-center gap-2">
+            <MapPin className="h-5 w-5" />
+            Message Locations
+          </h3>
+          {selectedCountry && (
+            <button onClick={handleClearFilter} className="text-sm text-[#3B82F6] hover:underline">
+              Clear Filter
+            </button>
+          )}
+        </div>
+        <div
+          className="neu-inset rounded-2xl bg-[#E0E5EC] flex items-center justify-center"
+          style={{ height }}
+        >
+          <div className="flex flex-col items-center gap-3 p-8 text-center">
+            <MapPin className="h-12 w-12 text-[#6B7280]" />
+            <div>
+              <p className="text-sm font-medium text-[#3D4852] mb-1">
+                Mapbox Access Token Required
+              </p>
+              <p className="text-xs text-[#6B7280]">
+                Add NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN to your environment variables
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">
@@ -121,42 +205,65 @@ export function LocationMap({
             <span className="text-sm text-[#6B7280]">Loading map...</span>
           </div>
         </div>
-      ) : !mapboxToken ? (
-        <div
-          className="neu-inset rounded-2xl bg-[#E0E5EC] flex items-center justify-center"
-          style={{ height }}
-        >
-          <div className="flex flex-col items-center gap-3 p-8 text-center">
-            <MapPin className="h-12 w-12 text-[#6B7280]" />
-            <div>
-              <p className="text-sm font-medium text-[#3D4852] mb-1">
-                Mapbox Access Token Required
-              </p>
-              <p className="text-xs text-[#6B7280]">
-                Add NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN to your environment variables to enable the map
-              </p>
-            </div>
-          </div>
-        </div>
       ) : (
         <div
           className="relative neu-inset rounded-2xl overflow-hidden bg-[#E0E5EC]"
           style={{ height }}
         >
-          <div ref={mapRef} className="w-full h-full" />
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="flex flex-col items-center gap-3 p-8 text-center">
-              <MapPin className="h-12 w-12 text-[#6B7280]" />
-              <div>
-                <p className="text-sm font-medium text-[#3D4852] mb-1">
-                  Interactive Map Coming Soon
-                </p>
-                <p className="text-xs text-[#6B7280]">
-                  Install mapbox-gl and react-mapbox-gl packages to enable map visualization
-                </p>
-              </div>
-            </div>
-          </div>
+          <Map
+            {...viewState}
+            onMove={(evt: { viewState: typeof viewState }) => setViewState(evt.viewState)}
+            mapboxAccessToken={mapboxToken}
+            mapStyle="mapbox://styles/mapbox/light-v11"
+            style={{ width: '100%', height: '100%' }}
+          >
+            <NavigationControl position="top-right" />
+
+            {locationStats.map((stat) => (
+              <Marker
+                key={stat.countryCode}
+                longitude={stat.lng}
+                latitude={stat.lat}
+                anchor="center"
+                onClick={(e: { originalEvent: MouseEvent }) => {
+                  e.originalEvent.stopPropagation();
+                  handleMarkerClick(stat);
+                }}
+              >
+                <div
+                  className="cursor-pointer transform transition-transform hover:scale-110 rounded-full bg-[#3B82F6] flex items-center justify-center text-white text-xs font-bold shadow-lg border-2 border-white"
+                  style={{
+                    width: `${getMarkerSize(stat.count)}px`,
+                    height: `${getMarkerSize(stat.count)}px`,
+                  }}
+                >
+                  <span className="text-sm">{getFlagEmoji(stat.countryCode)}</span>
+                </div>
+              </Marker>
+            ))}
+
+            {selectedLocation && (
+              <Popup
+                longitude={selectedLocation.lng}
+                latitude={selectedLocation.lat}
+                anchor="bottom"
+                onClose={() => setSelectedLocation(null)}
+                closeOnClick={false}
+              >
+                <div className="p-2">
+                  <p className="font-semibold text-[#3D4852]">
+                    {getFlagEmoji(selectedLocation.countryCode)} {selectedLocation.country}
+                  </p>
+                  {selectedLocation.city && (
+                    <p className="text-xs text-[#6B7280]">{selectedLocation.city}</p>
+                  )}
+                  <p className="text-sm text-[#3B82F6] font-medium mt-1">
+                    {selectedLocation.count} message{selectedLocation.count !== 1 ? 's' : ''}
+                  </p>
+                </div>
+              </Popup>
+            )}
+          </Map>
         </div>
       )}
 
@@ -167,7 +274,7 @@ export function LocationMap({
             {locationStats.slice(0, 5).map((stat) => (
               <button
                 key={stat.countryCode}
-                onClick={() => handleMarkerClick(stat.countryCode)}
+                onClick={() => handleMarkerClick(stat)}
                 className={`w-full neu-extruded rounded-xl p-3 flex items-center gap-3 transition-all duration-200 hover:-translate-y-[1px] hover:shadow-[12px_12px_20px_rgba(163,177,198,0.7),-12px_-12px_20px_rgba(255,255,255,0.6)] ${
                   selectedCountry === stat.countryCode ? 'ring-2 ring-[#3B82F6]' : ''
                 }`}
@@ -175,17 +282,9 @@ export function LocationMap({
                 <span className="text-xl">{getFlagEmoji(stat.countryCode)}</span>
                 <div className="flex-1 text-left">
                   <div className="text-sm font-medium text-[#3D4852]">{stat.country}</div>
-                  <div className="text-xs text-[#6B7280]">
-                    {stat.count} message{stat.count !== 1 ? 's' : ''}
-                  </div>
+                  {stat.city && <div className="text-xs text-[#6B7280]">{stat.city}</div>}
                 </div>
-                <div
-                  className="rounded-full bg-[#3B82F6] text-white text-xs font-bold flex items-center justify-center neu-extruded-sm"
-                  style={{
-                    width: `${getMarkerSize(stat.count)}px`,
-                    height: `${getMarkerSize(stat.count)}px`,
-                  }}
-                >
+                <div className="rounded-full bg-[#3B82F6] text-white text-xs font-bold px-3 py-1">
                   {stat.count}
                 </div>
               </button>
