@@ -68,6 +68,9 @@ export class ProjectsService {
         contexts: {
           orderBy: { order: 'asc' },
         },
+        images: {
+          orderBy: { order: 'asc' },
+        },
       },
     });
   }

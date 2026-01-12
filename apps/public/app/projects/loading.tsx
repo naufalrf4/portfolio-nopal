@@ -12,8 +12,7 @@ export function LoadingSkeleton() {
           <div key={i} className="neu-card h-[400px] animate-pulse">
             <div className="w-full h-48 mb-4 rounded-2xl neu-inset" />
             <div className="h-6 neu-inset rounded-lg mb-3 w-3/4" />
-            <div className="h-4 neu-inset rounded-lg mb-2 w-full" />
-            <div className="h-4 neu-inset rounded-lg mb-4 w-5/6" />
+            <div className="h-4 neu-inset rounded-lg mb-4 w-full" />
             <div className="flex gap-2 mb-4">
               <div className="h-6 neu-inset rounded-lg w-20" />
               <div className="h-6 neu-inset rounded-lg w-20" />
@@ -25,3 +24,5 @@ export function LoadingSkeleton() {
     </div>
   );
 }
+
+export default LoadingSkeleton;

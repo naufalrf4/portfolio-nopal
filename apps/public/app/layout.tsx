@@ -1,10 +1,11 @@
 import type { Metadata } from 'next';
 import Script from 'next/script';
 import { Plus_Jakarta_Sans, DM_Sans } from 'next/font/google';
-import { Navbar } from '@/components/layout/Navbar';
-import { Footer } from '@/components/layout/Footer';
-import { PageViewTracker } from '@/components/PageViewTracker';
-import { personStructuredData } from '@/lib/structured-data';
+import { Navbar, Footer } from '@/src/features/layout/components';
+import { PageViewTracker } from '@/src/components/PageViewTracker';
+import { SessionProvider } from '@/src/components/providers/SessionProvider';
+import { FloatingChatbot } from '@/src/features/chatbot/components';
+import { MobileBottomNav } from '@/src/features/layout/components';
 import './globals.css';
 
 const plusJakarta = Plus_Jakarta_Sans({
@@ -39,7 +40,6 @@ export const metadata: Metadata = {
   },
 };
 
-const structuredDataScript = JSON.stringify(personStructuredData);
 const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_ID;
 
 export default function RootLayout({
@@ -50,35 +50,34 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${plusJakarta.variable} ${dmSans.variable}`}>
       <body className="antialiased">
-        <Script
-          id="structured-data"
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: structuredDataScript }}
-        />
-        {GA_MEASUREMENT_ID && (
-          <Script
-            src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
-            strategy="afterInteractive"
-          />
-        )}
-        {GA_MEASUREMENT_ID && (
-          <Script
-            id="ga-init"
-            strategy="afterInteractive"
-            dangerouslySetInnerHTML={{
-              __html: `
-                window.dataLayer = window.dataLayer || [];
-                function gtag(){dataLayer.push(arguments);}
-                gtag('js', new Date());
-                gtag('config', '${GA_MEASUREMENT_ID}', { send_page_view: false });
-              `,
-            }}
-          />
-        )}
-        <PageViewTracker />
-        <Navbar />
-        {children}
-        <Footer />
+        <SessionProvider>
+          {GA_MEASUREMENT_ID && (
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+              strategy="afterInteractive"
+            />
+          )}
+          {GA_MEASUREMENT_ID && (
+            <Script
+              id="ga-init"
+              strategy="afterInteractive"
+              dangerouslySetInnerHTML={{
+                __html: `
+                  window.dataLayer = window.dataLayer || [];
+                  function gtag(){dataLayer.push(arguments);}
+                  gtag('js', new Date());
+                  gtag('config', '${GA_MEASUREMENT_ID}', { send_page_view: false });
+                `,
+              }}
+            />
+          )}
+          <PageViewTracker />
+          <Navbar />
+          {children}
+          <Footer />
+          <MobileBottomNav />
+          <FloatingChatbot />
+        </SessionProvider>
       </body>
     </html>
   );

@@ -25,16 +25,11 @@ export async function proxy(req: NextRequest) {
   const isApiPublicRoute = nextUrl.pathname.startsWith('/api/v1/public');
 
   if (isApiPublicRoute) {
-    return NextResponse.json(
-      {
-        success: false,
-        error: 'Public API not yet available',
-        message:
-          'This endpoint will be available soon. The public API is currently under development.',
-        code: 'SERVICE_UNAVAILABLE',
-      },
-      { status: 503 }
-    );
+    const response = NextResponse.next();
+    response.headers.set('Access-Control-Allow-Origin', '*');
+    response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    return response;
   }
 
   if (isProtectedRoute || isApiAdminRoute) {
