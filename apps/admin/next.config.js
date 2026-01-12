@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  output: 'standalone',
   transpilePackages: ['@prisma/client', 'react-map-gl', 'mapbox-gl'],
   serverExternalPackages: ['geoip-lite'],
   async headers() {
