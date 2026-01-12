@@ -9,7 +9,7 @@ export type {
   Project,
   ProjectContext,
   ProjectImage,
-} from '@/lib/api/types';
+} from '@/src/lib/api/types';
 
 export interface Experience {
   id: string;

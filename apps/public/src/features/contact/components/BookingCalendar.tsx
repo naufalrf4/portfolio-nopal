@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { cn } from '@/src/lib/utils';
 import { NeuCard, NeuInput, NeuButton } from '@/src/features/shared/components';
-import { api } from '@/src/lib/api/client';
+import { api } from '@/src/lib/api';
 import { Calendar, Clock, CheckCircle, AlertCircle } from 'lucide-react';
 
 interface BookingSlot {

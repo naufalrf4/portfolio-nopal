@@ -1,9 +1,8 @@
 'use client';
 
-import { useState } from 'react';
-import { cn } from '@/src/lib/utils';
+import React, { useState } from 'react';
 import { NeuInput, NeuTextarea, NeuButton } from '@/src/features/shared/components';
-import { api } from '@/src/lib/api/client';
+import { api } from '@/src/lib/api';
 import { Send, CheckCircle, AlertCircle } from 'lucide-react';
 
 interface FormData {

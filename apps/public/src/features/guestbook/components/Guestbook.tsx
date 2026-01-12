@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Section, SectionHeader, NeuCard } from '@/src/features/shared/components';
 import { GuestbookList } from './GuestbookList';
 import { GuestbookForm } from './GuestbookForm';
-import { api } from '@/src/lib/api/client';
+import { api } from '@/src/lib/api';
 import type { GuestbookEntry } from './types';
 
 export function Guestbook() {

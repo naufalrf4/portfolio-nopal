@@ -1,9 +1,8 @@
 'use client';
 
-import { useState } from 'react';
-import { cn } from '@/src/lib/utils';
+import React, { useState } from 'react';
 import { NeuTextarea, NeuButton } from '@/src/features/shared/components';
-import { api } from '@/src/lib/api/client';
+import { api } from '@/src/lib/api';
 import { Send, AlertCircle } from 'lucide-react';
 
 interface GuestbookFormProps {

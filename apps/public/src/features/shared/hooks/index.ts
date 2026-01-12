@@ -1,2 +1,3 @@
-// Shared hooks will be exported from here
-// Currently no shared hooks are defined
+// Shared hooks placeholder
+// Export an empty object to make this a valid module
+export {};
