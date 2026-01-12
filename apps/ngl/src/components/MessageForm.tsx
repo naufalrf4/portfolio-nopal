@@ -122,29 +122,43 @@ export function MessageForm() {
       </div>
 
       {formState === 'error' && errorMessage && (
-        <div className="flex items-center gap-2 p-3 rounded-xl bg-[#EF4444]/10 text-[#EF4444]">
-          <AlertCircle className="w-4 h-4 flex-shrink-0" />
-          <span className="text-sm">{errorMessage}</span>
+        <div className="space-y-3">
+          <div className="flex items-start gap-2 p-3 rounded-xl bg-[#EF4444]/10 text-[#EF4444] opacity-0 animate-scale-in">
+            <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <p className="text-sm font-medium mb-1">Failed to send message</p>
+              <p className="text-xs text-[#EF4444]/80">{errorMessage}</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={handleReset}
+            className="neu-button w-full py-3 flex items-center justify-center gap-2 text-sm font-medium text-[#3D4852] opacity-0 animate-fade-in-up stagger-1"
+          >
+            Try Again
+          </button>
         </div>
       )}
 
-      <button
-        type="submit"
-        disabled={!canSubmit}
-        className="neu-button neu-button-primary w-full py-4 flex items-center justify-center gap-2 font-medium"
-      >
-        {formState === 'loading' ? (
-          <>
-            <Loader2 className="w-5 h-5 animate-spin" />
-            <span>Sending...</span>
-          </>
-        ) : (
-          <>
-            <Send className="w-5 h-5" />
-            <span>Send Message</span>
-          </>
-        )}
-      </button>
+      {formState !== 'error' && (
+        <button
+          type="submit"
+          disabled={!canSubmit}
+          className="neu-button neu-button-primary w-full py-4 flex items-center justify-center gap-2 font-medium"
+        >
+          {formState === 'loading' ? (
+            <>
+              <Loader2 className="w-5 h-5 animate-spin" />
+              <span>Sending...</span>
+            </>
+          ) : (
+            <>
+              <Send className="w-5 h-5" />
+              <span>Send Message</span>
+            </>
+          )}
+        </button>
+      )}
     </form>
   );
 }
