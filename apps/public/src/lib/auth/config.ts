@@ -2,8 +2,15 @@ import NextAuth from 'next-auth';
 import Google from 'next-auth/providers/google';
 
 import type { NextAuthConfig } from 'next-auth';
+import { validateAuthEnvironment } from './env-validation';
 
 const API_BASE = process.env.NEXT_PUBLIC_ADMIN_API_URL || 'http://localhost:3001';
+
+const validation = validateAuthEnvironment();
+if (!validation.isValid) {
+  console.error('Authentication configuration errors:');
+  validation.errors.forEach((error) => console.error(`  - ${error}`));
+}
 
 const authConfig: NextAuthConfig = {
   secret: process.env.NEXTAUTH_SECRET,
@@ -26,13 +33,19 @@ const authConfig: NextAuthConfig = {
     async signIn({ account, profile }) {
       if (account?.provider === 'google') {
         const isEmailVerified = Boolean(profile?.email_verified);
-        if (!isEmailVerified) return false;
+        if (!isEmailVerified) {
+          console.error('Google sign-in failed: Email not verified');
+          return false;
+        }
 
         const email = profile?.email;
-        if (!email) return false;
+        if (!email) {
+          console.error('Google sign-in failed: No email provided');
+          return false;
+        }
 
         try {
-          await fetch(`${API_BASE}/api/v1/public/auth/sync`, {
+          const response = await fetch(`${API_BASE}/api/v1/public/auth/sync`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -41,11 +54,23 @@ const authConfig: NextAuthConfig = {
               image: profile?.picture,
             }),
           });
-        } catch {
+
+          if (!response.ok) {
+            console.error('User sync failed:', response.status, response.statusText);
+            return false;
+          }
+
+          const data = await response.json();
+          if (!data.success) {
+            console.error('User sync failed:', data.error?.message || 'Unknown error');
+            return false;
+          }
+
+          return true;
+        } catch (error) {
+          console.error('User sync error:', error);
           return false;
         }
-
-        return true;
       }
       return true;
     },
