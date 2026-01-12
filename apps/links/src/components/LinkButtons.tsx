@@ -1,5 +1,7 @@
 'use client';
 
+import { ExternalLink, Globe, FileText, Briefcase, Code, BookOpen } from 'lucide-react';
+
 interface ProfileLink {
   id: string;
   label: string;
@@ -11,39 +13,56 @@ interface LinkButtonsProps {
   links: ProfileLink[];
 }
 
-function ExternalLinkIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-      <polyline points="15 3 21 3 21 9" />
-      <line x1="10" x2="21" y1="14" y2="3" />
-    </svg>
-  );
+function getLinkIcon(link: ProfileLink) {
+  const labelLower = link.label.toLowerCase();
+  const iconLower = link.icon?.toLowerCase() || '';
+
+  if (labelLower.includes('portfolio') || iconLower.includes('portfolio')) {
+    return Briefcase;
+  }
+  if (labelLower.includes('blog') || iconLower.includes('blog')) {
+    return BookOpen;
+  }
+  if (labelLower.includes('resume') || labelLower.includes('cv') || iconLower.includes('resume')) {
+    return FileText;
+  }
+  if (labelLower.includes('project') || iconLower.includes('code')) {
+    return Code;
+  }
+  if (labelLower.includes('website') || iconLower.includes('website')) {
+    return Globe;
+  }
+
+  return Globe;
 }
 
 export function LinkButtons({ links }: LinkButtonsProps) {
   return (
-    <div className="w-full flex flex-col gap-3">
-      {links.map((link) => (
-        <a
-          key={link.id}
-          href={link.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="w-full py-4 px-6 rounded-2xl neu-extruded flex items-center justify-between text-foreground font-medium transition-all duration-300 hover:-translate-y-1 hover:shadow-[12px_12px_24px_rgba(163,177,198,0.7),-12px_-12px_24px_rgba(255,255,255,0.6)] active:shadow-[inset_4px_4px_8px_rgba(163,177,198,0.4),inset_-4px_-4px_8px_rgba(255,255,255,0.3)] active:translate-y-0"
-        >
-          <span>{link.label}</span>
-          <ExternalLinkIcon className="w-4 h-4 text-muted-foreground" />
-        </a>
-      ))}
+    <div className="w-full flex flex-col gap-4">
+      {links.map((link, index) => {
+        const IconComponent = getLinkIcon(link);
+
+        return (
+          <a
+            key={link.id}
+            href={link.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group neu-link-button"
+            style={{ animationDelay: `${index * 0.1}s` }}
+          >
+            <div className="neu-link-icon">
+              <IconComponent className="w-5 h-5 text-primary transition-transform duration-300 group-hover:scale-110" />
+            </div>
+            <span className="flex-1 font-semibold text-center text-foreground/90 group-hover:text-foreground transition-colors duration-300">
+              {link.label}
+            </span>
+            <div className="w-10 flex justify-center">
+              <ExternalLink className="w-4 h-4 text-muted-foreground/50 opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:translate-x-0.5" />
+            </div>
+          </a>
+        );
+      })}
     </div>
   );
 }

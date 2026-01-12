@@ -5,7 +5,7 @@ import './globals.css';
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
-  variable: '--font-sans',
+  variable: '--font-plus-jakarta',
   display: 'swap',
 });
 
@@ -43,8 +43,20 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${plusJakarta.variable} ${dmSans.variable}`}>
-      <body className="antialiased min-h-screen flex flex-col items-center justify-center p-4">
-        {children}
+      <body className="antialiased min-h-screen">
+        <div className="bg-shapes-container">
+          <div className="bg-gradient-overlay" />
+          <div className="floating-shape floating-shape-1" />
+          <div className="floating-shape floating-shape-2" />
+          <div className="floating-shape floating-shape-3" />
+          <div className="floating-shape floating-shape-4" />
+          <div className="floating-shape floating-shape-5" />
+          <div className="floating-shape floating-shape-6" />
+        </div>
+
+        <main className="relative z-10 min-h-screen flex flex-col items-center justify-start px-4 py-12 md:py-16">
+          {children}
+        </main>
       </body>
     </html>
   );

@@ -1,6 +1,6 @@
-import { ProfileHeader } from '../src/components/ProfileHeader';
-import { SocialIcons } from '../src/components/SocialIcons';
-import { LinkButtons } from '../src/components/LinkButtons';
+import { ProfileHeader } from '../components/ProfileHeader';
+import { SocialIcons } from '../components/SocialIcons';
+import { LinkButtons } from '../components/LinkButtons';
 
 interface AboutData {
   fullName: string;
@@ -66,22 +66,32 @@ export default async function LinksPage() {
   const websiteLinks = links.filter((link) => !isSocialLink(link));
 
   return (
-    <main className="w-full max-w-md mx-auto">
-      <div className="neu-card flex flex-col items-center gap-6">
+    <div className="w-full max-w-md mx-auto flex flex-col items-center">
+      <div className="opacity-0 animate-scale-in w-full">
         <ProfileHeader
           name={aboutData?.fullName || 'NaufalRF'}
           bio={aboutData?.tagline || 'Full-Stack Engineer'}
           avatarUrl={aboutData?.avatarUrl}
         />
-
-        {socialLinks.length > 0 && <SocialIcons links={socialLinks} />}
-
-        {websiteLinks.length > 0 && <LinkButtons links={websiteLinks} />}
-
-        <footer className="mt-4 text-center text-sm text-muted-foreground">
-          <p>© {new Date().getFullYear()} NaufalRF</p>
-        </footer>
       </div>
-    </main>
+
+      {socialLinks.length > 0 && (
+        <div className="opacity-0 animate-fade-in-up stagger-2 w-full flex justify-center mt-2">
+          <SocialIcons links={socialLinks} />
+        </div>
+      )}
+
+      {websiteLinks.length > 0 && (
+        <div className="opacity-0 animate-fade-in-up stagger-3 w-full mt-8">
+          <LinkButtons links={websiteLinks} />
+        </div>
+      )}
+
+      <footer className="opacity-0 animate-fade-in-up stagger-5 pt-12 text-center">
+        <p className="text-sm text-muted-foreground">
+          © {new Date().getFullYear()} Naufal Rizqullah Firdaus.
+        </p>
+      </footer>
+    </div>
   );
 }
