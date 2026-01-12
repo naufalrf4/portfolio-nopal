@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Script from 'next/script';
 import { defaultClient } from '@naufalrf/sdk';
 import type { ProfileLink, BlogLink, Project } from '@naufalrf/sdk';
 import {
@@ -8,6 +9,7 @@ import {
   TechnicalExpertise,
 } from '@/src/features/home/components';
 import { Guestbook } from '@/src/components/home/Guestbook';
+import { websiteStructuredData, personStructuredData } from '@/src/lib/structured-data';
 
 export const dynamic = 'force-dynamic';
 
@@ -191,6 +193,20 @@ export default async function HomePage() {
 
   return (
     <main>
+      <Script
+        id="website-structured-data"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(websiteStructuredData),
+        }}
+      />
+      <Script
+        id="person-structured-data"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(personStructuredData),
+        }}
+      />
       <Hero about={about} />
       <TechnicalExpertise />
       <FeaturedProjects projects={featuredProjects} />

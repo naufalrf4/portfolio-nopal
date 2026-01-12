@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
+import Script from 'next/script';
 import { AboutContent } from '@/src/features/about/components';
 import type { AboutData } from '@/src/features/about/components';
+import { personStructuredData } from '@/src/lib/structured-data';
 
 export const dynamic = 'force-dynamic';
 
@@ -112,6 +114,13 @@ export default async function AboutPage() {
 
   return (
     <main>
+      <Script
+        id="person-structured-data"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(personStructuredData),
+        }}
+      />
       <AboutContent about={about} />
     </main>
   );
