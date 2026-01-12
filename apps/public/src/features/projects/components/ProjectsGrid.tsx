@@ -22,30 +22,46 @@ export function ProjectsGrid({ projects }: ProjectsGridProps) {
     return projects.filter((p) => p.category === activeCategory);
   }, [projects, activeCategory]);
 
+  const projectCount = filteredProjects.length;
+
   return (
     <div>
-      <div className="flex flex-wrap gap-2 mb-8">
+      <div className="flex flex-wrap justify-center gap-3 mb-8">
         {categories.map((category) => {
           const isActive = activeCategory === category;
+          const count =
+            category === 'All'
+              ? projects.length
+              : projects.filter((p) => p.category === category).length;
 
           return (
             <button
               key={category}
               onClick={() => setActiveCategory(category)}
+              aria-pressed={isActive}
               className={cn(
-                'px-4 py-2 rounded-xl font-medium transition-all duration-200',
+                'px-5 py-2.5 rounded-2xl font-medium transition-all duration-300 capitalize',
+                'focus:outline-none focus:ring-2 focus:ring-[#3B82F6] focus:ring-offset-2 focus:ring-offset-[#E0E5EC]',
                 isActive
-                  ? 'text-[#3B82F6] shadow-[inset_4px_4px_8px_rgba(163,177,198,0.6),inset_-4px_-4px_8px_rgba(255,255,255,0.5)]'
-                  : 'text-[#6B7280] shadow-[4px_4px_8px_rgba(163,177,198,0.6),-4px_-4px_8px_rgba(255,255,255,0.5)] hover:text-[#3B82F6]'
+                  ? 'text-[#3B82F6] bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgba(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)]'
+                  : 'text-[#6B7280] bg-[#E0E5EC] shadow-[6px_6px_12px_rgba(163,177,198,0.6),-6px_-6px_12px_rgba(255,255,255,0.5)] hover:text-[#3B82F6] hover:-translate-y-0.5 hover:shadow-[8px_8px_16px_rgba(163,177,198,0.7),-8px_-8px_16px_rgba(255,255,255,0.6)]'
               )}
             >
               {category}
+              <span
+                className={cn(
+                  'ml-2 text-xs px-2 py-0.5 rounded-full',
+                  isActive ? 'bg-[#3B82F6]/10 text-[#3B82F6]' : 'bg-[#6B7280]/10 text-[#6B7280]'
+                )}
+              >
+                {count}
+              </span>
             </button>
           );
         })}
       </div>
 
-      {filteredProjects.length === 0 ? (
+      {projectCount === 0 ? (
         <div className="text-center py-12">
           <p className="text-[#6B7280]">No projects found in this category.</p>
         </div>
