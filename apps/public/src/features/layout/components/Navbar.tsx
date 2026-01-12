@@ -13,8 +13,8 @@ export function Navbar() {
   const [otherDropdownOpen, setOtherDropdownOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 bg-[#E0E5EC]/80 backdrop-blur-md">
-      <nav className="mx-auto max-w-7xl px-4 md:px-8">
+    <header className="sticky top-0 z-50 px-4 pt-4">
+      <nav className="mx-auto max-w-7xl rounded-2xl bg-[#E0E5EC]/80 backdrop-blur-md shadow-[9px_9px_16px_rgb(163,177,198,0.6),-9px_-9px_16px_rgba(255,255,255,0.5)] px-4 md:px-8">
         <div className="flex h-16 items-center justify-between">
           <Link
             href="/"
