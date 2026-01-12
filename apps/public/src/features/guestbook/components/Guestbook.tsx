@@ -26,9 +26,6 @@ export function Guestbook() {
       const response = await api.guestbook.getAll();
       const entries = response?.entries || [];
       setEntries(Array.isArray(entries) ? entries : []);
-    } catch (error) {
-      console.error('Failed to fetch guestbook entries:', error);
-      setEntries([]);
     } finally {
       setIsLoading(false);
     }
@@ -95,6 +92,20 @@ export function Guestbook() {
           {isLoading ? (
             <NeuCard className="text-center py-8">
               <div className="animate-pulse text-[#6B7280]">Loading messages...</div>
+            </NeuCard>
+          ) : entries.length === 0 ? (
+            <NeuCard className="text-center py-12 space-y-4">
+              <MessageSquare className="w-16 h-16 mx-auto text-[#6B7280] opacity-50" />
+              <div className="space-y-2">
+                <p className="text-lg font-medium text-[#3D4852]">No messages yet</p>
+                <p className="text-[#6B7280]">Be the first to leave a message!</p>
+              </div>
+              {!isAuthenticated && (
+                <NeuButton variant="accent" onClick={handleSignIn}>
+                  <LogIn size={18} className="mr-2" />
+                  Sign in to post
+                </NeuButton>
+              )}
             </NeuCard>
           ) : (
             <GuestbookList entries={entries} />
