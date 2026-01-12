@@ -14,7 +14,7 @@ const tabConfig = [
   { type: 'work', label: 'Experience', icon: Briefcase },
   { type: 'education', label: 'Education', icon: GraduationCap },
   { type: 'certification', label: 'Certifications', icon: Award },
-  { type: 'organization', label: 'Organizational', icon: Users },
+  { type: 'organizational', label: 'Organizational', icon: Users },
 ] as const;
 
 function normalizeType(type: string): string {
@@ -86,7 +86,7 @@ export function ExperienceTabs({ experience }: ExperienceTabsProps) {
                     <div className="flex items-center gap-1">
                       <Calendar size={14} />
                       <span>
-                        {exp.startDate} - {exp.endDate || 'Present'}
+                        {exp.startDate} - {exp.endDate ? exp.endDate : 'Present'}
                       </span>
                     </div>
                     {exp.location && (

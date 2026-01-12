@@ -18,7 +18,7 @@ interface EditBlogModalProps {
 
 export function EditBlogModal({ isOpen, onClose, onSubmit, blogLink }: EditBlogModalProps) {
   const form = useForm<CreateBlogLinkInput>({
-    resolver: zodResolver(createBlogLinkSchema),
+    resolver: zodResolver(createBlogLinkSchema as never) as never,
   });
 
   useEffect(() => {

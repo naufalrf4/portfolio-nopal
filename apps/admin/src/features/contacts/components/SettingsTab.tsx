@@ -25,7 +25,7 @@ export function SettingsTab() {
   const { settings, loading, saving, updateSettings } = useContactSettings();
 
   const form = useForm<ContactSettingsForm>({
-    resolver: zodResolver(contactSettingsSchema) as never,
+    resolver: zodResolver(contactSettingsSchema as never) as never,
     defaultValues: {
       notificationEmail: settings?.notificationEmail || '',
       blockedKeywords: settings?.blockedKeywords || [],

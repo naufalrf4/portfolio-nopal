@@ -15,7 +15,7 @@ interface CreateBlogModalProps {
 
 export function CreateBlogModal({ isOpen, onClose, onSubmit }: CreateBlogModalProps) {
   const form = useForm<CreateBlogLinkInput>({
-    resolver: zodResolver(createBlogLinkSchema),
+    resolver: zodResolver(createBlogLinkSchema as never) as never,
     defaultValues: {
       url: '',
       title: '',
