@@ -1,11 +1,13 @@
+export type ExperienceType = 'work' | 'education' | 'certification' | 'organization';
+
 export interface Experience {
-  id: string;
-  type: 'work' | 'education' | 'certification' | 'organization';
+  id?: string;
+  type: ExperienceType | string;
   title: string;
   organization: string;
   location?: string;
   startDate: string;
-  endDate?: string;
+  endDate?: string | null;
   description?: string;
   skills?: string[];
 }
@@ -16,6 +18,16 @@ export interface Skill {
   level?: string;
 }
 
+export interface SocialLinks {
+  github?: string;
+  linkedin?: string;
+  twitter?: string;
+  instagram?: string;
+  youtube?: string;
+  email?: string;
+  [key: string]: string | undefined;
+}
+
 export interface AboutData {
   fullName: string;
   tagline: string;
@@ -23,9 +35,9 @@ export interface AboutData {
   bio: string;
   email?: string;
   location?: string;
-  avatarUrl?: string;
-  resumeUrl?: string;
-  skills: Skill[];
+  avatarUrl?: string | null;
+  resumeUrl?: string | null;
+  skills: Skill[] | string[];
   experience: Experience[];
-  socialLinks?: Array<{ platform: string; url: string }>;
+  socialLinks?: SocialLinks | Array<{ platform: string; url: string }>;
 }

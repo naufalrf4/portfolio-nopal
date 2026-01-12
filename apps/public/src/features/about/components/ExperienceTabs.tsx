@@ -13,22 +13,28 @@ interface ExperienceTabsProps {
 const tabConfig = [
   { type: 'work', label: 'Experience', icon: Briefcase },
   { type: 'education', label: 'Education', icon: GraduationCap },
-  { type: 'certification', label: 'Work', icon: Award },
+  { type: 'certification', label: 'Certifications', icon: Award },
   { type: 'organization', label: 'Organizational', icon: Users },
 ] as const;
+
+function normalizeType(type: string): string {
+  return type.toLowerCase();
+}
 
 export function ExperienceTabs({ experience }: ExperienceTabsProps) {
   const [activeTab, setActiveTab] = useState<string>('work');
 
   const filteredExperience = experience
-    .filter((exp) => exp.type === activeTab)
+    .filter((exp) => normalizeType(exp.type) === activeTab)
     .sort((a, b) => {
       const dateA = a.startDate ? new Date(a.startDate).getTime() : 0;
       const dateB = b.startDate ? new Date(b.startDate).getTime() : 0;
       return dateB - dateA;
     });
 
-  const availableTabs = tabConfig.filter((tab) => experience.some((exp) => exp.type === tab.type));
+  const availableTabs = tabConfig.filter((tab) =>
+    experience.some((exp) => normalizeType(exp.type) === tab.type)
+  );
 
   if (experience.length === 0) {
     return null;
@@ -65,8 +71,8 @@ export function ExperienceTabs({ experience }: ExperienceTabsProps) {
         <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-[#3B82F6]/20" />
 
         <div className="space-y-6">
-          {filteredExperience.map((exp) => (
-            <div key={exp.id} className="relative pl-10">
+          {filteredExperience.map((exp, index) => (
+            <div key={exp.id || `${exp.title}-${index}`} className="relative pl-10">
               <div className="absolute left-2 top-6 w-4 h-4 rounded-full bg-[#3B82F6] shadow-[2px_2px_4px_rgba(59,130,246,0.3)]" />
 
               <NeuCard className="p-5 md:p-6">
@@ -96,9 +102,9 @@ export function ExperienceTabs({ experience }: ExperienceTabsProps) {
 
                 {exp.skills && exp.skills.length > 0 && (
                   <div className="flex flex-wrap gap-2">
-                    {exp.skills.map((skill, index) => (
+                    {exp.skills.map((skill, skillIndex) => (
                       <span
-                        key={index}
+                        key={skillIndex}
                         className="px-3 py-1 text-xs font-medium text-[#3B82F6] bg-[#E0E5EC] rounded-full shadow-[2px_2px_4px_rgba(163,177,198,0.6),-2px_-2px_4px_rgba(255,255,255,0.5)]"
                       >
                         {skill}

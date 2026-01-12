@@ -5,8 +5,17 @@ import Image from 'next/image';
 import { Section, NeuCard, NeuButton } from '@/src/features/shared/components';
 import { ExperienceTabs } from './ExperienceTabs';
 import { SkillBadges } from './SkillBadges';
-import { MapPin, Mail, Download, Github, Linkedin, Twitter } from 'lucide-react';
-import type { AboutData } from './types';
+import {
+  MapPin,
+  Mail,
+  Download,
+  Github,
+  Linkedin,
+  Twitter,
+  Instagram,
+  Youtube,
+} from 'lucide-react';
+import type { AboutData, SocialLinks } from './types';
 
 interface AboutContentProps {
   about: AboutData;
@@ -16,10 +25,33 @@ const socialIcons: Record<string, ComponentType<{ size?: number; className?: str
   github: Github,
   linkedin: Linkedin,
   twitter: Twitter,
+  instagram: Instagram,
+  youtube: Youtube,
   email: Mail,
 };
 
+interface SocialLinkItem {
+  platform: string;
+  url: string;
+}
+
+function normalizeSocialLinks(
+  socialLinks: SocialLinks | Array<{ platform: string; url: string }> | undefined
+): SocialLinkItem[] {
+  if (!socialLinks) return [];
+
+  if (Array.isArray(socialLinks)) {
+    return socialLinks;
+  }
+
+  return Object.entries(socialLinks)
+    .filter(([, url]) => url && typeof url === 'string')
+    .map(([platform, url]) => ({ platform, url: url as string }));
+}
+
 export function AboutContent({ about }: AboutContentProps) {
+  const socialLinksList = normalizeSocialLinks(about.socialLinks);
+
   return (
     <div className="py-8 md:py-16">
       <Section>
@@ -71,9 +103,9 @@ export function AboutContent({ about }: AboutContentProps) {
                     )}
                   </div>
 
-                  <div className="flex items-center justify-center gap-3 mb-4">
-                    {Array.isArray(about.socialLinks) &&
-                      about.socialLinks.map((link, index) => {
+                  {socialLinksList.length > 0 && (
+                    <div className="flex items-center justify-center gap-3 mb-4">
+                      {socialLinksList.map((link, index) => {
                         const Icon = socialIcons[link.platform.toLowerCase()] || Mail;
                         return (
                           <a
@@ -88,7 +120,8 @@ export function AboutContent({ about }: AboutContentProps) {
                           </a>
                         );
                       })}
-                  </div>
+                    </div>
+                  )}
 
                   {about.resumeUrl && (
                     <a href={about.resumeUrl} target="_blank" rel="noopener noreferrer">
