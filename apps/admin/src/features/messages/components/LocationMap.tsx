@@ -140,11 +140,23 @@ export function LocationMap({
   const handleMarkerClick = (stat: LocationStat) => {
     setSelectedLocation(stat);
     onCountrySelect?.(stat.countryCode === selectedCountry ? null : stat.countryCode);
+
+    setViewState({
+      longitude: stat.lng,
+      latitude: stat.lat,
+      zoom: 4,
+    });
   };
 
   const handleClearFilter = () => {
     onCountrySelect?.(null);
     setSelectedLocation(null);
+
+    setViewState({
+      longitude: 0,
+      latitude: 20,
+      zoom: 1.5,
+    });
   };
 
   if (!mapboxToken) {
@@ -214,7 +226,7 @@ export function LocationMap({
             {...viewState}
             onMove={(evt: { viewState: typeof viewState }) => setViewState(evt.viewState)}
             mapboxAccessToken={mapboxToken}
-            mapStyle="mapbox://styles/mapbox/light-v11"
+            mapStyle="mapbox://styles/mapbox/streets-v12"
             style={{ width: '100%', height: '100%' }}
           >
             <NavigationControl position="top-right" />
