@@ -6,10 +6,11 @@ import { api } from '@/src/lib/api';
 import { Send, AlertCircle } from 'lucide-react';
 
 interface GuestbookFormProps {
+  userEmail: string;
   onSuccess?: () => void;
 }
 
-export function GuestbookForm({ onSuccess }: GuestbookFormProps) {
+export function GuestbookForm({ userEmail, onSuccess }: GuestbookFormProps) {
   const [message, setMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -22,13 +23,11 @@ export function GuestbookForm({ onSuccess }: GuestbookFormProps) {
     setError('');
 
     try {
-      await api.guestbook.create(message.trim());
+      await api.guestbook.create(message.trim(), userEmail);
       setMessage('');
       onSuccess?.();
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : 'Failed to post message. Please sign in first.'
-      );
+      setError(err instanceof Error ? err.message : 'Failed to post message. Please try again.');
     } finally {
       setIsLoading(false);
     }

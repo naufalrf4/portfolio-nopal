@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { auth } from '@/lib/auth';
+import { prisma } from '@/lib/db/prisma';
 import { guestbookService } from '@/lib/api/handlers/guestbook.service';
 import {
   successResponse,
@@ -7,7 +7,15 @@ import {
   unauthorizedResponse,
   validationErrorResponse,
 } from '@/lib/api/responses';
-import { createGuestbookEntrySchema } from '@/lib/validations/guestbook.schema';
+import { z } from 'zod';
+
+const createGuestbookEntrySchema = z.object({
+  message: z
+    .string()
+    .min(1, 'Message is required')
+    .max(500, 'Message must be 500 characters or less'),
+  userEmail: z.string().email('Invalid email'),
+});
 
 export async function GET() {
   try {
@@ -23,7 +31,7 @@ export async function GET() {
       },
     }));
 
-    return successResponse(formattedEntries);
+    return successResponse({ entries: formattedEntries });
   } catch {
     return serverErrorResponse();
   }
@@ -31,12 +39,6 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth();
-
-    if (!session?.user?.id) {
-      return unauthorizedResponse('Authentication required');
-    }
-
     const body = await request.json();
     const parsed = createGuestbookEntrySchema.safeParse(body);
 
@@ -44,7 +46,18 @@ export async function POST(request: NextRequest) {
       return validationErrorResponse(parsed.error.flatten().fieldErrors);
     }
 
-    const entry = await guestbookService.create(session.user.id, parsed.data.message);
+    const { message, userEmail } = parsed.data;
+
+    const user = await prisma.user.findUnique({
+      where: { email: userEmail },
+      select: { id: true },
+    });
+
+    if (!user) {
+      return unauthorizedResponse('User not found. Please sign in again.');
+    }
+
+    const entry = await guestbookService.create(user.id, message);
 
     return successResponse(entry, 'Entry added successfully');
   } catch {
