@@ -66,3 +66,10 @@ export function formatDistanceToNow(date: Date): string {
   const years = Math.floor(diff / YEAR);
   return `${years} ${years === 1 ? 'year' : 'years'} ago`;
 }
+
+export function formatExperienceDate(dateString: string | null | undefined): string {
+  if (!dateString) return 'Present';
+
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
+}

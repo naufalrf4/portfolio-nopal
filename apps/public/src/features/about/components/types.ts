@@ -10,6 +10,7 @@ export interface Experience {
   endDate?: string | null;
   description?: string;
   skills?: string[];
+  logoUrl?: string | null;
 }
 
 export interface Skill {

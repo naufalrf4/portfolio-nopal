@@ -30,6 +30,8 @@ export interface Experience {
   startDate: string;
   endDate: string | null;
   description: string;
+  logoUrl?: string | null;
+  skills?: string[];
 }
 
 export interface SocialLinks {

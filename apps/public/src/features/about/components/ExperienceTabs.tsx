@@ -1,7 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { cn } from '@/src/lib/utils';
+import { formatExperienceDate } from '@/src/lib/utils';
 import { NeuCard } from '@/src/features/shared/components';
 import { Calendar, MapPin, Briefcase, GraduationCap, Award, Users } from 'lucide-react';
 import type { Experience } from './types';
@@ -77,16 +79,29 @@ export function ExperienceTabs({ experience }: ExperienceTabsProps) {
 
               <NeuCard className="p-5 md:p-6">
                 <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-2 mb-3">
-                  <div>
-                    <h4 className="text-lg font-bold text-[#3D4852]">{exp.title}</h4>
-                    <p className="text-[#3B82F6] font-medium">{exp.organization}</p>
+                  <div className="flex items-start gap-3">
+                    {exp.logoUrl && (
+                      <div className="flex-shrink-0 w-12 h-12 rounded-lg overflow-hidden shadow-[4px_4px_8px_rgba(163,177,198,0.6),-4px_-4px_8px_rgba(255,255,255,0.5)]">
+                        <Image
+                          src={exp.logoUrl}
+                          alt={`${exp.organization} logo`}
+                          width={48}
+                          height={48}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    )}
+                    <div>
+                      <h4 className="text-lg font-bold text-[#3D4852]">{exp.title}</h4>
+                      <p className="text-[#3B82F6] font-medium">{exp.organization}</p>
+                    </div>
                   </div>
 
                   <div className="flex flex-col items-start md:items-end gap-1 text-sm text-[#6B7280]">
                     <div className="flex items-center gap-1">
                       <Calendar size={14} />
                       <span>
-                        {exp.startDate} - {exp.endDate ? exp.endDate : 'Present'}
+                        {formatExperienceDate(exp.startDate)} - {formatExperienceDate(exp.endDate)}
                       </span>
                     </div>
                     {exp.location && (

@@ -1,8 +1,10 @@
 import type { Metadata } from 'next';
 import Script from 'next/script';
-import { AboutContent } from '@/src/features/about/components';
+import { AboutPageClient } from '@/src/features/about/components/AboutPageClient';
+import { LoadingState } from '@/src/features/shared/components';
 import type { AboutData } from '@/src/features/about/components';
 import { personStructuredData } from '@/src/lib/structured-data';
+import { Suspense } from 'react';
 
 export const dynamic = 'force-dynamic';
 
@@ -28,7 +30,7 @@ export const metadata: Metadata = {
   },
 };
 
-async function getAboutData(): Promise<AboutData> {
+async function getAboutData(): Promise<{ data: AboutData | null; error?: string }> {
   try {
     const baseUrl = process.env.NEXT_PUBLIC_ADMIN_API_URL || 'http://localhost:3001';
     const response = await fetch(`${baseUrl}/api/v1/public/about`, {
@@ -37,55 +39,25 @@ async function getAboutData(): Promise<AboutData> {
 
     if (!response.ok) {
       return {
-        fullName: 'Naufal RF',
-        tagline: 'Full-Stack Engineer & Tech Enthusiast',
-        roles: ['Full-Stack Developer'],
-        bio: 'Passionate software engineer with experience building scalable web applications.',
-        email: 'hello@naufalrf.tech',
-        location: 'Jakarta, Indonesia',
-        avatarUrl: null,
-        resumeUrl: null,
-        socialLinks: {},
-        skills: [],
-        experience: [],
+        data: null,
+        error: `Failed to fetch about data (${response.status})`,
       };
     }
 
-    const data = await response.json();
-    return (
-      data?.data || {
-        fullName: 'Naufal RF',
-        tagline: 'Full-Stack Engineer & Tech Enthusiast',
-        roles: ['Full-Stack Developer'],
-        bio: 'Passionate software engineer with experience building scalable web applications.',
-        email: 'hello@naufalrf.tech',
-        location: 'Jakarta, Indonesia',
-        avatarUrl: null,
-        resumeUrl: null,
-        socialLinks: {},
-        skills: [],
-        experience: [],
-      }
-    );
-  } catch {
+    const result = await response.json();
     return {
-      fullName: 'Naufal RF',
-      tagline: 'Full-Stack Engineer & Tech Enthusiast',
-      roles: ['Full-Stack Developer'],
-      bio: 'Passionate software engineer with experience building scalable web applications.',
-      email: 'hello@naufalrf.tech',
-      location: 'Jakarta, Indonesia',
-      avatarUrl: null,
-      resumeUrl: null,
-      socialLinks: {},
-      skills: [],
-      experience: [],
+      data: result?.data || null,
+    };
+  } catch (err) {
+    return {
+      data: null,
+      error: err instanceof Error ? err.message : 'Failed to load about data',
     };
   }
 }
 
 export default async function AboutPage() {
-  const about = await getAboutData();
+  const { data, error } = await getAboutData();
 
   return (
     <main>
@@ -96,7 +68,9 @@ export default async function AboutPage() {
           __html: JSON.stringify(personStructuredData),
         }}
       />
-      <AboutContent about={about} />
+      <Suspense fallback={<LoadingState type="skeleton" count={3} />}>
+        <AboutPageClient initialData={data} error={error} />
+      </Suspense>
     </main>
   );
 }
