@@ -1,6 +1,5 @@
-import { cn } from '@/src/lib/utils';
 import { Section, SectionHeader, NeuCard } from '@/src/features/shared/components';
-import { Globe, Brain, Cloud } from 'lucide-react';
+import { Globe, Brain, Cpu } from 'lucide-react';
 
 const expertiseAreas = [
   {
@@ -12,17 +11,17 @@ const expertiseAreas = [
   },
   {
     icon: Brain,
-    title: 'AI & Machine Learning',
+    title: 'AI & Automation',
     description:
-      'Implementing intelligent solutions using Large Language Models, RAG systems, and ML pipelines. Creating AI-powered applications that solve real-world problems.',
-    technologies: ['LLMs', 'RAG', 'Embeddings', 'Python', 'LangChain'],
+      'Implementing intelligent solutions using Large Language Models, RAG systems, and automation pipelines. Creating AI-powered applications that streamline workflows and solve real-world problems.',
+    technologies: ['LLMs', 'RAG', 'Python', 'LangChain', 'Automation'],
   },
   {
-    icon: Cloud,
-    title: 'Cloud & DevOps',
+    icon: Cpu,
+    title: 'IoT & Hardware',
     description:
-      'Designing and deploying cloud infrastructure with focus on scalability, reliability, and security. Implementing CI/CD pipelines and containerized applications.',
-    technologies: ['AWS', 'Docker', 'Kubernetes', 'CI/CD', 'Terraform'],
+      'Designing embedded systems and IoT solutions that bridge the physical and digital worlds. Building connected devices with sensors, microcontrollers, and real-time communication.',
+    technologies: ['Arduino', 'ESP32', 'Raspberry Pi', 'MQTT', 'Sensors'],
   },
 ];
 
