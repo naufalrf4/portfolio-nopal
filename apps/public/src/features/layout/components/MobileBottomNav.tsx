@@ -35,7 +35,7 @@ export function MobileBottomNav() {
           <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" />
 
           <div
-            className="absolute bottom-20 right-4 w-56 py-3 rounded-2xl bg-[#E0E5EC] shadow-[9px_9px_16px_rgba(163,177,198,0.6),-9px_-9px_16px_rgba(255,255,255,0.5)]"
+            className="absolute bottom-24 right-4 w-56 py-3 rounded-2xl bg-[#E0E5EC] shadow-[9px_9px_16px_rgba(163,177,198,0.6),-9px_-9px_16px_rgba(255,255,255,0.5)]"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between px-4 pb-2 mb-2 border-b border-[#d1d5db]">
@@ -69,8 +69,8 @@ export function MobileBottomNav() {
         </div>
       )}
 
-      <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-[#E0E5EC] border-t border-[#d1d5db] safe-area-pb">
-        <div className="flex items-center justify-around px-1 py-2">
+      <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden px-4 pb-4 safe-area-pb">
+        <div className="flex items-center justify-around px-1 py-2 rounded-2xl bg-[#E0E5EC] shadow-[9px_9px_16px_rgb(163,177,198,0.6),-9px_-9px_16px_rgba(255,255,255,0.5)]">
           {navItems.map((item) => {
             const isActive = pathname === item.href;
             const Icon = item.icon;
