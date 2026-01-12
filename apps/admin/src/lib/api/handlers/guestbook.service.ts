@@ -83,6 +83,49 @@ export class GuestbookService {
     });
   }
 
+  async toggleVisibility(id: string) {
+    const entry = await prisma.guestbookEntry.findUnique({
+      where: { id },
+      select: { visible: true },
+    });
+
+    if (!entry) {
+      throw new Error('Guestbook entry not found');
+    }
+
+    return prisma.guestbookEntry.update({
+      where: { id },
+      data: { visible: !entry.visible },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            image: true,
+          },
+        },
+      },
+    });
+  }
+
+  async updateReactions(id: string, reactions: object) {
+    return prisma.guestbookEntry.update({
+      where: { id },
+      data: { reactions },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            image: true,
+          },
+        },
+      },
+    });
+  }
+
   async addReaction(id: string, userId: string, emoji: string) {
     const entry = await prisma.guestbookEntry.findUnique({
       where: { id },

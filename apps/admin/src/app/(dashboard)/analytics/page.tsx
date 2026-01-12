@@ -1,15 +1,11 @@
-export default function AnalyticsPage() {
-  return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold font-[family-name:var(--font-plus-jakarta)]">
-          Analytics
-        </h1>
-      </div>
+import type { Metadata } from 'next';
+import { AnalyticsPageContent } from './AnalyticsPageContent';
 
-      <div className="neu-card p-8 text-center">
-        <p className="text-muted-foreground">Analytics dashboard coming soon...</p>
-      </div>
-    </div>
-  );
+export const metadata: Metadata = {
+  title: 'Analytics',
+  description: 'View analytics and insights for your portfolio',
+};
+
+export default function AnalyticsPage() {
+  return <AnalyticsPageContent />;
 }

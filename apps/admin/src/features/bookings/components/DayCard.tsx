@@ -1,0 +1,71 @@
+'use client';
+
+import { Plus } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import type { BookingSlot } from '../types/bookings.types';
+import { DAY_NAMES, NEUMORPHIC_STYLES } from '../constants';
+import { formatDateShort } from '../utils/dateUtils';
+import { SlotCard } from './SlotCard';
+
+interface DayCardProps {
+  date: Date;
+  slots: BookingSlot[];
+  isToday: boolean;
+  onAddSlot: () => void;
+  onEditSlot: (slot: BookingSlot) => void;
+  onDeleteSlot: (slot: BookingSlot) => void;
+  onToggleStatus: (slot: BookingSlot) => void;
+}
+
+export function DayCard({
+  date,
+  slots,
+  isToday,
+  onAddSlot,
+  onEditSlot,
+  onDeleteSlot,
+  onToggleStatus,
+}: DayCardProps) {
+  const dayIndex = date.getDay();
+
+  return (
+    <div
+      className={`rounded-2xl p-4 bg-[#E0E5EC] transition-all ${isToday ? 'ring-2 ring-[#3B82F6]/50' : ''}`}
+      style={NEUMORPHIC_STYLES.cardInset}
+    >
+      <div className="flex items-center justify-between mb-3">
+        <div>
+          <h3 className="font-semibold text-[#3D4852]">
+            {DAY_NAMES[dayIndex]}
+            {isToday && (
+              <Badge variant="primary" className="ml-2 text-xs">
+                Today
+              </Badge>
+            )}
+          </h3>
+          <p className="text-sm text-[#6B7280]">{formatDateShort(date)}</p>
+        </div>
+        <Button variant="outline" size="sm" onClick={onAddSlot}>
+          <Plus className="h-4 w-4" />
+        </Button>
+      </div>
+
+      {slots.length === 0 ? (
+        <p className="text-sm text-[#6B7280] text-center py-4">No slots</p>
+      ) : (
+        <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1">
+          {slots.map((slot) => (
+            <SlotCard
+              key={slot.id}
+              slot={slot}
+              onEdit={() => onEditSlot(slot)}
+              onDelete={() => onDeleteSlot(slot)}
+              onToggle={() => onToggleStatus(slot)}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}

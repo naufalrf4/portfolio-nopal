@@ -72,7 +72,7 @@ export default function ProjectForm({ projectId }: ProjectFormProps) {
         }
       } catch (error) {
         if ((error as Error).name !== 'AbortError') {
-          // Error fetching project
+          
         }
       }
     }

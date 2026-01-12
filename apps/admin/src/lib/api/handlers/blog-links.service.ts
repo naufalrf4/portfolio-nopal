@@ -51,6 +51,21 @@ export class BlogLinksService {
       orderBy: { order: 'asc' },
     });
   }
+
+  async toggleVisibility(id: string) {
+    const blogLink = await prisma.blogLink.findUnique({
+      where: { id },
+    });
+
+    if (!blogLink) {
+      return null;
+    }
+
+    return prisma.blogLink.update({
+      where: { id },
+      data: { visible: !blogLink.visible },
+    });
+  }
 }
 
 export const blogLinksService = new BlogLinksService();

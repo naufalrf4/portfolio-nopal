@@ -1,13 +1,26 @@
-export default function SettingsPage() {
-  return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold font-[family-name:var(--font-plus-jakarta)]">Settings</h1>
-      </div>
+import type { Metadata } from 'next';
+import { auth } from '@/lib/auth';
+import { redirect } from 'next/navigation';
+import { PageHeader } from '@/components/layout/PageHeader';
+import { PageWrapper } from '@/components/layout/PageWrapper';
+import { SettingsPageContent } from './SettingsPageContent';
 
-      <div className="neu-card p-8 text-center">
-        <p className="text-muted-foreground">Settings page coming soon...</p>
-      </div>
-    </div>
+export const metadata: Metadata = {
+  title: 'Settings',
+  description: 'Manage your account and application preferences',
+};
+
+export default async function SettingsPage() {
+  const session = await auth();
+
+  if (!session?.user) {
+    redirect('/auth/signin');
+  }
+
+  return (
+    <PageWrapper>
+      <PageHeader title="Settings" description="Manage your account and application preferences" />
+      <SettingsPageContent session={session} />
+    </PageWrapper>
   );
 }

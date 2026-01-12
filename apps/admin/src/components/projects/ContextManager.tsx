@@ -62,7 +62,7 @@ export default function ContextManager({ projectId }: ContextManagerProps) {
         setContexts(data.data);
       }
     } catch {
-      // Error fetching contexts
+      
     } finally {
       setLoading(false);
     }
@@ -135,7 +135,7 @@ export default function ContextManager({ projectId }: ContextManagerProps) {
         fetchContexts();
       }
     } catch {
-      // Error deleting context
+      
     }
   }
 

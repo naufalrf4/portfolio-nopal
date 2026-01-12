@@ -5,26 +5,68 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
+  [
+    'inline-flex items-center justify-center gap-2 whitespace-nowrap',
+    'font-medium rounded-2xl',
+    'transition-all duration-300 ease-out',
+    'outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary/50',
+    'disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none',
+    "[&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4",
+    'shrink-0 [&_svg]:shrink-0',
+  ].join(' '),
   {
     variants: {
       variant: {
-        default: 'bg-primary text-primary-foreground hover:bg-primary/90',
-        destructive:
-          'bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60',
-        outline:
-          'border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50',
-        secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
-        ghost: 'hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50',
-        link: 'text-primary underline-offset-4 hover:underline',
+        default: [
+          'bg-[#E0E5EC] text-[#3D4852]',
+          '[box-shadow:9px_9px_16px_rgba(163,177,198,0.6),-9px_-9px_16px_rgba(255,255,255,0.5)]',
+          'hover:translate-y-[-1px]',
+          'hover:[box-shadow:12px_12px_20px_rgba(163,177,198,0.7),-12px_-12px_20px_rgba(255,255,255,0.6)]',
+          'active:translate-y-[0.5px]',
+          'active:[box-shadow:inset_3px_3px_6px_rgba(163,177,198,0.6),inset_-3px_-3px_6px_rgba(255,255,255,0.5)]',
+        ].join(' '),
+        primary: [
+          'bg-gradient-to-r from-[#3B82F6] to-[#60A5FA] text-white',
+          '[box-shadow:9px_9px_16px_rgba(163,177,198,0.6),-9px_-9px_16px_rgba(255,255,255,0.5)]',
+          'hover:translate-y-[-1px] hover:brightness-110',
+          'hover:[box-shadow:12px_12px_20px_rgba(163,177,198,0.7),-12px_-12px_20px_rgba(255,255,255,0.6)]',
+          'active:translate-y-[0.5px] active:brightness-95',
+          'active:[box-shadow:inset_3px_3px_6px_rgba(59,130,246,0.4),inset_-3px_-3px_6px_rgba(96,165,250,0.3)]',
+        ].join(' '),
+        destructive: [
+          'bg-gradient-to-r from-red-500 to-red-600 text-white',
+          '[box-shadow:9px_9px_16px_rgba(163,177,198,0.6),-9px_-9px_16px_rgba(255,255,255,0.5)]',
+          'hover:translate-y-[-1px] hover:brightness-110',
+          'hover:[box-shadow:12px_12px_20px_rgba(163,177,198,0.7),-12px_-12px_20px_rgba(255,255,255,0.6)]',
+          'active:translate-y-[0.5px] active:brightness-95',
+          'active:[box-shadow:inset_3px_3px_6px_rgba(239,68,68,0.4),inset_-3px_-3px_6px_rgba(220,38,38,0.3)]',
+        ].join(' '),
+        outline: [
+          'bg-transparent border-2 border-[#D1D5DB] text-foreground',
+          '[box-shadow:2px_2px_4px_rgba(163,177,198,0.3),-2px_-2px_4px_rgba(255,255,255,0.3)]',
+          'hover:bg-[#E0E5EC] hover:translate-y-[-1px]',
+          'hover:[box-shadow:9px_9px_16px_rgba(163,177,198,0.6),-9px_-9px_16px_rgba(255,255,255,0.5)]',
+          'active:translate-y-[0.5px]',
+          'active:[box-shadow:inset_3px_3px_6px_rgba(163,177,198,0.6),inset_-3px_-3px_6px_rgba(255,255,255,0.5)]',
+        ].join(' '),
+        ghost: [
+          'bg-transparent shadow-none',
+          'hover:bg-[#E0E5EC]/50',
+          'active:bg-[#E0E5EC]/70',
+        ].join(' '),
+        link: [
+          'bg-transparent shadow-none text-[#3B82F6]',
+          'underline-offset-4 hover:underline',
+          'p-0 h-auto',
+        ].join(' '),
       },
       size: {
-        default: 'h-9 px-4 py-2 has-[>svg]:px-3',
-        sm: 'h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5',
-        lg: 'h-10 rounded-md px-6 has-[>svg]:px-4',
-        icon: 'size-9',
-        'icon-sm': 'size-8',
-        'icon-lg': 'size-10',
+        default: 'h-11 px-6 py-2 text-sm',
+        sm: 'h-9 px-4 text-sm rounded-xl',
+        lg: 'h-12 px-8 text-base',
+        icon: 'h-11 w-11',
+        'icon-sm': 'h-9 w-9 rounded-xl',
+        'icon-lg': 'h-12 w-12',
       },
     },
     defaultVariants: {
@@ -34,16 +76,19 @@ const buttonVariants = cva(
   }
 );
 
+type ButtonVariants = VariantProps<typeof buttonVariants>;
+
+interface ButtonProps extends React.ComponentProps<'button'>, ButtonVariants {
+  asChild?: boolean;
+}
+
 function Button({
   className,
   variant = 'default',
   size = 'default',
   asChild = false,
   ...props
-}: React.ComponentProps<'button'> &
-  VariantProps<typeof buttonVariants> & {
-    asChild?: boolean;
-  }) {
+}: ButtonProps) {
   const Comp = asChild ? Slot : 'button';
 
   return (
@@ -58,3 +103,4 @@ function Button({
 }
 
 export { Button, buttonVariants };
+export type { ButtonProps, ButtonVariants };

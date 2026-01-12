@@ -21,8 +21,7 @@ async function handleGet(req: NextRequest) {
 
     const result = await projectsService.getAll(validation.data);
     return successResponse(result);
-  } catch (error) {
-    console.error('GET /api/v1/admin/projects error:', error);
+  } catch {
     return serverErrorResponse();
   }
 }
@@ -43,8 +42,7 @@ async function handlePost(req: NextRequest) {
 
     const project = await projectsService.create(validation.data);
     return successResponse(project, 'Project created successfully');
-  } catch (error) {
-    console.error('POST /api/v1/admin/projects error:', error);
+  } catch {
     return serverErrorResponse();
   }
 }

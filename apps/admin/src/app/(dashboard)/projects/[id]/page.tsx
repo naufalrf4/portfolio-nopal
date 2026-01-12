@@ -1,16 +1,21 @@
-import ProjectForm from '@/components/projects/ProjectForm';
-import ContextManager from '@/components/projects/ContextManager';
+import type { Metadata } from 'next';
+import { ProjectDetailPageContent } from './components/ProjectDetailPageContent';
 
 type PageProps = {
   params: Promise<{ id: string }>;
 };
 
-export default async function EditProjectPage({ params }: PageProps) {
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { id } = await params;
-  return (
-    <div className="space-y-6">
-      <ProjectForm projectId={id} />
-      <ContextManager projectId={id} />
-    </div>
-  );
+
+  return {
+    title: `Project Details - ${id}`,
+    description: 'View and manage project details, contexts, and related information',
+  };
+}
+
+export default async function ProjectDetailPage({ params }: PageProps) {
+  const { id } = await params;
+
+  return <ProjectDetailPageContent projectId={id} />;
 }
