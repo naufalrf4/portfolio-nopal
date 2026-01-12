@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { formatDate } from '@/src/lib/utils';
 import type { Project, ProjectContext } from './types';
+import { ImageCarousel } from './ImageCarousel';
 
 interface ProjectDetailProps {
   project: Project;
@@ -81,7 +82,9 @@ export function ProjectDetail({ project }: ProjectDetailProps) {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
           <div className="lg:col-span-8 space-y-10">
             <div className="relative aspect-[16/9] rounded-2xl overflow-hidden shadow-[12px_12px_24px_rgba(163,177,198,0.6),-12px_-12px_24px_rgba(255,255,255,0.5)]">
-              {project.imageUrl ? (
+              {project.images && project.images.length > 0 ? (
+                <ImageCarousel images={project.images} title={project.title} />
+              ) : project.imageUrl ? (
                 <Image
                   src={project.imageUrl}
                   alt={project.title}

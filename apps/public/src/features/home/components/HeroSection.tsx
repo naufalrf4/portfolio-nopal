@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { Hero } from './Hero';
-import { LoadingState, ErrorState } from '@/src/features/shared/components';
+import { HeroSkeleton } from './HeroSkeleton';
+import { ErrorState } from '@/src/features/shared/components';
 import { aboutApi } from '@/src/lib/api/endpoints/about';
 import type { AboutData } from '@/src/lib/api/types';
 
@@ -29,11 +30,7 @@ export function HeroSection() {
   }, []);
 
   if (loading) {
-    return (
-      <section className="min-h-[60vh] flex items-center justify-center">
-        <LoadingState type="spinner" />
-      </section>
-    );
+    return <HeroSkeleton />;
   }
 
   if (error || !data) {
