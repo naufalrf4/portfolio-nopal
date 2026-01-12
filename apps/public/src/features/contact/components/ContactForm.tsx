@@ -63,8 +63,10 @@ export function ContactForm() {
 
     try {
       await api.contact.submit({
-        ...formData,
-        turnstileToken: turnstileToken || undefined,
+        name: formData.name,
+        email: formData.email,
+        message: formData.message,
+        turnstileToken: turnstileToken || '',
       });
       setStatus('success');
       setFormData({ name: '', email: '', subject: '', message: '' });

@@ -9,19 +9,13 @@ import { ContactInfo } from './ContactInfo';
 import { Mail, Calendar, ChevronDown, HelpCircle } from 'lucide-react';
 import { FAQS } from '@/src/lib/constants';
 import { api } from '@/src/lib/api';
+import type { AboutData as ApiAboutData } from '@/src/lib/api/types';
 
 type Tab = 'form' | 'booking';
-
-interface AboutData {
-  location?: string;
-  email?: string;
-  socialLinks?: Array<{ platform: string; url: string }>;
-}
-
 export function ContactContent() {
   const [activeTab, setActiveTab] = useState<Tab>('form');
   const [openFaqId, setOpenFaqId] = useState<string | null>(null);
-  const [aboutData, setAboutData] = useState<AboutData | null>(null);
+  const [aboutData, setAboutData] = useState<ApiAboutData | null>(null);
 
   useEffect(() => {
     const fetchAboutData = async () => {
@@ -39,7 +33,11 @@ export function ContactContent() {
     setOpenFaqId(openFaqId === id ? null : id);
   };
 
-  const socialLinks = aboutData?.socialLinks || [];
+  const socialLinks = aboutData?.socialLinks
+    ? Object.entries(aboutData.socialLinks)
+        .filter(([_, url]) => url)
+        .map(([platform, url]) => ({ platform, url: url! }))
+    : [];
 
   return (
     <div className="py-8 md:py-16">

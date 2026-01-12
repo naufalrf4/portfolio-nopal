@@ -4,4 +4,5 @@ export { bookingsApi } from './bookings';
 export { contactApi } from './contact';
 export { guestbookApi } from './guestbook';
 export { linksApi } from './links';
+export { messagesApi } from './messages';
 export { projectsApi } from './projects';

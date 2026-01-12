@@ -1,5 +1,5 @@
 import { fetchApi, buildQueryString } from '../client';
-import type { Project } from '../types';
+import type { Project, ProjectsResponse } from '../types';
 
 interface GetProjectsParams {
   featured?: boolean;
@@ -14,7 +14,12 @@ export const projectsApi = {
       limit: params?.limit,
       category: params?.category,
     });
-    return fetchApi<{ projects: Project[] }>(`/api/v1/public/projects${qs}`);
+    return fetchApi<ProjectsResponse>(`/api/v1/public/projects${qs}`, {
+      retries: 2,
+    });
   },
-  getBySlug: (slug: string) => fetchApi<{ project: Project }>(`/api/v1/public/projects/${slug}`),
+  getBySlug: (slug: string) =>
+    fetchApi<Project>(`/api/v1/public/projects/${slug}`, {
+      retries: 2,
+    }),
 };

@@ -6,5 +6,6 @@ export const contactApi = {
     fetchApi<{ success: boolean }>('/api/v1/public/contact', {
       method: 'POST',
       body: JSON.stringify(data),
+      retries: 0,
     }),
 };

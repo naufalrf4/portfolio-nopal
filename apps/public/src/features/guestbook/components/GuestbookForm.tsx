@@ -23,7 +23,10 @@ export function GuestbookForm({ userEmail, onSuccess }: GuestbookFormProps) {
     setError('');
 
     try {
-      await api.guestbook.create(message.trim(), userEmail);
+      await api.guestbook.create({
+        message: message.trim(),
+        userEmail,
+      });
       setMessage('');
       onSuccess?.();
     } catch (err) {

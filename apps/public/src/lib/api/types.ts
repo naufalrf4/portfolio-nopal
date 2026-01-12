@@ -4,6 +4,7 @@ export interface ApiResponse<T> {
   error?: {
     message: string;
     code?: string;
+    details?: Record<string, string[]>;
   };
 }
 
@@ -13,20 +14,38 @@ export interface AboutData {
   roles: string[];
   bio: string;
   email: string;
-  phone?: string;
   location: string;
-  avatarUrl: string;
-  resumeUrl?: string;
-  skills: { name: string; level: number; category: string }[];
-  experience: {
-    type: 'work' | 'education' | 'organization';
-    title: string;
-    company: string;
-    period: string;
-    description: string;
-    location?: string;
-  }[];
-  socialLinks: { platform: string; url: string }[];
+  avatarUrl: string | null;
+  resumeUrl: string | null;
+  skills: string[];
+  experience: Experience[];
+  socialLinks: SocialLinks;
+}
+
+export interface Experience {
+  type: 'Work' | 'Education';
+  title: string;
+  organization: string;
+  location: string;
+  startDate: string;
+  endDate: string | null;
+  description: string;
+}
+
+export interface SocialLinks {
+  github?: string;
+  twitter?: string;
+  linkedin?: string;
+  instagram?: string;
+  [key: string]: string | undefined;
+}
+
+export interface ProjectsResponse {
+  projects: Project[];
+  meta: {
+    total: number;
+    featured: number;
+  };
 }
 
 export interface Project {
@@ -37,20 +56,29 @@ export interface Project {
   description?: string;
   category: string;
   techStack: string[];
-  liveUrl?: string;
-  repoUrl?: string;
-  imageUrl?: string;
+  liveUrl: string | null;
+  repoUrl: string | null;
+  imageUrl: string | null;
   featured: boolean;
+  visible?: boolean;
+  order?: number;
+  createdAt: string;
+  updatedAt?: string;
+  content?: string;
+  thumbnailId?: string | null;
   contexts?: ProjectContext[];
   images?: ProjectImage[];
 }
 
 export interface ProjectContext {
   id: string;
+  projectId: string;
   type: string;
   title: string;
   content: string;
   order: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface ProjectImage {
@@ -61,50 +89,82 @@ export interface ProjectImage {
   order: number;
 }
 
+export interface BlogsResponse {
+  blogs: BlogLink[];
+  meta: {
+    total: number;
+  };
+}
+
 export interface BlogLink {
   id: string;
   title: string;
   url: string;
-  description?: string;
-  imageUrl?: string;
+  description: string | null;
+  imageUrl: string | null;
   source: string;
-  publishedAt?: string;
+  publishedAt: string;
+}
+
+export interface GuestbookResponse {
+  entries: GuestbookEntry[];
 }
 
 export interface GuestbookEntry {
   id: string;
+  userId: string;
   message: string;
+  visible: boolean;
   createdAt: string;
-  user?: { name: string; image?: string };
+  user: {
+    name: string;
+    image: string | null;
+  };
 }
 
 export interface ProfileLink {
   id: string;
   label: string;
   url: string;
-  icon?: string;
+  icon: string;
+  visible: boolean;
+  order: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface BookingAvailableResponse {
+  [date: string]: BookingSlot[];
 }
 
 export interface BookingSlot {
+  id: string;
   date: string;
-  time: string;
+  startTime: string;
+  endTime: string;
   duration: number;
 }
 
 export interface ContactFormData {
   name: string;
   email: string;
-  subject: string;
   message: string;
-  turnstileToken?: string;
+  turnstileToken: string;
 }
 
 export interface BookingData {
+  slotId: string;
   name: string;
   email: string;
-  phone?: string;
-  notes?: string;
-  date: string;
-  time: string;
-  turnstileToken?: string;
+  message?: string;
+  turnstileToken: string;
+}
+
+export interface AnonymousMessageData {
+  content: string;
+}
+
+export interface GuestbookSubmitData {
+  message: string;
+  userEmail: string;
 }

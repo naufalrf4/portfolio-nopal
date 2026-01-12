@@ -8,8 +8,10 @@ import { api } from '@/src/lib/api';
 import { Calendar, Clock, CheckCircle, AlertCircle } from 'lucide-react';
 
 interface BookingSlot {
+  id: string;
   date: string;
-  time: string;
+  startTime: string;
+  endTime: string;
   duration: number;
 }
 
@@ -48,7 +50,7 @@ export function BookingCalendar() {
       try {
         const data = await api.bookings.getAvailable();
         const flatSlots: FlatSlot[] = [];
-        Object.entries(data.slots || {}).forEach(([dateKey, dateSlots]) => {
+        Object.entries(data || {}).forEach(([dateKey, dateSlots]) => {
           dateSlots.forEach((slot) => {
             flatSlots.push({ ...slot, dateKey });
           });
@@ -99,10 +101,11 @@ export function BookingCalendar() {
 
     try {
       await api.bookings.create({
-        ...formData,
-        date: selectedSlot.date,
-        time: selectedSlot.time,
-        turnstileToken: turnstileToken || undefined,
+        slotId: selectedSlot.id,
+        name: formData.name,
+        email: formData.email,
+        message: formData.notes,
+        turnstileToken: turnstileToken || '',
       });
       setStatus('success');
       setFormData({ name: '', email: '', phone: '', notes: '' });
@@ -161,7 +164,7 @@ export function BookingCalendar() {
               <div className="flex items-center gap-2 text-sm text-[#6B7280]">
                 <Clock size={14} />
                 <span>
-                  {slot.time} ({slot.duration} min)
+                  {slot.startTime} ({slot.duration} min)
                 </span>
               </div>
             </button>
@@ -173,7 +176,7 @@ export function BookingCalendar() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <NeuCard>
             <h4 className="font-medium text-[#3D4852] mb-4">
-              Book: {selectedSlot.date} at {selectedSlot.time}
+              Book: {selectedSlot.date} at {selectedSlot.startTime}
             </h4>
 
             <div className="space-y-4">
