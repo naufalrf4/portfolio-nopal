@@ -1,7 +1,18 @@
 export const GREETINGS = {
-  ja: 'こんにちは、私は',
   en: "Hi, I'm",
+  id: 'Halo, saya',
+  ms: 'Hai, saya',
+  de: 'Hallo, ich bin',
+  nl: 'Hallo, ik ben',
+  ja: 'こんにちは、私は',
   ko: '안녕하세요, 저는',
+  pl: 'Cześć, jestem',
+  cs: 'Ahoj, jsem',
+  ro: 'Salut, sunt',
+  tr: 'Merhaba, ben',
+  fa: 'سلام، من',
+  hi: 'नमस्ते, मैं',
+  sw: 'Habari, mimi ni',
   zh: '你好，我是',
 } as const;
 
