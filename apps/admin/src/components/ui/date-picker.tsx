@@ -154,24 +154,51 @@ function DatePicker({
         className={cn(
           'w-auto p-0',
           'rounded-xl bg-[#E0E5EC]',
-          '[box-shadow:8px_8px_16px_rgba(163,177,198,0.6),-8px_-8px_16px_rgba(255,255,255,0.5)]',
-          'max-h-[80vh] overflow-auto',
-          'data-[state=open]:animate-in data-[state=closed]:animate-out',
-          'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
-          'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
-          'data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2',
-          'z-[100]'
+          '[box-shadow:6px_6px_12px_rgba(163,177,198,0.5),-6px_-6px_12px_rgba(255,255,255,0.45)]',
+          'z-[100]',
+          'max-w-[260px]'
         )}
         align="start"
         sideOffset={4}
       >
-        <div className="p-2">
+        <div className="p-1.5">
           <div
             className={cn(
-              'rounded-lg bg-[#E0E5EC] p-1.5',
-              '[box-shadow:inset_2px_2px_4px_rgba(163,177,198,0.4),inset_-2px_-2px_4px_rgba(255,255,255,0.4)]'
+              'rounded-lg bg-[#E0E5EC] p-1',
+              '[box-shadow:inset_1px_1px_2px_rgba(163,177,198,0.3),inset_-1px_-1px_2px_rgba(255,255,255,0.35)]'
             )}
           >
+            <style jsx global>{`
+              .rdp {
+                --rdp-cell-size: 28px !important;
+                --rdp-day-size: 28px !important;
+                --rdp-accent-color: #3b82f6;
+                margin: 0;
+              }
+              .rdp-caption_label {
+                font-size: 11px !important;
+                padding: 2px 0 !important;
+              }
+              .rdp-head_cell {
+                font-size: 10px !important;
+                height: 20px !important;
+              }
+              .rdp-day {
+                height: 28px !important;
+                width: 28px !important;
+                font-size: 11px !important;
+              }
+              .rdp-week {
+                margin: 0 !important;
+              }
+              .rdp-months {
+                gap: 0 !important;
+              }
+              .rdp-button_reset {
+                height: 28px !important;
+                width: 28px !important;
+              }
+            `}</style>
             <Calendar
               mode="single"
               selected={value ?? undefined}
@@ -181,75 +208,54 @@ function DatePicker({
               captionLayout="dropdown"
               fromYear={minDate?.getFullYear() ?? 1900}
               toYear={maxDate?.getFullYear() ?? new Date().getFullYear() + 10}
-              initialFocus
+              showOutsideDays={false}
               classNames={{
-                months: 'flex flex-row space-x-2',
-                month: 'space-y-1',
-                caption: 'flex justify-center pt-0.5 relative items-center gap-1',
+                months: 'flex flex-row gap-1',
+                month: 'space-y-0.5',
+                caption: 'flex justify-center py-0.5 relative items-center gap-1',
                 caption_label: 'text-xs font-medium text-[#3D4852]',
-                nav: 'space-x-1 flex items-center',
+                nav: 'space-x-0.5 flex items-center',
                 nav_button: cn(
-                  'h-6 w-6 flex items-center justify-center',
-                  'rounded-md bg-[#E0E5EC]',
-                  '[box-shadow:2px_2px_4px_rgba(163,177,198,0.4),-2px_-2px_4px_rgba(255,255,255,0.4)]',
-                  'transition-all duration-200',
-                  'hover:[box-shadow:2px_2px_4px_rgba(163,177,198,0.5),-2px_-2px_4px_rgba(255,255,255,0.45)]',
-                  'active:[box-shadow:inset_1px_1px_2px_rgba(163,177,198,0.4),inset_-1px_-1px_2px_rgba(255,255,255,0.4)]',
-                  'disabled:opacity-40 disabled:cursor-not-allowed'
+                  'h-5 w-5 flex items-center justify-center',
+                  'rounded bg-[#E0E5EC]',
+                  '[box-shadow:1px_1px_2px_rgba(163,177,198,0.3),-1px_-1px_2px_rgba(255,255,255,0.4)]',
+                  'hover:[box-shadow:inset_1px_1px_2px_rgba(163,177,198,0.3)]',
+                  'disabled:opacity-40'
                 ),
-                nav_button_previous: 'absolute left-1',
-                nav_button_next: 'absolute right-1',
+                nav_button_previous: 'absolute left-0.5',
+                nav_button_next: 'absolute right-0.5',
                 table: 'w-full border-collapse',
-                head_row: 'flex',
+                head_row: 'flex h-5',
                 head_cell: cn(
-                  'w-8 h-6 flex items-center justify-center',
-                  'text-[0.65rem] font-medium text-[#3D4852]/60 uppercase'
+                  'w-7 flex-1 flex items-center justify-center',
+                  'text-[0.6rem] font-medium text-[#3D4852]/60 uppercase'
                 ),
-                row: 'flex w-full mt-0',
+                row: 'flex h-7',
                 cell: cn(
-                  'relative p-0 text-center text-xs',
-                  'focus-within:relative focus-within:z-20',
-                  '[&:has([aria-selected])]:bg-[#3B82F6]/10 [&:has([aria-selected])]:rounded-md',
-                  '[&:has([aria-selected].day-outside)]:bg-[#3B82F6]/5',
-                  '[&:has([aria-selected].day-range-end)]:rounded-r-md',
-                  '[&:has([aria-selected].day-range-start)]:rounded-l-md'
+                  'flex-1 h-7 p-0 text-center relative',
+                  '[&:has([aria-selected])]:bg-[#3B82F6]/10'
                 ),
                 day: cn(
-                  'h-7 w-7 p-0 font-medium',
-                  'flex items-center justify-center',
-                  'rounded-md bg-transparent',
-                  'transition-all duration-150',
-                  'hover:bg-[#3B82F6]/10 hover:text-[#3B82F6]',
+                  'h-6 w-6 m-auto p-0 font-medium',
+                  'rounded bg-transparent',
+                  'hover:bg-[#3B82F6]/10',
                   'focus:outline-none focus:ring-1 focus:ring-[#3B82F6]/40',
-                  'aria-selected:opacity-100'
+                  'aria-selected:bg-[#3B82F6] aria-selected:text-white'
                 ),
-                day_range_start: 'day-range-start',
-                day_range_end: 'day-range-end',
-                day_selected: cn(
-                  'bg-gradient-to-br from-[#3B82F6] to-[#60A5FA] text-white',
-                  '[box-shadow:2px_2px_4px_rgba(59,130,246,0.25),-2px_-2px_4px_rgba(96,165,250,0.15)]',
-                  'hover:bg-gradient-to-br hover:from-[#3B82F6] hover:to-[#60A5FA]',
-                  'focus:bg-gradient-to-br focus:from-[#3B82F6] focus:to-[#60A5FA]'
-                ),
-                day_today: cn(
-                  'relative font-bold text-[#3B82F6]',
-                  'before:absolute before:bottom-0.5 before:left-1/2 before:-translate-x-1/2',
-                  'before:h-0.5 before:w-0.5 before:rounded-full before:bg-[#3B82F6]'
-                ),
-                day_outside: cn(
-                  'day-outside text-[#3D4852]/30',
-                  'aria-selected:bg-[#3B82F6]/5 aria-selected:text-[#3D4852]/40'
-                ),
-                day_disabled: 'text-[#3D4852]/25 cursor-not-allowed hover:bg-transparent',
-                day_range_middle: 'aria-selected:bg-[#3B82F6]/10 aria-selected:text-[#3D4852]',
-                day_hidden: 'invisible',
+                day_range_start: 'rounded-l',
+                day_range_end: 'rounded-r',
+                day_selected: 'bg-[#3B82F6] text-white hover:bg-[#3B82F6]',
+                day_today: 'font-bold text-[#3B82F6]',
+                day_outside: 'text-[#3D4852]/30',
+                day_disabled: 'text-[#3D4852]/25 cursor-not-allowed',
+                day_range_middle: 'bg-[#3B82F6]/5',
               }}
             />
           </div>
 
           {value && (
-            <div className="mt-1.5 flex items-center justify-between">
-              <span className="text-[0.65rem] text-[#3D4852]/70">{formattedDate}</span>
+            <div className="mt-1 flex items-center justify-between text-[0.65rem]">
+              <span className="text-[#3D4852]/70">{formattedDate}</span>
               <Button
                 type="button"
                 variant="ghost"
@@ -259,9 +265,8 @@ function DatePicker({
                   onChange(null);
                   setOpen(false);
                 }}
-                className="h-6 px-2 text-[0.65rem] text-red-500 hover:bg-red-50"
+                className="h-5 px-1.5 text-red-500 hover:bg-red-50"
               >
-                <X className="mr-0.5 h-2.5 w-2.5" />
                 Clear
               </Button>
             </div>
