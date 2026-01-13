@@ -5,7 +5,7 @@ import { Turnstile, type TurnstileInstance } from '@marsidev/react-turnstile';
 import { cn } from '@/src/lib/utils';
 import { NeuCard, NeuInput, NeuButton } from '@/src/features/shared/components';
 import { api } from '@/src/lib/api';
-import { Calendar, Clock, CheckCircle, AlertCircle } from 'lucide-react';
+import { Clock, CheckCircle, AlertCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface BookingSlot {
   id: string;
@@ -29,7 +29,8 @@ interface BookingFormData {
 const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '';
 
 export function BookingCalendar() {
-  const [slots, setSlots] = useState<FlatSlot[]>([]);
+  const [allSlots, setAllSlots] = useState<Record<string, FlatSlot[]>>({});
+  const [selectedDate, setSelectedDate] = useState<string>('');
   const [selectedSlot, setSelectedSlot] = useState<FlatSlot | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -49,13 +50,22 @@ export function BookingCalendar() {
     const fetchSlots = async () => {
       try {
         const data = await api.bookings.getAvailable();
-        const flatSlots: FlatSlot[] = [];
-        Object.entries(data || {}).forEach(([dateKey, dateSlots]) => {
-          dateSlots.forEach((slot) => {
-            flatSlots.push({ ...slot, dateKey });
-          });
+
+        const convertedSlots: Record<string, FlatSlot[]> = {};
+        Object.entries(data || {}).forEach(([date, dateSlots]) => {
+          const flatSlots = dateSlots.map((slot: any) => ({
+            ...slot,
+            dateKey: date,
+          }));
+          convertedSlots[date] = flatSlots;
         });
-        setSlots(flatSlots);
+
+        setAllSlots(convertedSlots);
+
+        const sortedDates = Object.keys(convertedSlots).sort();
+        if (sortedDates.length > 0 && !selectedDate) {
+          setSelectedDate(sortedDates[0]);
+        }
       } catch (error) {
         console.error('Failed to fetch slots:', error);
       } finally {
@@ -64,11 +74,27 @@ export function BookingCalendar() {
     };
 
     fetchSlots();
-  }, []);
+  }, [selectedDate]);
+
+  const sortedDates = Object.keys(allSlots).sort();
+  const currentDateIndex = sortedDates.indexOf(selectedDate);
+  const currentSlots = selectedDate ? allSlots[selectedDate] || [] : [];
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handlePreviousDate = () => {
+    if (currentDateIndex > 0) {
+      setSelectedDate(sortedDates[currentDateIndex - 1]);
+    }
+  };
+
+  const handleNextDate = () => {
+    if (currentDateIndex < sortedDates.length - 1) {
+      setSelectedDate(sortedDates[currentDateIndex + 1]);
+    }
   };
 
   const handleTurnstileSuccess = (token: string) => {
@@ -91,7 +117,7 @@ export function BookingCalendar() {
 
     if (TURNSTILE_SITE_KEY && !turnstileToken) {
       setStatus('error');
-      setErrorMessage('Please complete the verification');
+      setErrorMessage('Please complete verification');
       return;
     }
 
@@ -129,10 +155,10 @@ export function BookingCalendar() {
     );
   }
 
-  if (slots.length === 0) {
+  if (sortedDates.length === 0) {
     return (
       <NeuCard className="text-center py-12">
-        <Calendar className="w-12 h-12 mx-auto text-[#6B7280] mb-4" />
+        <Clock className="w-12 h-12 mx-auto text-[#6B7280] mb-4" />
         <p className="text-[#6B7280]">No available booking slots at the moment.</p>
         <p className="text-sm text-[#6B7280] mt-2">
           Please use the contact form to reach out instead.
@@ -145,10 +171,33 @@ export function BookingCalendar() {
     <div className="space-y-6">
       <div>
         <h3 className="text-lg font-semibold text-[#3D4852] mb-4">Available Slots</h3>
+
+        <div className="flex items-center justify-center gap-4 mb-4">
+          <button
+            onClick={handlePreviousDate}
+            disabled={currentDateIndex <= 0}
+            className="p-2 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-[#6B7280] hover:text-[#3B82F6] hover:shadow-[4px_4px_8px_rgba(163,177,198,0.6),-4px_-4px_8px_rgba(255,255,255,0.5)]"
+          >
+            <ChevronLeft size={20} />
+          </button>
+
+          <div className="text-xl font-semibold text-[#3D4852] min-w-[200px] text-center">
+            {selectedDate}
+          </div>
+
+          <button
+            onClick={handleNextDate}
+            disabled={currentDateIndex >= sortedDates.length - 1}
+            className="p-2 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-[#6B7280] hover:text-[#3B82F6] hover:shadow-[4px_4px_8px_rgba(163,177,198,0.6),-4px_-4px_8px_rgba(255,255,255,0.5)]"
+          >
+            <ChevronRight size={20} />
+          </button>
+        </div>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {slots.slice(0, 6).map((slot, index) => (
+          {currentSlots.slice(0, 6).map((slot) => (
             <button
-              key={index}
+              key={slot.id}
               onClick={() => setSelectedSlot(slot)}
               className={cn(
                 'p-4 rounded-xl text-left transition-all duration-200',
@@ -158,15 +207,10 @@ export function BookingCalendar() {
               )}
             >
               <div className="flex items-center gap-2 mb-1">
-                <Calendar size={16} />
-                <span className="font-medium">{slot.date}</span>
+                <Clock size={16} />
+                <span className="font-medium">{slot.startTime}</span>
               </div>
-              <div className="flex items-center gap-2 text-sm text-[#6B7280]">
-                <Clock size={14} />
-                <span>
-                  {slot.startTime} ({slot.duration} min)
-                </span>
-              </div>
+              <div className="text-sm text-[#6B7280]">{slot.duration} min</div>
             </button>
           ))}
         </div>
