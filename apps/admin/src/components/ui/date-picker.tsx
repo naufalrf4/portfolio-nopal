@@ -154,15 +154,22 @@ function DatePicker({
         className={cn(
           'w-auto p-0',
           'rounded-2xl bg-[#E0E5EC]',
-          '[box-shadow:12px_12px_24px_rgba(163,177,198,0.7),-12px_-12px_24px_rgba(255,255,255,0.6)]'
+          '[box-shadow:12px_12px_24px_rgba(163,177,198,0.7),-12px_-12px_24px_rgba(255,255,255,0.6)]',
+          'max-h-[90vh] overflow-auto',
+          'md:rounded-2xl',
+          'data-[state=open]:animate-in data-[state=closed]:animate-out',
+          'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
+          'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
+          'data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2',
+          'z-[100]'
         )}
         align="start"
         sideOffset={8}
       >
-        <div className="p-4">
+        <div className="p-3 md:p-4">
           <div
             className={cn(
-              'rounded-xl bg-[#E0E5EC] p-3',
+              'rounded-xl bg-[#E0E5EC] p-2 md:p-3',
               '[box-shadow:inset_4px_4px_8px_rgba(163,177,198,0.5),inset_-4px_-4px_8px_rgba(255,255,255,0.4)]'
             )}
           >
@@ -177,17 +184,17 @@ function DatePicker({
               toYear={maxDate?.getFullYear() ?? new Date().getFullYear() + 10}
               initialFocus
               classNames={{
-                months: 'flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0',
-                month: 'space-y-3',
+                months: 'flex flex-col sm:flex-row space-y-2 sm:space-x-4 sm:space-y-0',
+                month: 'space-y-2 md:space-y-3',
                 caption: 'flex justify-center pt-1 relative items-center gap-1',
-                caption_label: 'text-sm font-semibold text-[#3D4852]',
+                caption_label: 'text-xs md:text-sm font-semibold text-[#3D4852]',
                 nav: 'space-x-1 flex items-center',
                 nav_button: cn(
-                  'h-8 w-8 flex items-center justify-center',
+                  'h-7 w-7 md:h-8 md:w-8 flex items-center justify-center',
                   'rounded-lg bg-[#E0E5EC]',
-                  '[box-shadow:3px_3px_6px_rgba(163,177,198,0.5),-3px_-3px_6px_rgba(255,255,255,0.4)]',
+                  '[box-shadow:2px_2px_4px_rgba(163,177,198,0.5),-2px_-2px_4px_rgba(255,255,255,0.4)]',
                   'transition-all duration-200',
-                  'hover:[box-shadow:4px_4px_8px_rgba(163,177,198,0.55),-4px_-4px_8px_rgba(255,255,255,0.45)]',
+                  'hover:[box-shadow:3px_3px_6px_rgba(163,177,198,0.55),-3px_-3px_6px_rgba(255,255,255,0.45)]',
                   'hover:translate-y-[-1px]',
                   'active:[box-shadow:inset_2px_2px_4px_rgba(163,177,198,0.5),inset_-2px_-2px_4px_rgba(255,255,255,0.4)]',
                   'active:translate-y-0',
@@ -198,20 +205,20 @@ function DatePicker({
                 table: 'w-full border-collapse',
                 head_row: 'flex',
                 head_cell: cn(
-                  'w-10 h-8 flex items-center justify-center',
-                  'text-[0.75rem] font-medium text-[#3D4852]/60 uppercase'
+                  'w-8 h-7 md:w-10 md:h-8 flex items-center justify-center',
+                  'text-[0.65rem] md:text-[0.75rem] font-medium text-[#3D4852]/60 uppercase'
                 ),
-                row: 'flex w-full mt-1',
+                row: 'flex w-full mt-0.5 md:mt-1',
                 cell: cn(
-                  'relative p-0.5 text-center text-sm',
+                  'relative p-0.25 md:p-0.5 text-center text-xs md:text-sm',
                   'focus-within:relative focus-within:z-20',
-                  '[&:has([aria-selected])]:bg-[#3B82F6]/10 [&:has([aria-selected])]:rounded-lg',
+                  '[&:has([aria-selected])]:bg-[#3B82F6]/10 [&:has([aria-selected])]:rounded-md',
                   '[&:has([aria-selected].day-outside)]:bg-[#3B82F6]/5',
-                  '[&:has([aria-selected].day-range-end)]:rounded-r-lg',
-                  '[&:has([aria-selected].day-range-start)]:rounded-l-lg'
+                  '[&:has([aria-selected].day-range-end)]:rounded-r-md',
+                  '[&:has([aria-selected].day-range-start)]:rounded-l-md'
                 ),
                 day: cn(
-                  'h-10 w-10 p-0 font-medium',
+                  'h-8 w-8 md:h-10 md:w-10 p-0 font-medium',
                   'flex items-center justify-center',
                   'rounded-lg bg-transparent',
                   'transition-all duration-200',
@@ -223,15 +230,15 @@ function DatePicker({
                 day_range_end: 'day-range-end',
                 day_selected: cn(
                   'bg-gradient-to-br from-[#3B82F6] to-[#60A5FA] text-white',
-                  '[box-shadow:4px_4px_8px_rgba(59,130,246,0.3),-4px_-4px_8px_rgba(96,165,250,0.2)]',
+                  '[box-shadow:3px_3px_6px_rgba(59,130,246,0.3),-3px_-3px_6px_rgba(96,165,250,0.2)]',
                   'hover:bg-gradient-to-br hover:from-[#3B82F6] hover:to-[#60A5FA] hover:text-white',
                   'focus:bg-gradient-to-br focus:from-[#3B82F6] focus:to-[#60A5FA] focus:text-white',
                   'font-semibold'
                 ),
                 day_today: cn(
                   'relative font-bold text-[#3B82F6]',
-                  'before:absolute before:bottom-1 before:left-1/2 before:-translate-x-1/2',
-                  'before:h-1 before:w-1 before:rounded-full before:bg-[#3B82F6]'
+                  'before:absolute before:bottom-0.5 before:left-1/2 before:-translate-x-1/2',
+                  'before:h-0.5 before:w-0.5 md:before:h-1 md:before:w-1 before:rounded-full before:bg-[#3B82F6]'
                 ),
                 day_outside: cn(
                   'day-outside text-[#3D4852]/30',
@@ -246,8 +253,8 @@ function DatePicker({
           </div>
 
           {value && (
-            <div className="mt-3 flex items-center justify-between">
-              <span className="text-xs font-medium text-[#3D4852]/70">
+            <div className="mt-2 md:mt-3 flex items-center justify-between">
+              <span className="text-xs text-[#3D4852]/70 hidden md:block">
                 Selected: {formattedDate}
               </span>
               <Button
@@ -259,7 +266,7 @@ function DatePicker({
                   onChange(null);
                   setOpen(false);
                 }}
-                className="h-8 px-3 text-xs text-red-500 hover:bg-red-50 hover:text-red-600"
+                className="h-7 md:h-8 px-2 md:px-3 text-xs text-red-500 hover:bg-red-50 hover:text-red-600"
               >
                 <X className="mr-1 h-3 w-3" />
                 Clear
