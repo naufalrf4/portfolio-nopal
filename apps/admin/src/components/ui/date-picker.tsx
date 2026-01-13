@@ -68,10 +68,16 @@ function DatePicker({
           <CalendarIcon className="w-4 h-4 mr-2 text-[#3B82F6]" />
           {value ? formattedDate : placeholder}
           {value && (
-            <X
-              className="w-3.5 h-3.5 ml-auto text-[#6B7280] hover:text-red-500 transition-colors"
+            <span
+              role="button"
+              tabIndex={0}
+              className="w-4 h-4 ml-auto text-[#6B7280] hover:text-red-500 cursor-pointer transition-colors"
               onClick={handleClear}
-            />
+              onKeyDown={(e) => e.key === 'Enter' && handleClear(e as any)}
+              aria-label="Clear date"
+            >
+              <X className="w-full h-full" />
+            </span>
           )}
         </button>
       </PopoverTrigger>
