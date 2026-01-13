@@ -5,7 +5,6 @@ import {
   FileText,
   Mail,
   MoreHorizontal,
-  FlaskConical,
   MessageCircleQuestion,
   Link2,
   Bot,
@@ -21,7 +20,6 @@ export const NAV_ITEMS = [
 
 export const OTHER_LINKS = [
   { href: '/ai-chatbot', label: 'AI Assistant', icon: Bot, external: false },
-  { href: 'https://labs.naufalrf.tech', label: 'Labs', icon: FlaskConical, external: true },
   { href: 'https://ngl.naufalrf.tech', label: 'NGL', icon: MessageCircleQuestion, external: true },
   { href: 'https://links.naufalrf.tech', label: 'Links', icon: Link2, external: true },
 ] as const;

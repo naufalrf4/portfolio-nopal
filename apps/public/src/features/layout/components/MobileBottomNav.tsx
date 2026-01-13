@@ -4,11 +4,21 @@ import { cn } from '@/src/lib/utils';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
-import { Home, FolderKanban, FileText, Mail, MoreHorizontal, X, ExternalLink } from 'lucide-react';
+import {
+  Home,
+  User,
+  FolderKanban,
+  FileText,
+  Mail,
+  MoreHorizontal,
+  X,
+  ExternalLink,
+} from 'lucide-react';
 import { OTHER_LINKS } from '@/src/lib/constants';
 
 const navItems = [
   { href: '/', label: 'Home', icon: Home },
+  { href: '/about', label: 'About', icon: User },
   { href: '/projects', label: 'Projects', icon: FolderKanban },
   { href: '/blogs', label: 'Blogs', icon: FileText },
   { href: '/contact', label: 'Contact', icon: Mail },
@@ -25,7 +35,7 @@ export function MobileBottomNav() {
           <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" />
 
           <div
-            className="absolute bottom-24 right-4 w-56 py-3 rounded-2xl bg-[#E0E5EC] shadow-[9px_9px_16px_rgba(163,177,198,0.6),-9px_-9px_16px_rgba(255,255,255,0.5)]"
+            className="absolute bottom-24 right-4 w-56 py-3 rounded-2xl bg-[#E0E5EC] shadow-[9px_9px_16px_rgba(163,177,198,0.6),-9px_-9px_16px_rgba(255,255,255,0.5)] animate-in slide-in-from-bottom-4 fade-in duration-200"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between px-4 pb-2 mb-2 border-b border-[#d1d5db]">

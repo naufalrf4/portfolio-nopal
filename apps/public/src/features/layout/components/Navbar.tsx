@@ -17,9 +17,9 @@ export function Navbar() {
         <div className="flex h-16 items-center justify-between">
           <Link
             href="/"
-            className="text-xl font-bold text-[#3D4852] hover:text-[#3B82F6] transition-colors"
+            className="text-xl font-bold text-[#3B82F6] hover:text-[#2563EB] transition-colors"
           >
-            NaufalRF
+            Nau.
           </Link>
 
           <div className="hidden md:flex items-center gap-1">
@@ -44,6 +44,7 @@ export function Navbar() {
               onMouseLeave={() => setOtherDropdownOpen(false)}
             >
               <button
+                onClick={() => setOtherDropdownOpen(!otherDropdownOpen)}
                 className={cn(
                   'flex items-center gap-1 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200',
                   otherDropdownOpen
@@ -62,21 +63,37 @@ export function Navbar() {
               </button>
 
               {otherDropdownOpen && (
-                <div className="absolute top-full right-0 mt-2 w-48 py-2 rounded-xl bg-[#E0E5EC] shadow-[9px_9px_16px_rgba(163,177,198,0.6),-9px_-9px_16px_rgba(255,255,255,0.5)]">
+                <div className="absolute top-full right-0 mt-2 w-48 py-2 rounded-xl bg-[#E0E5EC] shadow-[9px_9px_16px_rgba(163,177,198,0.6),-9px_-9px_16px_rgba(255,255,255,0.5)] animate-in slide-in-from-top-2 fade-in duration-150">
                   {OTHER_LINKS.map((link) => {
                     const Icon = link.icon;
+                    const isExternal = link.external;
+
+                    if (isExternal) {
+                      return (
+                        <a
+                          key={link.href}
+                          href={link.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-3 px-4 py-3 text-sm text-[#3D4852] hover:text-[#3B82F6] hover:bg-[#E0E5EC]/50 transition-colors"
+                        >
+                          <Icon size={18} />
+                          <span className="flex-1">{link.label}</span>
+                          <ExternalLink size={14} className="text-[#6B7280]" />
+                        </a>
+                      );
+                    }
+
                     return (
-                      <a
+                      <Link
                         key={link.href}
                         href={link.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
                         className="flex items-center gap-3 px-4 py-3 text-sm text-[#3D4852] hover:text-[#3B82F6] hover:bg-[#E0E5EC]/50 transition-colors"
+                        onClick={() => setOtherDropdownOpen(false)}
                       >
                         <Icon size={18} />
                         <span className="flex-1">{link.label}</span>
-                        <ExternalLink size={14} className="text-[#6B7280]" />
-                      </a>
+                      </Link>
                     );
                   })}
                 </div>

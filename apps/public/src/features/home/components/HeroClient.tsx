@@ -130,17 +130,25 @@ export function HeroClient({ about }: HeroClientProps) {
           </div>
         )}
 
-        <div className="flex flex-wrap items-center justify-center gap-4">
+        <div className="flex flex-row items-center justify-center gap-2 md:gap-4">
           <Link href="/about">
-            <NeuButton variant="accent" size="lg">
+            <NeuButton
+              variant="accent"
+              size="sm"
+              className="text-sm px-3 py-2 md:px-6 md:py-3 md:text-base"
+            >
               Learn More
-              <ArrowRight className="ml-2" size={20} />
+              <ArrowRight className="ml-1 md:ml-2" size={16} />
             </NeuButton>
           </Link>
           {about.resumeUrl && (
             <a href={about.resumeUrl} target="_blank" rel="noopener noreferrer">
-              <NeuButton variant="default" size="lg">
-                <Download className="mr-2" size={20} />
+              <NeuButton
+                variant="default"
+                size="sm"
+                className="text-sm px-3 py-2 md:px-6 md:py-3 md:text-base"
+              >
+                <Download className="mr-1 md:mr-2" size={16} />
                 Download CV
               </NeuButton>
             </a>
