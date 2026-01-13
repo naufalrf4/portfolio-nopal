@@ -1,13 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Eye, FileText, Image as ImageIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { FileUpload } from '@/components/upload/FileUpload';
 import { useAbout } from '../hooks/useAbout';
+import { cn } from '@/lib/utils';
 
 export function PersonalInfoTab() {
   const { data, saving, updateAbout } = useAbout();
@@ -19,7 +20,19 @@ export function PersonalInfoTab() {
   const [location, setLocation] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('');
   const [resumeUrl, setResumeUrl] = useState('');
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [previewType, setPreviewType] = useState<'image' | 'pdf' | null>(null);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
+  const handlePreview = (url: string, type: 'image' | 'pdf') => {
+    setPreviewUrl(url);
+    setPreviewType(type);
+  };
+
+  const closePreview = () => {
+    setPreviewUrl(null);
+    setPreviewType(null);
+  };
 
   useEffect(() => {
     if (data) {
@@ -139,31 +152,65 @@ export function PersonalInfoTab() {
           </div>
 
           <div className="space-y-2 md:col-span-2">
-            <FileUpload
-              value={avatarUrl || null}
-              onChange={(url) => {
-                setAvatarUrl(url ?? '');
-                setHasUnsavedChanges(true);
-              }}
-              label="Avatar"
-              folder="about"
-              accept="image/jpeg,image/png,image/webp"
-              helperText="Upload your profile photo (JPG, PNG, WebP). Recommended: 400x400px"
-            />
+            <Label>Avatar</Label>
+            <div className="flex items-center gap-3">
+              <div className="flex-1">
+                <FileUpload
+                  value={avatarUrl || null}
+                  onChange={(url) => {
+                    setAvatarUrl(url ?? '');
+                    setHasUnsavedChanges(true);
+                  }}
+                  label=""
+                  folder="about"
+                  accept="image/jpeg,image/png,image/webp"
+                  helperText=""
+                />
+              </div>
+              {avatarUrl && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handlePreview(avatarUrl, 'image')}
+                  className="shrink-0"
+                >
+                  <Eye className="h-4 w-4 mr-1" />
+                  Preview
+                </Button>
+              )}
+            </div>
           </div>
 
           <div className="space-y-2 md:col-span-2">
-            <FileUpload
-              value={resumeUrl || null}
-              onChange={(url) => {
-                setResumeUrl(url ?? '');
-                setHasUnsavedChanges(true);
-              }}
-              label="Resume/CV"
-              folder="resumes"
-              accept="application/pdf"
-              helperText="Upload your resume in PDF format"
-            />
+            <Label>Resume/CV</Label>
+            <div className="flex items-center gap-3">
+              <div className="flex-1">
+                <FileUpload
+                  value={resumeUrl || null}
+                  onChange={(url) => {
+                    setResumeUrl(url ?? '');
+                    setHasUnsavedChanges(true);
+                  }}
+                  label=""
+                  folder="resumes"
+                  accept="application/pdf"
+                  helperText=""
+                />
+              </div>
+              {resumeUrl && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handlePreview(resumeUrl, 'pdf')}
+                  className="shrink-0"
+                >
+                  <Eye className="h-4 w-4 mr-1" />
+                  Preview
+                </Button>
+              )}
+            </div>
           </div>
         </div>
 
@@ -181,6 +228,43 @@ export function PersonalInfoTab() {
           </Button>
         </div>
       </CardContent>
+
+      {previewUrl && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+          onClick={closePreview}
+        >
+          <div
+            className="bg-[#E0E5EC] rounded-2xl shadow-[12px_12px_24px_rgba(163,177,198,0.7),-12px_-12px_24px_rgba(255,255,255,0.6)] max-w-4xl w-full max-h-[90vh] overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between p-4 border-b border-[#d1d5db]/50">
+              <div className="flex items-center gap-2">
+                {previewType === 'image' ? (
+                  <ImageIcon className="w-5 h-5" />
+                ) : (
+                  <FileText className="w-5 h-5" />
+                )}
+                <span className="font-medium">Preview</span>
+              </div>
+              <Button variant="ghost" size="sm" onClick={closePreview}>
+                Close
+              </Button>
+            </div>
+            <div className="p-4 overflow-auto max-h-[calc(90vh-80px)]">
+              {previewType === 'image' ? (
+                <img src={previewUrl} alt="Preview" className="w-full h-auto rounded-lg" />
+              ) : (
+                <iframe
+                  src={previewUrl}
+                  className="w-full h-[70vh] rounded-lg"
+                  title="PDF Preview"
+                />
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </Card>
   );
 }
