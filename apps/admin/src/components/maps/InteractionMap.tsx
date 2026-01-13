@@ -1,7 +1,11 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import mapboxgl from 'mapbox-gl';
+import 'mapbox-gl/dist/mapbox-gl.css';
 import { cn } from '@/lib/utils';
+
+mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN || '';
 
 interface InteractionMapProps {
   locations: Array<{
@@ -20,81 +24,81 @@ interface InteractionMapProps {
 export function InteractionMap({
   locations,
   className,
-  center = [-6.2088, 106.8456], // Jakarta default
+  center = [106.8456, -6.2088],
   zoom = 4,
 }: InteractionMapProps) {
-  const mapRef = useRef<HTMLDivElement>(null);
-  const mapInstanceRef = useRef<any>(null);
+  const mapContainerRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<mapboxgl.Map | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (typeof window === 'undefined' || !mapRef.current) return;
+    if (!mapContainerRef.current || typeof window === 'undefined') return;
 
-    const initMap = async () => {
-      if (mapInstanceRef.current) return;
+    if (!mapboxgl.accessToken || mapboxgl.accessToken === '') {
+      setError('Mapbox token not configured');
+      return;
+    }
 
-      const L = (await import('leaflet')).default;
-      await import('leaflet/dist/leaflet.css');
+    const map = new mapboxgl.Map({
+      container: mapContainerRef.current,
+      style: 'mapbox://styles/mapbox/light-v11',
+      center: center,
+      zoom: zoom,
+    });
 
-      const map = L.map(mapRef.current!).setView(center, zoom);
+    map.addControl(new mapboxgl.NavigationControl(), 'top-right');
+    mapRef.current = map;
 
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors',
-      }).addTo(map);
+    map.on('load', () => {
+      const bounds = new mapboxgl.LngLatBounds();
 
-      mapInstanceRef.current = map;
+      locations.forEach((loc) => {
+        if (loc.lat && loc.lng) {
+          const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(`
+            <div class="p-2 max-w-[200px]">
+              ${loc.label ? `<strong class="block text-sm mb-1">${loc.label}</strong>` : ''}
+              ${loc.message ? `<p class="text-xs text-gray-600">${loc.message}</p>` : ''}
+              ${loc.date ? `<p class="text-xs text-gray-400 mt-1">${loc.date}</p>` : ''}
+            </div>
+          `);
 
-      if (locations.length > 0) {
-        const bounds = L.latLngBounds([]);
-        locations.forEach((loc) => {
-          if (loc.lat && loc.lng) {
-            const marker = L.circleMarker([loc.lat, loc.lng], {
-              radius: 8,
-              fillColor: '#3B82F6',
-              color: '#fff',
-              weight: 2,
-              opacity: 1,
-              fillOpacity: 0.8,
-            }).addTo(map);
+          new mapboxgl.Marker({ color: '#3B82F6' })
+            .setLngLat([loc.lng, loc.lat])
+            .setPopup(popup)
+            .addTo(map);
 
-            if (loc.label || loc.message) {
-              marker.bindPopup(`
-                <div class="p-2">
-                  ${loc.label ? `<strong class="block mb-1">${loc.label}</strong>` : ''}
-                  ${loc.message ? `<p class="text-sm">${loc.message}</p>` : ''}
-                  ${loc.date ? `<p class="text-xs text-gray-500 mt-1">${loc.date}</p>` : ''}
-                </div>
-              `);
-            }
-
-            bounds.extend([loc.lat, loc.lng]);
-          }
-        });
-
-        if (bounds.isValid()) {
-          map.fitBounds(bounds, { padding: [50, 50] });
+          bounds.extend([loc.lng, loc.lat]);
         }
-      }
-    };
+      });
 
-    initMap();
+      if (!bounds.isEmpty()) {
+        map.fitBounds(bounds, { padding: 50, maxZoom: 12 });
+      }
+    });
 
     return () => {
-      if (mapInstanceRef.current) {
-        mapInstanceRef.current.remove();
-        mapInstanceRef.current = null;
-      }
+      map.remove();
+      mapRef.current = null;
     };
   }, [locations, center, zoom]);
 
+  if (error) {
+    return (
+      <div
+        className={cn(
+          'w-full h-64 rounded-xl bg-gray-100 flex items-center justify-center',
+          className
+        )}
+      >
+        <p className="text-gray-500 text-sm">{error}</p>
+      </div>
+    );
+  }
+
   return (
     <div
-      ref={mapRef}
-      className={cn(
-        'w-full h-64 rounded-xl bg-[#E0E5EC]',
-        '[box-shadow:inset_4px_4px_8px_rgba(163,177,198,0.5),inset_-4px_-4px_8px_rgba(255,255,255,0.4)]',
-        'overflow-hidden',
-        className
-      )}
+      ref={mapContainerRef}
+      className={cn('w-full h-64 rounded-xl overflow-hidden', className)}
     />
   );
 }
