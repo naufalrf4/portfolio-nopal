@@ -29,6 +29,7 @@ interface PublicAboutData {
   location: string | null;
   avatarUrl: string | null;
   resumeUrl: string | null;
+  availabilityStatus: 'available' | 'busy' | 'unavailable' | null;
   skills: Skill[];
   experience: Experience[];
   socialLinks: SocialLink[];
@@ -56,6 +57,7 @@ export async function GET() {
       return notFoundResponse('About me');
     }
 
+    const availability = aboutMe.availabilityStatus;
     const publicData: PublicAboutData = {
       fullName: aboutMe.fullName,
       tagline: aboutMe.tagline,
@@ -65,6 +67,10 @@ export async function GET() {
       location: aboutMe.location,
       avatarUrl: aboutMe.avatarUrl,
       resumeUrl: aboutMe.resumeUrl,
+      availabilityStatus:
+        availability === 'available' || availability === 'busy' || availability === 'unavailable'
+          ? availability
+          : null,
       skills: parseJsonField<Skill[]>(aboutMe.skills, []),
       experience: parseJsonField<Experience[]>(aboutMe.experience, []),
       socialLinks: parseJsonField<SocialLink[]>(aboutMe.socialLinks, []),

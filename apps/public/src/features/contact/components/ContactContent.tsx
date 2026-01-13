@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { cn } from '@/src/lib/utils';
 import { NeuCard, PageHeader } from '@/src/features/shared/components';
 import { ContactForm } from './ContactForm';
@@ -8,40 +8,26 @@ import { BookingCalendar } from './BookingCalendar';
 import { ContactInfo } from './ContactInfo';
 import { Mail, Calendar, ChevronDown, HelpCircle, MessageSquare } from 'lucide-react';
 import { FAQS } from '@/src/lib/constants';
-import { api } from '@/src/lib/api';
-import type { AboutData as ApiAboutData } from '@/src/lib/api/types';
+
+const STATIC_CONTACT = {
+  location: 'Jakarta, Indonesia',
+  email: 'hello@naufalrf.tech',
+  availabilityStatus: 'available' as const,
+  socialLinks: [
+    { platform: 'github', url: 'https://github.com/naufalrf' },
+    { platform: 'linkedin', url: 'https://linkedin.com/in/naufalrf' },
+    { platform: 'twitter', url: 'https://twitter.com/naufalrf' },
+  ],
+};
 
 type Tab = 'form' | 'booking';
 export function ContactContent() {
   const [activeTab, setActiveTab] = useState<Tab>('form');
   const [openFaqId, setOpenFaqId] = useState<string | null>(null);
-  const [aboutData, setAboutData] = useState<ApiAboutData | null>(null);
-  const [aboutDataError, setAboutDataError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchAboutData = async () => {
-      try {
-        setAboutDataError(null);
-        const data = await api.about.get();
-        setAboutData(data);
-      } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : 'Failed to load contact information';
-        setAboutDataError(errorMessage);
-      }
-    };
-    fetchAboutData();
-  }, []);
 
   const toggleFaq = (id: string) => {
     setOpenFaqId(openFaqId === id ? null : id);
   };
-
-  const socialLinks = aboutData?.socialLinks
-    ? Object.entries(aboutData.socialLinks)
-        .filter(([_, url]) => url)
-        .map(([platform, url]) => ({ platform, url: url! }))
-    : [];
 
   return (
     <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
@@ -54,17 +40,11 @@ export function ContactContent() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 mb-16">
           <div className="lg:col-span-5">
             <ContactInfo
-              location={aboutData?.location}
-              email={aboutData?.email}
-              socialLinks={socialLinks}
-              availabilityStatus={
-                aboutData?.availabilityStatus === 'available' ||
-                aboutData?.availabilityStatus === 'busy' ||
-                aboutData?.availabilityStatus === 'unavailable'
-                  ? aboutData.availabilityStatus
-                  : undefined
-              }
-              error={aboutDataError}
+              location={STATIC_CONTACT.location}
+              email={STATIC_CONTACT.email}
+              socialLinks={STATIC_CONTACT.socialLinks}
+              availabilityStatus={STATIC_CONTACT.availabilityStatus}
+              error={null}
             />
           </div>
 

@@ -25,6 +25,7 @@ export async function GET(req: NextRequest) {
           description: true,
           imageUrl: true,
           source: true,
+          category: true,
           publishedAt: true,
         },
         orderBy: [{ publishedAt: 'desc' }, { createdAt: 'desc' }],
