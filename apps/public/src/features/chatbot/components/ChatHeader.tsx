@@ -1,19 +1,18 @@
 'use client';
 
 import { cn } from '@/src/lib/utils';
-import { X, Trash2, Minimize2, Maximize2, Sparkles } from 'lucide-react';
+import { Minimize2, Maximize2, Sparkles, ExternalLink } from 'lucide-react';
+import Link from 'next/link';
 
 interface ChatHeaderProps {
-  onClose: () => void;
-  onClear: () => void;
+  onClose?: () => void;
+  onClear?: () => void;
   onToggleSize?: () => void;
   isFullPage?: boolean;
   isExpanded?: boolean;
 }
 
 export function ChatHeader({
-  onClose,
-  onClear,
   onToggleSize,
   isFullPage = false,
   isExpanded = false,
@@ -39,18 +38,20 @@ export function ChatHeader({
         </div>
       </div>
       <div className="flex items-center gap-2">
-        <button
-          onClick={onClear}
-          className={cn(
-            'p-2 rounded-lg',
-            'hover:bg-white/20 transition-colors',
-            'focus:outline-none focus:ring-2 focus:ring-white/50'
-          )}
-          aria-label="Clear chat history"
-          title="Clear chat"
-        >
-          <Trash2 size={18} />
-        </button>
+        {!isFullPage && (
+          <Link
+            href="/ai-chatbot"
+            className={cn(
+              'p-2 rounded-lg',
+              'hover:bg-white/20 transition-colors',
+              'focus:outline-none focus:ring-2 focus:ring-white/50'
+            )}
+            aria-label="Open full chat page"
+            title="Open full page"
+          >
+            <ExternalLink size={18} />
+          </Link>
+        )}
         {onToggleSize && !isFullPage && (
           <button
             onClick={onToggleSize}
@@ -63,19 +64,6 @@ export function ChatHeader({
             title={isExpanded ? 'Minimize' : 'Maximize'}
           >
             {isExpanded ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
-          </button>
-        )}
-        {!isFullPage && (
-          <button
-            onClick={onClose}
-            className={cn(
-              'p-2 rounded-lg',
-              'hover:bg-white/20 transition-colors',
-              'focus:outline-none focus:ring-2 focus:ring-white/50'
-            )}
-            aria-label="Close chat"
-          >
-            <X size={18} />
           </button>
         )}
       </div>

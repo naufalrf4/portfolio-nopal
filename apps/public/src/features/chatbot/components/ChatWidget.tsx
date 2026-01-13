@@ -48,7 +48,7 @@ export function ChatWidget() {
       <button
         onClick={handleToggle}
         className={cn(
-          'fixed bottom-20 md:bottom-6 right-6 z-50',
+          'fixed bottom-20 md:bottom-6 right-6 z-40',
           'w-14 h-14 rounded-full',
           'bg-[#3B82F6] text-white',
           'shadow-[6px_6px_12px_rgba(59,130,246,0.4),-6px_-6px_12px_rgba(255,255,255,0.3)]',
@@ -71,7 +71,7 @@ export function ChatWidget() {
       {isOpen && (
         <div
           className={cn(
-            'fixed z-50',
+            'fixed z-40',
             'transition-all duration-300 ease-out',
             isExpanded
               ? 'bottom-4 right-4 left-4 md:left-auto md:w-[600px] h-[80vh]'

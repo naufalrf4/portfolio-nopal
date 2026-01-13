@@ -16,13 +16,12 @@ interface ChatWindowProps {
 }
 
 export function ChatWindow({
-  onClose,
   onToggleSize,
   isFullPage = false,
   isExpanded = false,
   className,
 }: ChatWindowProps) {
-  const { messages, isLoading, error, sendMessage, clearMessages } = useChat();
+  const { messages, isLoading, error, sendMessage } = useChat();
 
   return (
     <div
@@ -34,13 +33,7 @@ export function ChatWindow({
         className
       )}
     >
-      <ChatHeader
-        onClose={onClose || (() => {})}
-        onClear={clearMessages}
-        onToggleSize={onToggleSize}
-        isFullPage={isFullPage}
-        isExpanded={isExpanded}
-      />
+      <ChatHeader onToggleSize={onToggleSize} isFullPage={isFullPage} isExpanded={isExpanded} />
 
       <MessageList messages={messages} isLoading={isLoading} />
 
