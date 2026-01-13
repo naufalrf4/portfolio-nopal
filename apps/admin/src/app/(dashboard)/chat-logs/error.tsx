@@ -13,7 +13,7 @@ export default function ChatLogsError({
   reset: () => void;
 }) {
   useEffect(() => {
-    void ('Chat logs page error:', error);
+    void error;
   }, [error]);
 
   return (

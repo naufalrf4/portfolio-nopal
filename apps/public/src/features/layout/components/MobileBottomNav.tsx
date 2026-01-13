@@ -4,21 +4,11 @@ import { cn } from '@/src/lib/utils';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
-import {
-  Home,
-  User,
-  FolderKanban,
-  FileText,
-  Mail,
-  MoreHorizontal,
-  X,
-  ExternalLink,
-} from 'lucide-react';
+import { Home, FolderKanban, FileText, Mail, MoreHorizontal, X, ExternalLink } from 'lucide-react';
 import { OTHER_LINKS } from '@/src/lib/constants';
 
 const navItems = [
   { href: '/', label: 'Home', icon: Home },
-  { href: '/about', label: 'About', icon: User },
   { href: '/projects', label: 'Projects', icon: FolderKanban },
   { href: '/blogs', label: 'Blogs', icon: FileText },
   { href: '/contact', label: 'Contact', icon: Mail },
@@ -50,19 +40,23 @@ export function MobileBottomNav() {
 
             {OTHER_LINKS.map((link) => {
               const Icon = link.icon;
+              const LinkComponent = link.external ? 'a' : Link;
+              const linkProps = link.external
+                ? { target: '_blank', rel: 'noopener noreferrer' }
+                : {};
+
               return (
-                <a
+                <LinkComponent
                   key={link.href}
                   href={link.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  {...linkProps}
                   className="flex items-center gap-3 px-4 py-3 text-sm text-[#3D4852] hover:text-[#3B82F6] hover:bg-[#E0E5EC]/50 transition-colors"
                   onClick={() => setOtherOpen(false)}
                 >
                   <Icon size={20} />
                   <span className="flex-1">{link.label}</span>
-                  <ExternalLink size={14} className="text-[#6B7280]" />
-                </a>
+                  {link.external && <ExternalLink size={14} className="text-[#6B7280]" />}
+                </LinkComponent>
               );
             })}
           </div>

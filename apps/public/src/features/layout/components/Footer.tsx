@@ -13,6 +13,7 @@ const quickLinks = [
   { href: '/about', label: 'About' },
   { href: '/projects', label: 'Projects' },
   { href: '/blogs', label: 'Blogs' },
+  { href: '/ai-chatbot', label: 'AI Assistant' },
   { href: '/contact', label: 'Contact' },
 ];
 

@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { ChatbotPageClient } from './ChatbotPageClient';
+import { AIChatPage } from './components';
 
 export const metadata: Metadata = {
   title: 'AI Chatbot',
@@ -24,5 +24,5 @@ export const metadata: Metadata = {
 };
 
 export default function AIChatbotPage() {
-  return <ChatbotPageClient />;
+  return <AIChatPage />;
 }

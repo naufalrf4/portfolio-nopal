@@ -70,11 +70,6 @@ export function KnowledgeTable({ docs, loading, onDelete, onIngest }: KnowledgeT
     }
   };
 
-  const truncateContent = (content: string, maxLength = 100) => {
-    if (content.length <= maxLength) return content;
-    return content.substring(0, maxLength) + '...';
-  };
-
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -153,8 +148,8 @@ export function KnowledgeTable({ docs, loading, onDelete, onIngest }: KnowledgeT
                     {doc.indexed ? 'Indexed' : 'Pending'}
                   </Badge>
                 </TableCell>
-                <TableCell className="text-[#6B7280] text-sm hidden md:table-cell max-w-xs">
-                  {truncateContent(doc.content)}
+                <TableCell className="text-[#6B7280] text-sm hidden md:table-cell">
+                  <div className="line-clamp-2 max-w-md">{doc.content}</div>
                 </TableCell>
                 <TableCell className="text-[#6B7280] text-sm whitespace-nowrap">
                   {formatDate(doc.updatedAt)}

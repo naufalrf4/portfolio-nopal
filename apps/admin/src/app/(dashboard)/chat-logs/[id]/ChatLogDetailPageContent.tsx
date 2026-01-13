@@ -161,7 +161,7 @@ export function ChatLogDetailPageContent({ id }: ChatLogDetailPageContentProps) 
               Are you sure you want to delete this chat session? This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
+          <AlertDialogFooter className="flex-col gap-2 sm:flex-row sm:gap-0">
             <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}

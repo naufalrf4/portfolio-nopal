@@ -13,7 +13,7 @@ export default function KnowledgeError({
   reset: () => void;
 }) {
   useEffect(() => {
-    void ('Knowledge page error:', error);
+    void error;
   }, [error]);
 
   return (
