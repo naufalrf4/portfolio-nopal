@@ -57,7 +57,13 @@ export function ContactContent() {
               location={aboutData?.location}
               email={aboutData?.email}
               socialLinks={socialLinks}
-              availabilityStatus={aboutData?.availabilityStatus}
+              availabilityStatus={
+                aboutData?.availabilityStatus === 'available' ||
+                aboutData?.availabilityStatus === 'busy' ||
+                aboutData?.availabilityStatus === 'unavailable'
+                  ? aboutData.availabilityStatus
+                  : undefined
+              }
               error={aboutDataError}
             />
           </div>
