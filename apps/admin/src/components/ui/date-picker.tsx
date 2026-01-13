@@ -65,22 +65,21 @@ function DatePicker({
           )}
           disabled={disabled}
         >
-          <CalendarIcon className="w-4 h-4 mr-2 text-[#3B82F6]" />
-          {value ? formattedDate : placeholder}
-          {value && (
-            <span
-              role="button"
-              tabIndex={0}
-              className="w-4 h-4 ml-auto text-[#6B7280] hover:text-red-500 cursor-pointer transition-colors"
-              onClick={handleClear}
-              onKeyDown={(e) => e.key === 'Enter' && handleClear(e as any)}
-              aria-label="Clear date"
-            >
-              <X className="w-full h-full" />
-            </span>
-          )}
+          <CalendarIcon className="w-4 h-4 mr-2 text-[#3B82F6] inline-block" />
+          <span className="inline-block">{value ? formattedDate : placeholder}</span>
         </button>
       </PopoverTrigger>
+
+      {value && (
+        <button
+          type="button"
+          onClick={handleClear}
+          className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6B7280] hover:text-red-500 transition-colors z-10"
+          aria-label="Clear date"
+        >
+          <X className="w-full h-full" />
+        </button>
+      )}
 
       <PopoverContent
         className={cn(
