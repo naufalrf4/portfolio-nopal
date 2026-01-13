@@ -5,7 +5,7 @@ import { Plus_Jakarta_Sans, DM_Sans } from 'next/font/google';
 import { Navbar, Footer } from '@/src/features/layout/components';
 import { PageViewTracker } from '@/src/components/PageViewTracker';
 import { SessionProvider } from '@/src/components/providers/SessionProvider';
-import { FloatingChatbot } from '@/src/features/chatbot/components';
+import { ChatWidget } from '@/src/features/chatbot/components';
 import { MobileBottomNav } from '@/src/features/layout/components';
 import './globals.css';
 
@@ -81,7 +81,7 @@ export default function RootLayout({
           {children}
           <Footer />
           <MobileBottomNav />
-          <FloatingChatbot />
+          <ChatWidget />
         </SessionProvider>
       </body>
     </html>

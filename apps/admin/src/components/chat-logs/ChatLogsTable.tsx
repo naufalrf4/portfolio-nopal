@@ -1,0 +1,236 @@
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { Eye, Trash2, MessageSquare, Clock, Hash } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { Skeleton } from '@/components/ui/skeleton';
+import { cn } from '@/lib/utils';
+
+interface ChatLog {
+  id: string;
+  sessionId: string;
+  messages: Array<{
+    id: string;
+    role: 'user' | 'assistant' | 'system';
+    content: string;
+    timestamp: string;
+    metadata?: {
+      model?: string;
+      provider?: string;
+      tokens?: number;
+      duration?: number;
+    };
+  }>;
+  messageCount: number;
+  lastMessageAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface ChatLogsTableProps {
+  logs: ChatLog[];
+  loading: boolean;
+  onDelete: (id: string) => Promise<boolean>;
+}
+
+export function ChatLogsTable({ logs, loading, onDelete }: ChatLogsTableProps) {
+  const router = useRouter();
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [deletingLog, setDeletingLog] = useState<ChatLog | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const openDeleteModal = (log: ChatLog) => {
+    setDeletingLog(log);
+    setDeleteModalOpen(true);
+  };
+
+  const handleDelete = async () => {
+    if (!deletingLog) return;
+    setIsDeleting(true);
+    try {
+      const success = await onDelete(deletingLog.id);
+      if (success) {
+        setDeleteModalOpen(false);
+        setDeletingLog(null);
+      }
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const truncateSessionId = (sessionId: string) => {
+    if (sessionId.length <= 16) return sessionId;
+    return `${sessionId.substring(0, 8)}...${sessionId.substring(sessionId.length - 4)}`;
+  };
+
+  const formatDate = (dateString: string | null) => {
+    if (!dateString) return 'N/A';
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
+
+  const formatRelativeTime = (dateString: string | null) => {
+    if (!dateString) return 'N/A';
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffDays < 7) return `${diffDays}d ago`;
+    return formatDate(dateString);
+  };
+
+  if (loading) {
+    return (
+      <Card className="p-6">
+        <div className="space-y-4">
+          {[...Array(5)].map((_, i) => (
+            <div key={i} className="flex items-center gap-4">
+              <Skeleton className="h-10 flex-1" />
+              <Skeleton className="h-10 w-20" />
+              <Skeleton className="h-10 w-28" />
+              <Skeleton className="h-10 w-24" />
+            </div>
+          ))}
+        </div>
+      </Card>
+    );
+  }
+
+  if (logs.length === 0) {
+    return (
+      <Card className="p-12 text-center">
+        <div
+          className={cn(
+            'mx-auto w-16 h-16 rounded-full flex items-center justify-center mb-4',
+            'bg-[#E0E5EC]',
+            '[box-shadow:inset_6px_6px_10px_rgba(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)]'
+          )}
+        >
+          <MessageSquare className="h-8 w-8 text-[#6B7280]" />
+        </div>
+        <h3 className="text-lg font-semibold text-[#3D4852] mb-2">No Chat Logs</h3>
+        <p className="text-[#6B7280]">
+          Chat conversations will appear here when users interact with the AI assistant.
+        </p>
+      </Card>
+    );
+  }
+
+  return (
+    <>
+      <Card className="overflow-hidden">
+        <Table>
+          <TableHeader>
+            <TableRow className="border-b border-[#D1D9E6]">
+              <TableHead className="text-[#6B7280]">Session ID</TableHead>
+              <TableHead className="text-[#6B7280]">Messages</TableHead>
+              <TableHead className="text-[#6B7280]">Last Activity</TableHead>
+              <TableHead className="text-[#6B7280] hidden md:table-cell">Created</TableHead>
+              <TableHead className="text-[#6B7280] text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {logs.map((log) => (
+              <TableRow
+                key={log.id}
+                className="border-b border-[#D1D9E6]/50 hover:bg-[#E0E5EC]/50 transition-colors cursor-pointer"
+                onClick={() => router.push(`/chat-logs/${log.id}`)}
+              >
+                <TableCell className="font-mono text-sm text-[#3D4852]">
+                  <div className="flex items-center gap-2">
+                    <Hash className="h-4 w-4 text-[#3B82F6]" />
+                    {truncateSessionId(log.sessionId)}
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    <MessageSquare className="h-4 w-4 text-[#6B7280]" />
+                    <span className="text-[#3D4852] font-medium">{log.messageCount}</span>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-2 text-[#6B7280] text-sm">
+                    <Clock className="h-4 w-4" />
+                    {formatRelativeTime(log.lastMessageAt || log.updatedAt)}
+                  </div>
+                </TableCell>
+                <TableCell className="text-[#6B7280] text-sm hidden md:table-cell">
+                  {formatDate(log.createdAt)}
+                </TableCell>
+                <TableCell>
+                  <div
+                    className="flex items-center justify-end gap-2"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      onClick={() => router.push(`/chat-logs/${log.id}`)}
+                    >
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                    <Button variant="ghost" size="icon-sm" onClick={() => openDeleteModal(log)}>
+                      <Trash2 className="h-4 w-4 text-red-500" />
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </Card>
+
+      <AlertDialog open={deleteModalOpen} onOpenChange={setDeleteModalOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Chat Log</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this chat session? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              disabled={isDeleting}
+              className="bg-gradient-to-r from-red-500 to-red-600 text-white"
+            >
+              {isDeleting ? 'Deleting...' : 'Delete'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
+  );
+}
