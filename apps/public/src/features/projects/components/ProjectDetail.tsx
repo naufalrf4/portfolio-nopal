@@ -183,7 +183,9 @@ export function ProjectDetail({ project }: ProjectDetailProps) {
                     </p>
                     <div className="flex items-center gap-2 text-[#3D4852]">
                       <Calendar size={16} className="text-[#6B7280]" />
-                      <span className="font-medium">{formatDate(project.createdAt)}</span>
+                      <span className="font-medium">
+                        {formatDate(project.projectDate || project.createdAt)}
+                      </span>
                     </div>
                   </div>
 
