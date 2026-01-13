@@ -2,12 +2,6 @@ import * as React from 'react';
 
 import { cn } from '@/lib/utils';
 
-const NEU_SHADOW = '9px 9px 16px rgba(163,177,198,0.6), -9px -9px 16px rgba(255,255,255,0.5)';
-const NEU_SHADOW_HOVER =
-  '12px 12px 20px rgba(163,177,198,0.7), -12px -12px 20px rgba(255,255,255,0.6)';
-const NEU_SHADOW_INSET =
-  'inset 6px 6px 10px rgba(163,177,198,0.6), inset -6px -6px 10px rgba(255,255,255,0.5)';
-
 function Card({ className, style, ...props }: React.ComponentProps<'div'>) {
   const isInset = className?.includes('neu-card-inset');
 
@@ -18,26 +12,12 @@ function Card({ className, style, ...props }: React.ComponentProps<'div'>) {
         'bg-[#E0E5EC] text-[#3D4852] flex flex-col rounded-[32px] transition-all duration-300 ease-out',
         'data-[hoverable=true]:hover:-translate-y-0.5 data-[hoverable=true]:cursor-pointer',
         '[&.neu-card-inset]:rounded-2xl',
+        isInset
+          ? '[box-shadow:inset_6px_6px_10px_rgba(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)]'
+          : '[box-shadow:9px_9px_16px_rgba(163,177,198,0.6),-9px_-9px_16px_rgba(255,255,255,0.5)] data-[hoverable=true]:hover:[box-shadow:12px_12px_20px_rgba(163,177,198,0.7),-12px_-12px_20px_rgba(255,255,255,0.6)]',
         className
       )}
-      style={{
-        boxShadow: isInset ? NEU_SHADOW_INSET : NEU_SHADOW,
-        ...style,
-      }}
-      onMouseEnter={(e) => {
-        const target = e.currentTarget;
-        if (target.dataset.hoverable === 'true' && !isInset) {
-          target.style.boxShadow = NEU_SHADOW_HOVER;
-        }
-        props.onMouseEnter?.(e);
-      }}
-      onMouseLeave={(e) => {
-        const target = e.currentTarget;
-        if (target.dataset.hoverable === 'true' && !isInset) {
-          target.style.boxShadow = NEU_SHADOW;
-        }
-        props.onMouseLeave?.(e);
-      }}
+      style={style}
       {...props}
     />
   );
