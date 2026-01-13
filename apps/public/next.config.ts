@@ -41,6 +41,11 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
+        hostname: 'dev.to',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
         hostname: 'github.com',
         pathname: '/**',
       },
