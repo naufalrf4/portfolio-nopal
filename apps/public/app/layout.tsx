@@ -3,10 +3,11 @@ import type React from 'react';
 import Script from 'next/script';
 import { Plus_Jakarta_Sans, DM_Sans } from 'next/font/google';
 import { Navbar, Footer } from '@/src/features/layout/components';
-import { PageViewTracker } from '@/src/components/PageViewTracker';
+import { GAScript } from '@/src/components/GAScript';
 import { SessionProvider } from '@/src/components/providers/SessionProvider';
 import { ChatWidget } from '@/src/features/chatbot/components';
 import { MobileBottomNav } from '@/src/features/layout/components';
+import { FloatingBlobs } from '@/src/features/shared/components';
 import './globals.css';
 
 const plusJakarta = Plus_Jakarta_Sans({
@@ -25,23 +26,54 @@ const dmSans = DM_Sans({
 export const metadata: Metadata = {
   metadataBase: new URL('https://naufalrf.tech'),
   title: {
-    default: 'NaufalRF | Full-Stack Engineer',
+    default: 'NaufalRF',
     template: '%s | NaufalRF',
   },
   description:
-    'Portfolio of NaufalRF - Full-Stack Engineer specializing in scalable web applications',
+    'Portfolio of Naufal Rizqullah Firdaus, a software engineer focused on full stack development, automation, IoT integration, and scalable digital solutions. Based in Depok, Indonesia and open to remote and global opportunities.',
+  keywords: [
+    'NaufalRF',
+    'Naufal Rizqullah Firdaus',
+    'Software Engineer Indonesia',
+    'Full Stack Developer Indonesia',
+    'Automation Engineer Indonesia',
+    'IoT Integration Engineer',
+    'Solution Engineer',
+    'Solution Architect',
+    'AI Automation',
+    'Web Developer Indonesia',
+    'Remote Software Engineer',
+  ],
+  authors: [{ name: 'Naufal Rizqullah Firdaus', url: 'https://naufalrf.tech' }],
+  creator: 'Naufal Rizqullah Firdaus',
+  publisher: 'Naufal Rizqullah Firdaus',
   openGraph: {
     type: 'website',
     locale: 'en_US',
     url: 'https://naufalrf.tech',
     siteName: 'NaufalRF Portfolio',
+    title: 'NaufalRF',
+    description:
+      'The personal portfolio of Naufal Rizqullah Firdaus featuring full stack development, automation engineering, IoT integration, and real world digital solutions designed for scalability and usability.',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'NaufalRF Portfolio',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     creator: '@naufalrf',
+    title: 'NaufalRF',
+    description:
+      'The personal portfolio of Naufal Rizqullah Firdaus featuring full stack development, automation engineering, IoT integration, and real world digital solutions designed for scalability and usability.',
+    images: ['/og-image.png'],
   },
   alternates: {
-    canonical: '/',
+    canonical: 'https://naufalrf.tech',
   },
 };
 
@@ -54,7 +86,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${plusJakarta.variable} ${dmSans.variable}`}>
-      <body className="antialiased">
+      <body className="antialiased overflow-x-hidden">
         <SessionProvider>
           {GA_MEASUREMENT_ID && (
             <Script
@@ -76,9 +108,10 @@ export default function RootLayout({
               }}
             />
           )}
-          <PageViewTracker />
+          <GAScript />
+          <FloatingBlobs />
           <Navbar />
-          {children}
+          <main className="relative z-10">{children}</main>
           <Footer />
           <MobileBottomNav />
           <ChatWidget />

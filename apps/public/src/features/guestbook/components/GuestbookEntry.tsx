@@ -8,7 +8,7 @@ interface GuestbookEntryProps {
 
 export function GuestbookEntry({ entry }: GuestbookEntryProps) {
   return (
-    <NeuCard className="p-3 min-h-[100px] max-h-[140px] w-[260px] flex flex-col">
+    <NeuCard className="p-3 h-[140px] w-full flex flex-col">
       <div className="flex items-center gap-2.5 mb-2 flex-shrink-0">
         <div className="w-8 h-8 rounded-full overflow-hidden shadow-[2px_2px_4px_rgba(163,177,198,0.6),-2px_-2px_4px_rgba(255,255,255,0.5)] flex-shrink-0">
           {entry.user?.image ? (

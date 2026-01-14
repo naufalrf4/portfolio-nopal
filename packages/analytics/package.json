@@ -1,0 +1,14 @@
+{
+  "name": "@naufalrf/analytics",
+  "version": "0.1.0",
+  "description": "Shared Google Analytics implementation",
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

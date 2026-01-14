@@ -30,7 +30,7 @@ interface GenerateResult {
 
 const PROVIDER_MODELS: Record<LLMProvider, string> = {
   openai: 'gpt-4o-mini',
-  google: 'gemini-2.0-flash',
+  google: 'gemini-3-flash-preview',
   groq: 'llama-3.3-70b-versatile',
   deepseek: 'deepseek-chat',
 };

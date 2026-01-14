@@ -31,7 +31,8 @@ export async function GET(request: NextRequest) {
 
     const { days } = parsed.data;
 
-    const today = new Date();
+    const now = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Jakarta' }));
+    const today = new Date(now);
     today.setHours(0, 0, 0, 0);
 
     const endDate = new Date(today);
@@ -49,6 +50,14 @@ export async function GET(request: NextRequest) {
       orderBy: [{ date: 'asc' }, { time: 'asc' }],
     });
 
+    const filteredSlots = slots.filter((slot) => {
+      const slotDateTime = new Date(slot.date);
+      const [hours, minutes] = slot.time.split(':').map(Number);
+      slotDateTime.setHours(hours, minutes, 0, 0);
+
+      return slotDateTime > now;
+    });
+
     const groupedByDate: Record<
       string,
       {
@@ -60,7 +69,7 @@ export async function GET(request: NextRequest) {
       }[]
     > = {};
 
-    for (const slot of slots) {
+    for (const slot of filteredSlots) {
       const dateKey = slot.date.toISOString().split('T')[0];
 
       if (!groupedByDate[dateKey]) {

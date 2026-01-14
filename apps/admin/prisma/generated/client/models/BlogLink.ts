@@ -41,6 +41,7 @@ export type BlogLinkMinAggregateOutputType = {
   description: string | null
   imageUrl: string | null
   source: string | null
+  category: string | null
   publishedAt: Date | null
   visible: boolean | null
   order: number | null
@@ -55,6 +56,7 @@ export type BlogLinkMaxAggregateOutputType = {
   description: string | null
   imageUrl: string | null
   source: string | null
+  category: string | null
   publishedAt: Date | null
   visible: boolean | null
   order: number | null
@@ -69,6 +71,8 @@ export type BlogLinkCountAggregateOutputType = {
   description: number
   imageUrl: number
   source: number
+  category: number
+  tags: number
   publishedAt: number
   visible: number
   order: number
@@ -93,6 +97,7 @@ export type BlogLinkMinAggregateInputType = {
   description?: true
   imageUrl?: true
   source?: true
+  category?: true
   publishedAt?: true
   visible?: true
   order?: true
@@ -107,6 +112,7 @@ export type BlogLinkMaxAggregateInputType = {
   description?: true
   imageUrl?: true
   source?: true
+  category?: true
   publishedAt?: true
   visible?: true
   order?: true
@@ -121,6 +127,8 @@ export type BlogLinkCountAggregateInputType = {
   description?: true
   imageUrl?: true
   source?: true
+  category?: true
+  tags?: true
   publishedAt?: true
   visible?: true
   order?: true
@@ -222,7 +230,9 @@ export type BlogLinkGroupByOutputType = {
   description: string | null
   imageUrl: string | null
   source: string
-  publishedAt: Date | null
+  category: string | null
+  tags: string[]
+  publishedAt: Date
   visible: boolean
   order: number
   createdAt: Date
@@ -259,7 +269,9 @@ export type BlogLinkWhereInput = {
   description?: Prisma.StringNullableFilter<"BlogLink"> | string | null
   imageUrl?: Prisma.StringNullableFilter<"BlogLink"> | string | null
   source?: Prisma.StringFilter<"BlogLink"> | string
-  publishedAt?: Prisma.DateTimeNullableFilter<"BlogLink"> | Date | string | null
+  category?: Prisma.StringNullableFilter<"BlogLink"> | string | null
+  tags?: Prisma.StringNullableListFilter<"BlogLink">
+  publishedAt?: Prisma.DateTimeFilter<"BlogLink"> | Date | string
   visible?: Prisma.BoolFilter<"BlogLink"> | boolean
   order?: Prisma.IntFilter<"BlogLink"> | number
   createdAt?: Prisma.DateTimeFilter<"BlogLink"> | Date | string
@@ -273,7 +285,9 @@ export type BlogLinkOrderByWithRelationInput = {
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   imageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   source?: Prisma.SortOrder
-  publishedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  category?: Prisma.SortOrderInput | Prisma.SortOrder
+  tags?: Prisma.SortOrder
+  publishedAt?: Prisma.SortOrder
   visible?: Prisma.SortOrder
   order?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -282,20 +296,22 @@ export type BlogLinkOrderByWithRelationInput = {
 
 export type BlogLinkWhereUniqueInput = Prisma.AtLeast<{
   id?: string
-  url?: string
   AND?: Prisma.BlogLinkWhereInput | Prisma.BlogLinkWhereInput[]
   OR?: Prisma.BlogLinkWhereInput[]
   NOT?: Prisma.BlogLinkWhereInput | Prisma.BlogLinkWhereInput[]
+  url?: Prisma.StringFilter<"BlogLink"> | string
   title?: Prisma.StringFilter<"BlogLink"> | string
   description?: Prisma.StringNullableFilter<"BlogLink"> | string | null
   imageUrl?: Prisma.StringNullableFilter<"BlogLink"> | string | null
   source?: Prisma.StringFilter<"BlogLink"> | string
-  publishedAt?: Prisma.DateTimeNullableFilter<"BlogLink"> | Date | string | null
+  category?: Prisma.StringNullableFilter<"BlogLink"> | string | null
+  tags?: Prisma.StringNullableListFilter<"BlogLink">
+  publishedAt?: Prisma.DateTimeFilter<"BlogLink"> | Date | string
   visible?: Prisma.BoolFilter<"BlogLink"> | boolean
   order?: Prisma.IntFilter<"BlogLink"> | number
   createdAt?: Prisma.DateTimeFilter<"BlogLink"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"BlogLink"> | Date | string
-}, "id" | "url">
+}, "id">
 
 export type BlogLinkOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -304,7 +320,9 @@ export type BlogLinkOrderByWithAggregationInput = {
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   imageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   source?: Prisma.SortOrder
-  publishedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  category?: Prisma.SortOrderInput | Prisma.SortOrder
+  tags?: Prisma.SortOrder
+  publishedAt?: Prisma.SortOrder
   visible?: Prisma.SortOrder
   order?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -326,7 +344,9 @@ export type BlogLinkScalarWhereWithAggregatesInput = {
   description?: Prisma.StringNullableWithAggregatesFilter<"BlogLink"> | string | null
   imageUrl?: Prisma.StringNullableWithAggregatesFilter<"BlogLink"> | string | null
   source?: Prisma.StringWithAggregatesFilter<"BlogLink"> | string
-  publishedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"BlogLink"> | Date | string | null
+  category?: Prisma.StringNullableWithAggregatesFilter<"BlogLink"> | string | null
+  tags?: Prisma.StringNullableListFilter<"BlogLink">
+  publishedAt?: Prisma.DateTimeWithAggregatesFilter<"BlogLink"> | Date | string
   visible?: Prisma.BoolWithAggregatesFilter<"BlogLink"> | boolean
   order?: Prisma.IntWithAggregatesFilter<"BlogLink"> | number
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"BlogLink"> | Date | string
@@ -340,7 +360,9 @@ export type BlogLinkCreateInput = {
   description?: string | null
   imageUrl?: string | null
   source: string
-  publishedAt?: Date | string | null
+  category?: string | null
+  tags?: Prisma.BlogLinkCreatetagsInput | string[]
+  publishedAt: Date | string
   visible?: boolean
   order?: number
   createdAt?: Date | string
@@ -354,7 +376,9 @@ export type BlogLinkUncheckedCreateInput = {
   description?: string | null
   imageUrl?: string | null
   source: string
-  publishedAt?: Date | string | null
+  category?: string | null
+  tags?: Prisma.BlogLinkCreatetagsInput | string[]
+  publishedAt: Date | string
   visible?: boolean
   order?: number
   createdAt?: Date | string
@@ -368,7 +392,9 @@ export type BlogLinkUpdateInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   source?: Prisma.StringFieldUpdateOperationsInput | string
-  publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tags?: Prisma.BlogLinkUpdatetagsInput | string[]
+  publishedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   visible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   order?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -382,7 +408,9 @@ export type BlogLinkUncheckedUpdateInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   source?: Prisma.StringFieldUpdateOperationsInput | string
-  publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tags?: Prisma.BlogLinkUpdatetagsInput | string[]
+  publishedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   visible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   order?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -396,7 +424,9 @@ export type BlogLinkCreateManyInput = {
   description?: string | null
   imageUrl?: string | null
   source: string
-  publishedAt?: Date | string | null
+  category?: string | null
+  tags?: Prisma.BlogLinkCreatetagsInput | string[]
+  publishedAt: Date | string
   visible?: boolean
   order?: number
   createdAt?: Date | string
@@ -410,7 +440,9 @@ export type BlogLinkUpdateManyMutationInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   source?: Prisma.StringFieldUpdateOperationsInput | string
-  publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tags?: Prisma.BlogLinkUpdatetagsInput | string[]
+  publishedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   visible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   order?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -424,7 +456,9 @@ export type BlogLinkUncheckedUpdateManyInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   source?: Prisma.StringFieldUpdateOperationsInput | string
-  publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tags?: Prisma.BlogLinkUpdatetagsInput | string[]
+  publishedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   visible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   order?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -438,6 +472,8 @@ export type BlogLinkCountOrderByAggregateInput = {
   description?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   source?: Prisma.SortOrder
+  category?: Prisma.SortOrder
+  tags?: Prisma.SortOrder
   publishedAt?: Prisma.SortOrder
   visible?: Prisma.SortOrder
   order?: Prisma.SortOrder
@@ -456,6 +492,7 @@ export type BlogLinkMaxOrderByAggregateInput = {
   description?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   source?: Prisma.SortOrder
+  category?: Prisma.SortOrder
   publishedAt?: Prisma.SortOrder
   visible?: Prisma.SortOrder
   order?: Prisma.SortOrder
@@ -470,6 +507,7 @@ export type BlogLinkMinOrderByAggregateInput = {
   description?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   source?: Prisma.SortOrder
+  category?: Prisma.SortOrder
   publishedAt?: Prisma.SortOrder
   visible?: Prisma.SortOrder
   order?: Prisma.SortOrder
@@ -481,8 +519,13 @@ export type BlogLinkSumOrderByAggregateInput = {
   order?: Prisma.SortOrder
 }
 
-export type NullableDateTimeFieldUpdateOperationsInput = {
-  set?: Date | string | null
+export type BlogLinkCreatetagsInput = {
+  set: string[]
+}
+
+export type BlogLinkUpdatetagsInput = {
+  set?: string[]
+  push?: string | string[]
 }
 
 
@@ -494,6 +537,8 @@ export type BlogLinkSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   description?: boolean
   imageUrl?: boolean
   source?: boolean
+  category?: boolean
+  tags?: boolean
   publishedAt?: boolean
   visible?: boolean
   order?: boolean
@@ -508,6 +553,8 @@ export type BlogLinkSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   description?: boolean
   imageUrl?: boolean
   source?: boolean
+  category?: boolean
+  tags?: boolean
   publishedAt?: boolean
   visible?: boolean
   order?: boolean
@@ -522,6 +569,8 @@ export type BlogLinkSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   description?: boolean
   imageUrl?: boolean
   source?: boolean
+  category?: boolean
+  tags?: boolean
   publishedAt?: boolean
   visible?: boolean
   order?: boolean
@@ -536,6 +585,8 @@ export type BlogLinkSelectScalar = {
   description?: boolean
   imageUrl?: boolean
   source?: boolean
+  category?: boolean
+  tags?: boolean
   publishedAt?: boolean
   visible?: boolean
   order?: boolean
@@ -543,7 +594,7 @@ export type BlogLinkSelectScalar = {
   updatedAt?: boolean
 }
 
-export type BlogLinkOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "url" | "title" | "description" | "imageUrl" | "source" | "publishedAt" | "visible" | "order" | "createdAt" | "updatedAt", ExtArgs["result"]["blogLink"]>
+export type BlogLinkOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "url" | "title" | "description" | "imageUrl" | "source" | "category" | "tags" | "publishedAt" | "visible" | "order" | "createdAt" | "updatedAt", ExtArgs["result"]["blogLink"]>
 
 export type $BlogLinkPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "BlogLink"
@@ -555,7 +606,9 @@ export type $BlogLinkPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     description: string | null
     imageUrl: string | null
     source: string
-    publishedAt: Date | null
+    category: string | null
+    tags: string[]
+    publishedAt: Date
     visible: boolean
     order: number
     createdAt: Date
@@ -989,6 +1042,8 @@ export interface BlogLinkFieldRefs {
   readonly description: Prisma.FieldRef<"BlogLink", 'String'>
   readonly imageUrl: Prisma.FieldRef<"BlogLink", 'String'>
   readonly source: Prisma.FieldRef<"BlogLink", 'String'>
+  readonly category: Prisma.FieldRef<"BlogLink", 'String'>
+  readonly tags: Prisma.FieldRef<"BlogLink", 'String[]'>
   readonly publishedAt: Prisma.FieldRef<"BlogLink", 'DateTime'>
   readonly visible: Prisma.FieldRef<"BlogLink", 'Boolean'>
   readonly order: Prisma.FieldRef<"BlogLink", 'Int'>

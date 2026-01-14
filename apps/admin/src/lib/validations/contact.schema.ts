@@ -6,6 +6,11 @@ export const createContactSchema = z.object({
   subject: z.string().max(200).optional(),
   message: z.string().min(1).max(5000),
   ipHash: z.string().min(1),
+  ipAddress: z.string().optional().nullable(),
+  countryCode: z.string().max(10).optional().nullable(),
+  country: z.string().max(100).optional().nullable(),
+  city: z.string().max(100).optional().nullable(),
+  region: z.string().max(100).optional().nullable(),
 });
 
 export const updateContactSchema = z.object({

@@ -1,23 +1,29 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AboutContent } from './AboutContent';
 import { LoadingState, ErrorState, PageHeader } from '@/src/features/shared/components';
 import type { AboutData } from './types';
+import type { Achievement } from '@/src/lib/api/types';
 import { User } from 'lucide-react';
 
 interface AboutPageClientProps {
   initialData: AboutData | null;
-  error?: string;
+  achievements: Achievement[];
+  ssrError?: boolean;
 }
 
-export function AboutPageClient({ initialData, error: initialError }: AboutPageClientProps) {
+export function AboutPageClient({
+  initialData,
+  achievements,
+  ssrError = false,
+}: AboutPageClientProps) {
   const [data, setData] = useState<AboutData | null>(initialData);
-  const [error, setError] = useState<string | undefined>(initialError);
-  const [isRetrying, setIsRetrying] = useState(false);
+  const [error, setError] = useState<string | undefined>(undefined);
+  const [isLoading, setIsLoading] = useState(ssrError && !initialData);
 
-  const handleRetry = async () => {
-    setIsRetrying(true);
+  const fetchData = async () => {
+    setIsLoading(true);
     setError(undefined);
 
     try {
@@ -33,11 +39,19 @@ export function AboutPageClient({ initialData, error: initialError }: AboutPageC
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load about data');
     } finally {
-      setIsRetrying(false);
+      setIsLoading(false);
     }
   };
 
-  if (isRetrying) {
+  // Auto-fetch if SSR failed and no initial data
+  useEffect(() => {
+    if (ssrError && !initialData) {
+      fetchData();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  if (isLoading) {
     return <LoadingState type="skeleton" count={3} />;
   }
 
@@ -53,7 +67,7 @@ export function AboutPageClient({ initialData, error: initialError }: AboutPageC
           <ErrorState
             title="Failed to load about data"
             message={error || 'Unable to load about information. Please try again.'}
-            onRetry={handleRetry}
+            onRetry={fetchData}
             showRetry={true}
           />
         </div>
@@ -69,7 +83,7 @@ export function AboutPageClient({ initialData, error: initialError }: AboutPageC
           subtitle="Learn more about my journey, skills, and professional experience as a Full-Stack Engineer."
           icon={User}
         />
-        <AboutContent about={data} />
+        <AboutContent about={data} achievements={achievements} />
       </div>
     </div>
   );

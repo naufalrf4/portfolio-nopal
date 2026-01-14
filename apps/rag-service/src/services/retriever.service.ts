@@ -52,6 +52,8 @@ class RetrieverService {
         with_payload: true,
       });
 
+      logger.info({ query, resultCount: results.length, topK }, 'Qdrant search completed');
+
       return results.map((r) => ({
         content: r.payload?.content as string,
         source: r.payload?.source as string,

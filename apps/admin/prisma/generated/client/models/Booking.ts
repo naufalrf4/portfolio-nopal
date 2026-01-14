@@ -33,6 +33,11 @@ export type BookingMinAggregateOutputType = {
   status: $Enums.BookingStatus | null
   slotId: string | null
   ipHash: string | null
+  ipAddress: string | null
+  countryCode: string | null
+  country: string | null
+  city: string | null
+  region: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -46,6 +51,11 @@ export type BookingMaxAggregateOutputType = {
   status: $Enums.BookingStatus | null
   slotId: string | null
   ipHash: string | null
+  ipAddress: string | null
+  countryCode: string | null
+  country: string | null
+  city: string | null
+  region: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -59,6 +69,11 @@ export type BookingCountAggregateOutputType = {
   status: number
   slotId: number
   ipHash: number
+  ipAddress: number
+  countryCode: number
+  country: number
+  city: number
+  region: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -74,6 +89,11 @@ export type BookingMinAggregateInputType = {
   status?: true
   slotId?: true
   ipHash?: true
+  ipAddress?: true
+  countryCode?: true
+  country?: true
+  city?: true
+  region?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -87,6 +107,11 @@ export type BookingMaxAggregateInputType = {
   status?: true
   slotId?: true
   ipHash?: true
+  ipAddress?: true
+  countryCode?: true
+  country?: true
+  city?: true
+  region?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -100,6 +125,11 @@ export type BookingCountAggregateInputType = {
   status?: true
   slotId?: true
   ipHash?: true
+  ipAddress?: true
+  countryCode?: true
+  country?: true
+  city?: true
+  region?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -186,6 +216,11 @@ export type BookingGroupByOutputType = {
   status: $Enums.BookingStatus
   slotId: string | null
   ipHash: string
+  ipAddress: string | null
+  countryCode: string | null
+  country: string | null
+  city: string | null
+  region: string | null
   createdAt: Date
   updatedAt: Date
   _count: BookingCountAggregateOutputType | null
@@ -220,6 +255,11 @@ export type BookingWhereInput = {
   status?: Prisma.EnumBookingStatusFilter<"Booking"> | $Enums.BookingStatus
   slotId?: Prisma.StringNullableFilter<"Booking"> | string | null
   ipHash?: Prisma.StringFilter<"Booking"> | string
+  ipAddress?: Prisma.StringNullableFilter<"Booking"> | string | null
+  countryCode?: Prisma.StringNullableFilter<"Booking"> | string | null
+  country?: Prisma.StringNullableFilter<"Booking"> | string | null
+  city?: Prisma.StringNullableFilter<"Booking"> | string | null
+  region?: Prisma.StringNullableFilter<"Booking"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Booking"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Booking"> | Date | string
   slot?: Prisma.XOR<Prisma.BookingSlotNullableScalarRelationFilter, Prisma.BookingSlotWhereInput> | null
@@ -234,6 +274,11 @@ export type BookingOrderByWithRelationInput = {
   status?: Prisma.SortOrder
   slotId?: Prisma.SortOrderInput | Prisma.SortOrder
   ipHash?: Prisma.SortOrder
+  ipAddress?: Prisma.SortOrderInput | Prisma.SortOrder
+  countryCode?: Prisma.SortOrderInput | Prisma.SortOrder
+  country?: Prisma.SortOrderInput | Prisma.SortOrder
+  city?: Prisma.SortOrderInput | Prisma.SortOrder
+  region?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   slot?: Prisma.BookingSlotOrderByWithRelationInput
@@ -251,6 +296,11 @@ export type BookingWhereUniqueInput = Prisma.AtLeast<{
   notes?: Prisma.StringNullableFilter<"Booking"> | string | null
   status?: Prisma.EnumBookingStatusFilter<"Booking"> | $Enums.BookingStatus
   ipHash?: Prisma.StringFilter<"Booking"> | string
+  ipAddress?: Prisma.StringNullableFilter<"Booking"> | string | null
+  countryCode?: Prisma.StringNullableFilter<"Booking"> | string | null
+  country?: Prisma.StringNullableFilter<"Booking"> | string | null
+  city?: Prisma.StringNullableFilter<"Booking"> | string | null
+  region?: Prisma.StringNullableFilter<"Booking"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Booking"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Booking"> | Date | string
   slot?: Prisma.XOR<Prisma.BookingSlotNullableScalarRelationFilter, Prisma.BookingSlotWhereInput> | null
@@ -265,6 +315,11 @@ export type BookingOrderByWithAggregationInput = {
   status?: Prisma.SortOrder
   slotId?: Prisma.SortOrderInput | Prisma.SortOrder
   ipHash?: Prisma.SortOrder
+  ipAddress?: Prisma.SortOrderInput | Prisma.SortOrder
+  countryCode?: Prisma.SortOrderInput | Prisma.SortOrder
+  country?: Prisma.SortOrderInput | Prisma.SortOrder
+  city?: Prisma.SortOrderInput | Prisma.SortOrder
+  region?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.BookingCountOrderByAggregateInput
@@ -284,6 +339,11 @@ export type BookingScalarWhereWithAggregatesInput = {
   status?: Prisma.EnumBookingStatusWithAggregatesFilter<"Booking"> | $Enums.BookingStatus
   slotId?: Prisma.StringNullableWithAggregatesFilter<"Booking"> | string | null
   ipHash?: Prisma.StringWithAggregatesFilter<"Booking"> | string
+  ipAddress?: Prisma.StringNullableWithAggregatesFilter<"Booking"> | string | null
+  countryCode?: Prisma.StringNullableWithAggregatesFilter<"Booking"> | string | null
+  country?: Prisma.StringNullableWithAggregatesFilter<"Booking"> | string | null
+  city?: Prisma.StringNullableWithAggregatesFilter<"Booking"> | string | null
+  region?: Prisma.StringNullableWithAggregatesFilter<"Booking"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Booking"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Booking"> | Date | string
 }
@@ -296,6 +356,11 @@ export type BookingCreateInput = {
   notes?: string | null
   status?: $Enums.BookingStatus
   ipHash: string
+  ipAddress?: string | null
+  countryCode?: string | null
+  country?: string | null
+  city?: string | null
+  region?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   slot?: Prisma.BookingSlotCreateNestedOneWithoutBookingInput
@@ -310,6 +375,11 @@ export type BookingUncheckedCreateInput = {
   status?: $Enums.BookingStatus
   slotId?: string | null
   ipHash: string
+  ipAddress?: string | null
+  countryCode?: string | null
+  country?: string | null
+  city?: string | null
+  region?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -322,6 +392,11 @@ export type BookingUpdateInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumBookingStatusFieldUpdateOperationsInput | $Enums.BookingStatus
   ipHash?: Prisma.StringFieldUpdateOperationsInput | string
+  ipAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  countryCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   slot?: Prisma.BookingSlotUpdateOneWithoutBookingNestedInput
@@ -336,6 +411,11 @@ export type BookingUncheckedUpdateInput = {
   status?: Prisma.EnumBookingStatusFieldUpdateOperationsInput | $Enums.BookingStatus
   slotId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ipHash?: Prisma.StringFieldUpdateOperationsInput | string
+  ipAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  countryCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -349,6 +429,11 @@ export type BookingCreateManyInput = {
   status?: $Enums.BookingStatus
   slotId?: string | null
   ipHash: string
+  ipAddress?: string | null
+  countryCode?: string | null
+  country?: string | null
+  city?: string | null
+  region?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -361,6 +446,11 @@ export type BookingUpdateManyMutationInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumBookingStatusFieldUpdateOperationsInput | $Enums.BookingStatus
   ipHash?: Prisma.StringFieldUpdateOperationsInput | string
+  ipAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  countryCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -374,6 +464,11 @@ export type BookingUncheckedUpdateManyInput = {
   status?: Prisma.EnumBookingStatusFieldUpdateOperationsInput | $Enums.BookingStatus
   slotId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ipHash?: Prisma.StringFieldUpdateOperationsInput | string
+  ipAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  countryCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -392,6 +487,11 @@ export type BookingCountOrderByAggregateInput = {
   status?: Prisma.SortOrder
   slotId?: Prisma.SortOrder
   ipHash?: Prisma.SortOrder
+  ipAddress?: Prisma.SortOrder
+  countryCode?: Prisma.SortOrder
+  country?: Prisma.SortOrder
+  city?: Prisma.SortOrder
+  region?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -405,6 +505,11 @@ export type BookingMaxOrderByAggregateInput = {
   status?: Prisma.SortOrder
   slotId?: Prisma.SortOrder
   ipHash?: Prisma.SortOrder
+  ipAddress?: Prisma.SortOrder
+  countryCode?: Prisma.SortOrder
+  country?: Prisma.SortOrder
+  city?: Prisma.SortOrder
+  region?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -418,6 +523,11 @@ export type BookingMinOrderByAggregateInput = {
   status?: Prisma.SortOrder
   slotId?: Prisma.SortOrder
   ipHash?: Prisma.SortOrder
+  ipAddress?: Prisma.SortOrder
+  countryCode?: Prisma.SortOrder
+  country?: Prisma.SortOrder
+  city?: Prisma.SortOrder
+  region?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -466,6 +576,11 @@ export type BookingCreateWithoutSlotInput = {
   notes?: string | null
   status?: $Enums.BookingStatus
   ipHash: string
+  ipAddress?: string | null
+  countryCode?: string | null
+  country?: string | null
+  city?: string | null
+  region?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -478,6 +593,11 @@ export type BookingUncheckedCreateWithoutSlotInput = {
   notes?: string | null
   status?: $Enums.BookingStatus
   ipHash: string
+  ipAddress?: string | null
+  countryCode?: string | null
+  country?: string | null
+  city?: string | null
+  region?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -506,6 +626,11 @@ export type BookingUpdateWithoutSlotInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumBookingStatusFieldUpdateOperationsInput | $Enums.BookingStatus
   ipHash?: Prisma.StringFieldUpdateOperationsInput | string
+  ipAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  countryCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -518,6 +643,11 @@ export type BookingUncheckedUpdateWithoutSlotInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumBookingStatusFieldUpdateOperationsInput | $Enums.BookingStatus
   ipHash?: Prisma.StringFieldUpdateOperationsInput | string
+  ipAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  countryCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -533,6 +663,11 @@ export type BookingSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   status?: boolean
   slotId?: boolean
   ipHash?: boolean
+  ipAddress?: boolean
+  countryCode?: boolean
+  country?: boolean
+  city?: boolean
+  region?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   slot?: boolean | Prisma.Booking$slotArgs<ExtArgs>
@@ -547,6 +682,11 @@ export type BookingSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   status?: boolean
   slotId?: boolean
   ipHash?: boolean
+  ipAddress?: boolean
+  countryCode?: boolean
+  country?: boolean
+  city?: boolean
+  region?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   slot?: boolean | Prisma.Booking$slotArgs<ExtArgs>
@@ -561,6 +701,11 @@ export type BookingSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   status?: boolean
   slotId?: boolean
   ipHash?: boolean
+  ipAddress?: boolean
+  countryCode?: boolean
+  country?: boolean
+  city?: boolean
+  region?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   slot?: boolean | Prisma.Booking$slotArgs<ExtArgs>
@@ -575,11 +720,16 @@ export type BookingSelectScalar = {
   status?: boolean
   slotId?: boolean
   ipHash?: boolean
+  ipAddress?: boolean
+  countryCode?: boolean
+  country?: boolean
+  city?: boolean
+  region?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type BookingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "phone" | "notes" | "status" | "slotId" | "ipHash" | "createdAt" | "updatedAt", ExtArgs["result"]["booking"]>
+export type BookingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "phone" | "notes" | "status" | "slotId" | "ipHash" | "ipAddress" | "countryCode" | "country" | "city" | "region" | "createdAt" | "updatedAt", ExtArgs["result"]["booking"]>
 export type BookingInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   slot?: boolean | Prisma.Booking$slotArgs<ExtArgs>
 }
@@ -604,6 +754,11 @@ export type $BookingPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     status: $Enums.BookingStatus
     slotId: string | null
     ipHash: string
+    ipAddress: string | null
+    countryCode: string | null
+    country: string | null
+    city: string | null
+    region: string | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["booking"]>
@@ -1038,6 +1193,11 @@ export interface BookingFieldRefs {
   readonly status: Prisma.FieldRef<"Booking", 'BookingStatus'>
   readonly slotId: Prisma.FieldRef<"Booking", 'String'>
   readonly ipHash: Prisma.FieldRef<"Booking", 'String'>
+  readonly ipAddress: Prisma.FieldRef<"Booking", 'String'>
+  readonly countryCode: Prisma.FieldRef<"Booking", 'String'>
+  readonly country: Prisma.FieldRef<"Booking", 'String'>
+  readonly city: Prisma.FieldRef<"Booking", 'String'>
+  readonly region: Prisma.FieldRef<"Booking", 'String'>
   readonly createdAt: Prisma.FieldRef<"Booking", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Booking", 'DateTime'>
 }

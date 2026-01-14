@@ -2,21 +2,26 @@ import type { Metadata } from 'next';
 import { ContactContent } from '@/src/features/contact/components';
 
 export const metadata: Metadata = {
-  title: 'Contact',
+  title: 'Contact - NaufalRF',
   description:
-    'Get in touch with NaufalRF. Send a message or book a call to discuss your project, collaboration, or job opportunity.',
+    'Contact Naufal Rizqullah Firdaus for software engineering roles, automation and IoT projects, solution engineering work, freelance opportunities, or technical collaboration.',
+  keywords: [
+    'Contact Naufal Rizqullah Firdaus',
+    'Hire Automation Engineer Indonesia',
+    'Solution Engineer Indonesia',
+  ],
   openGraph: {
-    title: 'Contact | NaufalRF',
+    title: 'Contact NaufalRF',
     description:
-      'Get in touch with NaufalRF. Send a message or book a call to discuss your project, collaboration, or job opportunity.',
+      'Get in touch with Naufal Rizqullah Firdaus who is open to full time roles, freelance automation projects, IoT integration work, and solution oriented engineering collaboration.',
     type: 'website',
     url: 'https://naufalrf.tech/contact',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Contact | NaufalRF',
+    title: 'Contact NaufalRF',
     description:
-      'Get in touch with NaufalRF. Send a message or book a call to discuss your project, collaboration, or job opportunity.',
+      'Get in touch with Naufal Rizqullah Firdaus who is open to full time roles, freelance automation projects, IoT integration work, and solution oriented engineering collaboration.',
   },
   alternates: {
     canonical: 'https://naufalrf.tech/contact',

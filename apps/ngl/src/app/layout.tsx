@@ -1,7 +1,12 @@
 import type { Metadata } from 'next';
 import type React from 'react';
+import Script from 'next/script';
 import { Plus_Jakarta_Sans, DM_Sans } from 'next/font/google';
+import { Analytics } from '@vercel/analytics/react';
+import { initGA } from '@naufalrf/analytics';
 import './globals.css';
+
+const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
@@ -18,21 +23,30 @@ const dmSans = DM_Sans({
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://ngl.naufalrf.tech'),
-  title: 'NaufalRF | Send Anonymous Message',
+  title: 'Anonymous Message - NaufalRF',
   description:
-    'Send an anonymous message to NaufalRF. Share your thoughts, feedback, or questions privately.',
+    'Send anonymous messages, feedback, or questions to Naufal Rizqullah Firdaus regarding his work, projects, or engineering approach in a safe and open way.',
+  keywords: ['Anonymous Message Portfolio', 'Feedback Software Engineer', 'NGL Developer Page'],
+  authors: [{ name: 'Naufal Rizqullah Firdaus', url: 'https://naufalrf.tech' }],
+  creator: 'Naufal Rizqullah Firdaus',
   openGraph: {
     type: 'website',
     locale: 'en_US',
     url: 'https://ngl.naufalrf.tech',
     siteName: 'NaufalRF NGL',
-    title: 'NaufalRF | Send Anonymous Message',
+    title: 'Anonymous Messages for NaufalRF',
     description:
-      'Send an anonymous message to NaufalRF. Share your thoughts, feedback, or questions privately.',
+      'An open space to share feedback or questions anonymously with Naufal Rizqullah Firdaus to support transparency and continuous improvement.',
   },
   twitter: {
     card: 'summary_large_image',
     creator: '@naufalrf',
+    title: 'Anonymous Messages for NaufalRF',
+    description:
+      'An open space to share feedback or questions anonymously with Naufal Rizqullah Firdaus to support transparency and continuous improvement.',
+  },
+  alternates: {
+    canonical: 'https://ngl.naufalrf.tech',
   },
 };
 
@@ -42,19 +56,31 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${plusJakarta.variable} ${dmSans.variable}`}>
-      <body className="antialiased min-h-screen">
-        <div className="bg-shapes-container">
-          <div className="bg-gradient-overlay" />
-          <div className="floating-shape floating-shape-1" />
-          <div className="floating-shape floating-shape-2" />
-          <div className="floating-shape floating-shape-3" />
-          <div className="floating-shape floating-shape-4" />
-        </div>
-
-        <main className="relative z-10 min-h-screen flex flex-col items-center justify-center px-4 py-12">
-          {children}
-        </main>
+    <html lang="en">
+      <body className={`${plusJakarta.variable} ${dmSans.variable} antialiased`}>
+        {GA_MEASUREMENT_ID && (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+              strategy="afterInteractive"
+              onLoad={() => initGA()}
+            />
+            <Script
+              id="ga-init"
+              strategy="afterInteractive"
+              dangerouslySetInnerHTML={{
+                __html: `
+                  window.dataLayer = window.dataLayer || [];
+                  function gtag(){dataLayer.push(arguments);}
+                  gtag('js', new Date());
+                  gtag('config', '${GA_MEASUREMENT_ID}', { send_page_view: false });
+                `,
+              }}
+            />
+          </>
+        )}
+        {children}
+        <Analytics />
       </body>
     </html>
   );

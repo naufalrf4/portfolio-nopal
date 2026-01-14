@@ -1,5 +1,8 @@
 import { Prisma } from '@/prisma/generated/client/client';
 import { prisma } from '@/lib/db/prisma';
+import type { CreateBlogLinkInput } from '@/lib/validations/blog-link.schema';
+
+export type BlogLinkCreateInput = CreateBlogLinkInput;
 
 export class BlogLinksService {
   async getAll(query?: { source?: string; visible?: boolean }) {
@@ -20,8 +23,24 @@ export class BlogLinksService {
     });
   }
 
-  async create(data: Prisma.BlogLinkCreateInput) {
-    return prisma.blogLink.create({ data });
+  async create(data: BlogLinkCreateInput) {
+    const maxOrder = await prisma.blogLink.aggregate({
+      _max: { order: true },
+    });
+
+    return prisma.blogLink.create({
+      data: {
+        url: data.url,
+        title: data.title,
+        description: data.description || null,
+        imageUrl: data.imageUrl || null,
+        source: data.source,
+        tags: data.tags || [],
+        publishedAt: data.publishedAt ? new Date(data.publishedAt) : new Date(),
+        order: (maxOrder._max.order ?? -1) + 1,
+        visible: true,
+      },
+    });
   }
 
   async update(id: string, data: Prisma.BlogLinkUpdateInput) {

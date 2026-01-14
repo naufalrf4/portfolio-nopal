@@ -76,7 +76,7 @@ export class ProjectsService {
   }
 
   async create(data: CreateProjectInput) {
-    const { description, liveUrl, repoUrl, ...rest } = data;
+    const { description, liveUrl, repoUrl, startDate, endDate, projectDate, tags, ...rest } = data;
 
     return prisma.project.create({
       data: {
@@ -84,6 +84,10 @@ export class ProjectsService {
         description: description || '',
         liveUrl: liveUrl || null,
         repoUrl: repoUrl || null,
+        tags: tags || [],
+        startDate: startDate ? new Date(startDate) : null,
+        endDate: endDate ? new Date(endDate) : null,
+        projectDate: projectDate || null,
       },
       include: {
         contexts: true,
@@ -92,9 +96,20 @@ export class ProjectsService {
   }
 
   async update(id: string, data: UpdateProjectInput) {
+    const { startDate, endDate, ...rest } = data;
+
+    const updateData: Record<string, unknown> = { ...rest };
+
+    if (startDate !== undefined) {
+      updateData.startDate = startDate ? new Date(startDate) : null;
+    }
+    if (endDate !== undefined) {
+      updateData.endDate = endDate ? new Date(endDate) : null;
+    }
+
     return prisma.project.update({
       where: { id },
-      data,
+      data: updateData,
       include: {
         contexts: true,
       },

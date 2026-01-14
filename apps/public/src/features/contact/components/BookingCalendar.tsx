@@ -6,6 +6,7 @@ import { NeuCard, NeuInput, NeuButton } from '@/src/features/shared/components';
 import { api } from '@/src/lib/api';
 import { Clock, CheckCircle, AlertCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useLazyTurnstile, LazyTurnstile } from '@naufalrf/ui';
+import { trackBookingRequest } from '@naufalrf/analytics';
 
 interface BookingSlot {
   id: string;
@@ -106,8 +107,8 @@ export function BookingCalendar() {
         if (sortedDates.length > 0 && !selectedDate) {
           setSelectedDate(sortedDates[0]);
         }
-      } catch (error) {
-        console.error('Failed to fetch slots:', error);
+      } catch {
+        // Error handled silently - component shows default state
       } finally {
         setIsLoading(false);
       }
@@ -162,6 +163,7 @@ export function BookingCalendar() {
         turnstileToken: turnstileToken || '',
       });
       setStatus('success');
+      trackBookingRequest(selectedSlot.id);
       setFormData({ name: '', email: '', phone: '', notes: '' });
       setSelectedSlot(null);
       resetTurnstile();

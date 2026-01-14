@@ -6,6 +6,12 @@ export interface ClientConfig {
   headers?: Record<string, string>;
 }
 
+export interface RequestOptions {
+  params?: Record<string, string>;
+  revalidate?: number | false;
+  cache?: RequestCache;
+}
+
 export class HttpClient {
   private baseURL: string;
   private headers: Record<string, string>;
@@ -73,13 +79,24 @@ export class HttpClient {
     return {} as T;
   }
 
-  async get<T>(path: string, params?: Record<string, string>): Promise<T> {
+  async get<T>(path: string, options?: RequestOptions): Promise<T> {
     try {
-      const url = this.buildURL(path, params);
-      const response = await fetch(url, {
+      const url = this.buildURL(path, options?.params);
+
+      const fetchOptions: RequestInit & { next?: { revalidate?: number | false } } = {
         method: 'GET',
         headers: this.headers,
-      });
+      };
+
+      if (options?.cache) {
+        fetchOptions.cache = options.cache;
+      }
+
+      if (options?.revalidate !== undefined) {
+        fetchOptions.next = { revalidate: options.revalidate };
+      }
+
+      const response = await fetch(url, fetchOptions);
       return this.handleResponse<T>(response);
     } catch (error) {
       if (error instanceof ApiError) {

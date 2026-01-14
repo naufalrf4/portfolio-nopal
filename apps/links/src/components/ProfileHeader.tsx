@@ -10,9 +10,9 @@ interface ProfileHeaderProps {
 
 export function ProfileHeader({ name, bio, avatarUrl }: ProfileHeaderProps) {
   return (
-    <div className="flex flex-col items-center gap-5 py-8">
+    <div className="flex flex-col items-center gap-5 md:gap-7 py-8 md:py-10">
       <div className="relative">
-        <div className="neu-avatar-ring">
+        <div className="neu-avatar-ring md:scale-125">
           <div className="neu-avatar-inner">
             {avatarUrl ? (
               <Image
@@ -35,14 +35,18 @@ export function ProfileHeader({ name, bio, avatarUrl }: ProfileHeaderProps) {
         </div>
       </div>
 
-      <div className="text-center space-y-3">
-        <h1 className="text-2xl font-bold text-foreground tracking-tight">{name}</h1>
-        <p className="text-base text-muted-foreground max-w-xs mx-auto leading-relaxed">{bio}</p>
+      <div className="text-center space-y-3 md:space-y-4">
+        <h1 className="text-2xl md:text-3xl font-bold text-foreground tracking-tight">{name}</h1>
+        <p className="text-base md:text-lg text-muted-foreground max-w-xs md:max-w-md mx-auto leading-relaxed">
+          {bio}
+        </p>
       </div>
 
-      <div className="neu-status-badge">
+      <div className="neu-status-badge md:scale-110">
         <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.6)]" />
-        <span className="text-sm text-muted-foreground font-medium">Available for work</span>
+        <span className="text-sm md:text-base text-muted-foreground font-medium">
+          Available for work
+        </span>
       </div>
     </div>
   );

@@ -1,69 +1,51 @@
 import { NextRequest } from 'next/server';
-import { z } from 'zod';
+import { successResponse, serverErrorResponse, validationErrorResponse } from '@/lib/api/responses';
 import { prisma } from '@/lib/db/prisma';
-import {
-  successResponse,
-  validationErrorResponse,
-  serverErrorResponse,
-  errorResponse,
-} from '@/lib/api/responses';
-import { verifyTurnstileToken, isTurnstileConfigured } from '@/lib/services/turnstile';
-import { createHash } from 'crypto';
+import { z } from 'zod';
+import { getIpLocation } from '@/lib/services/geoIpService';
+import { hashIp } from '@/lib/utils/hash';
 
-const publicContactSchema = z.object({
-  name: z.string().min(1).max(100),
-  email: z.string().email().max(255),
-  subject: z.string().max(200).optional(),
-  message: z.string().min(1).max(5000),
-  turnstileToken: z.string().min(1, 'CAPTCHA verification is required'),
+const createContactSchema = z.object({
+  name: z.string().min(1, 'Name is required'),
+  email: z.string().email('Invalid email'),
+  subject: z.string().optional(),
+  message: z.string().min(1, 'Message is required'),
+  turnstileToken: z.string().optional(),
 });
-
-function hashIp(ip: string): string {
-  return createHash('sha256').update(ip).digest('hex').slice(0, 16);
-}
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const parsed = publicContactSchema.safeParse(body);
+    const parsed = createContactSchema.safeParse(body);
 
     if (!parsed.success) {
       return validationErrorResponse(parsed.error.flatten().fieldErrors);
     }
 
-    if (isTurnstileConfigured()) {
-      const turnstileResult = await verifyTurnstileToken(parsed.data.turnstileToken);
-
-      if (!turnstileResult.success) {
-        return errorResponse(
-          'CAPTCHA verification failed. Please try again.',
-          400,
-          'TURNSTILE_VERIFICATION_FAILED'
-        );
-      }
-    }
-
     const forwarded = request.headers.get('x-forwarded-for');
-    const ip = forwarded?.split(',')[0]?.trim() || 'unknown';
-    const ipHash = hashIp(ip);
+    const clientIp = forwarded?.split(',')[0]?.trim() || 'unknown';
+    const geoLocation = getIpLocation(clientIp);
+    const ipHash = hashIp(clientIp);
 
-    await prisma.contactForm.create({
+    const contact = await prisma.contactForm.create({
       data: {
         name: parsed.data.name,
         email: parsed.data.email,
         subject: parsed.data.subject || null,
         message: parsed.data.message,
         ipHash,
+        ipAddress: clientIp !== 'unknown' ? clientIp : null,
+        countryCode: geoLocation?.countryCode || null,
+        country: geoLocation?.country || null,
+        city: geoLocation?.city || null,
+        region: geoLocation?.region || null,
         read: false,
         replied: false,
       },
     });
 
-    return successResponse({ success: true }, 'Message sent successfully');
-  } catch (error) {
-    if (error instanceof SyntaxError) {
-      return errorResponse('Invalid JSON body', 400);
-    }
+    return successResponse(contact, 'Message sent successfully');
+  } catch {
     return serverErrorResponse();
   }
 }

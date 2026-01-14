@@ -21,7 +21,7 @@ export function ChatWindow({
   isExpanded = false,
   className,
 }: ChatWindowProps) {
-  const { messages, isLoading, error, sendMessage } = useChat();
+  const { messages, isLoading, error, sendMessage, shouldScrollToBottom } = useChat();
 
   return (
     <div
@@ -35,7 +35,11 @@ export function ChatWindow({
     >
       <ChatHeader onToggleSize={onToggleSize} isFullPage={isFullPage} isExpanded={isExpanded} />
 
-      <MessageList messages={messages} isLoading={isLoading} />
+      <MessageList
+        messages={messages}
+        isLoading={isLoading}
+        shouldScrollToBottom={shouldScrollToBottom}
+      />
 
       {error && (
         <div className="px-4 py-2 bg-red-50/90 backdrop-blur-sm border-t border-red-200">

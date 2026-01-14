@@ -7,9 +7,10 @@ import type { Message } from '@/src/features/chatbot/types';
 interface ChatAreaProps {
   messages: Message[];
   isLoading: boolean;
+  shouldScrollToBottom?: boolean;
 }
 
-export function ChatArea({ messages, isLoading }: ChatAreaProps) {
+export function ChatArea({ messages, isLoading, shouldScrollToBottom = false }: ChatAreaProps) {
   return (
     <div
       className={cn(
@@ -17,7 +18,11 @@ export function ChatArea({ messages, isLoading }: ChatAreaProps) {
         'scrollbar-thin scrollbar-thumb-[#3B82F6] scrollbar-track-transparent'
       )}
     >
-      <MessageThread messages={messages} isLoading={isLoading} />
+      <MessageThread
+        messages={messages}
+        isLoading={isLoading}
+        shouldScrollToBottom={shouldScrollToBottom}
+      />
     </div>
   );
 }

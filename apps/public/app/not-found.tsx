@@ -43,7 +43,7 @@ export default function NotFound() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-2">
             <Link
               href="/"
-              className="inline-flex items-center justify-center gap-2 h-12 px-6 rounded-2xl font-medium text-primary-foreground bg-primary neu-extruded hover:-translate-y-[1px] hover:neu-extruded-hover active:translate-y-[0.5px] active:neu-inset transition-all duration-200 w-full sm:w-auto"
+              className="inline-flex items-center justify-center gap-2 h-12 px-6 rounded-2xl font-medium bg-gradient-to-br from-primary to-primary/90 text-white shadow-lg shadow-primary/30 neu-extruded hover:-translate-y-[1px] hover:shadow-xl hover:shadow-primary/40 active:translate-y-[0.5px] active:shadow-md transition-all duration-200 w-full sm:w-auto"
             >
               <Home className="w-4 h-4" strokeWidth={2.5} />
               Go to Home

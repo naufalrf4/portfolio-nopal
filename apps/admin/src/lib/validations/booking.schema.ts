@@ -9,6 +9,11 @@ export const createBookingSchema = z.object({
   timezone: z.string().default('Asia/Jakarta'),
   notes: z.string().optional(),
   ipHash: z.string().min(1),
+  ipAddress: z.string().optional().nullable(),
+  countryCode: z.string().max(10).optional().nullable(),
+  country: z.string().max(100).optional().nullable(),
+  city: z.string().max(100).optional().nullable(),
+  region: z.string().max(100).optional().nullable(),
 });
 
 export const updateBookingStatusSchema = z.object({

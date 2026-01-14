@@ -28,13 +28,18 @@ function hashIp(ip: string): string {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
+    console.log('[Bookings API] Received body:', JSON.stringify(body, null, 2));
+
     const parsed = publicBookingSchema.safeParse(body);
 
     if (!parsed.success) {
+      console.error('[Bookings API] Validation failed:', parsed.error.flatten());
       return validationErrorResponse(parsed.error.flatten().fieldErrors);
     }
 
-    if (isTurnstileConfigured()) {
+    console.log('[Bookings API] Validation passed, data:', parsed.data);
+
+    if (isTurnstileConfigured() && parsed.data.turnstileToken) {
       const turnstileResult = await verifyTurnstileToken(parsed.data.turnstileToken);
 
       if (!turnstileResult.success) {
@@ -65,12 +70,13 @@ export async function POST(request: NextRequest) {
       return errorResponse('This time slot is already booked', 409);
     }
 
-    const slotDate = new Date(slot.date);
-    slotDate.setHours(0, 0, 0, 0);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const now = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Jakarta' }));
 
-    if (slotDate < today) {
+    const slotDateTime = new Date(slot.date);
+    const [hours, minutes] = slot.time.split(':').map(Number);
+    slotDateTime.setHours(hours, minutes, 0, 0);
+
+    if (slotDateTime < now) {
       return errorResponse('Cannot book a slot in the past', 400);
     }
 

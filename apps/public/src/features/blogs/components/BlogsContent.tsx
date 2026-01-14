@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { BlogsGrid } from './BlogsGrid';
 import { LoadingState, ErrorState } from '@/src/features/shared/components';
 import { NeuCard } from '@/src/features/shared/components';
@@ -11,11 +11,16 @@ const API_BASE = process.env.NEXT_PUBLIC_ADMIN_API_URL || 'http://localhost:3001
 interface BlogsContentProps {
   initialBlogs: BlogLink[];
   error?: string;
+  ssrError?: boolean;
 }
 
-export function BlogsContent({ initialBlogs, error: initialError }: BlogsContentProps) {
+export function BlogsContent({
+  initialBlogs,
+  error: initialError,
+  ssrError = false,
+}: BlogsContentProps) {
   const [selectedSource, setSelectedSource] = useState<string>('all');
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(ssrError && initialBlogs.length === 0);
   const [error, setError] = useState<string | undefined>(initialError);
   const [blogs, setBlogs] = useState<BlogLink[]>(initialBlogs);
 
@@ -33,7 +38,7 @@ export function BlogsContent({ initialBlogs, error: initialError }: BlogsContent
     return blogs.filter((blog) => blog.source === selectedSource);
   }, [blogs, selectedSource]);
 
-  const handleRetry = async () => {
+  const fetchBlogs = async () => {
     setIsLoading(true);
     setError(undefined);
 
@@ -42,8 +47,10 @@ export function BlogsContent({ initialBlogs, error: initialError }: BlogsContent
       if (!response.ok) {
         throw new Error('Failed to fetch blogs');
       }
-      const data = await response.json();
-      setBlogs(data.blogs || []);
+      const result = await response.json();
+      // API response format: { success: true, data: { blogs: [...], meta: {...} } }
+      const blogsData = result.data?.blogs || result.blogs || [];
+      setBlogs(blogsData);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load blogs');
     } finally {
@@ -51,12 +58,20 @@ export function BlogsContent({ initialBlogs, error: initialError }: BlogsContent
     }
   };
 
+  // Auto-fetch if SSR failed and no initial blogs
+  useEffect(() => {
+    if (ssrError && initialBlogs.length === 0) {
+      fetchBlogs();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   if (error) {
     return (
       <ErrorState
         title="Failed to load articles"
         message={error}
-        onRetry={handleRetry}
+        onRetry={fetchBlogs}
         showRetry={true}
       />
     );

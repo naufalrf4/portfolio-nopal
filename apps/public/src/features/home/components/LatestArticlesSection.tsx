@@ -40,7 +40,7 @@ export function LatestArticlesSection() {
 
   if (loading) {
     return (
-      <Section className="bg-[#E0E5EC]">
+      <Section>
         <div className="py-12">
           <LoadingState type="skeleton" count={3} height="h-64" />
         </div>
@@ -50,7 +50,7 @@ export function LatestArticlesSection() {
 
   if (error) {
     return (
-      <Section className="bg-[#E0E5EC]">
+      <Section>
         <ErrorState title="Failed to load articles" message={error} onRetry={fetchData} />
       </Section>
     );

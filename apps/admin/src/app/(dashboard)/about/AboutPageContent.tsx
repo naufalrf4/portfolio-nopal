@@ -1,10 +1,11 @@
 'use client';
 
-import { Loader2, User } from 'lucide-react';
+import { Loader2, User, Award } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { PageWrapper } from '@/components/layout/PageWrapper';
 import { PersonalInfoTab, BioTab, SkillsTab, ExperienceTab, useAbout } from '@/features/about';
+import { AchievementsTab } from '@/features/about/components/AchievementsTab';
 
 export function AboutPageContent() {
   const { loading } = useAbout();
@@ -34,6 +35,7 @@ export function AboutPageContent() {
             <TabsTrigger value="bio">Bio</TabsTrigger>
             <TabsTrigger value="skills">Skills</TabsTrigger>
             <TabsTrigger value="experience">Experience</TabsTrigger>
+            <TabsTrigger value="achievements">Achievements</TabsTrigger>
           </TabsList>
 
           <TabsContent value="personal">
@@ -50,6 +52,10 @@ export function AboutPageContent() {
 
           <TabsContent value="experience">
             <ExperienceTab />
+          </TabsContent>
+
+          <TabsContent value="achievements">
+            <AchievementsTab />
           </TabsContent>
         </Tabs>
       </div>

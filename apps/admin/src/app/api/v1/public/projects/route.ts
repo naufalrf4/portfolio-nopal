@@ -32,6 +32,18 @@ export async function GET(req: NextRequest) {
           imageUrl: true,
           featured: true,
           createdAt: true,
+          images: {
+            select: {
+              id: true,
+              url: true,
+              order: true,
+              alt: true,
+              caption: true,
+            },
+            orderBy: {
+              order: 'asc',
+            },
+          },
         },
       }),
       prisma.project.count({ where }),

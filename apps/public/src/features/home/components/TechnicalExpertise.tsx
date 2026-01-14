@@ -27,7 +27,7 @@ const expertiseAreas = [
 
 export function TechnicalExpertise() {
   return (
-    <Section className="bg-[#E0E5EC]">
+    <Section>
       <SectionHeader
         title="Technical Expertise"
         subtitle="Areas of specialization and technical skills I bring to every project"

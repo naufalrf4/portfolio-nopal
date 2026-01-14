@@ -4,7 +4,7 @@ import { cn } from '@/src/lib/utils';
 import { forwardRef } from 'react';
 
 interface NeuButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'default' | 'accent' | 'ghost';
+  variant?: 'default' | 'primary' | 'accent' | 'ghost';
   size?: 'sm' | 'md' | 'lg';
   isLoading?: boolean;
   children: React.ReactNode;
@@ -21,15 +21,16 @@ export const NeuButton = forwardRef<HTMLButtonElement, NeuButtonProps>(
         disabled={disabled || isLoading}
         className={cn(
           'inline-flex items-center justify-center font-medium rounded-xl transition-all duration-200',
-          'shadow-[6px_6px_12px_rgba(163,177,198,0.6),-6px_-6px_12px_rgba(255,255,255,0.5)]',
-          'active:shadow-[inset_4px_4px_8px_rgba(163,177,198,0.6),inset_-4px_-4px_8px_rgba(255,255,255,0.5)]',
           'disabled:opacity-50 disabled:cursor-not-allowed',
           size === 'sm' && 'px-4 py-2 text-sm',
           size === 'md' && 'px-6 py-3 text-base',
           size === 'lg' && 'px-8 py-4 text-lg',
-          variant === 'default' && 'bg-[#E0E5EC] text-[#3D4852] hover:text-[#3B82F6]',
+          variant === 'default' &&
+            'bg-[#E0E5EC] text-[#3D4852] hover:text-[#3B82F6] shadow-[6px_6px_12px_rgba(163,177,198,0.6),-6px_-6px_12px_rgba(255,255,255,0.5)] active:shadow-[inset_4px_4px_8px_rgba(163,177,198,0.6),inset_-4px_-4px_8px_rgba(255,255,255,0.5)]',
+          variant === 'primary' &&
+            'bg-gradient-to-br from-[#3B82F6] to-[#2563EB] text-white shadow-[6px_6px_12px_rgba(59,130,246,0.4),-6px_-6px_12px_rgba(255,255,255,0.3)] hover:shadow-[8px_8px_16px_rgba(59,130,246,0.5),-8px_-8px_16px_rgba(255,255,255,0.4)] active:shadow-[inset_4px_4px_8px_rgba(0,0,0,0.2)] hover:scale-[1.02] active:scale-[0.98]',
           variant === 'accent' &&
-            'bg-[#3B82F6] text-white hover:bg-[#2563EB] shadow-[6px_6px_12px_rgba(59,130,246,0.3),-6px_-6px_12px_rgba(255,255,255,0.5)]',
+            'bg-[#3B82F6] text-white hover:bg-[#2563EB] shadow-[6px_6px_12px_rgba(59,130,246,0.3),-6px_-6px_12px_rgba(255,255,255,0.5)] active:shadow-[inset_4px_4px_8px_rgba(163,177,198,0.6),inset_-4px_-4px_8px_rgba(255,255,255,0.5)]',
           variant === 'ghost' && 'bg-transparent shadow-none hover:bg-[#E0E5EC]/50',
           className
         )}

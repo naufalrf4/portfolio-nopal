@@ -25,7 +25,9 @@ export function Footer({ className }: FooterProps) {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className={cn('bg-[#E0E5EC] py-12 px-4 md:px-8 pb-28 md:pb-12', className)}>
+    <footer
+      className={cn('relative z-10 bg-transparent py-12 px-4 md:px-8 pb-28 md:pb-12', className)}
+    >
       <div className="mx-auto max-w-7xl">
         <div className="rounded-2xl bg-[#E0E5EC] p-8 shadow-[9px_9px_16px_rgb(163,177,198,0.6),-9px_-9px_16px_rgba(255,255,255,0.5)]">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

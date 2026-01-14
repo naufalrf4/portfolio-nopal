@@ -1,31 +1,41 @@
 'use client';
 
-import { useEffect } from 'react';
+import { Suspense, useEffect } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import Script from 'next/script';
-import { pageview, shouldLoadAnalytics } from '@/lib/analytics/gtag';
+import { trackPageView, isGAEnabled } from '@naufalrf/analytics';
 
 interface GoogleAnalyticsProps {
   measurementId: string;
 }
 
-export function GoogleAnalytics({ measurementId }: GoogleAnalyticsProps) {
+function AnalyticsPageView() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    if (!shouldLoadAnalytics()) return;
+    if (!isGAEnabled()) return;
 
-    const url = pathname + (searchParams?.toString() ? `?${searchParams.toString()}` : '');
-    pageview(url);
+    trackPageView({
+      page_path: pathname + (searchParams?.toString() ? `?${searchParams.toString()}` : ''),
+      page_location: window.location.href,
+      page_title: document.title,
+    });
   }, [pathname, searchParams]);
 
-  if (!shouldLoadAnalytics()) {
+  return null;
+}
+
+export function GoogleAnalytics({ measurementId }: GoogleAnalyticsProps) {
+  if (!isGAEnabled()) {
     return null;
   }
 
   return (
     <>
+      <Suspense fallback={null}>
+        <AnalyticsPageView />
+      </Suspense>
       <Script
         src={`https://www.googletagmanager.com/gtag/js?id=${measurementId}`}
         strategy="afterInteractive"

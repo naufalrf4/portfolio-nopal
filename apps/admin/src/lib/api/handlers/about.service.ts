@@ -18,7 +18,7 @@ export class AboutService {
 
     const updateData: Prisma.AboutMeUpdateInput = {
       fullName: data.fullName,
-      tagline: data.tagline,
+      tagline: data.tagline ?? undefined,
       roles: data.roles,
       bio: data.bio,
       email: data.email,
@@ -47,6 +47,7 @@ export class AboutService {
     return prisma.aboutMe.create({
       data: {
         fullName: 'Full Name',
+        tagline: 'Your Tagline',
         email: 'email@example.com',
         bio: '',
         roles: [],

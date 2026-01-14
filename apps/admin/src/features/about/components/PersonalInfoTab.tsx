@@ -7,8 +7,28 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { FileUpload } from '@/components/upload/FileUpload';
+import { ResponsiveModal } from '@/components/ui/responsive-modal';
 import { useAbout } from '../hooks/useAbout';
 import { cn } from '@/lib/utils';
+
+type PreviewType = 'image' | 'pdf';
+
+interface PreviewState {
+  url: string;
+  type: PreviewType;
+  title: string;
+}
+
+const neumorphicButton = cn(
+  'h-9 w-9 rounded-xl shrink-0',
+  'bg-[#E0E5EC] flex items-center justify-center',
+  'shadow-[4px_4px_8px_rgba(163,177,198,0.5),-4px_-4px_8px_rgba(255,255,255,0.4)]',
+  'text-[#6B7280] transition-all duration-200',
+  'hover:shadow-[5px_5px_10px_rgba(163,177,198,0.55),-5px_-5px_10px_rgba(255,255,255,0.5)]',
+  'hover:text-[#3B82F6]',
+  'active:shadow-[inset_3px_3px_6px_rgba(163,177,198,0.5),inset_-3px_-3px_6px_rgba(255,255,255,0.4)]',
+  'focus:outline-none focus:ring-2 focus:ring-[#3B82F6]/30'
+);
 
 export function PersonalInfoTab() {
   const { data, saving, updateAbout } = useAbout();
@@ -20,18 +40,15 @@ export function PersonalInfoTab() {
   const [location, setLocation] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('');
   const [resumeUrl, setResumeUrl] = useState('');
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [previewType, setPreviewType] = useState<'image' | 'pdf' | null>(null);
+  const [preview, setPreview] = useState<PreviewState | null>(null);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
-  const handlePreview = (url: string, type: 'image' | 'pdf') => {
-    setPreviewUrl(url);
-    setPreviewType(type);
+  const handlePreview = (url: string, type: PreviewType, title: string) => {
+    setPreview({ url, type, title });
   };
 
   const closePreview = () => {
-    setPreviewUrl(null);
-    setPreviewType(null);
+    setPreview(null);
   };
 
   useEffect(() => {
@@ -165,19 +182,18 @@ export function PersonalInfoTab() {
                   folder="about"
                   accept="image/jpeg,image/png,image/webp"
                   helperText=""
+                  preview={false}
                 />
               </div>
               {avatarUrl && (
-                <Button
+                <button
                   type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handlePreview(avatarUrl, 'image')}
-                  className="shrink-0"
+                  onClick={() => handlePreview(avatarUrl, 'image', 'Avatar Preview')}
+                  className={neumorphicButton}
+                  title="Preview avatar"
                 >
-                  <Eye className="h-4 w-4 mr-1" />
-                  Preview
-                </Button>
+                  <Eye className="h-4 w-4" />
+                </button>
               )}
             </div>
           </div>
@@ -196,19 +212,18 @@ export function PersonalInfoTab() {
                   folder="resumes"
                   accept="application/pdf"
                   helperText=""
+                  preview={false}
                 />
               </div>
               {resumeUrl && (
-                <Button
+                <button
                   type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handlePreview(resumeUrl, 'pdf')}
-                  className="shrink-0"
+                  onClick={() => handlePreview(resumeUrl, 'pdf', 'Resume Preview')}
+                  className={neumorphicButton}
+                  title="Preview resume"
                 >
-                  <Eye className="h-4 w-4 mr-1" />
-                  Preview
-                </Button>
+                  <Eye className="h-4 w-4" />
+                </button>
               )}
             </div>
           </div>
@@ -229,42 +244,35 @@ export function PersonalInfoTab() {
         </div>
       </CardContent>
 
-      {previewUrl && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
-          onClick={closePreview}
-        >
-          <div
-            className="bg-[#E0E5EC] rounded-2xl shadow-[12px_12px_24px_rgba(163,177,198,0.7),-12px_-12px_24px_rgba(255,255,255,0.6)] max-w-4xl w-full max-h-[90vh] overflow-hidden"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between p-4 border-b border-[#d1d5db]/50">
-              <div className="flex items-center gap-2">
-                {previewType === 'image' ? (
-                  <ImageIcon className="w-5 h-5" />
-                ) : (
-                  <FileText className="w-5 h-5" />
-                )}
-                <span className="font-medium">Preview</span>
-              </div>
-              <Button variant="ghost" size="sm" onClick={closePreview}>
-                Close
-              </Button>
-            </div>
-            <div className="p-4 overflow-auto max-h-[calc(90vh-80px)]">
-              {previewType === 'image' ? (
-                <img src={previewUrl} alt="Preview" className="w-full h-auto rounded-lg" />
-              ) : (
-                <iframe
-                  src={previewUrl}
-                  className="w-full h-[70vh] rounded-lg"
-                  title="PDF Preview"
-                />
-              )}
-            </div>
-          </div>
+      <ResponsiveModal
+        open={!!preview}
+        onOpenChange={(open) => !open && closePreview()}
+        title={preview?.title || 'Preview'}
+        description={preview?.type === 'image' ? 'Image preview' : 'PDF document preview'}
+        size="xl"
+      >
+        <div className="flex items-center gap-2 mb-4">
+          {preview?.type === 'image' ? (
+            <ImageIcon className="w-5 h-5 text-[#3B82F6]" />
+          ) : (
+            <FileText className="w-5 h-5 text-[#3B82F6]" />
+          )}
+          <span className="text-sm text-[#6B7280]">
+            {preview?.type === 'image' ? 'Image' : 'PDF Document'}
+          </span>
         </div>
-      )}
+        <div className="rounded-xl overflow-hidden bg-white/50">
+          {preview?.type === 'image' ? (
+            <img
+              src={preview.url}
+              alt="Preview"
+              className="w-full h-auto max-h-[60vh] object-contain"
+            />
+          ) : (
+            <iframe src={preview?.url} className="w-full h-[60vh] rounded-lg" title="PDF Preview" />
+          )}
+        </div>
+      </ResponsiveModal>
     </Card>
   );
 }

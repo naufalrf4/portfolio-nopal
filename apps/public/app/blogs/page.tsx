@@ -6,45 +6,52 @@ import { Suspense } from 'react';
 import { LoadingState, PageHeader } from '@/src/features/shared/components';
 import { BookOpen } from 'lucide-react';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 1800;
 
 export const metadata: Metadata = {
-  title: 'Articles',
+  title: 'Blogs - NaufalRF',
   description:
-    'Thoughts, tutorials, and insights on web development, software engineering, and technology.',
+    'Technical blogs and practical insights by Naufal Rizqullah Firdaus covering software engineering, automation design, IoT integration, system architecture, and applied AI workflows.',
+  keywords: [
+    'Naufal Rizqullah Firdaus Blog',
+    'Automation Engineering Blog',
+    'IoT Integration Blog',
+    'Software Architecture Notes',
+  ],
   openGraph: {
-    title: 'Articles | NaufalRF',
+    title: 'Blogs by NaufalRF',
     description:
-      'Thoughts, tutorials, and insights on web development, software engineering, and technology.',
+      'Engineering notes and reflections from Naufal Rizqullah Firdaus on building automation systems, integrated solutions, and scalable software architectures.',
     type: 'website',
     url: 'https://naufalrf.tech/blogs',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Articles | NaufalRF',
+    title: 'Blogs by NaufalRF',
     description:
-      'Thoughts, tutorials, and insights on web development, software engineering, and technology.',
+      'Engineering notes and reflections from Naufal Rizqullah Firdaus on building automation systems, integrated solutions, and scalable software architectures.',
   },
   alternates: {
     canonical: 'https://naufalrf.tech/blogs',
   },
 };
 
-async function getBlogs(): Promise<{ blogs: BlogLink[]; error?: string }> {
+async function getBlogs(): Promise<{ blogs: BlogLink[]; error?: string; ssrError?: boolean }> {
   try {
     const response = await defaultClient.blogs.getAll();
     const blogs = response.data || [];
     return { blogs };
-  } catch {
+  } catch (error) {
+    console.error('Error fetching blogs during SSR:', error);
     return {
       blogs: [],
-      error: 'Failed to load articles. Please try again later.',
+      ssrError: true,
     };
   }
 }
 
 export default async function BlogsPage() {
-  const { blogs, error } = await getBlogs();
+  const { blogs, error, ssrError } = await getBlogs();
 
   const serializedBlogs = Array.isArray(blogs)
     ? blogs.map((blog) => ({
@@ -64,7 +71,7 @@ export default async function BlogsPage() {
           icon={BookOpen}
         />
         <Suspense fallback={<LoadingState type="skeleton" count={6} height="h-64" />}>
-          <BlogsContent initialBlogs={serializedBlogs} error={error} />
+          <BlogsContent initialBlogs={serializedBlogs} error={error} ssrError={ssrError} />
         </Suspense>
       </div>
     </div>

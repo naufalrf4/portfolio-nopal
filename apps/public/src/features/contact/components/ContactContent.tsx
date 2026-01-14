@@ -30,7 +30,7 @@ export function ContactContent() {
   };
 
   return (
-    <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+    <div className="animate-fade-in min-h-screen py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <PageHeader
           title="Get in Touch"
@@ -38,7 +38,7 @@ export function ContactContent() {
           icon={MessageSquare}
         />
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 mb-16">
-          <div className="lg:col-span-5">
+          <div className="lg:col-span-5 stagger-item">
             <ContactInfo
               location={STATIC_CONTACT.location}
               email={STATIC_CONTACT.email}
@@ -48,7 +48,7 @@ export function ContactContent() {
             />
           </div>
 
-          <div className="lg:col-span-7">
+          <div className="lg:col-span-7 stagger-item">
             <div className="flex gap-2 mb-6">
               <button
                 onClick={() => setActiveTab('form')}
@@ -92,12 +92,13 @@ export function ContactContent() {
           </div>
 
           <div className="space-y-4">
-            {FAQS.map((faq) => {
+            {FAQS.map((faq, index) => {
               const isOpen = openFaqId === faq.id;
               return (
                 <NeuCard
                   key={faq.id}
-                  className="cursor-pointer overflow-hidden"
+                  className="cursor-pointer overflow-hidden stagger-item"
+                  style={{ animationDelay: `${0.3 + index * 0.05}s` }}
                   onClick={() => toggleFaq(faq.id)}
                 >
                   <div className="flex items-center justify-between">

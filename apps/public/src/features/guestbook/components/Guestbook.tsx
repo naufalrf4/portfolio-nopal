@@ -65,11 +65,11 @@ export function Guestbook() {
 
   return (
     <Section>
-      <div className="mx-auto max-w-7xl">
+      <div className="animate-fade-in mx-auto max-w-7xl">
         <SectionHeader title="Guestbook" subtitle="Leave a message and say hello!" />
 
         <div className="max-w-3xl mx-auto space-y-8">
-          <NeuCard>
+          <NeuCard className="stagger-item">
             {authConfigError ? (
               <div className="text-center py-6 space-y-4">
                 <AlertCircle className="w-12 h-12 mx-auto text-red-500" />
@@ -89,7 +89,7 @@ export function Guestbook() {
               </div>
             ) : isAuthenticated && userEmail ? (
               <div className="text-center py-6">
-                <NeuButton onClick={() => setIsModalOpen(true)}>
+                <NeuButton variant="primary" size="md" onClick={() => setIsModalOpen(true)}>
                   <Plus size={18} className="mr-2" />
                   Leave a Message
                 </NeuButton>

@@ -4,12 +4,14 @@ import { cn } from '@/src/lib/utils';
 import { formatDistanceToNow } from '@/src/lib/utils';
 import { User, Bot } from 'lucide-react';
 import type { Message } from '../types';
+import { MarkdownMessage } from './MarkdownMessage';
 
 interface MessageBubbleProps {
   message: Message;
+  isStreaming?: boolean;
 }
 
-export function MessageBubble({ message }: MessageBubbleProps) {
+export function MessageBubble({ message, isStreaming = false }: MessageBubbleProps) {
   const isUser = message.role === 'user';
 
   return (
@@ -33,19 +35,7 @@ export function MessageBubble({ message }: MessageBubbleProps) {
             : 'bg-[#E0E5EC] text-[#3D4852] rounded-bl-md shadow-[6px_6px_12px_rgba(163,177,198,0.5),-6px_-6px_12px_rgba(255,255,255,0.5)]'
         )}
       >
-        <div className={cn('text-sm leading-relaxed', isUser ? 'text-white' : 'text-[#3D4852]')}>
-          {isUser ? (
-            message.content
-          ) : (
-            <div className="prose prose-sm max-w-none prose-p:my-1 prose-headings:my-2">
-              {message.content.split('\n').map((line, i) => (
-                <p key={i} className={line ? '' : 'h-2'}>
-                  {line}
-                </p>
-              ))}
-            </div>
-          )}
-        </div>
+        <MarkdownMessage content={message.content} isUser={isUser} isStreaming={isStreaming} />
 
         <div className={cn('text-xs mt-2', isUser ? 'text-white/70' : 'text-[#6B7280]')}>
           {formatDistanceToNow(new Date(message.timestamp))}

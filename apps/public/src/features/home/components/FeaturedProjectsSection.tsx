@@ -28,6 +28,7 @@ export function FeaturedProjectsSection() {
         liveUrl: p.liveUrl || undefined,
         repoUrl: p.repoUrl || undefined,
         imageUrl: p.imageUrl || undefined,
+        images: p.images || undefined,
         featured: p.featured,
         createdAt: p.createdAt,
       }));

@@ -4,7 +4,7 @@ export default function ProjectDetailLoading() {
   return (
     <div className="min-h-screen p-8">
       <Section>
-        <div className="max-w-5xl mx-auto">
+        <div className="max-w-5xl mx-auto animate-fade-in">
           <div className="mb-8">
             <div className="w-16 h-6 bg-[#E0E5EC] rounded-xl shadow-[inset_4px_4px_8px_rgba(163,177,198,0.4),inset_-4px_-4px_8px_rgba(255,255,255,0.4)] mb-4 animate-pulse" />
             <div className="w-3/4 h-12 bg-[#E0E5EC] rounded-xl shadow-[inset_4px_4px_8px_rgba(163,177,198,0.4),inset_-4px_-4px_8px_rgba(255,255,255,0.4)] mb-4 animate-pulse" />

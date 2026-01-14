@@ -7,11 +7,15 @@ export const createProjectSchema = z.object({
   description: z.string().optional(),
   category: z.string().min(1).max(100),
   techStack: z.array(z.string()).default([]),
+  tags: z.array(z.string()).default([]),
   liveUrl: z.string().url().optional().nullable(),
   repoUrl: z.string().url().optional().nullable(),
   featured: z.boolean().default(false),
   visible: z.boolean().default(true),
   order: z.number().int().default(0),
+  startDate: z.string().datetime().optional().nullable(),
+  endDate: z.string().datetime().optional().nullable(),
+  projectDate: z.string().max(50).optional().nullable(),
 });
 
 export const updateProjectSchema = createProjectSchema.partial();

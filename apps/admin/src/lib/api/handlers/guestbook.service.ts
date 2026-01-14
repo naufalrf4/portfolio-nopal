@@ -40,12 +40,27 @@ export class GuestbookService {
     });
   }
 
-  async create(userId: string, message: string) {
+  async create(
+    userId: string,
+    message: string,
+    locationData?: {
+      ipAddress?: string;
+      countryCode?: string;
+      country?: string;
+      city?: string;
+      region?: string;
+    }
+  ) {
     return prisma.guestbookEntry.create({
       data: {
         userId,
         message,
         visible: true,
+        ipAddress: locationData?.ipAddress || null,
+        countryCode: locationData?.countryCode || null,
+        country: locationData?.country || null,
+        city: locationData?.city || null,
+        region: locationData?.region || null,
       },
       include: {
         user: {

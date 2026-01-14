@@ -4,6 +4,8 @@ import { defaultClient } from '@naufalrf/sdk';
 import { ProjectDetail } from '@/src/features/projects/components';
 import { ProjectViewTracker } from '@/src/components/projects/ProjectViewTracker';
 
+export const revalidate = 3600;
+
 interface ProjectPageProps {
   params: Promise<{
     slug: string;
@@ -33,10 +35,20 @@ export async function generateMetadata({ params }: ProjectPageProps): Promise<Me
   const title = project.title;
   const description = project.summary;
   const url = `https://naufalrf.tech/projects/${project.slug}`;
+  const keywords = [
+    'NaufalRF',
+    'Naufal Rizqullah Firdaus',
+    'Software Engineer Indonesia',
+    'Full Stack Developer Indonesia',
+    'Solution Engineering Portfolio',
+    ...(project.techStack ?? []),
+    ...(project.tags ?? []),
+  ].filter((keyword) => Boolean(keyword));
 
   return {
     title,
     description,
+    keywords,
     openGraph: {
       title: `${title} | NaufalRF`,
       description,

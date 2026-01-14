@@ -3,13 +3,77 @@
 import { cn } from '@/src/lib/utils';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { ChevronDown, ExternalLink } from 'lucide-react';
 import { NAV_ITEMS, OTHER_LINKS } from '@/src/lib/constants';
 
 export function Navbar() {
   const pathname = usePathname();
   const [otherDropdownOpen, setOtherDropdownOpen] = useState(false);
+  const [isClickOpen, setIsClickOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleMouseEnter = () => {
+    if (!isClickOpen) {
+      if (hoverTimeoutRef.current) {
+        clearTimeout(hoverTimeoutRef.current);
+      }
+      hoverTimeoutRef.current = setTimeout(() => {
+        setOtherDropdownOpen(true);
+      }, 100);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (!isClickOpen) {
+      if (hoverTimeoutRef.current) {
+        clearTimeout(hoverTimeoutRef.current);
+      }
+      hoverTimeoutRef.current = setTimeout(() => {
+        setOtherDropdownOpen(false);
+      }, 150);
+    }
+  };
+
+  const handleClick = () => {
+    setIsClickOpen(!isClickOpen);
+    setOtherDropdownOpen(!otherDropdownOpen);
+  };
+
+  const handleLinkClick = () => {
+    setIsClickOpen(false);
+    setOtherDropdownOpen(false);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsClickOpen(false);
+        setOtherDropdownOpen(false);
+      }
+    };
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsClickOpen(false);
+        setOtherDropdownOpen(false);
+      }
+    };
+
+    if (otherDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('keydown', handleEscape);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscape);
+      if (hoverTimeoutRef.current) {
+        clearTimeout(hoverTimeoutRef.current);
+      }
+    };
+  }, [otherDropdownOpen]);
 
   return (
     <header className="sticky top-0 z-50 px-4 pt-4">
@@ -39,12 +103,13 @@ export function Navbar() {
             ))}
 
             <div
+              ref={dropdownRef}
               className="relative"
-              onMouseEnter={() => setOtherDropdownOpen(true)}
-              onMouseLeave={() => setOtherDropdownOpen(false)}
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={handleMouseLeave}
             >
               <button
-                onClick={() => setOtherDropdownOpen(!otherDropdownOpen)}
+                onClick={handleClick}
                 className={cn(
                   'flex items-center gap-1 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200',
                   otherDropdownOpen
@@ -63,10 +128,11 @@ export function Navbar() {
               </button>
 
               {otherDropdownOpen && (
-                <div className="absolute top-full right-0 mt-2 w-48 py-2 rounded-xl bg-[#E0E5EC] shadow-[9px_9px_16px_rgba(163,177,198,0.6),-9px_-9px_16px_rgba(255,255,255,0.5)] animate-in slide-in-from-top-2 fade-in duration-150">
+                <div className="absolute top-full right-0 mt-2 w-56 py-2 rounded-xl bg-[#E0E5EC] shadow-[9px_9px_16px_rgba(163,177,198,0.6),-9px_-9px_16px_rgba(255,255,255,0.5)] animate-in slide-in-from-top-2 fade-in duration-200">
                   {OTHER_LINKS.map((link) => {
                     const Icon = link.icon;
                     const isExternal = link.external;
+                    const isActive = pathname === link.href;
 
                     if (isExternal) {
                       return (
@@ -75,11 +141,18 @@ export function Navbar() {
                           href={link.href}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex items-center gap-3 px-4 py-3 text-sm text-[#3D4852] hover:text-[#3B82F6] hover:bg-[#E0E5EC]/50 transition-colors"
+                          className="group flex items-center gap-3 px-4 py-3 mx-2 rounded-lg text-sm text-[#3D4852] hover:text-[#3B82F6] hover:shadow-[inset_2px_2px_4px_rgba(163,177,198,0.4),inset_-2px_-2px_4px_rgba(255,255,255,0.4)] transition-all duration-200"
+                          onClick={handleLinkClick}
                         >
-                          <Icon size={18} />
+                          <Icon
+                            size={18}
+                            className="transition-transform duration-200 group-hover:scale-110"
+                          />
                           <span className="flex-1">{link.label}</span>
-                          <ExternalLink size={14} className="text-[#6B7280]" />
+                          <ExternalLink
+                            size={14}
+                            className="text-[#6B7280] transition-opacity duration-200 group-hover:opacity-100 opacity-60"
+                          />
                         </a>
                       );
                     }
@@ -88,10 +161,18 @@ export function Navbar() {
                       <Link
                         key={link.href}
                         href={link.href}
-                        className="flex items-center gap-3 px-4 py-3 text-sm text-[#3D4852] hover:text-[#3B82F6] hover:bg-[#E0E5EC]/50 transition-colors"
-                        onClick={() => setOtherDropdownOpen(false)}
+                        className={cn(
+                          'group flex items-center gap-3 px-4 py-3 mx-2 rounded-lg text-sm transition-all duration-200',
+                          isActive
+                            ? 'text-[#3B82F6] shadow-[inset_2px_2px_4px_rgba(163,177,198,0.4),inset_-2px_-2px_4px_rgba(255,255,255,0.4)]'
+                            : 'text-[#3D4852] hover:text-[#3B82F6] hover:shadow-[inset_2px_2px_4px_rgba(163,177,198,0.4),inset_-2px_-2px_4px_rgba(255,255,255,0.4)]'
+                        )}
+                        onClick={handleLinkClick}
                       >
-                        <Icon size={18} />
+                        <Icon
+                          size={18}
+                          className="transition-transform duration-200 group-hover:scale-110"
+                        />
                         <span className="flex-1">{link.label}</span>
                       </Link>
                     );

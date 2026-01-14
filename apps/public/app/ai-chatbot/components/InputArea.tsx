@@ -1,6 +1,13 @@
 'use client';
 
-import { useState, useCallback, type KeyboardEvent } from 'react';
+import {
+  useState,
+  useCallback,
+  useRef,
+  useEffect,
+  type KeyboardEvent,
+  type ChangeEvent,
+} from 'react';
 import { cn } from '@/src/lib/utils';
 import { Send, Loader2 } from 'lucide-react';
 
@@ -9,8 +16,25 @@ interface InputAreaProps {
   isLoading: boolean;
 }
 
+const MAX_CHARS = 2000;
+
 export function InputArea({ onSend, isLoading }: InputAreaProps) {
   const [value, setValue] = useState('');
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+    const newValue = e.target.value;
+    if (newValue.length <= MAX_CHARS) {
+      setValue(newValue);
+    }
+  };
+
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 200)}px`;
+    }
+  }, [value]);
 
   const handleSend = useCallback(() => {
     if (value.trim() && !isLoading) {
@@ -29,14 +53,18 @@ export function InputArea({ onSend, isLoading }: InputAreaProps) {
     [handleSend]
   );
 
+  const charCount = value.length;
+  const isNearLimit = charCount > MAX_CHARS * 0.9;
+
   return (
     <div className="p-6 border-t border-[#D1D5DB]/50 bg-[#F0F4F8]">
       <div className="max-w-4xl mx-auto">
         <div className="flex gap-4">
           <div className="flex-1 relative">
             <textarea
+              ref={textareaRef}
               value={value}
-              onChange={(e) => setValue(e.target.value)}
+              onChange={handleChange}
               onKeyDown={handleKeyDown}
               placeholder="Type your message... (Press Enter to send, Shift+Enter for new line)"
               disabled={isLoading}
@@ -48,10 +76,19 @@ export function InputArea({ onSend, isLoading }: InputAreaProps) {
                 'placeholder:text-[#6B7280]',
                 'transition-all duration-200',
                 'disabled:opacity-50 disabled:cursor-not-allowed',
-                'resize-none min-h-[56px] max-h-[200px]'
+                'resize-none min-h-[56px] overflow-y-auto'
               )}
+              style={{ maxHeight: '200px' }}
               aria-label="Chat message input"
             />
+            <div
+              className={cn(
+                'absolute bottom-2 right-2 text-xs',
+                isNearLimit ? 'text-red-500' : 'text-[#6B7280]'
+              )}
+            >
+              {charCount}/{MAX_CHARS}
+            </div>
           </div>
 
           <button
@@ -67,7 +104,7 @@ export function InputArea({ onSend, isLoading }: InputAreaProps) {
               'active:shadow-[inset_4px_4px_8px_rgba(0,0,0,0.2)]',
               'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100',
               'transition-all duration-200',
-              'flex items-center justify-center gap-2'
+              'flex items-center justify-center gap-2 self-end'
             )}
             aria-label="Send message"
           >

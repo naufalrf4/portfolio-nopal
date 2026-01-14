@@ -8,12 +8,16 @@ export interface Project {
   description: string;
   category: string;
   techStack: string[];
+  tags: string[];
   liveUrl?: string;
   repoUrl?: string;
   imageUrl?: string;
   featured: boolean;
   visible: boolean;
   order: number;
+  startDate?: Date;
+  endDate?: Date;
+  projectDate?: string;
   createdAt: Date;
   updatedAt: Date;
   contexts?: ProjectContext[];
@@ -59,6 +63,7 @@ export interface BlogLink {
   description?: string;
   imageUrl?: string;
   source: string;
+  tags: string[];
   publishedAt?: Date;
   visible: boolean;
   order: number;
@@ -72,6 +77,11 @@ export interface GuestbookEntry {
   message: string;
   reactions: unknown;
   visible: boolean;
+  ipAddress?: string;
+  countryCode?: string;
+  country?: string;
+  city?: string;
+  region?: string;
   createdAt: Date;
   updatedAt: Date;
   user?: {
@@ -195,3 +205,57 @@ export type ChatLogsResponse = ApiResponse<{
   };
 }>;
 export type ChatLogResponse = ApiResponse<ChatLog>;
+
+export interface Achievement {
+  id: string;
+  name: string;
+  location: string;
+  monthYear: string;
+  photos: string[];
+  description: string;
+  externalUrl?: string;
+  order: number;
+  visible: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface CreateAchievementInput {
+  name: string;
+  location: string;
+  monthYear: string;
+  photos: string[];
+  description: string;
+  externalUrl?: string;
+  order?: number;
+  visible?: boolean;
+}
+
+export interface UpdateAchievementInput {
+  name?: string;
+  location?: string;
+  monthYear?: string;
+  photos?: string[];
+  description?: string;
+  externalUrl?: string;
+  order?: number;
+  visible?: boolean;
+}
+
+export interface AchievementsQuery {
+  page?: number;
+  limit?: number;
+  visible?: boolean;
+}
+
+export type AchievementsResponse = ApiResponse<{
+  achievements: Achievement[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}>;
+
+export type AchievementResponse = ApiResponse<Achievement>;

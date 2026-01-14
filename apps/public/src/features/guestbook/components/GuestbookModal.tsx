@@ -6,6 +6,7 @@ import { NeuTextarea, NeuButton } from '@/src/features/shared/components';
 import { api } from '@/src/lib/api';
 import { Send, AlertCircle } from 'lucide-react';
 import { useLazyTurnstile, LazyTurnstile } from '@naufalrf/ui';
+import { trackGuestbookEntry } from '@naufalrf/analytics';
 
 const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '';
 
@@ -53,6 +54,7 @@ export function GuestbookModal({ isOpen, onClose, userEmail, onSuccess }: Guestb
       } as any);
       setMessage('');
       resetTurnstile();
+      trackGuestbookEntry();
       onClose();
       onSuccess();
     } catch (err) {

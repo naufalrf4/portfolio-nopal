@@ -3,6 +3,7 @@
 import { useState, useCallback, type FormEvent } from 'react';
 import { Send, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 import { useLazyTurnstile, LazyTurnstile } from '@naufalrf/ui';
+import { trackNGLSubmission } from '@naufalrf/analytics';
 
 const MAX_CHARACTERS = 500;
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
@@ -89,6 +90,7 @@ export function MessageForm() {
         setFormState('success');
         setMessage('');
         resetTurnstile();
+        trackNGLSubmission();
       } catch {
         setErrorMessage('Network error. Please check your connection.');
         setFormState('error');

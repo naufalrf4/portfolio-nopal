@@ -151,6 +151,7 @@ export interface BookingSlot {
 export interface ContactFormData {
   name: string;
   email: string;
+  subject?: string;
   message: string;
   turnstileToken: string;
 }
@@ -159,7 +160,8 @@ export interface BookingData {
   slotId: string;
   name: string;
   email: string;
-  message?: string;
+  phone: string;
+  notes: string;
   turnstileToken: string;
 }
 
@@ -170,4 +172,23 @@ export interface AnonymousMessageData {
 export interface GuestbookSubmitData {
   message: string;
   userEmail: string;
+}
+
+export interface Achievement {
+  id: string;
+  name: string;
+  location: string;
+  monthYear: string;
+  photos: string[];
+  description: string;
+  externalUrl: string | null;
+  order: number;
+  createdAt: string;
+}
+
+export interface AchievementsResponse {
+  achievements: Achievement[];
+  meta: {
+    total: number;
+  };
 }

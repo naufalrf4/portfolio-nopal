@@ -23,7 +23,7 @@ export function LatestArticles({ blogs }: LatestArticlesProps) {
   }
 
   return (
-    <Section className="bg-[#E0E5EC] animate-fade-in">
+    <Section className="animate-fade-in">
       <SectionHeader
         title="Latest Articles"
         subtitle="Thoughts, tutorials, and insights on software development and technology"
@@ -84,9 +84,9 @@ export function LatestArticles({ blogs }: LatestArticlesProps) {
 
       <div className="mt-10 text-center">
         <Link href="/blogs">
-          <NeuButton variant="default" size="lg">
+          <NeuButton variant="primary" size="md" className="min-w-[200px]">
             View All Articles
-            <ArrowRight className="ml-2 w-5 h-5" />
+            <ArrowRight className="ml-2 w-4 h-4" />
           </NeuButton>
         </Link>
       </div>

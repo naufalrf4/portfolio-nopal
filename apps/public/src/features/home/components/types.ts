@@ -22,6 +22,14 @@ export interface AboutData {
   socialLinks?: Array<{ platform: string; url: string }>;
 }
 
+export interface ProjectImage {
+  id: string;
+  url: string;
+  order: number;
+  alt?: string;
+  caption?: string;
+}
+
 export interface Project {
   id: string;
   title: string;
@@ -33,6 +41,7 @@ export interface Project {
   liveUrl?: string;
   repoUrl?: string;
   imageUrl?: string;
+  images?: ProjectImage[];
   featured: boolean;
   createdAt?: string | Date;
 }

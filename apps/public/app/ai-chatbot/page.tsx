@@ -2,21 +2,26 @@ import type { Metadata } from 'next';
 import { AIChatPage } from './components';
 
 export const metadata: Metadata = {
-  title: 'AI Chatbot',
+  title: 'AI Chatbot - NaufalRF',
   description:
-    'Chat with an AI assistant to learn more about my projects, experience, and skills. Ask anything about my work!',
+    'An AI powered chatbot built by Naufal Rizqullah Firdaus to represent his portfolio, projects, automation skills, IoT experience, and solution engineering approach in an interactive format.',
+  keywords: [
+    'AI Chatbot Portfolio',
+    'Automation Engineer AI',
+    'Naufal Rizqullah Firdaus AI Assistant',
+  ],
   openGraph: {
-    title: 'AI Chatbot | NaufalRF',
+    title: 'NaufalRF AI Chatbot',
     description:
-      'Chat with an AI assistant to learn more about my projects, experience, and skills.',
+      'Interact with an AI assistant created by Naufal Rizqullah Firdaus to explore software projects, automation workflows, IoT systems, and solution architecture thinking.',
     type: 'website',
     url: 'https://naufalrf.tech/ai-chatbot',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'AI Chatbot | NaufalRF',
+    title: 'NaufalRF AI Chatbot',
     description:
-      'Chat with an AI assistant to learn more about my projects, experience, and skills.',
+      'Interact with an AI assistant created by Naufal Rizqullah Firdaus to explore software projects, automation workflows, IoT systems, and solution architecture thinking.',
   },
   alternates: {
     canonical: 'https://naufalrf.tech/ai-chatbot',
