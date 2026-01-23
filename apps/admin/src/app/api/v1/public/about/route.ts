@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/db/prisma';
 import { successResponse, notFoundResponse, serverErrorResponse } from '@/lib/api/responses';
+import { signAssetUrls } from '@/lib/utils/sign-urls';
 
 interface Skill {
   name: string;
@@ -76,7 +77,11 @@ export async function GET() {
       socialLinks: parseJsonField<SocialLink[]>(aboutMe.socialLinks, []),
     };
 
-    return successResponse(publicData);
+    const signedData = await signAssetUrls(publicData, {
+      fields: ['avatarUrl', 'resumeUrl'],
+    });
+
+    return successResponse(signedData);
   } catch {
     return serverErrorResponse();
   }

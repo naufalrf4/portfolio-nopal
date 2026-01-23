@@ -9,7 +9,7 @@ import { BookOpen } from 'lucide-react';
 export const revalidate = 1800;
 
 export const metadata: Metadata = {
-  title: 'Blogs - NaufalRF',
+  title: 'Blogs',
   description:
     'Technical blogs and practical insights by Naufal Rizqullah Firdaus covering software engineering, automation design, IoT integration, system architecture, and applied AI workflows.',
   keywords: [

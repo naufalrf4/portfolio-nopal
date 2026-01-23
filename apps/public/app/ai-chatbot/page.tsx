@@ -1,8 +1,8 @@
+import { AIChatPage } from '@/src/features/chatbot/components';
 import type { Metadata } from 'next';
-import { AIChatPage } from './components';
 
 export const metadata: Metadata = {
-  title: 'AI Chatbot - NaufalRF',
+  title: 'AI Chatbot',
   description:
     'An AI powered chatbot built by Naufal Rizqullah Firdaus to represent his portfolio, projects, automation skills, IoT experience, and solution engineering approach in an interactive format.',
   keywords: [

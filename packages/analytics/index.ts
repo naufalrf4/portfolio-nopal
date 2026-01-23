@@ -9,6 +9,8 @@ export {
   trackNGLSubmission,
   trackGuestbookEntry,
   trackBookingRequest,
-  isGAEnabled,
+  isGAConfigured,
+  isGAReady,
+  isGAEnabled, // Backward compatibility alias for isGAConfigured
 } from './src/tracker';
 export type { GAEvent } from './src/types';

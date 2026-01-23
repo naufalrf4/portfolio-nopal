@@ -6,6 +6,7 @@ import {
   createAchievementSchema,
   achievementQuerySchema,
 } from '@/lib/validations/achievement.schema';
+import { signStringArray } from '@/lib/utils/sign-urls';
 
 async function handleGet(req: NextRequest) {
   try {
@@ -18,7 +19,15 @@ async function handleGet(req: NextRequest) {
     }
 
     const achievements = await achievementsService.getAll(validation.data);
-    return successResponse({ achievements });
+
+    const signedAchievements = await Promise.all(
+      achievements.map(async (achievement) => ({
+        ...achievement,
+        photos: await signStringArray(achievement.photos),
+      }))
+    );
+
+    return successResponse({ achievements: signedAchievements });
   } catch {
     return serverErrorResponse();
   }
@@ -34,7 +43,13 @@ async function handlePost(req: NextRequest) {
     }
 
     const achievement = await achievementsService.create(validation.data);
-    return successResponse(achievement, 'Achievement created successfully');
+
+    const signedAchievement = {
+      ...achievement,
+      photos: await signStringArray(achievement.photos),
+    };
+
+    return successResponse(signedAchievement, 'Achievement created successfully');
   } catch {
     return serverErrorResponse();
   }

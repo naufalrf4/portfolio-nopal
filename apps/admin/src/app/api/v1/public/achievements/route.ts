@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
 import { prisma } from '@/lib/db/prisma';
 import { successResponse, serverErrorResponse } from '@/lib/api/responses';
+import { signStringArray } from '@/lib/utils/sign-urls';
 
 const DEFAULT_LIMIT = 10;
 const MAX_LIMIT = 50;
@@ -35,7 +36,14 @@ export async function GET(req: NextRequest) {
       prisma.achievement.count({ where }),
     ]);
 
-    return successResponse({ achievements, meta: { total } });
+    const signedAchievements = await Promise.all(
+      achievements.map(async (achievement) => ({
+        ...achievement,
+        photos: await signStringArray(achievement.photos),
+      }))
+    );
+
+    return successResponse({ achievements: signedAchievements, meta: { total } });
   } catch {
     return serverErrorResponse();
   }

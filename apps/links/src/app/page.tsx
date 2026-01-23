@@ -1,22 +1,6 @@
 import { LinksPageContent } from '../components/LinksPageContent';
 
-export const revalidate = 7200;
-export const dynamic = 'error';
-
-interface AboutData {
-  fullName: string;
-  tagline: string;
-  bio: string;
-  avatarUrl: string;
-  socialLinks: { platform: string; url: string }[];
-}
-
-interface ProfileLink {
-  id: string;
-  label: string;
-  url: string;
-  icon?: string;
-}
+export const dynamic = 'force-dynamic';
 
 async function getLinksData() {
   const baseUrl = process.env.NEXT_PUBLIC_ADMIN_API_URL || 'http://localhost:3001';

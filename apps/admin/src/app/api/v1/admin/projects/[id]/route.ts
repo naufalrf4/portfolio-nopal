@@ -9,6 +9,7 @@ import {
   serverErrorResponse,
 } from '@/lib/api/responses';
 import { updateProjectSchema } from '@/lib/validations/project.schema';
+import { signAssetUrls } from '@/lib/utils/sign-urls';
 
 type RouteContext = {
   params: Promise<{ id: string }>;
@@ -24,7 +25,11 @@ export async function GET(req: NextRequest, context: RouteContext) {
         return notFoundResponse('Project');
       }
 
-      return successResponse(project);
+      const signedProject = await signAssetUrls(project, {
+        fields: ['imageUrl'],
+      });
+
+      return successResponse(signedProject);
     } catch {
       return serverErrorResponse();
     }
@@ -55,7 +60,12 @@ export async function PUT(req: NextRequest, context: RouteContext) {
       }
 
       const project = await projectsService.update(id, validation.data);
-      return successResponse(project, 'Project updated successfully');
+
+      const signedProject = await signAssetUrls(project, {
+        fields: ['imageUrl'],
+      });
+
+      return successResponse(signedProject, 'Project updated successfully');
     } catch {
       return serverErrorResponse();
     }

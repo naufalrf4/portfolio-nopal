@@ -4,16 +4,7 @@ import { useState } from 'react';
 import { Mail, MailOpen, Trash2, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+import { DeleteConfirmModal } from './DeleteConfirmModal';
 import { useContacts } from '../hooks/useContacts';
 import { ContactTable } from './ContactTable';
 import { ContactDetailModal } from './ContactDetailModal';
@@ -31,11 +22,9 @@ export function ContactsTab() {
     contacts,
     loading,
     pagination,
-    unreadCount,
     filterMode,
     setFilterMode,
     setPage,
-    refetch,
     getContact,
     deleteContact,
     toggleReadStatus,
@@ -283,23 +272,12 @@ export function ContactsTab() {
         onConfirm={handleBulkAction}
       />
 
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete Contact</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to delete this contact from {contactToDelete?.name}? This action
-              cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete} className="bg-red-600 hover:bg-red-700">
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <DeleteConfirmModal
+        isOpen={isDeleteDialogOpen}
+        onClose={() => setIsDeleteDialogOpen(false)}
+        onConfirm={confirmDelete}
+        contactName={contactToDelete?.name}
+      />
     </>
   );
 }

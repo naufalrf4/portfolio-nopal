@@ -11,6 +11,7 @@ import {
 } from '@/lib/api/responses';
 import { verifyTurnstileToken, isTurnstileConfigured } from '@/lib/services/turnstile';
 import { createHash } from 'crypto';
+import { emailService } from '@/lib/services/emailService';
 
 const publicBookingSchema = z.object({
   slotId: z.string().min(1),
@@ -116,6 +117,51 @@ export async function POST(request: NextRequest) {
       duration: booking.slot?.duration,
       createdAt: booking.createdAt.toISOString(),
     };
+
+    try {
+      await emailService.sendBookingConfirmation(booking.email, {
+        bookingId: booking.id,
+        name: booking.name,
+        date: booking.slot!.date.toLocaleDateString('en-US', {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        }),
+        time: booking.slot!.time,
+        duration: booking.slot!.duration,
+      });
+    } catch (emailError) {
+      console.error('[Booking API] User confirmation email failed:', emailError);
+    }
+
+    try {
+      const bookingSettings = await prisma.bookingSettings.findFirst();
+
+      if (bookingSettings?.notificationEmail) {
+        await emailService.sendAdminBookingNotification(bookingSettings.notificationEmail, {
+          booking: {
+            id: booking.id,
+            name: booking.name,
+            email: booking.email,
+            phone: booking.phone,
+            date: booking.slot!.date.toLocaleDateString('en-US', {
+              weekday: 'long',
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+            }),
+            time: booking.slot!.time,
+            notes: booking.notes,
+          },
+          dashboardLink: `${process.env.NEXTAUTH_URL || 'http://localhost:3001'}/admin/bookings/${booking.id}`,
+          acceptLink: `${process.env.NEXTAUTH_URL || 'http://localhost:3001'}/admin/bookings/${booking.id}?action=accept`,
+          rejectLink: `${process.env.NEXTAUTH_URL || 'http://localhost:3001'}/admin/bookings/${booking.id}?action=reject`,
+        });
+      }
+    } catch (emailError) {
+      console.error('[Booking API] Admin notification email failed:', emailError);
+    }
 
     return successResponse(responseData, 'Booking confirmed');
   } catch (error) {

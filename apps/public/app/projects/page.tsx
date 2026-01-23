@@ -7,7 +7,7 @@ import { FolderKanban } from 'lucide-react';
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: 'Projects - NaufalRF',
+  title: 'Projects',
   description:
     'Explore real world projects by Naufal Rizqullah Firdaus including full stack web applications, automation tools, AI driven workflows, IoT monitoring systems, and end to end solution engineering implementations.',
   keywords: [

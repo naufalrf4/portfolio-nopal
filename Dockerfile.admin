@@ -5,6 +5,8 @@ RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
 
 WORKDIR /app
 
+ENV PATH="/app/node_modules/.bin:${PATH}"
+
 FROM base AS deps
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
@@ -15,14 +17,18 @@ COPY packages/sdk/package.json ./packages/sdk/
 COPY packages/types/package.json ./packages/types/
 COPY packages/ui/package.json ./packages/ui/
 
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile --prod=false
 
 FROM base AS builder
 
-COPY --from=deps /app/node_modules ./node_modules
+ARG RESEND_API_KEY=dummy-resend-key
+ENV RESEND_API_KEY=${RESEND_API_KEY}
+
+RUN mkdir -p apps/admin/public
 COPY . .
 
-RUN pnpm --filter admin db:generate
+RUN pnpm install --frozen-lockfile --prod=false --force
+RUN pnpm --filter admin exec prisma generate
 RUN pnpm --filter admin build
 
 FROM base AS runner

@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { ContactContent } from '@/src/features/contact/components';
 
 export const metadata: Metadata = {
-  title: 'Contact - NaufalRF',
+  title: 'Contact Me',
   description:
     'Contact Naufal Rizqullah Firdaus for software engineering roles, automation and IoT projects, solution engineering work, freelance opportunities, or technical collaboration.',
   keywords: [

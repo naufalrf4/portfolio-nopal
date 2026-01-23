@@ -1,15 +1,15 @@
 import { NextRequest } from 'next/server';
 import { withAdminAuth } from '@/lib/api/middleware/auth';
 import { projectsService } from '@/lib/api/handlers/projects.service';
-import {
-  successResponse,
-  errorResponse,
-  validationErrorResponse,
-  serverErrorResponse,
-} from '@/lib/api/responses';
+import { successResponse, errorResponse, validationErrorResponse } from '@/lib/api/responses';
 import { projectQuerySchema, createProjectSchema } from '@/lib/validations/project.schema';
+import { logger } from '@/lib/utils/logger';
+import { handleApiError } from '@/lib/api/utils/error-handler';
+import { signAssetUrlsMany, signAssetUrls } from '@/lib/utils/sign-urls';
 
 async function handleGet(req: NextRequest) {
+  const requestId = crypto.randomUUID();
+
   try {
     const { searchParams } = new URL(req.url);
     const queryParams = Object.fromEntries(searchParams.entries());
@@ -19,14 +19,32 @@ async function handleGet(req: NextRequest) {
       return validationErrorResponse(validation.error.format());
     }
 
+    logger.info('Fetching projects', { requestId, operation: 'projects.getAll' });
     const result = await projectsService.getAll(validation.data);
-    return successResponse(result);
-  } catch {
-    return serverErrorResponse();
+
+    const signedProjects = await signAssetUrlsMany(result.projects, {
+      fields: ['imageUrl'],
+    });
+
+    logger.info('Projects fetched successfully', {
+      requestId,
+      count: result.projects?.length || 0,
+      operation: 'projects.getAll',
+    });
+
+    return successResponse({ ...result, projects: signedProjects });
+  } catch (error) {
+    return handleApiError(error, {
+      operation: 'admin.projects.getAll',
+      requestId,
+      metadata: { query: req.url },
+    });
   }
 }
 
 async function handlePost(req: NextRequest) {
+  const requestId = crypto.randomUUID();
+
   try {
     const body = await req.json();
     const validation = createProjectSchema.safeParse(body);
@@ -40,10 +58,29 @@ async function handlePost(req: NextRequest) {
       return errorResponse('Project with this slug already exists', 409, 'SLUG_EXISTS');
     }
 
+    logger.info('Creating project', {
+      requestId,
+      operation: 'projects.create',
+      slug: validation.data.slug,
+    });
     const project = await projectsService.create(validation.data);
-    return successResponse(project, 'Project created successfully');
-  } catch {
-    return serverErrorResponse();
+
+    const signedProject = await signAssetUrls(project, {
+      fields: ['imageUrl'],
+    });
+
+    logger.info('Project created successfully', {
+      requestId,
+      operation: 'projects.create',
+      projectId: project.id,
+    });
+
+    return successResponse(signedProject, 'Project created successfully');
+  } catch (error) {
+    return handleApiError(error, {
+      operation: 'admin.projects.create',
+      requestId,
+    });
   }
 }
 

@@ -16,10 +16,12 @@ export const projectsApi = {
     });
     return fetchApi<ProjectsResponse>(`/api/v1/public/projects${qs}`, {
       retries: 2,
+      revalidate: 3600,
     });
   },
   getBySlug: (slug: string) =>
     fetchApi<Project>(`/api/v1/public/projects/${slug}`, {
       retries: 2,
+      revalidate: 3600,
     }),
 };

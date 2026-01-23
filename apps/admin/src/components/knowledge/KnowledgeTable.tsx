@@ -15,18 +15,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { IngestButton } from './IngestButton';
+import { DeleteConfirmModal } from './DeleteConfirmModal';
 import { cn } from '@/lib/utils';
 
 interface KnowledgeDoc {
@@ -175,27 +166,13 @@ export function KnowledgeTable({ docs, loading, onDelete, onIngest }: KnowledgeT
         </Table>
       </Card>
 
-      <AlertDialog open={deleteModalOpen} onOpenChange={setDeleteModalOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete Knowledge Document</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to delete &quot;{deletingDoc?.filename}&quot;? This action
-              cannot be undone and will remove the document from the RAG system.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDelete}
-              disabled={isDeleting}
-              className="bg-gradient-to-r from-red-500 to-red-600 text-white"
-            >
-              {isDeleting ? 'Deleting...' : 'Delete'}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <DeleteConfirmModal
+        isOpen={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        onConfirm={handleDelete}
+        isDeleting={isDeleting}
+        filename={deletingDoc?.filename}
+      />
     </>
   );
 }

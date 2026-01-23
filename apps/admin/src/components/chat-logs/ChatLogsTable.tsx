@@ -13,17 +13,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
 import { Skeleton } from '@/components/ui/skeleton';
+import { DeleteConfirmModal } from './DeleteConfirmModal';
 import { cn } from '@/lib/utils';
 
 interface ChatLog {
@@ -211,26 +202,13 @@ export function ChatLogsTable({ logs, loading, onDelete }: ChatLogsTableProps) {
         </Table>
       </Card>
 
-      <AlertDialog open={deleteModalOpen} onOpenChange={setDeleteModalOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete Chat Log</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to delete this chat session? This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDelete}
-              disabled={isDeleting}
-              className="bg-gradient-to-r from-red-500 to-red-600 text-white"
-            >
-              {isDeleting ? 'Deleting...' : 'Delete'}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <DeleteConfirmModal
+        isOpen={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        onConfirm={handleDelete}
+        isDeleting={isDeleting}
+        sessionId={deletingLog?.sessionId}
+      />
     </>
   );
 }

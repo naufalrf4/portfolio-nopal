@@ -2,10 +2,10 @@ import type { Metadata } from 'next';
 import { AboutPageClient } from '@/src/features/about/components/AboutPageClient';
 import { api } from '@/src/lib/api';
 
-export const revalidate = 7200;
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'About - NaufalRF',
+  title: 'About Me',
   description:
     'Naufal Rizqullah Firdaus is a Computer Engineering student and software engineer with a strong focus on full stack development, workflow automation, IoT system integration, and solution oriented engineering for real world use cases.',
   keywords: [

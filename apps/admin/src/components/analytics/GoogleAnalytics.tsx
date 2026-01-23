@@ -3,7 +3,7 @@
 import { Suspense, useEffect } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import Script from 'next/script';
-import { trackPageView, isGAEnabled } from '@naufalrf/analytics';
+import { trackPageView, isGAReady } from '@naufalrf/analytics';
 
 interface GoogleAnalyticsProps {
   measurementId: string;
@@ -14,7 +14,7 @@ function AnalyticsPageView() {
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    if (!isGAEnabled()) return;
+    if (!isGAReady()) return;
 
     trackPageView({
       page_path: pathname + (searchParams?.toString() ? `?${searchParams.toString()}` : ''),
@@ -27,7 +27,8 @@ function AnalyticsPageView() {
 }
 
 export function GoogleAnalytics({ measurementId }: GoogleAnalyticsProps) {
-  if (!isGAEnabled()) {
+  // SSR-safe check: only validate prop, not window
+  if (!measurementId) {
     return null;
   }
 

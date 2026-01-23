@@ -16,3 +16,5 @@ export interface CustomEvent {
   event_label?: string;
   value?: number;
 }
+
+export type GtagFunction = (...args: unknown[]) => void;

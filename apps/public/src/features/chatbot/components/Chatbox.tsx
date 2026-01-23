@@ -7,7 +7,7 @@ interface ChatHeaderProps {
   onClear: () => void;
 }
 
-export function ChatHeader({ onClear }: ChatHeaderProps) {
+export function Chatbox({ onClear }: ChatHeaderProps) {
   return (
     <header className="text-center">
       <div className="flex items-center justify-center gap-4 mb-6">

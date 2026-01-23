@@ -2,21 +2,21 @@
 
 import { cn } from '@/src/lib/utils';
 import { useChat } from '@/src/features/chatbot/hooks';
-import { ChatHeader } from './ChatHeader';
 import { ChatArea } from './ChatArea';
 import { InputArea } from './InputArea';
 import { AlertCircle } from 'lucide-react';
+import { Chatbox } from './Chatbox';
 
 export function AIChatPage() {
   const { messages, isLoading, error, sendMessage, clearMessages, shouldScrollToBottom } =
     useChat();
 
   return (
-    <div className="h-screen bg-[#E0E5EC] flex flex-col overflow-hidden">
-      <div className="flex-1 flex flex-col max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 min-h-0">
-        <ChatHeader onClear={clearMessages} />
+    <div className="h-screen bg-[#E0E5EC] flex items-center justify-center overflow-hidden">
+      <div className="flex-1 flex flex-col max-w-7xl w-full h-full px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex-1 flex flex-col min-h-0">
+          <Chatbox onClear={clearMessages} />
 
-        <div className="flex-1 flex flex-col min-h-0 mt-6">
           <div
             className={cn(
               'flex-1 flex flex-col min-h-0 bg-[#F0F4F8] rounded-2xl overflow-hidden backdrop-blur-sm',

@@ -46,6 +46,8 @@ export async function sendChatMessage(request: ChatRequest): Promise<ChatRespons
     if (error instanceof ChatServiceError) {
       throw error;
     }
-    throw new ChatServiceError('Unable to connect to AI service. Please try again later.');
+    throw new ChatServiceError(
+      'Maaf, saat ini AI tidak tersedia. Silakan coba lagi beberapa saat atau hubungi saya melalui formulir kontak.'
+    );
   }
 }

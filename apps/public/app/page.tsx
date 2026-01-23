@@ -9,7 +9,7 @@ import {
 import { Guestbook } from '@/src/components/home/Guestbook';
 import { websiteStructuredData, personStructuredData } from '@/src/lib/structured-data';
 
-export const revalidate = 3600;
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'NaufalRF Portfolio',

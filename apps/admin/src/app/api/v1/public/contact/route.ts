@@ -4,6 +4,7 @@ import { prisma } from '@/lib/db/prisma';
 import { z } from 'zod';
 import { getIpLocation } from '@/lib/services/geoIpService';
 import { hashIp } from '@/lib/utils/hash';
+import { emailService } from '@/lib/services/emailService';
 
 const createContactSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -43,6 +44,47 @@ export async function POST(request: NextRequest) {
         replied: false,
       },
     });
+
+    try {
+      await emailService.sendContactConfirmation(parsed.data.email, {
+        name: parsed.data.name,
+        subject: parsed.data.subject,
+        messageId: contact.id,
+        receivedAt: new Date().toLocaleString('en-US', {
+          dateStyle: 'full',
+          timeStyle: 'short',
+          timeZone: 'Asia/Jakarta',
+        }),
+      });
+    } catch (emailError) {
+      console.error('[Contact API] User confirmation email failed:', emailError);
+    }
+
+    try {
+      const contactSettings = await prisma.contactSettings.findFirst();
+
+      if (contactSettings?.notificationEmail) {
+        await emailService.sendAdminContactNotification(contactSettings.notificationEmail, {
+          contact: {
+            id: contact.id,
+            name: parsed.data.name,
+            email: parsed.data.email,
+            subject: parsed.data.subject,
+            message: parsed.data.message,
+            country: geoLocation?.country,
+            city: geoLocation?.city,
+          },
+          dashboardLink: `${process.env.NEXTAUTH_URL || 'http://localhost:3001'}/admin/contacts/${contact.id}`,
+          receivedAt: new Date().toLocaleString('en-US', {
+            dateStyle: 'full',
+            timeStyle: 'short',
+            timeZone: 'Asia/Jakarta',
+          }),
+        });
+      }
+    } catch (emailError) {
+      console.error('[Contact API] Admin notification email failed:', emailError);
+    }
 
     return successResponse(contact, 'Message sent successfully');
   } catch {

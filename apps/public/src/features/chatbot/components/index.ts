@@ -6,3 +6,8 @@ export { MessageBubble } from './MessageBubble';
 export { ChatInput } from './ChatInput';
 export { TypingIndicator } from './TypingIndicator';
 export { SourcesList } from './SourcesList';
+export { AIChatPage } from './AIChatPage';
+export { ChatArea } from './ChatArea';
+export { MessageThread } from './MessageThread';
+export { InputArea } from './InputArea';
+export { Chatbox } from './Chatbox';

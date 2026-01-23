@@ -7,18 +7,9 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { PageWrapper } from '@/components/layout/PageWrapper';
 import { Button } from '@/components/ui/button';
 import { KnowledgeForm } from '@/components/knowledge';
+import { DeleteConfirmModal } from '@/components/knowledge/DeleteConfirmModal';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent } from '@/components/ui/card';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
 
 interface KnowledgeDoc {
   id: string;
@@ -183,27 +174,13 @@ export function EditKnowledgePageContent({ id }: EditKnowledgePageContentProps) 
 
       <KnowledgeForm doc={doc} onSubmit={handleSubmit} isSubmitting={isSubmitting} />
 
-      <AlertDialog open={deleteModalOpen} onOpenChange={setDeleteModalOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete Knowledge Document</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to delete &quot;{doc.filename}&quot;? This action cannot be
-              undone and will remove the document from the RAG system.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDelete}
-              disabled={isDeleting}
-              className="bg-gradient-to-r from-red-500 to-red-600 text-white"
-            >
-              {isDeleting ? 'Deleting...' : 'Delete'}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <DeleteConfirmModal
+        isOpen={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        onConfirm={handleDelete}
+        isDeleting={isDeleting}
+        filename={doc.filename}
+      />
     </PageWrapper>
   );
 }

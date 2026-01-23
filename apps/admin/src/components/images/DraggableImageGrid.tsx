@@ -22,16 +22,7 @@ import { Star, Trash2, GripVertical } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+import { DeleteConfirmModal } from './DeleteConfirmModal';
 import { toast } from 'sonner';
 
 interface ProjectImage {
@@ -262,26 +253,12 @@ export function DraggableImageGrid({ images, projectId, onUpdate }: DraggableIma
         </SortableContext>
       </DndContext>
 
-      <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete image?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. The image will be permanently deleted from storage.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={updating}>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => deleteId && handleDelete(deleteId)}
-              disabled={updating}
-              className="bg-red-500 hover:bg-red-600"
-            >
-              {updating ? 'Deleting...' : 'Delete'}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <DeleteConfirmModal
+        isOpen={!!deleteId}
+        onClose={() => setDeleteId(null)}
+        onConfirm={() => deleteId && handleDelete(deleteId)}
+        isDeleting={updating}
+      />
     </>
   );
 }

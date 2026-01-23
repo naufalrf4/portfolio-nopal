@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
 import { prisma } from '@/lib/db/prisma';
 import { successResponse, serverErrorResponse } from '@/lib/api/responses';
+import { signAssetUrlsMany } from '@/lib/utils/sign-urls';
 
 export async function GET(req: NextRequest) {
   try {
@@ -50,8 +51,13 @@ export async function GET(req: NextRequest) {
       prisma.project.count({ where: { visible: true, featured: true } }),
     ]);
 
+    const signedProjects = await signAssetUrlsMany(projects, {
+      fields: ['imageUrl'],
+      nested: { images: ['url'] },
+    });
+
     return successResponse({
-      projects,
+      projects: signedProjects,
       meta: {
         total,
         featured: featuredCount,

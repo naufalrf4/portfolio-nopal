@@ -25,7 +25,12 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'pub-bddf3c7a03ef4238a49feac98d3cf217.r2.dev',
+        hostname: 'naufalrf-portfolio.s3.ap-southeast-1.amazonaws.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'naufalrf-portfolio.s3.amazonaws.com',
         pathname: '/**',
       },
       {

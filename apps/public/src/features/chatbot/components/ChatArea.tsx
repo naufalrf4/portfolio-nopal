@@ -14,7 +14,7 @@ export function ChatArea({ messages, isLoading, shouldScrollToBottom = false }: 
   return (
     <div
       className={cn(
-        'flex-1 overflow-y-auto p-6',
+        'flex-1 h-full overflow-y-auto p-6',
         'scrollbar-thin scrollbar-thumb-[#3B82F6] scrollbar-track-transparent'
       )}
     >
