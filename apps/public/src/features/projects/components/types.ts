@@ -28,4 +28,5 @@ export interface Project {
   contexts?: ProjectContext[];
   images?: ProjectImage[];
   createdAt: string | Date;
+  projectDate?: string | Date | null;
 }

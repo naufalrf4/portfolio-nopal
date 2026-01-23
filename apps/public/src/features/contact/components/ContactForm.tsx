@@ -65,6 +65,7 @@ export function ContactForm() {
       await api.contact.submit({
         name: formData.name,
         email: formData.email,
+        subject: formData.subject,
         message: formData.message,
         turnstileToken: turnstileToken || '',
       });

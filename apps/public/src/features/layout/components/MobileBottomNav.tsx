@@ -35,7 +35,7 @@ export function MobileBottomNav() {
           <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" />
 
           <div
-            className="absolute bottom-24 right-4 w-56 py-3 rounded-2xl bg-[#E0E5EC] shadow-[9px_9px_16px_rgba(163,177,198,0.6),-9px_-9px_16px_rgba(255,255,255,0.5)]"
+            className="absolute bottom-24 right-4 w-56 py-3 rounded-2xl bg-[#E0E5EC] shadow-[9px_9px_16px_rgba(163,177,198,0.6),-9px_-9px_16px_rgba(255,255,255,0.5)] animate-in slide-in-from-bottom-4 fade-in duration-200"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between px-4 pb-2 mb-2 border-b border-[#d1d5db]">
@@ -50,19 +50,23 @@ export function MobileBottomNav() {
 
             {OTHER_LINKS.map((link) => {
               const Icon = link.icon;
+              const LinkComponent = link.external ? 'a' : Link;
+              const linkProps = link.external
+                ? { target: '_blank', rel: 'noopener noreferrer' }
+                : {};
+
               return (
-                <a
+                <LinkComponent
                   key={link.href}
                   href={link.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  {...linkProps}
                   className="flex items-center gap-3 px-4 py-3 text-sm text-[#3D4852] hover:text-[#3B82F6] hover:bg-[#E0E5EC]/50 transition-colors"
                   onClick={() => setOtherOpen(false)}
                 >
                   <Icon size={20} />
                   <span className="flex-1">{link.label}</span>
-                  <ExternalLink size={14} className="text-[#6B7280]" />
-                </a>
+                  {link.external && <ExternalLink size={14} className="text-[#6B7280]" />}
+                </LinkComponent>
               );
             })}
           </div>

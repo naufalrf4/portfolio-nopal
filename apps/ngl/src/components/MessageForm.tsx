@@ -2,9 +2,12 @@
 
 import { useState, useCallback, type FormEvent } from 'react';
 import { Send, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
+import { useLazyTurnstile, LazyTurnstile } from '@naufalrf/ui';
+import { trackNGLSubmission } from '@naufalrf/analytics';
 
 const MAX_CHARACTERS = 500;
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '';
 
 type FormState = 'idle' | 'loading' | 'success' | 'error';
 
@@ -21,16 +24,38 @@ export function MessageForm() {
   const [formState, setFormState] = useState<FormState>('idle');
   const [errorMessage, setErrorMessage] = useState('');
 
+  const {
+    shouldShowTurnstile,
+    turnstileToken,
+    turnstileRef,
+    handleTurnstileSuccess,
+    handleTurnstileError,
+    handleTurnstileExpire,
+    resetTurnstile,
+    activateTurnstile,
+    isTurnstileRequired,
+  } = useLazyTurnstile(TURNSTILE_SITE_KEY);
+
   const charactersRemaining = MAX_CHARACTERS - message.length;
   const isOverLimit = charactersRemaining < 0;
   const isEmpty = message.trim().length === 0;
-  const canSubmit = !isEmpty && !isOverLimit && formState !== 'loading';
+  const canSubmit =
+    !isEmpty &&
+    !isOverLimit &&
+    formState !== 'loading' &&
+    (isTurnstileRequired ? !!turnstileToken : true);
 
   const handleSubmit = useCallback(
     async (e: FormEvent) => {
       e.preventDefault();
 
       if (!canSubmit) return;
+
+      if (isTurnstileRequired && !turnstileToken) {
+        setErrorMessage('Please complete the CAPTCHA verification');
+        setFormState('error');
+        return;
+      }
 
       setFormState('loading');
       setErrorMessage('');
@@ -41,7 +66,10 @@ export function MessageForm() {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ content: message.trim() }),
+          body: JSON.stringify({
+            content: message.trim(),
+            turnstileToken: turnstileToken || '',
+          }),
         });
 
         const data: ApiResponse = await response.json();
@@ -55,23 +83,28 @@ export function MessageForm() {
             setErrorMessage('Failed to send message. Please try again.');
           }
           setFormState('error');
+          resetTurnstile();
           return;
         }
 
         setFormState('success');
         setMessage('');
+        resetTurnstile();
+        trackNGLSubmission();
       } catch {
         setErrorMessage('Network error. Please check your connection.');
         setFormState('error');
+        resetTurnstile();
       }
     },
-    [canSubmit, message]
+    [canSubmit, message, turnstileToken, isTurnstileRequired, resetTurnstile]
   );
 
   const handleReset = useCallback(() => {
     setFormState('idle');
     setErrorMessage('');
-  }, []);
+    resetTurnstile();
+  }, [resetTurnstile]);
 
   if (formState === 'success') {
     return (
@@ -99,6 +132,8 @@ export function MessageForm() {
         <textarea
           value={message}
           onChange={(e) => setMessage(e.target.value)}
+          onFocus={activateTurnstile}
+          onKeyDown={activateTurnstile}
           placeholder="Type your message here..."
           rows={5}
           maxLength={MAX_CHARACTERS + 50}
@@ -120,6 +155,17 @@ export function MessageForm() {
           </span>
         </div>
       </div>
+
+      {shouldShowTurnstile && (
+        <LazyTurnstile
+          ref={turnstileRef}
+          siteKey={TURNSTILE_SITE_KEY}
+          theme="light"
+          onSuccess={handleTurnstileSuccess}
+          onError={handleTurnstileError}
+          onExpire={handleTurnstileExpire}
+        />
+      )}
 
       {formState === 'error' && errorMessage && (
         <div className="space-y-3">

@@ -122,3 +122,8 @@ export type BookingAvailability = Prisma.BookingAvailabilityModel
  * 
  */
 export type AboutMe = Prisma.AboutMeModel
+/**
+ * Model Achievement
+ * 
+ */
+export type Achievement = Prisma.AchievementModel

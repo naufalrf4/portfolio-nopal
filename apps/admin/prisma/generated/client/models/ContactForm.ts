@@ -31,6 +31,11 @@ export type ContactFormMinAggregateOutputType = {
   subject: string | null
   message: string | null
   ipHash: string | null
+  ipAddress: string | null
+  countryCode: string | null
+  country: string | null
+  city: string | null
+  region: string | null
   read: boolean | null
   replied: boolean | null
   createdAt: Date | null
@@ -44,6 +49,11 @@ export type ContactFormMaxAggregateOutputType = {
   subject: string | null
   message: string | null
   ipHash: string | null
+  ipAddress: string | null
+  countryCode: string | null
+  country: string | null
+  city: string | null
+  region: string | null
   read: boolean | null
   replied: boolean | null
   createdAt: Date | null
@@ -57,6 +67,11 @@ export type ContactFormCountAggregateOutputType = {
   subject: number
   message: number
   ipHash: number
+  ipAddress: number
+  countryCode: number
+  country: number
+  city: number
+  region: number
   read: number
   replied: number
   createdAt: number
@@ -72,6 +87,11 @@ export type ContactFormMinAggregateInputType = {
   subject?: true
   message?: true
   ipHash?: true
+  ipAddress?: true
+  countryCode?: true
+  country?: true
+  city?: true
+  region?: true
   read?: true
   replied?: true
   createdAt?: true
@@ -85,6 +105,11 @@ export type ContactFormMaxAggregateInputType = {
   subject?: true
   message?: true
   ipHash?: true
+  ipAddress?: true
+  countryCode?: true
+  country?: true
+  city?: true
+  region?: true
   read?: true
   replied?: true
   createdAt?: true
@@ -98,6 +123,11 @@ export type ContactFormCountAggregateInputType = {
   subject?: true
   message?: true
   ipHash?: true
+  ipAddress?: true
+  countryCode?: true
+  country?: true
+  city?: true
+  region?: true
   read?: true
   replied?: true
   createdAt?: true
@@ -184,6 +214,11 @@ export type ContactFormGroupByOutputType = {
   subject: string | null
   message: string
   ipHash: string
+  ipAddress: string | null
+  countryCode: string | null
+  country: string | null
+  city: string | null
+  region: string | null
   read: boolean
   replied: boolean
   createdAt: Date
@@ -218,6 +253,11 @@ export type ContactFormWhereInput = {
   subject?: Prisma.StringNullableFilter<"ContactForm"> | string | null
   message?: Prisma.StringFilter<"ContactForm"> | string
   ipHash?: Prisma.StringFilter<"ContactForm"> | string
+  ipAddress?: Prisma.StringNullableFilter<"ContactForm"> | string | null
+  countryCode?: Prisma.StringNullableFilter<"ContactForm"> | string | null
+  country?: Prisma.StringNullableFilter<"ContactForm"> | string | null
+  city?: Prisma.StringNullableFilter<"ContactForm"> | string | null
+  region?: Prisma.StringNullableFilter<"ContactForm"> | string | null
   read?: Prisma.BoolFilter<"ContactForm"> | boolean
   replied?: Prisma.BoolFilter<"ContactForm"> | boolean
   createdAt?: Prisma.DateTimeFilter<"ContactForm"> | Date | string
@@ -231,6 +271,11 @@ export type ContactFormOrderByWithRelationInput = {
   subject?: Prisma.SortOrderInput | Prisma.SortOrder
   message?: Prisma.SortOrder
   ipHash?: Prisma.SortOrder
+  ipAddress?: Prisma.SortOrderInput | Prisma.SortOrder
+  countryCode?: Prisma.SortOrderInput | Prisma.SortOrder
+  country?: Prisma.SortOrderInput | Prisma.SortOrder
+  city?: Prisma.SortOrderInput | Prisma.SortOrder
+  region?: Prisma.SortOrderInput | Prisma.SortOrder
   read?: Prisma.SortOrder
   replied?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -247,6 +292,11 @@ export type ContactFormWhereUniqueInput = Prisma.AtLeast<{
   subject?: Prisma.StringNullableFilter<"ContactForm"> | string | null
   message?: Prisma.StringFilter<"ContactForm"> | string
   ipHash?: Prisma.StringFilter<"ContactForm"> | string
+  ipAddress?: Prisma.StringNullableFilter<"ContactForm"> | string | null
+  countryCode?: Prisma.StringNullableFilter<"ContactForm"> | string | null
+  country?: Prisma.StringNullableFilter<"ContactForm"> | string | null
+  city?: Prisma.StringNullableFilter<"ContactForm"> | string | null
+  region?: Prisma.StringNullableFilter<"ContactForm"> | string | null
   read?: Prisma.BoolFilter<"ContactForm"> | boolean
   replied?: Prisma.BoolFilter<"ContactForm"> | boolean
   createdAt?: Prisma.DateTimeFilter<"ContactForm"> | Date | string
@@ -260,6 +310,11 @@ export type ContactFormOrderByWithAggregationInput = {
   subject?: Prisma.SortOrderInput | Prisma.SortOrder
   message?: Prisma.SortOrder
   ipHash?: Prisma.SortOrder
+  ipAddress?: Prisma.SortOrderInput | Prisma.SortOrder
+  countryCode?: Prisma.SortOrderInput | Prisma.SortOrder
+  country?: Prisma.SortOrderInput | Prisma.SortOrder
+  city?: Prisma.SortOrderInput | Prisma.SortOrder
+  region?: Prisma.SortOrderInput | Prisma.SortOrder
   read?: Prisma.SortOrder
   replied?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -279,6 +334,11 @@ export type ContactFormScalarWhereWithAggregatesInput = {
   subject?: Prisma.StringNullableWithAggregatesFilter<"ContactForm"> | string | null
   message?: Prisma.StringWithAggregatesFilter<"ContactForm"> | string
   ipHash?: Prisma.StringWithAggregatesFilter<"ContactForm"> | string
+  ipAddress?: Prisma.StringNullableWithAggregatesFilter<"ContactForm"> | string | null
+  countryCode?: Prisma.StringNullableWithAggregatesFilter<"ContactForm"> | string | null
+  country?: Prisma.StringNullableWithAggregatesFilter<"ContactForm"> | string | null
+  city?: Prisma.StringNullableWithAggregatesFilter<"ContactForm"> | string | null
+  region?: Prisma.StringNullableWithAggregatesFilter<"ContactForm"> | string | null
   read?: Prisma.BoolWithAggregatesFilter<"ContactForm"> | boolean
   replied?: Prisma.BoolWithAggregatesFilter<"ContactForm"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"ContactForm"> | Date | string
@@ -292,6 +352,11 @@ export type ContactFormCreateInput = {
   subject?: string | null
   message: string
   ipHash: string
+  ipAddress?: string | null
+  countryCode?: string | null
+  country?: string | null
+  city?: string | null
+  region?: string | null
   read?: boolean
   replied?: boolean
   createdAt?: Date | string
@@ -305,6 +370,11 @@ export type ContactFormUncheckedCreateInput = {
   subject?: string | null
   message: string
   ipHash: string
+  ipAddress?: string | null
+  countryCode?: string | null
+  country?: string | null
+  city?: string | null
+  region?: string | null
   read?: boolean
   replied?: boolean
   createdAt?: Date | string
@@ -318,6 +388,11 @@ export type ContactFormUpdateInput = {
   subject?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   message?: Prisma.StringFieldUpdateOperationsInput | string
   ipHash?: Prisma.StringFieldUpdateOperationsInput | string
+  ipAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  countryCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   read?: Prisma.BoolFieldUpdateOperationsInput | boolean
   replied?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -331,6 +406,11 @@ export type ContactFormUncheckedUpdateInput = {
   subject?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   message?: Prisma.StringFieldUpdateOperationsInput | string
   ipHash?: Prisma.StringFieldUpdateOperationsInput | string
+  ipAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  countryCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   read?: Prisma.BoolFieldUpdateOperationsInput | boolean
   replied?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -344,6 +424,11 @@ export type ContactFormCreateManyInput = {
   subject?: string | null
   message: string
   ipHash: string
+  ipAddress?: string | null
+  countryCode?: string | null
+  country?: string | null
+  city?: string | null
+  region?: string | null
   read?: boolean
   replied?: boolean
   createdAt?: Date | string
@@ -357,6 +442,11 @@ export type ContactFormUpdateManyMutationInput = {
   subject?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   message?: Prisma.StringFieldUpdateOperationsInput | string
   ipHash?: Prisma.StringFieldUpdateOperationsInput | string
+  ipAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  countryCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   read?: Prisma.BoolFieldUpdateOperationsInput | boolean
   replied?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -370,6 +460,11 @@ export type ContactFormUncheckedUpdateManyInput = {
   subject?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   message?: Prisma.StringFieldUpdateOperationsInput | string
   ipHash?: Prisma.StringFieldUpdateOperationsInput | string
+  ipAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  countryCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   read?: Prisma.BoolFieldUpdateOperationsInput | boolean
   replied?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -383,6 +478,11 @@ export type ContactFormCountOrderByAggregateInput = {
   subject?: Prisma.SortOrder
   message?: Prisma.SortOrder
   ipHash?: Prisma.SortOrder
+  ipAddress?: Prisma.SortOrder
+  countryCode?: Prisma.SortOrder
+  country?: Prisma.SortOrder
+  city?: Prisma.SortOrder
+  region?: Prisma.SortOrder
   read?: Prisma.SortOrder
   replied?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -396,6 +496,11 @@ export type ContactFormMaxOrderByAggregateInput = {
   subject?: Prisma.SortOrder
   message?: Prisma.SortOrder
   ipHash?: Prisma.SortOrder
+  ipAddress?: Prisma.SortOrder
+  countryCode?: Prisma.SortOrder
+  country?: Prisma.SortOrder
+  city?: Prisma.SortOrder
+  region?: Prisma.SortOrder
   read?: Prisma.SortOrder
   replied?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -409,6 +514,11 @@ export type ContactFormMinOrderByAggregateInput = {
   subject?: Prisma.SortOrder
   message?: Prisma.SortOrder
   ipHash?: Prisma.SortOrder
+  ipAddress?: Prisma.SortOrder
+  countryCode?: Prisma.SortOrder
+  country?: Prisma.SortOrder
+  city?: Prisma.SortOrder
+  region?: Prisma.SortOrder
   read?: Prisma.SortOrder
   replied?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -424,6 +534,11 @@ export type ContactFormSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   subject?: boolean
   message?: boolean
   ipHash?: boolean
+  ipAddress?: boolean
+  countryCode?: boolean
+  country?: boolean
+  city?: boolean
+  region?: boolean
   read?: boolean
   replied?: boolean
   createdAt?: boolean
@@ -437,6 +552,11 @@ export type ContactFormSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   subject?: boolean
   message?: boolean
   ipHash?: boolean
+  ipAddress?: boolean
+  countryCode?: boolean
+  country?: boolean
+  city?: boolean
+  region?: boolean
   read?: boolean
   replied?: boolean
   createdAt?: boolean
@@ -450,6 +570,11 @@ export type ContactFormSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   subject?: boolean
   message?: boolean
   ipHash?: boolean
+  ipAddress?: boolean
+  countryCode?: boolean
+  country?: boolean
+  city?: boolean
+  region?: boolean
   read?: boolean
   replied?: boolean
   createdAt?: boolean
@@ -463,13 +588,18 @@ export type ContactFormSelectScalar = {
   subject?: boolean
   message?: boolean
   ipHash?: boolean
+  ipAddress?: boolean
+  countryCode?: boolean
+  country?: boolean
+  city?: boolean
+  region?: boolean
   read?: boolean
   replied?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type ContactFormOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "subject" | "message" | "ipHash" | "read" | "replied" | "createdAt" | "updatedAt", ExtArgs["result"]["contactForm"]>
+export type ContactFormOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "subject" | "message" | "ipHash" | "ipAddress" | "countryCode" | "country" | "city" | "region" | "read" | "replied" | "createdAt" | "updatedAt", ExtArgs["result"]["contactForm"]>
 
 export type $ContactFormPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "ContactForm"
@@ -481,6 +611,11 @@ export type $ContactFormPayload<ExtArgs extends runtime.Types.Extensions.Interna
     subject: string | null
     message: string
     ipHash: string
+    ipAddress: string | null
+    countryCode: string | null
+    country: string | null
+    city: string | null
+    region: string | null
     read: boolean
     replied: boolean
     createdAt: Date
@@ -914,6 +1049,11 @@ export interface ContactFormFieldRefs {
   readonly subject: Prisma.FieldRef<"ContactForm", 'String'>
   readonly message: Prisma.FieldRef<"ContactForm", 'String'>
   readonly ipHash: Prisma.FieldRef<"ContactForm", 'String'>
+  readonly ipAddress: Prisma.FieldRef<"ContactForm", 'String'>
+  readonly countryCode: Prisma.FieldRef<"ContactForm", 'String'>
+  readonly country: Prisma.FieldRef<"ContactForm", 'String'>
+  readonly city: Prisma.FieldRef<"ContactForm", 'String'>
+  readonly region: Prisma.FieldRef<"ContactForm", 'String'>
   readonly read: Prisma.FieldRef<"ContactForm", 'Boolean'>
   readonly replied: Prisma.FieldRef<"ContactForm", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"ContactForm", 'DateTime'>

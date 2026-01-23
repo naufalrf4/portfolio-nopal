@@ -3,6 +3,9 @@ import { ProjectsClient } from './resources/projects';
 import { BlogLinksClient } from './resources/blog-links';
 import { GuestbookClient } from './resources/guestbook';
 import { ProfileLinksClient } from './resources/profile-links';
+import { KnowledgeClient } from './resources/knowledge';
+import { ChatLogsClient } from './resources/chat-logs';
+import { AchievementsClient } from './resources/achievements';
 
 export * from './types';
 export * from './errors';
@@ -13,6 +16,9 @@ export class NaufalRFSDK {
   public blogs: BlogLinksClient;
   public guestbook: GuestbookClient;
   public profileLinks: ProfileLinksClient;
+  public knowledge: KnowledgeClient;
+  public chatLogs: ChatLogsClient;
+  public achievements: AchievementsClient;
 
   constructor(config: ClientConfig = {}) {
     const client = new HttpClient(config);
@@ -21,6 +27,9 @@ export class NaufalRFSDK {
     this.blogs = new BlogLinksClient(client);
     this.guestbook = new GuestbookClient(client);
     this.profileLinks = new ProfileLinksClient(client);
+    this.knowledge = new KnowledgeClient(client);
+    this.chatLogs = new ChatLogsClient(client);
+    this.achievements = new AchievementsClient(client);
   }
 }
 

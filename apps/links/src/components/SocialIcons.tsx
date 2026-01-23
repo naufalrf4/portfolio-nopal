@@ -46,7 +46,7 @@ function getIconComponent(link: ProfileLink) {
 
 export function SocialIcons({ links }: SocialIconsProps) {
   return (
-    <div className="flex items-center justify-center gap-4 flex-wrap py-2">
+    <div className="flex items-center justify-center gap-4 md:gap-5 flex-wrap py-2">
       {links.map((link, index) => {
         const IconComponent = getIconComponent(link);
         if (!IconComponent) return null;
@@ -58,10 +58,10 @@ export function SocialIcons({ links }: SocialIconsProps) {
             target="_blank"
             rel="noopener noreferrer"
             aria-label={link.label}
-            className="neu-social-icon text-muted-foreground hover:text-primary"
+            className="neu-social-icon md:w-12 md:h-12 text-muted-foreground hover:text-primary"
             style={{ animationDelay: `${index * 0.05}s` }}
           >
-            <IconComponent className="w-5 h-5 transition-all duration-300" />
+            <IconComponent className="w-5 h-5 md:w-6 md:h-6 transition-all duration-300" />
           </a>
         );
       })}

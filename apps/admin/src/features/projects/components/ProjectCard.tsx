@@ -12,6 +12,11 @@ export function ProjectCard({
   onToggleFeatured,
 }: ProjectCardProps) {
   const CategoryIcon = getCategoryIcon(project.category);
+  const imageUrl =
+    (project as any).imageUrl ||
+    ((project as any).images && (project as any).images.length > 0
+      ? (project as any).images[0].url
+      : null);
 
   return (
     <TooltipProvider>
@@ -23,6 +28,12 @@ export function ProjectCard({
           animationDelay: `${index * 50}ms`,
         }}
       >
+        {imageUrl && (
+          <div className="mb-4 rounded-2xl overflow-hidden bg-[#E0E5EC] shadow-[inset_4px_4px_8px_rgba(163,177,198,0.4),inset_-4px_-4px_8px_rgba(255,255,255,0.4)]">
+            <img src={imageUrl} alt={project.title} className="w-full h-40 object-cover" />
+          </div>
+        )}
+
         <div className="flex items-center justify-between mb-4">
           <div
             className="p-3 rounded-2xl bg-[#E0E5EC] text-[#3B82F6]"

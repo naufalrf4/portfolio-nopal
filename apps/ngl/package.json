@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "next dev -p 3003",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p 3003",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf .next .turbo node_modules"
@@ -16,6 +16,7 @@
     "@naufalrf/sdk": "workspace:*",
     "@naufalrf/types": "workspace:*",
     "@naufalrf/ui": "workspace:*",
+    "@vercel/analytics": "^1.6.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.562.0",

@@ -5,5 +5,6 @@ export interface BlogLink {
   description?: string;
   imageUrl?: string;
   source: string;
+  category?: string | null;
   publishedAt?: string | Date;
 }

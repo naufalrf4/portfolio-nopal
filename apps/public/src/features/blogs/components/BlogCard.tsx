@@ -28,8 +28,13 @@ export function BlogCard({ blog }: BlogCardProps) {
           )}
         </div>
 
-        <div className="flex items-center gap-3 mb-3">
-          <NeuBadge variant="accent" size="sm">
+        <div className="flex items-center gap-3 mb-3 flex-wrap">
+          {blog.category && (
+            <NeuBadge variant="accent" size="sm">
+              {blog.category}
+            </NeuBadge>
+          )}
+          <NeuBadge variant="default" size="sm">
             {blog.source}
           </NeuBadge>
           <div className="flex items-center text-sm text-[#6B7280]">

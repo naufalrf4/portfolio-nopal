@@ -1,6 +1,6 @@
 import { cn } from '@/src/lib/utils';
 import Link from 'next/link';
-import { Github, Linkedin, Twitter, Mail, Heart } from 'lucide-react';
+import { Github, Linkedin, Twitter, Mail } from 'lucide-react';
 
 const socialLinks = [
   { href: 'https://github.com/naufalrf', label: 'GitHub', icon: Github },
@@ -13,6 +13,7 @@ const quickLinks = [
   { href: '/about', label: 'About' },
   { href: '/projects', label: 'Projects' },
   { href: '/blogs', label: 'Blogs' },
+  { href: '/ai-chatbot', label: 'AI Assistant' },
   { href: '/contact', label: 'Contact' },
 ];
 
@@ -24,16 +25,18 @@ export function Footer({ className }: FooterProps) {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className={cn('bg-[#E0E5EC] py-12 px-4 md:px-8 pb-28 md:pb-12', className)}>
+    <footer
+      className={cn('relative z-10 bg-transparent py-12 px-4 md:px-8 pb-28 md:pb-12', className)}
+    >
       <div className="mx-auto max-w-7xl">
         <div className="rounded-2xl bg-[#E0E5EC] p-8 shadow-[9px_9px_16px_rgb(163,177,198,0.6),-9px_-9px_16px_rgba(255,255,255,0.5)]">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="text-center md:text-left">
               <Link
                 href="/"
-                className="text-2xl font-bold text-[#3D4852] hover:text-[#3B82F6] transition-colors"
+                className="text-2xl font-bold text-[#3B82F6] hover:text-[#2563EB] transition-colors"
               >
-                NaufalRF
+                Nau.
               </Link>
               <p className="text-sm text-[#6B7280] mt-2 max-w-xs mx-auto md:mx-0">
                 Full-Stack Engineer & AI Enthusiast crafting digital experiences with passion.
@@ -82,12 +85,10 @@ export function Footer({ className }: FooterProps) {
           </div>
 
           <div className="mt-8 pt-6 border-t border-[#d1d5db]/50">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex items-center justify-center">
               <p className="text-sm text-[#6B7280]">
-                © {currentYear} NaufalRF. All rights reserved.
-              </p>
-              <p className="text-sm text-[#6B7280] flex items-center gap-1">
-                Made with <Heart size={14} className="text-[#EF4444] fill-[#EF4444]" /> in Indonesia
+                © {currentYear} <span className="text-[#3B82F6] font-medium">Nau.</span> All rights
+                reserved.
               </p>
             </div>
           </div>

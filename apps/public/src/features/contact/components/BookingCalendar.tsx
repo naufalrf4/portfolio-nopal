@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
-import { Turnstile, type TurnstileInstance } from '@marsidev/react-turnstile';
+import React, { useState, useEffect } from 'react';
 import { cn } from '@/src/lib/utils';
 import { NeuCard, NeuInput, NeuButton } from '@/src/features/shared/components';
 import { api } from '@/src/lib/api';
-import { Calendar, Clock, CheckCircle, AlertCircle } from 'lucide-react';
+import { Clock, CheckCircle, AlertCircle, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useLazyTurnstile, LazyTurnstile } from '@naufalrf/ui';
+import { trackBookingRequest } from '@naufalrf/analytics';
 
 interface BookingSlot {
   id: string;
@@ -28,16 +29,45 @@ interface BookingFormData {
 
 const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '';
 
+function isSlotPast(slot: BookingSlot): boolean {
+  const now = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Jakarta' }));
+  const slotDate = new Date(slot.date + 'T00:00:00+07:00');
+  const [hours, minutes] = slot.startTime.split(':').map(Number);
+  slotDate.setHours(hours, minutes, 0, 0);
+
+  return slotDate < now;
+}
+
+function formatDateDisplay(dateString: string): string {
+  const date = new Date(dateString + 'T00:00:00+07:00');
+  const today = new Date();
+
+  const isToday =
+    date.getFullYear() === today.getFullYear() &&
+    date.getMonth() === today.getMonth() &&
+    date.getDate() === today.getDate();
+
+  const options: Intl.DateTimeFormatOptions = {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'Asia/Jakarta',
+  };
+
+  const formatted = new Intl.DateTimeFormat('en-US', options).format(date);
+
+  return isToday ? `${formatted} (Today)` : formatted;
+}
+
 export function BookingCalendar() {
-  const [slots, setSlots] = useState<FlatSlot[]>([]);
+  const [allSlots, setAllSlots] = useState<Record<string, FlatSlot[]>>({});
+  const [selectedDate, setSelectedDate] = useState<string>('');
   const [selectedSlot, setSelectedSlot] = useState<FlatSlot | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
-  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
-  const [turnstileError, setTurnstileError] = useState(false);
-  const turnstileRef = useRef<TurnstileInstance>(null);
   const [formData, setFormData] = useState<BookingFormData>({
     name: '',
     email: '',
@@ -45,53 +75,77 @@ export function BookingCalendar() {
     notes: '',
   });
 
+  const {
+    shouldShowTurnstile,
+    turnstileToken,
+    turnstileRef,
+    handleTurnstileSuccess,
+    handleTurnstileError,
+    handleTurnstileExpire,
+    resetTurnstile,
+    activateTurnstile,
+    isTurnstileRequired,
+  } = useLazyTurnstile(TURNSTILE_SITE_KEY);
+
   useEffect(() => {
     const fetchSlots = async () => {
       try {
         const data = await api.bookings.getAvailable();
-        const flatSlots: FlatSlot[] = [];
-        Object.entries(data || {}).forEach(([dateKey, dateSlots]) => {
-          dateSlots.forEach((slot) => {
-            flatSlots.push({ ...slot, dateKey });
-          });
+
+        const convertedSlots: Record<string, FlatSlot[]> = {};
+        Object.entries(data || {}).forEach(([date, dateSlots]) => {
+          const flatSlots = dateSlots.map((slot: any) => ({
+            ...slot,
+            dateKey: date,
+          }));
+          convertedSlots[date] = flatSlots;
         });
-        setSlots(flatSlots);
-      } catch (error) {
-        console.error('Failed to fetch slots:', error);
+
+        setAllSlots(convertedSlots);
+
+        const sortedDates = Object.keys(convertedSlots).sort();
+        if (sortedDates.length > 0 && !selectedDate) {
+          setSelectedDate(sortedDates[0]);
+        }
+      } catch {
+        // Error handled silently - component shows default state
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchSlots();
-  }, []);
+  }, [selectedDate]);
+
+  const sortedDates = Object.keys(allSlots).sort();
+  const currentDateIndex = sortedDates.indexOf(selectedDate);
+  const currentSlots = selectedDate ? allSlots[selectedDate] || [] : [];
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    activateTurnstile();
   };
 
-  const handleTurnstileSuccess = (token: string) => {
-    setTurnstileToken(token);
-    setTurnstileError(false);
+  const handlePreviousDate = () => {
+    if (currentDateIndex > 0) {
+      setSelectedDate(sortedDates[currentDateIndex - 1]);
+    }
   };
 
-  const handleTurnstileError = () => {
-    setTurnstileToken(null);
-    setTurnstileError(true);
-  };
-
-  const handleTurnstileExpire = () => {
-    setTurnstileToken(null);
+  const handleNextDate = () => {
+    if (currentDateIndex < sortedDates.length - 1) {
+      setSelectedDate(sortedDates[currentDateIndex + 1]);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedSlot) return;
 
-    if (TURNSTILE_SITE_KEY && !turnstileToken) {
+    if (isTurnstileRequired && !turnstileToken) {
       setStatus('error');
-      setErrorMessage('Please complete the verification');
+      setErrorMessage('Please complete verification');
       return;
     }
 
@@ -104,18 +158,19 @@ export function BookingCalendar() {
         slotId: selectedSlot.id,
         name: formData.name,
         email: formData.email,
-        message: formData.notes,
+        phone: formData.phone,
+        notes: formData.notes,
         turnstileToken: turnstileToken || '',
       });
       setStatus('success');
+      trackBookingRequest(selectedSlot.id);
       setFormData({ name: '', email: '', phone: '', notes: '' });
       setSelectedSlot(null);
-      setTurnstileToken(null);
-      turnstileRef.current?.reset();
+      resetTurnstile();
     } catch (error) {
       setStatus('error');
       setErrorMessage(error instanceof Error ? error.message : 'Failed to book slot');
-      turnstileRef.current?.reset();
+      resetTurnstile();
     } finally {
       setIsSubmitting(false);
     }
@@ -129,10 +184,10 @@ export function BookingCalendar() {
     );
   }
 
-  if (slots.length === 0) {
+  if (sortedDates.length === 0) {
     return (
       <NeuCard className="text-center py-12">
-        <Calendar className="w-12 h-12 mx-auto text-[#6B7280] mb-4" />
+        <Clock className="w-12 h-12 mx-auto text-[#6B7280] mb-4" />
         <p className="text-[#6B7280]">No available booking slots at the moment.</p>
         <p className="text-sm text-[#6B7280] mt-2">
           Please use the contact form to reach out instead.
@@ -145,30 +200,56 @@ export function BookingCalendar() {
     <div className="space-y-6">
       <div>
         <h3 className="text-lg font-semibold text-[#3D4852] mb-4">Available Slots</h3>
+
+        <div className="flex items-center justify-center gap-4 mb-4">
+          <button
+            onClick={handlePreviousDate}
+            disabled={currentDateIndex <= 0}
+            className="p-2 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-[#6B7280] hover:text-[#3B82F6] hover:shadow-[4px_4px_8px_rgba(163,177,198,0.6),-4px_-4px_8px_rgba(255,255,255,0.5)]"
+          >
+            <ChevronLeft size={20} />
+          </button>
+
+          <div className="text-xl font-semibold text-[#3D4852] min-w-[200px] text-center">
+            {formatDateDisplay(selectedDate)}
+          </div>
+
+          <button
+            onClick={handleNextDate}
+            disabled={currentDateIndex >= sortedDates.length - 1}
+            className="p-2 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-[#6B7280] hover:text-[#3B82F6] hover:shadow-[4px_4px_8px_rgba(163,177,198,0.6),-4px_-4px_8px_rgba(255,255,255,0.5)]"
+          >
+            <ChevronRight size={20} />
+          </button>
+        </div>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {slots.slice(0, 6).map((slot, index) => (
-            <button
-              key={index}
-              onClick={() => setSelectedSlot(slot)}
-              className={cn(
-                'p-4 rounded-xl text-left transition-all duration-200',
-                selectedSlot === slot
-                  ? 'text-[#3B82F6] shadow-[inset_4px_4px_8px_rgba(163,177,198,0.6),inset_-4px_-4px_8px_rgba(255,255,255,0.5)]'
-                  : 'text-[#3D4852] shadow-[4px_4px_8px_rgba(163,177,198,0.6),-4px_-4px_8px_rgba(255,255,255,0.5)] hover:text-[#3B82F6]'
-              )}
-            >
-              <div className="flex items-center gap-2 mb-1">
-                <Calendar size={16} />
-                <span className="font-medium">{slot.date}</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-[#6B7280]">
-                <Clock size={14} />
-                <span>
-                  {slot.startTime} ({slot.duration} min)
-                </span>
-              </div>
-            </button>
-          ))}
+          {currentSlots.slice(0, 6).map((slot) => {
+            const isPast = isSlotPast(slot);
+
+            return (
+              <button
+                key={slot.id}
+                onClick={() => !isPast && setSelectedSlot(slot)}
+                disabled={isPast}
+                className={cn(
+                  'p-4 rounded-xl text-left transition-all duration-200',
+                  isPast
+                    ? 'opacity-50 cursor-not-allowed bg-[#E0E5EC] text-[#9CA3AF] shadow-none'
+                    : selectedSlot === slot
+                      ? 'text-[#3B82F6] shadow-[inset_4px_4px_8px_rgba(163,177,198,0.6),inset_-4px_-4px_8px_rgba(255,255,255,0.5)]'
+                      : 'text-[#3D4852] shadow-[4px_4px_8px_rgba(163,177,198,0.6),-4px_-4px_8px_rgba(255,255,255,0.5)] hover:text-[#3B82F6]'
+                )}
+              >
+                <div className="flex items-center gap-2 mb-1">
+                  <Clock size={16} />
+                  <span className="font-medium">{slot.startTime}</span>
+                  {isPast && <span className="text-xs ml-auto">(Past)</span>}
+                </div>
+                <div className="text-sm text-[#6B7280]">{slot.duration} min</div>
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -176,7 +257,7 @@ export function BookingCalendar() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <NeuCard>
             <h4 className="font-medium text-[#3D4852] mb-4">
-              Book: {selectedSlot.date} at {selectedSlot.startTime}
+              Book: {formatDateDisplay(selectedSlot.date)} at {selectedSlot.startTime}
             </h4>
 
             <div className="space-y-4">
@@ -185,6 +266,7 @@ export function BookingCalendar() {
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
+                onFocus={activateTurnstile}
                 placeholder="Your name"
                 required
               />
@@ -194,6 +276,7 @@ export function BookingCalendar() {
                 type="email"
                 value={formData.email}
                 onChange={handleChange}
+                onFocus={activateTurnstile}
                 placeholder="your@email.com"
                 required
               />
@@ -203,6 +286,7 @@ export function BookingCalendar() {
                 type="tel"
                 value={formData.phone}
                 onChange={handleChange}
+                onFocus={activateTurnstile}
                 placeholder="+1 (555) 000-0000"
               />
               <NeuInput
@@ -210,31 +294,21 @@ export function BookingCalendar() {
                 name="notes"
                 value={formData.notes}
                 onChange={handleChange}
+                onFocus={activateTurnstile}
                 placeholder="What would you like to discuss?"
               />
             </div>
           </NeuCard>
 
-          {TURNSTILE_SITE_KEY && (
-            <div className="flex justify-center">
-              <Turnstile
-                ref={turnstileRef}
-                siteKey={TURNSTILE_SITE_KEY}
-                onSuccess={handleTurnstileSuccess}
-                onError={handleTurnstileError}
-                onExpire={handleTurnstileExpire}
-                options={{
-                  theme: 'light',
-                }}
-              />
-            </div>
-          )}
-
-          {turnstileError && (
-            <div className="flex items-center gap-2 text-red-600 bg-red-50 p-4 rounded-xl">
-              <AlertCircle size={20} />
-              <span>Verification failed. Please try again.</span>
-            </div>
+          {shouldShowTurnstile && (
+            <LazyTurnstile
+              ref={turnstileRef}
+              siteKey={TURNSTILE_SITE_KEY}
+              theme="light"
+              onSuccess={handleTurnstileSuccess}
+              onError={handleTurnstileError}
+              onExpire={handleTurnstileExpire}
+            />
           )}
 
           {status === 'success' && (

@@ -262,170 +262,56 @@ async function main() {
 
   console.log('✅ Project contexts created\n');
 
+  // Clear existing blog links
+  await prisma.blogLink.deleteMany({});
+
   console.log('📰 Creating blog links...');
-  const blogLinks = await Promise.all([
-    prisma.blogLink.upsert({
-      where: { url: 'https://dev.to/naufalrf/building-modern-portfolio' },
-      update: {},
-      create: {
+  await prisma.blogLink.deleteMany({});
+  await prisma.blogLink.createMany({
+    data: [
+      {
         url: 'https://dev.to/naufalrf/building-modern-portfolio',
         title: 'Building a Modern Portfolio with Next.js 15',
         description:
           'A comprehensive guide to creating a portfolio using Next.js App Router and React Server Components',
         imageUrl: 'https://dev.to/assets/og-image.png',
         source: 'DEV.to',
-        publishedAt: new Date('2024-01-15'),
+        category: 'Engineering',
+        tags: ['nextjs', 'react', 'tailwindcss'],
+        publishedAt: new Date('2024-01-15T00:00:00.000Z'),
         visible: true,
         order: 0,
       },
-    }),
-    prisma.blogLink.upsert({
-      where: { url: 'https://medium.com/@naufalrf/typescript-best-practices' },
-      update: {},
-      create: {
-        url: 'https://medium.com/@naufalrf/typescript-best-practices',
-        title: 'TypeScript Best Practices for Large Scale Applications',
-        description: 'Learn how to structure and maintain TypeScript projects at scale',
-        imageUrl: 'https://miro.medium.com/max/1200/0*xyz.jpg',
-        source: 'Medium',
-        publishedAt: new Date('2024-02-20'),
-        visible: true,
-        order: 1,
-      },
-    }),
-    prisma.blogLink.upsert({
-      where: { url: 'https://hashnode.dev/naufalrf/prisma-optimization' },
-      update: {},
-      create: {
-        url: 'https://hashnode.dev/naufalrf/prisma-optimization',
-        title: 'Optimizing Prisma Queries for Performance',
-        description: 'Tips and tricks to improve database query performance with Prisma ORM',
-        source: 'Hashnode',
-        publishedAt: new Date('2024-03-10'),
-        visible: true,
-        order: 2,
-      },
-    }),
-    prisma.blogLink.upsert({
-      where: { url: 'https://dev.to/naufalrf/next-auth-implementation' },
-      update: {},
-      create: {
-        url: 'https://dev.to/naufalrf/next-auth-implementation',
-        title: 'Implementing NextAuth.js Authentication',
+      {
+        url: 'https://medium.com/@naufalrf/mastering-typescript-generics',
+        title: 'Mastering TypeScript Generics: A Practical Guide',
         description:
-          'Complete guide to setting up authentication with NextAuth.js and OAuth providers',
-        source: 'DEV.to',
-        publishedAt: new Date('2024-04-05'),
-        visible: true,
-        order: 3,
-      },
-    }),
-    prisma.blogLink.upsert({
-      where: { url: 'https://medium.com/@naufalrf/tailwind-css-advanced' },
-      update: {},
-      create: {
-        url: 'https://medium.com/@naufalrf/tailwind-css-advanced',
-        title: 'Advanced Tailwind CSS Techniques',
-        description: 'Master advanced Tailwind CSS patterns for professional UI design',
-        imageUrl: 'https://miro.medium.com/max/1200/1*abc.jpg',
+          'Learn how to leverage TypeScript generics to write reusable and type-safe code',
+        imageUrl: 'https://miro.medium.com/v2/resize:fit:1200/1*y6C4nSvy2Woe0m7bWEn4BA.png',
         source: 'Medium',
-        publishedAt: new Date('2024-05-12'),
-        visible: false,
-        order: 4,
-      },
-    }),
-    prisma.blogLink.upsert({
-      where: { url: 'https://hashnode.dev/naufalrf/docker-best-practices' },
-      update: {},
-      create: {
-        url: 'https://hashnode.dev/naufalrf/docker-best-practices',
-        title: 'Docker Best Practices for Production',
-        description: 'Essential Docker patterns and practices for production deployments',
-        source: 'Hashnode',
-        publishedAt: new Date('2024-06-20'),
-        visible: true,
-        order: 5,
-      },
-    }),
-  ]);
-
-  console.log('✅ Blog links created\n');
-
-  console.log('🔗 Creating profile links...');
-  await Promise.all([
-    prisma.profileLink.upsert({
-      where: { id: 'link-github' },
-      update: {},
-      create: {
-        id: 'link-github',
-        label: 'GitHub',
-        url: 'https://github.com/naufalrf',
-        icon: 'github',
-        visible: true,
-        order: 0,
-      },
-    }),
-    prisma.profileLink.upsert({
-      where: { id: 'link-linkedin' },
-      update: {},
-      create: {
-        id: 'link-linkedin',
-        label: 'LinkedIn',
-        url: 'https://linkedin.com/in/naufalrf',
-        icon: 'linkedin',
+        category: 'Engineering',
+        tags: ['typescript', 'programming'],
+        publishedAt: new Date('2024-02-01T00:00:00.000Z'),
         visible: true,
         order: 1,
       },
-    }),
-    prisma.profileLink.upsert({
-      where: { id: 'link-twitter' },
-      update: {},
-      create: {
-        id: 'link-twitter',
-        label: 'Twitter',
-        url: 'https://twitter.com/naufalrf',
-        icon: 'twitter',
+      {
+        url: 'https://hashnode.com/@naufalrf/serverless-architecture-patterns',
+        title: 'Serverless Architecture Patterns for Scalable Apps',
+        description: 'Exploring common serverless patterns using AWS Lambda and API Gateway',
+        imageUrl: 'https://cdn.hashnode.com/res/hashnode/image/upload/v1612423456789/sample.png',
+        source: 'Hashnode',
+        category: 'Cloud',
+        tags: ['aws', 'serverless', 'architecture'],
+        publishedAt: new Date('2024-02-20T00:00:00.000Z'),
         visible: true,
         order: 2,
       },
-    }),
-    prisma.profileLink.upsert({
-      where: { id: 'link-email' },
-      update: {},
-      create: {
-        id: 'link-email',
-        label: 'Email',
-        url: 'mailto:hello@naufalrf.tech',
-        icon: 'mail',
-        visible: true,
-        order: 3,
-      },
-    }),
-    prisma.profileLink.upsert({
-      where: { id: 'link-youtube' },
-      update: {},
-      create: {
-        id: 'link-youtube',
-        label: 'YouTube',
-        url: 'https://youtube.com/@naufalrf',
-        icon: 'youtube',
-        visible: false,
-        order: 4,
-      },
-    }),
-    prisma.profileLink.upsert({
-      where: { id: 'link-instagram' },
-      update: {},
-      create: {
-        id: 'link-instagram',
-        label: 'Instagram',
-        url: 'https://instagram.com/naufalrf',
-        icon: 'instagram',
-        visible: true,
-        order: 5,
-      },
-    }),
-  ]);
+    ],
+  });
+
+  const blogLinks = await prisma.blogLink.findMany();
+  console.log('✅ Blog links created\n');
 
   console.log('✅ Profile links created\n');
 

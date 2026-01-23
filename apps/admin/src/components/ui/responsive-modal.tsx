@@ -27,8 +27,6 @@ interface ResponsiveModalProps {
   showCloseButton?: boolean;
 }
 
-const neumorphicShadow =
-  'shadow-[12px_12px_24px_rgba(163,177,198,0.7),-12px_-12px_24px_rgba(255,255,255,0.6)]';
 const neumorphicButtonShadow =
   'shadow-[5px_5px_10px_rgba(163,177,198,0.6),-5px_-5px_10px_rgba(255,255,255,0.5)]';
 const neumorphicButtonHover =

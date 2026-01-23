@@ -17,6 +17,8 @@ import {
   Settings,
   LogOut,
   Lock,
+  FileText,
+  MessagesSquare,
 } from 'lucide-react';
 import { signOut } from 'next-auth/react';
 import type { Session } from 'next-auth';
@@ -49,6 +51,8 @@ const navigation = [
   { name: 'Messages (NGL)', href: '/messages', icon: Mail },
   { name: 'Contacts', href: '/contacts', icon: Send },
   { name: 'Bookings', href: '/bookings', icon: Calendar },
+  { name: 'Knowledge Base', href: '/knowledge', icon: FileText },
+  { name: 'Chat Logs', href: '/chat-logs', icon: MessagesSquare },
   { name: 'Analytics', href: '/analytics', icon: BarChart3 },
   { name: 'Settings', href: '/settings', icon: Settings },
 ];
@@ -134,7 +138,7 @@ export function AppSidebar({ session }: AppSidebarProps) {
         }
       } catch (error) {
         if ((error as Error).name !== 'AbortError') {
-          
+          void error;
         }
       }
     }

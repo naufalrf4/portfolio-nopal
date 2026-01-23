@@ -5,12 +5,14 @@ interface NeuCardProps {
   className?: string;
   hover?: boolean;
   onClick?: () => void;
+  style?: React.CSSProperties;
 }
 
-export function NeuCard({ children, className, hover = false, onClick }: NeuCardProps) {
+export function NeuCard({ children, className, hover = false, onClick, style }: NeuCardProps) {
   return (
     <div
       onClick={onClick}
+      style={style}
       className={cn(
         'bg-[#E0E5EC] rounded-2xl p-6',
         'shadow-[9px_9px_16px_rgba(163,177,198,0.6),-9px_-9px_16px_rgba(255,255,255,0.5)]',

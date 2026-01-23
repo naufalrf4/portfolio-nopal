@@ -85,13 +85,15 @@ export function ExperienceTabs({ experience }: ExperienceTabsProps) {
                 <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-2 mb-3">
                   <div className="flex items-start gap-3">
                     {exp.logoUrl && (
-                      <div className="flex-shrink-0 w-12 h-12 rounded-lg overflow-hidden shadow-[4px_4px_8px_rgba(163,177,198,0.6),-4px_-4px_8px_rgba(255,255,255,0.5)]">
+                      <div className="flex-shrink-0 h-12 rounded-lg overflow-hidden shadow-[4px_4px_8px_rgba(163,177,198,0.6),-4px_-4px_8px_rgba(255,255,255,0.5)]">
                         <Image
                           src={exp.logoUrl}
                           alt={`${exp.organization} logo`}
-                          width={48}
+                          width={0}
                           height={48}
-                          className="w-full h-full object-cover"
+                          sizes="100vw"
+                          className="h-full w-auto object-contain bg-white"
+                          style={{ width: 'auto', height: '100%' }}
                         />
                       </div>
                     )}

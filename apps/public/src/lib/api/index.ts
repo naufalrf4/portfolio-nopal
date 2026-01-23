@@ -3,6 +3,7 @@ export * from './types';
 export * from './endpoints';
 
 import { aboutApi } from './endpoints/about';
+import { achievementsApi } from './endpoints/achievements';
 import { blogsApi } from './endpoints/blogs';
 import { bookingsApi } from './endpoints/bookings';
 import { contactApi } from './endpoints/contact';
@@ -12,6 +13,7 @@ import { projectsApi } from './endpoints/projects';
 
 export const api = {
   about: aboutApi,
+  achievements: achievementsApi,
   blogs: blogsApi,
   bookings: bookingsApi,
   contact: contactApi,

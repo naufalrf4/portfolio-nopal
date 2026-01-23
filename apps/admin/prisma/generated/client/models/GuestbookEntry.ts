@@ -29,6 +29,11 @@ export type GuestbookEntryMinAggregateOutputType = {
   userId: string | null
   message: string | null
   visible: boolean | null
+  ipAddress: string | null
+  countryCode: string | null
+  country: string | null
+  city: string | null
+  region: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -38,6 +43,11 @@ export type GuestbookEntryMaxAggregateOutputType = {
   userId: string | null
   message: string | null
   visible: boolean | null
+  ipAddress: string | null
+  countryCode: string | null
+  country: string | null
+  city: string | null
+  region: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -48,6 +58,11 @@ export type GuestbookEntryCountAggregateOutputType = {
   message: number
   reactions: number
   visible: number
+  ipAddress: number
+  countryCode: number
+  country: number
+  city: number
+  region: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -59,6 +74,11 @@ export type GuestbookEntryMinAggregateInputType = {
   userId?: true
   message?: true
   visible?: true
+  ipAddress?: true
+  countryCode?: true
+  country?: true
+  city?: true
+  region?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -68,6 +88,11 @@ export type GuestbookEntryMaxAggregateInputType = {
   userId?: true
   message?: true
   visible?: true
+  ipAddress?: true
+  countryCode?: true
+  country?: true
+  city?: true
+  region?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -78,6 +103,11 @@ export type GuestbookEntryCountAggregateInputType = {
   message?: true
   reactions?: true
   visible?: true
+  ipAddress?: true
+  countryCode?: true
+  country?: true
+  city?: true
+  region?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -161,6 +191,11 @@ export type GuestbookEntryGroupByOutputType = {
   message: string
   reactions: runtime.JsonValue
   visible: boolean
+  ipAddress: string | null
+  countryCode: string | null
+  country: string | null
+  city: string | null
+  region: string | null
   createdAt: Date
   updatedAt: Date
   _count: GuestbookEntryCountAggregateOutputType | null
@@ -192,6 +227,11 @@ export type GuestbookEntryWhereInput = {
   message?: Prisma.StringFilter<"GuestbookEntry"> | string
   reactions?: Prisma.JsonFilter<"GuestbookEntry">
   visible?: Prisma.BoolFilter<"GuestbookEntry"> | boolean
+  ipAddress?: Prisma.StringNullableFilter<"GuestbookEntry"> | string | null
+  countryCode?: Prisma.StringNullableFilter<"GuestbookEntry"> | string | null
+  country?: Prisma.StringNullableFilter<"GuestbookEntry"> | string | null
+  city?: Prisma.StringNullableFilter<"GuestbookEntry"> | string | null
+  region?: Prisma.StringNullableFilter<"GuestbookEntry"> | string | null
   createdAt?: Prisma.DateTimeFilter<"GuestbookEntry"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"GuestbookEntry"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -203,6 +243,11 @@ export type GuestbookEntryOrderByWithRelationInput = {
   message?: Prisma.SortOrder
   reactions?: Prisma.SortOrder
   visible?: Prisma.SortOrder
+  ipAddress?: Prisma.SortOrderInput | Prisma.SortOrder
+  countryCode?: Prisma.SortOrderInput | Prisma.SortOrder
+  country?: Prisma.SortOrderInput | Prisma.SortOrder
+  city?: Prisma.SortOrderInput | Prisma.SortOrder
+  region?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
@@ -217,6 +262,11 @@ export type GuestbookEntryWhereUniqueInput = Prisma.AtLeast<{
   message?: Prisma.StringFilter<"GuestbookEntry"> | string
   reactions?: Prisma.JsonFilter<"GuestbookEntry">
   visible?: Prisma.BoolFilter<"GuestbookEntry"> | boolean
+  ipAddress?: Prisma.StringNullableFilter<"GuestbookEntry"> | string | null
+  countryCode?: Prisma.StringNullableFilter<"GuestbookEntry"> | string | null
+  country?: Prisma.StringNullableFilter<"GuestbookEntry"> | string | null
+  city?: Prisma.StringNullableFilter<"GuestbookEntry"> | string | null
+  region?: Prisma.StringNullableFilter<"GuestbookEntry"> | string | null
   createdAt?: Prisma.DateTimeFilter<"GuestbookEntry"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"GuestbookEntry"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -228,6 +278,11 @@ export type GuestbookEntryOrderByWithAggregationInput = {
   message?: Prisma.SortOrder
   reactions?: Prisma.SortOrder
   visible?: Prisma.SortOrder
+  ipAddress?: Prisma.SortOrderInput | Prisma.SortOrder
+  countryCode?: Prisma.SortOrderInput | Prisma.SortOrder
+  country?: Prisma.SortOrderInput | Prisma.SortOrder
+  city?: Prisma.SortOrderInput | Prisma.SortOrder
+  region?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.GuestbookEntryCountOrderByAggregateInput
@@ -244,6 +299,11 @@ export type GuestbookEntryScalarWhereWithAggregatesInput = {
   message?: Prisma.StringWithAggregatesFilter<"GuestbookEntry"> | string
   reactions?: Prisma.JsonWithAggregatesFilter<"GuestbookEntry">
   visible?: Prisma.BoolWithAggregatesFilter<"GuestbookEntry"> | boolean
+  ipAddress?: Prisma.StringNullableWithAggregatesFilter<"GuestbookEntry"> | string | null
+  countryCode?: Prisma.StringNullableWithAggregatesFilter<"GuestbookEntry"> | string | null
+  country?: Prisma.StringNullableWithAggregatesFilter<"GuestbookEntry"> | string | null
+  city?: Prisma.StringNullableWithAggregatesFilter<"GuestbookEntry"> | string | null
+  region?: Prisma.StringNullableWithAggregatesFilter<"GuestbookEntry"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"GuestbookEntry"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"GuestbookEntry"> | Date | string
 }
@@ -253,6 +313,11 @@ export type GuestbookEntryCreateInput = {
   message: string
   reactions?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   visible?: boolean
+  ipAddress?: string | null
+  countryCode?: string | null
+  country?: string | null
+  city?: string | null
+  region?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutGuestbookEntriesInput
@@ -264,6 +329,11 @@ export type GuestbookEntryUncheckedCreateInput = {
   message: string
   reactions?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   visible?: boolean
+  ipAddress?: string | null
+  countryCode?: string | null
+  country?: string | null
+  city?: string | null
+  region?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -273,6 +343,11 @@ export type GuestbookEntryUpdateInput = {
   message?: Prisma.StringFieldUpdateOperationsInput | string
   reactions?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   visible?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ipAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  countryCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutGuestbookEntriesNestedInput
@@ -284,6 +359,11 @@ export type GuestbookEntryUncheckedUpdateInput = {
   message?: Prisma.StringFieldUpdateOperationsInput | string
   reactions?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   visible?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ipAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  countryCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -294,6 +374,11 @@ export type GuestbookEntryCreateManyInput = {
   message: string
   reactions?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   visible?: boolean
+  ipAddress?: string | null
+  countryCode?: string | null
+  country?: string | null
+  city?: string | null
+  region?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -303,6 +388,11 @@ export type GuestbookEntryUpdateManyMutationInput = {
   message?: Prisma.StringFieldUpdateOperationsInput | string
   reactions?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   visible?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ipAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  countryCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -313,6 +403,11 @@ export type GuestbookEntryUncheckedUpdateManyInput = {
   message?: Prisma.StringFieldUpdateOperationsInput | string
   reactions?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   visible?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ipAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  countryCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -333,6 +428,11 @@ export type GuestbookEntryCountOrderByAggregateInput = {
   message?: Prisma.SortOrder
   reactions?: Prisma.SortOrder
   visible?: Prisma.SortOrder
+  ipAddress?: Prisma.SortOrder
+  countryCode?: Prisma.SortOrder
+  country?: Prisma.SortOrder
+  city?: Prisma.SortOrder
+  region?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -342,6 +442,11 @@ export type GuestbookEntryMaxOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   message?: Prisma.SortOrder
   visible?: Prisma.SortOrder
+  ipAddress?: Prisma.SortOrder
+  countryCode?: Prisma.SortOrder
+  country?: Prisma.SortOrder
+  city?: Prisma.SortOrder
+  region?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -351,6 +456,11 @@ export type GuestbookEntryMinOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   message?: Prisma.SortOrder
   visible?: Prisma.SortOrder
+  ipAddress?: Prisma.SortOrder
+  countryCode?: Prisma.SortOrder
+  country?: Prisma.SortOrder
+  city?: Prisma.SortOrder
+  region?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -402,6 +512,11 @@ export type GuestbookEntryCreateWithoutUserInput = {
   message: string
   reactions?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   visible?: boolean
+  ipAddress?: string | null
+  countryCode?: string | null
+  country?: string | null
+  city?: string | null
+  region?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -411,6 +526,11 @@ export type GuestbookEntryUncheckedCreateWithoutUserInput = {
   message: string
   reactions?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   visible?: boolean
+  ipAddress?: string | null
+  countryCode?: string | null
+  country?: string | null
+  city?: string | null
+  region?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -450,6 +570,11 @@ export type GuestbookEntryScalarWhereInput = {
   message?: Prisma.StringFilter<"GuestbookEntry"> | string
   reactions?: Prisma.JsonFilter<"GuestbookEntry">
   visible?: Prisma.BoolFilter<"GuestbookEntry"> | boolean
+  ipAddress?: Prisma.StringNullableFilter<"GuestbookEntry"> | string | null
+  countryCode?: Prisma.StringNullableFilter<"GuestbookEntry"> | string | null
+  country?: Prisma.StringNullableFilter<"GuestbookEntry"> | string | null
+  city?: Prisma.StringNullableFilter<"GuestbookEntry"> | string | null
+  region?: Prisma.StringNullableFilter<"GuestbookEntry"> | string | null
   createdAt?: Prisma.DateTimeFilter<"GuestbookEntry"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"GuestbookEntry"> | Date | string
 }
@@ -459,6 +584,11 @@ export type GuestbookEntryCreateManyUserInput = {
   message: string
   reactions?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   visible?: boolean
+  ipAddress?: string | null
+  countryCode?: string | null
+  country?: string | null
+  city?: string | null
+  region?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -468,6 +598,11 @@ export type GuestbookEntryUpdateWithoutUserInput = {
   message?: Prisma.StringFieldUpdateOperationsInput | string
   reactions?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   visible?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ipAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  countryCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -477,6 +612,11 @@ export type GuestbookEntryUncheckedUpdateWithoutUserInput = {
   message?: Prisma.StringFieldUpdateOperationsInput | string
   reactions?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   visible?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ipAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  countryCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -486,6 +626,11 @@ export type GuestbookEntryUncheckedUpdateManyWithoutUserInput = {
   message?: Prisma.StringFieldUpdateOperationsInput | string
   reactions?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   visible?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ipAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  countryCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -498,6 +643,11 @@ export type GuestbookEntrySelect<ExtArgs extends runtime.Types.Extensions.Intern
   message?: boolean
   reactions?: boolean
   visible?: boolean
+  ipAddress?: boolean
+  countryCode?: boolean
+  country?: boolean
+  city?: boolean
+  region?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -509,6 +659,11 @@ export type GuestbookEntrySelectCreateManyAndReturn<ExtArgs extends runtime.Type
   message?: boolean
   reactions?: boolean
   visible?: boolean
+  ipAddress?: boolean
+  countryCode?: boolean
+  country?: boolean
+  city?: boolean
+  region?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -520,6 +675,11 @@ export type GuestbookEntrySelectUpdateManyAndReturn<ExtArgs extends runtime.Type
   message?: boolean
   reactions?: boolean
   visible?: boolean
+  ipAddress?: boolean
+  countryCode?: boolean
+  country?: boolean
+  city?: boolean
+  region?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -531,11 +691,16 @@ export type GuestbookEntrySelectScalar = {
   message?: boolean
   reactions?: boolean
   visible?: boolean
+  ipAddress?: boolean
+  countryCode?: boolean
+  country?: boolean
+  city?: boolean
+  region?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type GuestbookEntryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "message" | "reactions" | "visible" | "createdAt" | "updatedAt", ExtArgs["result"]["guestbookEntry"]>
+export type GuestbookEntryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "message" | "reactions" | "visible" | "ipAddress" | "countryCode" | "country" | "city" | "region" | "createdAt" | "updatedAt", ExtArgs["result"]["guestbookEntry"]>
 export type GuestbookEntryInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -557,6 +722,11 @@ export type $GuestbookEntryPayload<ExtArgs extends runtime.Types.Extensions.Inte
     message: string
     reactions: runtime.JsonValue
     visible: boolean
+    ipAddress: string | null
+    countryCode: string | null
+    country: string | null
+    city: string | null
+    region: string | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["guestbookEntry"]>
@@ -988,6 +1158,11 @@ export interface GuestbookEntryFieldRefs {
   readonly message: Prisma.FieldRef<"GuestbookEntry", 'String'>
   readonly reactions: Prisma.FieldRef<"GuestbookEntry", 'Json'>
   readonly visible: Prisma.FieldRef<"GuestbookEntry", 'Boolean'>
+  readonly ipAddress: Prisma.FieldRef<"GuestbookEntry", 'String'>
+  readonly countryCode: Prisma.FieldRef<"GuestbookEntry", 'String'>
+  readonly country: Prisma.FieldRef<"GuestbookEntry", 'String'>
+  readonly city: Prisma.FieldRef<"GuestbookEntry", 'String'>
+  readonly region: Prisma.FieldRef<"GuestbookEntry", 'String'>
   readonly createdAt: Prisma.FieldRef<"GuestbookEntry", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"GuestbookEntry", 'DateTime'>
 }

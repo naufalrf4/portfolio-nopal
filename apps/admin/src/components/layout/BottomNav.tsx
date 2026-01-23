@@ -16,6 +16,8 @@ import {
   Settings,
   MoreHorizontal,
   X,
+  Bot,
+  FileText,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -47,6 +49,7 @@ export function BottomNav() {
         }
       } catch (error) {
         if ((error as Error).name !== 'AbortError') {
+          void error;
         }
       }
     }
@@ -93,6 +96,8 @@ export function BottomNav() {
     { name: 'About', href: '/about', icon: User },
     { name: 'Guestbook', href: '/guestbook', icon: MessageSquare },
     { name: 'Messages', href: '/messages', icon: Mail, badge: unreadCount },
+    { name: 'Knowledge', href: '/knowledge', icon: FileText },
+    { name: 'Chat Logs', href: '/chat-logs', icon: Bot },
     { name: 'Analytics', href: '/analytics', icon: BarChart3 },
     { name: 'Settings', href: '/settings', icon: Settings },
   ];

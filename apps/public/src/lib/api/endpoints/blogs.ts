@@ -6,6 +6,7 @@ export const blogsApi = {
     const qs = buildQueryString({ limit });
     return fetchApi<BlogsResponse>(`/api/v1/public/blogs${qs}`, {
       retries: 2,
+      revalidate: 1800,
     });
   },
 };

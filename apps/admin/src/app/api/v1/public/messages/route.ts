@@ -10,12 +10,14 @@ import {
 import { checkRateLimit, getRateLimitHeaders } from '@/lib/services/rate-limiter';
 import { getIpLocation } from '@/lib/services/geoIpService';
 import { createHash } from 'crypto';
+import { verifyTurnstileToken, isTurnstileConfigured } from '@/lib/services/turnstile';
 
 const publicMessageSchema = z.object({
   content: z
     .string()
     .min(1, 'Message is required')
     .max(500, 'Message must be 500 characters or less'),
+  turnstileToken: z.string().min(1, 'CAPTCHA verification is required'),
 });
 
 const RATE_LIMIT_CONFIG = {
@@ -62,6 +64,20 @@ export async function POST(request: NextRequest) {
       return validationErrorResponse(parsed.error.flatten().fieldErrors);
     }
 
+    const { content, turnstileToken } = parsed.data;
+
+    if (isTurnstileConfigured() && turnstileToken) {
+      const turnstileResult = await verifyTurnstileToken(turnstileToken);
+
+      if (!turnstileResult.success) {
+        return errorResponse(
+          'CAPTCHA verification failed. Please try again.',
+          400,
+          'TURNSTILE_VERIFICATION_FAILED'
+        );
+      }
+    }
+
     const geoLocation = getIpLocation(clientIp);
 
     const messageData: {
@@ -74,7 +90,7 @@ export async function POST(request: NextRequest) {
       city?: string;
       region?: string;
     } = {
-      content: parsed.data.content,
+      content,
       ipHash,
       ipAddress: clientIp,
       read: false,

@@ -34,6 +34,7 @@ export type AboutMeMinAggregateOutputType = {
   location: string | null
   avatarUrl: string | null
   resumeUrl: string | null
+  availabilityStatus: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -48,6 +49,7 @@ export type AboutMeMaxAggregateOutputType = {
   location: string | null
   avatarUrl: string | null
   resumeUrl: string | null
+  availabilityStatus: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -63,6 +65,7 @@ export type AboutMeCountAggregateOutputType = {
   location: number
   avatarUrl: number
   resumeUrl: number
+  availabilityStatus: number
   skills: number
   experience: number
   socialLinks: number
@@ -82,6 +85,7 @@ export type AboutMeMinAggregateInputType = {
   location?: true
   avatarUrl?: true
   resumeUrl?: true
+  availabilityStatus?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -96,6 +100,7 @@ export type AboutMeMaxAggregateInputType = {
   location?: true
   avatarUrl?: true
   resumeUrl?: true
+  availabilityStatus?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -111,6 +116,7 @@ export type AboutMeCountAggregateInputType = {
   location?: true
   avatarUrl?: true
   resumeUrl?: true
+  availabilityStatus?: true
   skills?: true
   experience?: true
   socialLinks?: true
@@ -194,7 +200,7 @@ export type AboutMeGroupByArgs<ExtArgs extends runtime.Types.Extensions.Internal
 export type AboutMeGroupByOutputType = {
   id: string
   fullName: string
-  tagline: string | null
+  tagline: string
   roles: string[]
   bio: string
   email: string
@@ -202,6 +208,7 @@ export type AboutMeGroupByOutputType = {
   location: string | null
   avatarUrl: string | null
   resumeUrl: string | null
+  availabilityStatus: string | null
   skills: string[]
   experience: runtime.JsonValue | null
   socialLinks: runtime.JsonValue | null
@@ -233,7 +240,7 @@ export type AboutMeWhereInput = {
   NOT?: Prisma.AboutMeWhereInput | Prisma.AboutMeWhereInput[]
   id?: Prisma.StringFilter<"AboutMe"> | string
   fullName?: Prisma.StringFilter<"AboutMe"> | string
-  tagline?: Prisma.StringNullableFilter<"AboutMe"> | string | null
+  tagline?: Prisma.StringFilter<"AboutMe"> | string
   roles?: Prisma.StringNullableListFilter<"AboutMe">
   bio?: Prisma.StringFilter<"AboutMe"> | string
   email?: Prisma.StringFilter<"AboutMe"> | string
@@ -241,6 +248,7 @@ export type AboutMeWhereInput = {
   location?: Prisma.StringNullableFilter<"AboutMe"> | string | null
   avatarUrl?: Prisma.StringNullableFilter<"AboutMe"> | string | null
   resumeUrl?: Prisma.StringNullableFilter<"AboutMe"> | string | null
+  availabilityStatus?: Prisma.StringNullableFilter<"AboutMe"> | string | null
   skills?: Prisma.StringNullableListFilter<"AboutMe">
   experience?: Prisma.JsonNullableFilter<"AboutMe">
   socialLinks?: Prisma.JsonNullableFilter<"AboutMe">
@@ -251,7 +259,7 @@ export type AboutMeWhereInput = {
 export type AboutMeOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   fullName?: Prisma.SortOrder
-  tagline?: Prisma.SortOrderInput | Prisma.SortOrder
+  tagline?: Prisma.SortOrder
   roles?: Prisma.SortOrder
   bio?: Prisma.SortOrder
   email?: Prisma.SortOrder
@@ -259,6 +267,7 @@ export type AboutMeOrderByWithRelationInput = {
   location?: Prisma.SortOrderInput | Prisma.SortOrder
   avatarUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   resumeUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  availabilityStatus?: Prisma.SortOrderInput | Prisma.SortOrder
   skills?: Prisma.SortOrder
   experience?: Prisma.SortOrderInput | Prisma.SortOrder
   socialLinks?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -272,7 +281,7 @@ export type AboutMeWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.AboutMeWhereInput[]
   NOT?: Prisma.AboutMeWhereInput | Prisma.AboutMeWhereInput[]
   fullName?: Prisma.StringFilter<"AboutMe"> | string
-  tagline?: Prisma.StringNullableFilter<"AboutMe"> | string | null
+  tagline?: Prisma.StringFilter<"AboutMe"> | string
   roles?: Prisma.StringNullableListFilter<"AboutMe">
   bio?: Prisma.StringFilter<"AboutMe"> | string
   email?: Prisma.StringFilter<"AboutMe"> | string
@@ -280,6 +289,7 @@ export type AboutMeWhereUniqueInput = Prisma.AtLeast<{
   location?: Prisma.StringNullableFilter<"AboutMe"> | string | null
   avatarUrl?: Prisma.StringNullableFilter<"AboutMe"> | string | null
   resumeUrl?: Prisma.StringNullableFilter<"AboutMe"> | string | null
+  availabilityStatus?: Prisma.StringNullableFilter<"AboutMe"> | string | null
   skills?: Prisma.StringNullableListFilter<"AboutMe">
   experience?: Prisma.JsonNullableFilter<"AboutMe">
   socialLinks?: Prisma.JsonNullableFilter<"AboutMe">
@@ -290,7 +300,7 @@ export type AboutMeWhereUniqueInput = Prisma.AtLeast<{
 export type AboutMeOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   fullName?: Prisma.SortOrder
-  tagline?: Prisma.SortOrderInput | Prisma.SortOrder
+  tagline?: Prisma.SortOrder
   roles?: Prisma.SortOrder
   bio?: Prisma.SortOrder
   email?: Prisma.SortOrder
@@ -298,6 +308,7 @@ export type AboutMeOrderByWithAggregationInput = {
   location?: Prisma.SortOrderInput | Prisma.SortOrder
   avatarUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   resumeUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  availabilityStatus?: Prisma.SortOrderInput | Prisma.SortOrder
   skills?: Prisma.SortOrder
   experience?: Prisma.SortOrderInput | Prisma.SortOrder
   socialLinks?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -314,7 +325,7 @@ export type AboutMeScalarWhereWithAggregatesInput = {
   NOT?: Prisma.AboutMeScalarWhereWithAggregatesInput | Prisma.AboutMeScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"AboutMe"> | string
   fullName?: Prisma.StringWithAggregatesFilter<"AboutMe"> | string
-  tagline?: Prisma.StringNullableWithAggregatesFilter<"AboutMe"> | string | null
+  tagline?: Prisma.StringWithAggregatesFilter<"AboutMe"> | string
   roles?: Prisma.StringNullableListFilter<"AboutMe">
   bio?: Prisma.StringWithAggregatesFilter<"AboutMe"> | string
   email?: Prisma.StringWithAggregatesFilter<"AboutMe"> | string
@@ -322,6 +333,7 @@ export type AboutMeScalarWhereWithAggregatesInput = {
   location?: Prisma.StringNullableWithAggregatesFilter<"AboutMe"> | string | null
   avatarUrl?: Prisma.StringNullableWithAggregatesFilter<"AboutMe"> | string | null
   resumeUrl?: Prisma.StringNullableWithAggregatesFilter<"AboutMe"> | string | null
+  availabilityStatus?: Prisma.StringNullableWithAggregatesFilter<"AboutMe"> | string | null
   skills?: Prisma.StringNullableListFilter<"AboutMe">
   experience?: Prisma.JsonNullableWithAggregatesFilter<"AboutMe">
   socialLinks?: Prisma.JsonNullableWithAggregatesFilter<"AboutMe">
@@ -332,7 +344,7 @@ export type AboutMeScalarWhereWithAggregatesInput = {
 export type AboutMeCreateInput = {
   id?: string
   fullName: string
-  tagline?: string | null
+  tagline: string
   roles?: Prisma.AboutMeCreaterolesInput | string[]
   bio: string
   email: string
@@ -340,6 +352,7 @@ export type AboutMeCreateInput = {
   location?: string | null
   avatarUrl?: string | null
   resumeUrl?: string | null
+  availabilityStatus?: string | null
   skills?: Prisma.AboutMeCreateskillsInput | string[]
   experience?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   socialLinks?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -350,7 +363,7 @@ export type AboutMeCreateInput = {
 export type AboutMeUncheckedCreateInput = {
   id?: string
   fullName: string
-  tagline?: string | null
+  tagline: string
   roles?: Prisma.AboutMeCreaterolesInput | string[]
   bio: string
   email: string
@@ -358,6 +371,7 @@ export type AboutMeUncheckedCreateInput = {
   location?: string | null
   avatarUrl?: string | null
   resumeUrl?: string | null
+  availabilityStatus?: string | null
   skills?: Prisma.AboutMeCreateskillsInput | string[]
   experience?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   socialLinks?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -368,7 +382,7 @@ export type AboutMeUncheckedCreateInput = {
 export type AboutMeUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
-  tagline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tagline?: Prisma.StringFieldUpdateOperationsInput | string
   roles?: Prisma.AboutMeUpdaterolesInput | string[]
   bio?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
@@ -376,6 +390,7 @@ export type AboutMeUpdateInput = {
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resumeUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  availabilityStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   skills?: Prisma.AboutMeUpdateskillsInput | string[]
   experience?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   socialLinks?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -386,7 +401,7 @@ export type AboutMeUpdateInput = {
 export type AboutMeUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
-  tagline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tagline?: Prisma.StringFieldUpdateOperationsInput | string
   roles?: Prisma.AboutMeUpdaterolesInput | string[]
   bio?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
@@ -394,6 +409,7 @@ export type AboutMeUncheckedUpdateInput = {
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resumeUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  availabilityStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   skills?: Prisma.AboutMeUpdateskillsInput | string[]
   experience?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   socialLinks?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -404,7 +420,7 @@ export type AboutMeUncheckedUpdateInput = {
 export type AboutMeCreateManyInput = {
   id?: string
   fullName: string
-  tagline?: string | null
+  tagline: string
   roles?: Prisma.AboutMeCreaterolesInput | string[]
   bio: string
   email: string
@@ -412,6 +428,7 @@ export type AboutMeCreateManyInput = {
   location?: string | null
   avatarUrl?: string | null
   resumeUrl?: string | null
+  availabilityStatus?: string | null
   skills?: Prisma.AboutMeCreateskillsInput | string[]
   experience?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   socialLinks?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -422,7 +439,7 @@ export type AboutMeCreateManyInput = {
 export type AboutMeUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
-  tagline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tagline?: Prisma.StringFieldUpdateOperationsInput | string
   roles?: Prisma.AboutMeUpdaterolesInput | string[]
   bio?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
@@ -430,6 +447,7 @@ export type AboutMeUpdateManyMutationInput = {
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resumeUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  availabilityStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   skills?: Prisma.AboutMeUpdateskillsInput | string[]
   experience?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   socialLinks?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -440,7 +458,7 @@ export type AboutMeUpdateManyMutationInput = {
 export type AboutMeUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
-  tagline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tagline?: Prisma.StringFieldUpdateOperationsInput | string
   roles?: Prisma.AboutMeUpdaterolesInput | string[]
   bio?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
@@ -448,6 +466,7 @@ export type AboutMeUncheckedUpdateManyInput = {
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resumeUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  availabilityStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   skills?: Prisma.AboutMeUpdateskillsInput | string[]
   experience?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   socialLinks?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -466,6 +485,7 @@ export type AboutMeCountOrderByAggregateInput = {
   location?: Prisma.SortOrder
   avatarUrl?: Prisma.SortOrder
   resumeUrl?: Prisma.SortOrder
+  availabilityStatus?: Prisma.SortOrder
   skills?: Prisma.SortOrder
   experience?: Prisma.SortOrder
   socialLinks?: Prisma.SortOrder
@@ -483,6 +503,7 @@ export type AboutMeMaxOrderByAggregateInput = {
   location?: Prisma.SortOrder
   avatarUrl?: Prisma.SortOrder
   resumeUrl?: Prisma.SortOrder
+  availabilityStatus?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -497,6 +518,7 @@ export type AboutMeMinOrderByAggregateInput = {
   location?: Prisma.SortOrder
   avatarUrl?: Prisma.SortOrder
   resumeUrl?: Prisma.SortOrder
+  availabilityStatus?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -532,6 +554,7 @@ export type AboutMeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   location?: boolean
   avatarUrl?: boolean
   resumeUrl?: boolean
+  availabilityStatus?: boolean
   skills?: boolean
   experience?: boolean
   socialLinks?: boolean
@@ -550,6 +573,7 @@ export type AboutMeSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   location?: boolean
   avatarUrl?: boolean
   resumeUrl?: boolean
+  availabilityStatus?: boolean
   skills?: boolean
   experience?: boolean
   socialLinks?: boolean
@@ -568,6 +592,7 @@ export type AboutMeSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   location?: boolean
   avatarUrl?: boolean
   resumeUrl?: boolean
+  availabilityStatus?: boolean
   skills?: boolean
   experience?: boolean
   socialLinks?: boolean
@@ -586,6 +611,7 @@ export type AboutMeSelectScalar = {
   location?: boolean
   avatarUrl?: boolean
   resumeUrl?: boolean
+  availabilityStatus?: boolean
   skills?: boolean
   experience?: boolean
   socialLinks?: boolean
@@ -593,7 +619,7 @@ export type AboutMeSelectScalar = {
   updatedAt?: boolean
 }
 
-export type AboutMeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "fullName" | "tagline" | "roles" | "bio" | "email" | "phone" | "location" | "avatarUrl" | "resumeUrl" | "skills" | "experience" | "socialLinks" | "createdAt" | "updatedAt", ExtArgs["result"]["aboutMe"]>
+export type AboutMeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "fullName" | "tagline" | "roles" | "bio" | "email" | "phone" | "location" | "avatarUrl" | "resumeUrl" | "availabilityStatus" | "skills" | "experience" | "socialLinks" | "createdAt" | "updatedAt", ExtArgs["result"]["aboutMe"]>
 
 export type $AboutMePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "AboutMe"
@@ -601,7 +627,7 @@ export type $AboutMePayload<ExtArgs extends runtime.Types.Extensions.InternalArg
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     fullName: string
-    tagline: string | null
+    tagline: string
     roles: string[]
     bio: string
     email: string
@@ -609,6 +635,7 @@ export type $AboutMePayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     location: string | null
     avatarUrl: string | null
     resumeUrl: string | null
+    availabilityStatus: string | null
     skills: string[]
     experience: runtime.JsonValue | null
     socialLinks: runtime.JsonValue | null
@@ -1047,6 +1074,7 @@ export interface AboutMeFieldRefs {
   readonly location: Prisma.FieldRef<"AboutMe", 'String'>
   readonly avatarUrl: Prisma.FieldRef<"AboutMe", 'String'>
   readonly resumeUrl: Prisma.FieldRef<"AboutMe", 'String'>
+  readonly availabilityStatus: Prisma.FieldRef<"AboutMe", 'String'>
   readonly skills: Prisma.FieldRef<"AboutMe", 'String[]'>
   readonly experience: Prisma.FieldRef<"AboutMe", 'Json'>
   readonly socialLinks: Prisma.FieldRef<"AboutMe", 'Json'>

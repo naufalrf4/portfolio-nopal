@@ -1,10 +1,10 @@
-import type { HttpClient } from '../client';
+import type { HttpClient, RequestOptions } from '../client';
 import type { Project, ProjectsQuery, ProjectsResponse, ProjectResponse } from '../types';
 
 export class ProjectsClient {
   constructor(private client: HttpClient) {}
 
-  async getAll(query?: ProjectsQuery): Promise<ProjectsResponse> {
+  async getAll(query?: ProjectsQuery, options?: RequestOptions): Promise<ProjectsResponse> {
     const params: Record<string, string> = {};
 
     if (query?.page) params.page = query.page.toString();
@@ -20,7 +20,7 @@ export class ProjectsClient {
         total: number;
         totalPages: number;
       };
-    }>('/api/v1/public/projects', params);
+    }>('/api/v1/public/projects', { ...options, params });
 
     return {
       success: true,
@@ -28,8 +28,8 @@ export class ProjectsClient {
     };
   }
 
-  async getBySlug(slug: string): Promise<ProjectResponse> {
-    const project = await this.client.get<Project>(`/api/v1/public/projects/${slug}`);
+  async getBySlug(slug: string, options?: RequestOptions): Promise<ProjectResponse> {
+    const project = await this.client.get<Project>(`/api/v1/public/projects/${slug}`, options);
     return {
       success: true,
       data: project,

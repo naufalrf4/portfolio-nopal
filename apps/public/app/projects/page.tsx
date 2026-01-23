@@ -4,24 +4,30 @@ import { ProjectsContent } from '@/src/features/projects/components/ProjectsCont
 import { LoadingState, PageHeader } from '@/src/features/shared/components';
 import { FolderKanban } from 'lucide-react';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: 'Projects',
   description:
-    'Explore my portfolio of web applications, mobile apps, backend systems, and DevOps projects showcasing modern development practices.',
+    'Explore real world projects by Naufal Rizqullah Firdaus including full stack web applications, automation tools, AI driven workflows, IoT monitoring systems, and end to end solution engineering implementations.',
+  keywords: [
+    'Naufal Rizqullah Firdaus Projects',
+    'Automation Projects',
+    'IoT Integration Projects',
+    'Solution Engineering Portfolio',
+  ],
   openGraph: {
-    title: 'Projects | NaufalRF',
+    title: 'Projects by NaufalRF',
     description:
-      'Explore my portfolio of web applications, mobile apps, backend systems, and DevOps projects.',
+      'A curated collection of projects by Naufal Rizqullah Firdaus that demonstrate solution engineering, system integration, automation logic, and scalable architecture design.',
     type: 'website',
     url: 'https://naufalrf.tech/projects',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Projects | NaufalRF',
+    title: 'Projects by NaufalRF',
     description:
-      'Explore my portfolio of web applications, mobile apps, backend systems, and DevOps projects.',
+      'A curated collection of projects by Naufal Rizqullah Firdaus that demonstrate solution engineering, system integration, automation logic, and scalable architecture design.',
   },
   alternates: {
     canonical: 'https://naufalrf.tech/projects',

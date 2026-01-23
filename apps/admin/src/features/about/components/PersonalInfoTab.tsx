@@ -1,13 +1,34 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Eye, FileText, Image as ImageIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { FileUpload } from '@/components/upload/FileUpload';
+import { ResponsiveModal } from '@/components/ui/responsive-modal';
 import { useAbout } from '../hooks/useAbout';
+import { cn } from '@/lib/utils';
+
+type PreviewType = 'image' | 'pdf';
+
+interface PreviewState {
+  url: string;
+  type: PreviewType;
+  title: string;
+}
+
+const neumorphicButton = cn(
+  'h-9 w-9 rounded-xl shrink-0',
+  'bg-[#E0E5EC] flex items-center justify-center',
+  'shadow-[4px_4px_8px_rgba(163,177,198,0.5),-4px_-4px_8px_rgba(255,255,255,0.4)]',
+  'text-[#6B7280] transition-all duration-200',
+  'hover:shadow-[5px_5px_10px_rgba(163,177,198,0.55),-5px_-5px_10px_rgba(255,255,255,0.5)]',
+  'hover:text-[#3B82F6]',
+  'active:shadow-[inset_3px_3px_6px_rgba(163,177,198,0.5),inset_-3px_-3px_6px_rgba(255,255,255,0.4)]',
+  'focus:outline-none focus:ring-2 focus:ring-[#3B82F6]/30'
+);
 
 export function PersonalInfoTab() {
   const { data, saving, updateAbout } = useAbout();
@@ -19,7 +40,16 @@ export function PersonalInfoTab() {
   const [location, setLocation] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('');
   const [resumeUrl, setResumeUrl] = useState('');
+  const [preview, setPreview] = useState<PreviewState | null>(null);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
+  const handlePreview = (url: string, type: PreviewType, title: string) => {
+    setPreview({ url, type, title });
+  };
+
+  const closePreview = () => {
+    setPreview(null);
+  };
 
   useEffect(() => {
     if (data) {
@@ -139,31 +169,63 @@ export function PersonalInfoTab() {
           </div>
 
           <div className="space-y-2 md:col-span-2">
-            <FileUpload
-              value={avatarUrl || null}
-              onChange={(url) => {
-                setAvatarUrl(url ?? '');
-                setHasUnsavedChanges(true);
-              }}
-              label="Avatar"
-              folder="about"
-              accept="image/jpeg,image/png,image/webp"
-              helperText="Upload your profile photo (JPG, PNG, WebP). Recommended: 400x400px"
-            />
+            <Label>Avatar</Label>
+            <div className="flex items-center gap-3">
+              <div className="flex-1">
+                <FileUpload
+                  value={avatarUrl || null}
+                  onChange={(url) => {
+                    setAvatarUrl(url ?? '');
+                    setHasUnsavedChanges(true);
+                  }}
+                  label=""
+                  folder="about"
+                  accept="image/jpeg,image/png,image/webp"
+                  helperText=""
+                  preview={false}
+                />
+              </div>
+              {avatarUrl && (
+                <button
+                  type="button"
+                  onClick={() => handlePreview(avatarUrl, 'image', 'Avatar Preview')}
+                  className={neumorphicButton}
+                  title="Preview avatar"
+                >
+                  <Eye className="h-4 w-4" />
+                </button>
+              )}
+            </div>
           </div>
 
           <div className="space-y-2 md:col-span-2">
-            <FileUpload
-              value={resumeUrl || null}
-              onChange={(url) => {
-                setResumeUrl(url ?? '');
-                setHasUnsavedChanges(true);
-              }}
-              label="Resume/CV"
-              folder="resumes"
-              accept="application/pdf"
-              helperText="Upload your resume in PDF format"
-            />
+            <Label>Resume/CV</Label>
+            <div className="flex items-center gap-3">
+              <div className="flex-1">
+                <FileUpload
+                  value={resumeUrl || null}
+                  onChange={(url) => {
+                    setResumeUrl(url ?? '');
+                    setHasUnsavedChanges(true);
+                  }}
+                  label=""
+                  folder="resumes"
+                  accept="application/pdf"
+                  helperText=""
+                  preview={false}
+                />
+              </div>
+              {resumeUrl && (
+                <button
+                  type="button"
+                  onClick={() => handlePreview(resumeUrl, 'pdf', 'Resume Preview')}
+                  className={neumorphicButton}
+                  title="Preview resume"
+                >
+                  <Eye className="h-4 w-4" />
+                </button>
+              )}
+            </div>
           </div>
         </div>
 
@@ -181,6 +243,36 @@ export function PersonalInfoTab() {
           </Button>
         </div>
       </CardContent>
+
+      <ResponsiveModal
+        open={!!preview}
+        onOpenChange={(open) => !open && closePreview()}
+        title={preview?.title || 'Preview'}
+        description={preview?.type === 'image' ? 'Image preview' : 'PDF document preview'}
+        size="xl"
+      >
+        <div className="flex items-center gap-2 mb-4">
+          {preview?.type === 'image' ? (
+            <ImageIcon className="w-5 h-5 text-[#3B82F6]" />
+          ) : (
+            <FileText className="w-5 h-5 text-[#3B82F6]" />
+          )}
+          <span className="text-sm text-[#6B7280]">
+            {preview?.type === 'image' ? 'Image' : 'PDF Document'}
+          </span>
+        </div>
+        <div className="rounded-xl overflow-hidden bg-white/50">
+          {preview?.type === 'image' ? (
+            <img
+              src={preview.url}
+              alt="Preview"
+              className="w-full h-auto max-h-[60vh] object-contain"
+            />
+          ) : (
+            <iframe src={preview?.url} className="w-full h-[60vh] rounded-lg" title="PDF Preview" />
+          )}
+        </div>
+      </ResponsiveModal>
     </Card>
   );
 }

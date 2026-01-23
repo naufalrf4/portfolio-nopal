@@ -9,14 +9,17 @@ interface ProjectCardProps {
 }
 
 export function ProjectCard({ project }: ProjectCardProps) {
+  // Use imageUrl first, fallback to first image from images array, then fallback to gradient
+  const thumbnailUrl = project.imageUrl || project.images?.[0]?.url;
+
   return (
     <Link href={`/projects/${project.slug}`}>
       <NeuCard hover className="h-full group">
         <div className="relative aspect-video rounded-xl overflow-hidden mb-4 shadow-[inset_4px_4px_8px_rgba(163,177,198,0.6),inset_-4px_-4px_8px_rgba(255,255,255,0.5)]">
-          {project.imageUrl ? (
+          {thumbnailUrl ? (
             <Image
-              src={project.imageUrl}
-              alt={project.title}
+              src={thumbnailUrl}
+              alt={project.images?.[0]?.alt || project.title}
               fill
               className="object-cover transition-transform duration-300 group-hover:scale-105"
             />

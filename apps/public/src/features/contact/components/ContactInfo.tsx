@@ -23,7 +23,7 @@ interface ContactInfoProps {
   location?: string;
   email?: string;
   socialLinks?: SocialLink[];
-  availabilityStatus?: string;
+  availabilityStatus?: 'available' | 'busy' | 'unavailable';
   error?: string | null;
 }
 
@@ -92,11 +92,21 @@ export function ContactInfo({
           {availabilityStatus && (
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-[#E0E5EC] shadow-[4px_4px_8px_rgba(163,177,198,0.6),-4px_-4px_8px_rgba(255,255,255,0.5)] flex items-center justify-center">
-                <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse" />
+                {availabilityStatus === 'available' ? (
+                  <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse" />
+                ) : availabilityStatus === 'busy' ? (
+                  <div className="w-3 h-3 rounded-full bg-yellow-500" />
+                ) : (
+                  <div className="w-3 h-3 rounded-full bg-gray-400" />
+                )}
               </div>
               <div>
-                <p className="text-sm text-[#6B7280]">Availability</p>
-                <p className="text-[#3D4852] font-medium">{availabilityStatus}</p>
+                <p className="text-sm text-[#6B7280]">Status</p>
+                <p className="text-[#3D4852] font-medium">
+                  {availabilityStatus === 'available' && 'Available to work'}
+                  {availabilityStatus === 'busy' && 'Currently busy'}
+                  {availabilityStatus === 'unavailable' && 'Not available'}
+                </p>
               </div>
             </div>
           )}

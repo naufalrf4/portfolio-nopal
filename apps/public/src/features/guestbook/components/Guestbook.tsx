@@ -10,10 +10,10 @@ import {
   ErrorState,
 } from '@/src/features/shared/components';
 import { GuestbookList } from './GuestbookList';
-import { GuestbookForm } from './GuestbookForm';
+import { GuestbookModal } from './GuestbookModal';
 import { api } from '@/src/lib/api';
 import { getAuthErrorMessage } from '@/src/lib/auth/env-validation';
-import { LogIn, MessageSquare, AlertCircle } from 'lucide-react';
+import { LogIn, MessageSquare, AlertCircle, Plus } from 'lucide-react';
 import type { GuestbookEntry } from './types';
 
 export function Guestbook() {
@@ -22,6 +22,7 @@ export function Guestbook() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [authConfigError, setAuthConfigError] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const errorMessage = getAuthErrorMessage();
@@ -64,11 +65,11 @@ export function Guestbook() {
 
   return (
     <Section>
-      <div className="mx-auto max-w-7xl">
+      <div className="animate-fade-in mx-auto max-w-7xl">
         <SectionHeader title="Guestbook" subtitle="Leave a message and say hello!" />
 
         <div className="max-w-3xl mx-auto space-y-8">
-          <NeuCard>
+          <NeuCard className="stagger-item">
             {authConfigError ? (
               <div className="text-center py-6 space-y-4">
                 <AlertCircle className="w-12 h-12 mx-auto text-red-500" />
@@ -87,7 +88,12 @@ export function Guestbook() {
                 <div className="animate-pulse text-[#6B7280]">Loading...</div>
               </div>
             ) : isAuthenticated && userEmail ? (
-              <GuestbookForm userEmail={userEmail} onSuccess={handleSuccess} />
+              <div className="text-center py-6">
+                <NeuButton variant="primary" size="md" onClick={() => setIsModalOpen(true)}>
+                  <Plus size={18} className="mr-2" />
+                  Leave a Message
+                </NeuButton>
+              </div>
             ) : (
               <div className="text-center py-6 space-y-4">
                 <MessageSquare className="w-12 h-12 mx-auto text-[#6B7280]" />
@@ -130,6 +136,15 @@ export function Guestbook() {
           )}
         </div>
       </div>
+
+      {isAuthenticated && userEmail && (
+        <GuestbookModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          userEmail={userEmail}
+          onSuccess={handleSuccess}
+        />
+      )}
     </Section>
   );
 }

@@ -1,69 +1,93 @@
 import { NextRequest } from 'next/server';
-import { z } from 'zod';
+import { successResponse, serverErrorResponse, validationErrorResponse } from '@/lib/api/responses';
 import { prisma } from '@/lib/db/prisma';
-import {
-  successResponse,
-  validationErrorResponse,
-  serverErrorResponse,
-  errorResponse,
-} from '@/lib/api/responses';
-import { verifyTurnstileToken, isTurnstileConfigured } from '@/lib/services/turnstile';
-import { createHash } from 'crypto';
+import { z } from 'zod';
+import { getIpLocation } from '@/lib/services/geoIpService';
+import { hashIp } from '@/lib/utils/hash';
+import { emailService } from '@/lib/services/emailService';
 
-const publicContactSchema = z.object({
-  name: z.string().min(1).max(100),
-  email: z.string().email().max(255),
-  subject: z.string().max(200).optional(),
-  message: z.string().min(1).max(5000),
-  turnstileToken: z.string().min(1, 'CAPTCHA verification is required'),
+const createContactSchema = z.object({
+  name: z.string().min(1, 'Name is required'),
+  email: z.string().email('Invalid email'),
+  subject: z.string().optional(),
+  message: z.string().min(1, 'Message is required'),
+  turnstileToken: z.string().optional(),
 });
-
-function hashIp(ip: string): string {
-  return createHash('sha256').update(ip).digest('hex').slice(0, 16);
-}
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const parsed = publicContactSchema.safeParse(body);
+    const parsed = createContactSchema.safeParse(body);
 
     if (!parsed.success) {
       return validationErrorResponse(parsed.error.flatten().fieldErrors);
     }
 
-    if (isTurnstileConfigured()) {
-      const turnstileResult = await verifyTurnstileToken(parsed.data.turnstileToken);
-
-      if (!turnstileResult.success) {
-        return errorResponse(
-          'CAPTCHA verification failed. Please try again.',
-          400,
-          'TURNSTILE_VERIFICATION_FAILED'
-        );
-      }
-    }
-
     const forwarded = request.headers.get('x-forwarded-for');
-    const ip = forwarded?.split(',')[0]?.trim() || 'unknown';
-    const ipHash = hashIp(ip);
+    const clientIp = forwarded?.split(',')[0]?.trim() || 'unknown';
+    const geoLocation = getIpLocation(clientIp);
+    const ipHash = hashIp(clientIp);
 
-    await prisma.contactForm.create({
+    const contact = await prisma.contactForm.create({
       data: {
         name: parsed.data.name,
         email: parsed.data.email,
         subject: parsed.data.subject || null,
         message: parsed.data.message,
         ipHash,
+        ipAddress: clientIp !== 'unknown' ? clientIp : null,
+        countryCode: geoLocation?.countryCode || null,
+        country: geoLocation?.country || null,
+        city: geoLocation?.city || null,
+        region: geoLocation?.region || null,
         read: false,
         replied: false,
       },
     });
 
-    return successResponse({ success: true }, 'Message sent successfully');
-  } catch (error) {
-    if (error instanceof SyntaxError) {
-      return errorResponse('Invalid JSON body', 400);
+    try {
+      await emailService.sendContactConfirmation(parsed.data.email, {
+        name: parsed.data.name,
+        subject: parsed.data.subject,
+        messageId: contact.id,
+        receivedAt: new Date().toLocaleString('en-US', {
+          dateStyle: 'full',
+          timeStyle: 'short',
+          timeZone: 'Asia/Jakarta',
+        }),
+      });
+    } catch (emailError) {
+      console.error('[Contact API] User confirmation email failed:', emailError);
     }
+
+    try {
+      const contactSettings = await prisma.contactSettings.findFirst();
+
+      if (contactSettings?.notificationEmail) {
+        await emailService.sendAdminContactNotification(contactSettings.notificationEmail, {
+          contact: {
+            id: contact.id,
+            name: parsed.data.name,
+            email: parsed.data.email,
+            subject: parsed.data.subject,
+            message: parsed.data.message,
+            country: geoLocation?.country,
+            city: geoLocation?.city,
+          },
+          dashboardLink: `${process.env.NEXTAUTH_URL || 'http://localhost:3001'}/admin/contacts/${contact.id}`,
+          receivedAt: new Date().toLocaleString('en-US', {
+            dateStyle: 'full',
+            timeStyle: 'short',
+            timeZone: 'Asia/Jakarta',
+          }),
+        });
+      }
+    } catch (emailError) {
+      console.error('[Contact API] Admin notification email failed:', emailError);
+    }
+
+    return successResponse(contact, 'Message sent successfully');
+  } catch {
     return serverErrorResponse();
   }
 }

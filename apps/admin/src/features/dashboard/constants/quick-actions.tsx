@@ -9,6 +9,7 @@ import {
   User,
   BarChart3,
   FileText,
+  MessagesSquare,
 } from 'lucide-react';
 import type { QuickAction } from '../types';
 
@@ -70,7 +71,13 @@ export const QUICK_ACTIONS: QuickAction[] = [
   {
     icon: <FileText className="w-4 h-4" />,
     label: 'Knowledge Docs',
-    href: '/rag',
+    href: '/knowledge',
+    delay: 1150,
+  },
+  {
+    icon: <MessagesSquare className="w-4 h-4" />,
+    label: 'Chat Logs',
+    href: '/chat-logs',
     delay: 1150,
   },
 ];

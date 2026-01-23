@@ -27,7 +27,7 @@ const expertiseAreas = [
 
 export function TechnicalExpertise() {
   return (
-    <Section className="bg-[#E0E5EC]">
+    <Section>
       <SectionHeader
         title="Technical Expertise"
         subtitle="Areas of specialization and technical skills I bring to every project"
@@ -45,12 +45,14 @@ export function TechnicalExpertise() {
               <NeuCard hover className="h-full">
                 <div className="flex flex-col h-full">
                   <div className="w-12 h-12 rounded-xl bg-[#E0E5EC] shadow-[inset_3px_3px_6px_rgba(163,177,198,0.6),inset_-3px_-3px_6px_rgba(255,255,255,0.5)] flex items-center justify-center mb-4">
-                    <Icon className="w-6 h-6 text-[#3B82F6]" />
+                    <Icon className="w-8 h-8 md:w-10 md:h-10 text-[#3B82F6]" />
                   </div>
 
-                  <h3 className="text-lg font-bold text-[#3D4852] mb-2">{area.title}</h3>
+                  <h3 className="text-xl font-bold text-[#3D4852] mb-2 md:text-2xl">
+                    {area.title}
+                  </h3>
 
-                  <p className="text-sm text-[#6B7280] leading-relaxed mb-4 flex-1">
+                  <p className="text-sm text-[#6B7280] leading-relaxed mb-4 flex-1 md:text-base">
                     {area.description}
                   </p>
 

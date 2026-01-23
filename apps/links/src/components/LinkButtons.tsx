@@ -38,7 +38,7 @@ function getLinkIcon(link: ProfileLink) {
 
 export function LinkButtons({ links }: LinkButtonsProps) {
   return (
-    <div className="w-full flex flex-col gap-4">
+    <div className="w-full flex flex-col gap-4 md:gap-5">
       {links.map((link, index) => {
         const IconComponent = getLinkIcon(link);
 
@@ -48,17 +48,17 @@ export function LinkButtons({ links }: LinkButtonsProps) {
             href={link.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="group neu-link-button"
+            className="group neu-link-button md:py-5 md:px-6"
             style={{ animationDelay: `${index * 0.1}s` }}
           >
-            <div className="neu-link-icon">
-              <IconComponent className="w-5 h-5 text-primary transition-transform duration-300 group-hover:scale-110" />
+            <div className="neu-link-icon md:w-12 md:h-12">
+              <IconComponent className="w-5 h-5 md:w-6 md:h-6 text-primary transition-transform duration-300 group-hover:scale-110" />
             </div>
-            <span className="flex-1 font-semibold text-center text-foreground/90 group-hover:text-foreground transition-colors duration-300">
+            <span className="flex-1 font-semibold text-center text-base md:text-lg text-foreground/90 group-hover:text-foreground transition-colors duration-300">
               {link.label}
             </span>
             <div className="w-10 flex justify-center">
-              <ExternalLink className="w-4 h-4 text-muted-foreground/50 opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:translate-x-0.5" />
+              <ExternalLink className="w-4 h-4 md:w-5 md:h-5 text-muted-foreground/50 opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:translate-x-0.5" />
             </div>
           </a>
         );

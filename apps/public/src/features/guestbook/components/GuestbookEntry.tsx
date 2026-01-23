@@ -1,6 +1,5 @@
 import Image from 'next/image';
 import { NeuCard } from '@/src/features/shared/components';
-import { formatRelativeDate } from '@/src/lib/utils';
 import type { GuestbookEntry as GuestbookEntryType } from './types';
 
 interface GuestbookEntryProps {
@@ -9,20 +8,20 @@ interface GuestbookEntryProps {
 
 export function GuestbookEntry({ entry }: GuestbookEntryProps) {
   return (
-    <NeuCard className="p-4 w-[280px] h-[160px] flex flex-col">
-      <div className="flex items-center gap-3 mb-3">
-        <div className="w-10 h-10 rounded-full overflow-hidden shadow-[3px_3px_6px_rgba(163,177,198,0.6),-3px_-3px_6px_rgba(255,255,255,0.5)] flex-shrink-0">
+    <NeuCard className="p-3 h-[140px] w-full flex flex-col">
+      <div className="flex items-center gap-2.5 mb-2 flex-shrink-0">
+        <div className="w-8 h-8 rounded-full overflow-hidden shadow-[2px_2px_4px_rgba(163,177,198,0.6),-2px_-2px_4px_rgba(255,255,255,0.5)] flex-shrink-0">
           {entry.user?.image ? (
             <Image
               src={entry.user.image}
               alt={entry.user?.name || 'User'}
-              width={40}
-              height={40}
+              width={32}
+              height={32}
               className="w-full h-full object-cover"
             />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-[#3B82F6] to-[#8B5CF6] flex items-center justify-center">
-              <span className="text-white font-medium text-lg">
+              <span className="text-white font-medium text-sm">
                 {entry.user?.name?.charAt(0).toUpperCase() || '?'}
               </span>
             </div>
@@ -30,14 +29,13 @@ export function GuestbookEntry({ entry }: GuestbookEntryProps) {
         </div>
 
         <div className="flex-1 min-w-0">
-          <div className="font-medium text-[#3D4852] truncate">
+          <div className="font-medium text-[#3D4852] text-sm truncate">
             {entry.user?.name || 'Anonymous'}
           </div>
-          <div className="text-xs text-[#6B7280]">{formatRelativeDate(entry.createdAt)}</div>
         </div>
       </div>
 
-      <p className="text-sm text-[#6B7280] line-clamp-4 flex-1">{entry.message}</p>
+      <p className="text-xs text-[#6B7280] line-clamp-3 flex-1 leading-relaxed">{entry.message}</p>
     </NeuCard>
   );
 }

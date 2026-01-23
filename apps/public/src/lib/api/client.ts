@@ -16,6 +16,7 @@ export class ApiError extends Error {
 interface FetchOptions extends globalThis.RequestInit {
   retries?: number;
   retryDelay?: number;
+  revalidate?: number | false;
 }
 
 function logRequest(endpoint: string, options?: FetchOptions): void {
@@ -72,20 +73,26 @@ function getUserFriendlyMessage(status: number, errorMessage?: string): string {
 }
 
 export async function fetchApi<T>(endpoint: string, options?: FetchOptions): Promise<T> {
-  const { retries = 1, retryDelay = 1000, ...fetchOptions } = options || {};
+  const { retries = 1, retryDelay = 1000, revalidate, ...fetchOptions } = options || {};
   let lastError: ApiError | null = null;
 
   logRequest(endpoint, fetchOptions);
 
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
-      const res = await fetch(`${API_BASE}${endpoint}`, {
+      const nextFetchOptions: RequestInit & { next?: { revalidate?: number | false } } = {
         ...fetchOptions,
         headers: {
           'Content-Type': 'application/json',
           ...fetchOptions?.headers,
         },
-      });
+      };
+
+      if (revalidate !== undefined) {
+        nextFetchOptions.next = { revalidate };
+      }
+
+      const res = await fetch(`${API_BASE}${endpoint}`, nextFetchOptions);
 
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));

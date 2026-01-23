@@ -8,12 +8,16 @@ export interface Project {
   description: string;
   category: string;
   techStack: string[];
+  tags: string[];
   liveUrl?: string;
   repoUrl?: string;
   imageUrl?: string;
   featured: boolean;
   visible: boolean;
   order: number;
+  startDate?: Date;
+  endDate?: Date;
+  projectDate?: string;
   createdAt: Date;
   updatedAt: Date;
   contexts?: ProjectContext[];
@@ -59,6 +63,7 @@ export interface BlogLink {
   description?: string;
   imageUrl?: string;
   source: string;
+  tags: string[];
   publishedAt?: Date;
   visible: boolean;
   order: number;
@@ -72,6 +77,11 @@ export interface GuestbookEntry {
   message: string;
   reactions: unknown;
   visible: boolean;
+  ipAddress?: string;
+  countryCode?: string;
+  country?: string;
+  city?: string;
+  region?: string;
   createdAt: Date;
   updatedAt: Date;
   user?: {
@@ -107,6 +117,57 @@ export interface BlogLinksQuery {
   source?: string;
 }
 
+export interface KnowledgeDoc {
+  id: string;
+  filename: string;
+  content: string;
+  indexed: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface ChatMessage {
+  id: string;
+  role: 'user' | 'assistant' | 'system';
+  content: string;
+  timestamp: string;
+  metadata?: {
+    model?: string;
+    provider?: string;
+    tokens?: number;
+    duration?: number;
+  };
+}
+
+export interface ChatLog {
+  id: string;
+  sessionId: string;
+  messages: ChatMessage[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface CreateKnowledgeDocInput {
+  filename: string;
+  content: string;
+}
+
+export interface UpdateKnowledgeDocInput {
+  filename?: string;
+  content?: string;
+}
+
+export interface KnowledgeDocsQuery {
+  page?: number;
+  limit?: number;
+  indexed?: boolean;
+}
+
+export interface ChatLogsQuery {
+  page?: number;
+  limit?: number;
+}
+
 export type ProjectsResponse = ApiResponse<{
   projects: Project[];
   pagination: {
@@ -122,3 +183,79 @@ export type BlogLinksResponse = ApiResponse<BlogLink[]>;
 export type GuestbookEntriesResponse = ApiResponse<GuestbookEntry[]>;
 export type GuestbookEntryResponse = ApiResponse<GuestbookEntry>;
 export type ProfileLinksResponse = ApiResponse<ProfileLink[]>;
+
+export type KnowledgeDocsResponse = ApiResponse<{
+  docs: KnowledgeDoc[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}>;
+export type KnowledgeDocResponse = ApiResponse<KnowledgeDoc>;
+
+export type ChatLogsResponse = ApiResponse<{
+  logs: ChatLog[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}>;
+export type ChatLogResponse = ApiResponse<ChatLog>;
+
+export interface Achievement {
+  id: string;
+  name: string;
+  location: string;
+  monthYear: string;
+  photos: string[];
+  description: string;
+  externalUrl?: string;
+  order: number;
+  visible: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface CreateAchievementInput {
+  name: string;
+  location: string;
+  monthYear: string;
+  photos: string[];
+  description: string;
+  externalUrl?: string;
+  order?: number;
+  visible?: boolean;
+}
+
+export interface UpdateAchievementInput {
+  name?: string;
+  location?: string;
+  monthYear?: string;
+  photos?: string[];
+  description?: string;
+  externalUrl?: string;
+  order?: number;
+  visible?: boolean;
+}
+
+export interface AchievementsQuery {
+  page?: number;
+  limit?: number;
+  visible?: boolean;
+}
+
+export type AchievementsResponse = ApiResponse<{
+  achievements: Achievement[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}>;
+
+export type AchievementResponse = ApiResponse<Achievement>;

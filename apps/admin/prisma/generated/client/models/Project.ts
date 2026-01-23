@@ -47,6 +47,9 @@ export type ProjectMinAggregateOutputType = {
   featured: boolean | null
   visible: boolean | null
   order: number | null
+  startDate: Date | null
+  endDate: Date | null
+  projectDate: string | null
   createdAt: Date | null
   updatedAt: Date | null
   content: string | null
@@ -66,6 +69,9 @@ export type ProjectMaxAggregateOutputType = {
   featured: boolean | null
   visible: boolean | null
   order: number | null
+  startDate: Date | null
+  endDate: Date | null
+  projectDate: string | null
   createdAt: Date | null
   updatedAt: Date | null
   content: string | null
@@ -80,12 +86,16 @@ export type ProjectCountAggregateOutputType = {
   description: number
   category: number
   techStack: number
+  tags: number
   liveUrl: number
   repoUrl: number
   imageUrl: number
   featured: number
   visible: number
   order: number
+  startDate: number
+  endDate: number
+  projectDate: number
   createdAt: number
   updatedAt: number
   content: number
@@ -115,6 +125,9 @@ export type ProjectMinAggregateInputType = {
   featured?: true
   visible?: true
   order?: true
+  startDate?: true
+  endDate?: true
+  projectDate?: true
   createdAt?: true
   updatedAt?: true
   content?: true
@@ -134,6 +147,9 @@ export type ProjectMaxAggregateInputType = {
   featured?: true
   visible?: true
   order?: true
+  startDate?: true
+  endDate?: true
+  projectDate?: true
   createdAt?: true
   updatedAt?: true
   content?: true
@@ -148,12 +164,16 @@ export type ProjectCountAggregateInputType = {
   description?: true
   category?: true
   techStack?: true
+  tags?: true
   liveUrl?: true
   repoUrl?: true
   imageUrl?: true
   featured?: true
   visible?: true
   order?: true
+  startDate?: true
+  endDate?: true
+  projectDate?: true
   createdAt?: true
   updatedAt?: true
   content?: true
@@ -255,12 +275,16 @@ export type ProjectGroupByOutputType = {
   description: string
   category: string
   techStack: string[]
+  tags: string[]
   liveUrl: string | null
   repoUrl: string | null
   imageUrl: string | null
   featured: boolean
   visible: boolean
   order: number
+  startDate: Date | null
+  endDate: Date | null
+  projectDate: string | null
   createdAt: Date
   updatedAt: Date
   content: string | null
@@ -298,12 +322,16 @@ export type ProjectWhereInput = {
   description?: Prisma.StringFilter<"Project"> | string
   category?: Prisma.StringFilter<"Project"> | string
   techStack?: Prisma.StringNullableListFilter<"Project">
+  tags?: Prisma.StringNullableListFilter<"Project">
   liveUrl?: Prisma.StringNullableFilter<"Project"> | string | null
   repoUrl?: Prisma.StringNullableFilter<"Project"> | string | null
   imageUrl?: Prisma.StringNullableFilter<"Project"> | string | null
   featured?: Prisma.BoolFilter<"Project"> | boolean
   visible?: Prisma.BoolFilter<"Project"> | boolean
   order?: Prisma.IntFilter<"Project"> | number
+  startDate?: Prisma.DateTimeNullableFilter<"Project"> | Date | string | null
+  endDate?: Prisma.DateTimeNullableFilter<"Project"> | Date | string | null
+  projectDate?: Prisma.StringNullableFilter<"Project"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Project"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Project"> | Date | string
   content?: Prisma.StringNullableFilter<"Project"> | string | null
@@ -320,12 +348,16 @@ export type ProjectOrderByWithRelationInput = {
   description?: Prisma.SortOrder
   category?: Prisma.SortOrder
   techStack?: Prisma.SortOrder
+  tags?: Prisma.SortOrder
   liveUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   repoUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   imageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   featured?: Prisma.SortOrder
   visible?: Prisma.SortOrder
   order?: Prisma.SortOrder
+  startDate?: Prisma.SortOrderInput | Prisma.SortOrder
+  endDate?: Prisma.SortOrderInput | Prisma.SortOrder
+  projectDate?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   content?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -345,12 +377,16 @@ export type ProjectWhereUniqueInput = Prisma.AtLeast<{
   description?: Prisma.StringFilter<"Project"> | string
   category?: Prisma.StringFilter<"Project"> | string
   techStack?: Prisma.StringNullableListFilter<"Project">
+  tags?: Prisma.StringNullableListFilter<"Project">
   liveUrl?: Prisma.StringNullableFilter<"Project"> | string | null
   repoUrl?: Prisma.StringNullableFilter<"Project"> | string | null
   imageUrl?: Prisma.StringNullableFilter<"Project"> | string | null
   featured?: Prisma.BoolFilter<"Project"> | boolean
   visible?: Prisma.BoolFilter<"Project"> | boolean
   order?: Prisma.IntFilter<"Project"> | number
+  startDate?: Prisma.DateTimeNullableFilter<"Project"> | Date | string | null
+  endDate?: Prisma.DateTimeNullableFilter<"Project"> | Date | string | null
+  projectDate?: Prisma.StringNullableFilter<"Project"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Project"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Project"> | Date | string
   content?: Prisma.StringNullableFilter<"Project"> | string | null
@@ -367,12 +403,16 @@ export type ProjectOrderByWithAggregationInput = {
   description?: Prisma.SortOrder
   category?: Prisma.SortOrder
   techStack?: Prisma.SortOrder
+  tags?: Prisma.SortOrder
   liveUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   repoUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   imageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   featured?: Prisma.SortOrder
   visible?: Prisma.SortOrder
   order?: Prisma.SortOrder
+  startDate?: Prisma.SortOrderInput | Prisma.SortOrder
+  endDate?: Prisma.SortOrderInput | Prisma.SortOrder
+  projectDate?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   content?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -395,12 +435,16 @@ export type ProjectScalarWhereWithAggregatesInput = {
   description?: Prisma.StringWithAggregatesFilter<"Project"> | string
   category?: Prisma.StringWithAggregatesFilter<"Project"> | string
   techStack?: Prisma.StringNullableListFilter<"Project">
+  tags?: Prisma.StringNullableListFilter<"Project">
   liveUrl?: Prisma.StringNullableWithAggregatesFilter<"Project"> | string | null
   repoUrl?: Prisma.StringNullableWithAggregatesFilter<"Project"> | string | null
   imageUrl?: Prisma.StringNullableWithAggregatesFilter<"Project"> | string | null
   featured?: Prisma.BoolWithAggregatesFilter<"Project"> | boolean
   visible?: Prisma.BoolWithAggregatesFilter<"Project"> | boolean
   order?: Prisma.IntWithAggregatesFilter<"Project"> | number
+  startDate?: Prisma.DateTimeNullableWithAggregatesFilter<"Project"> | Date | string | null
+  endDate?: Prisma.DateTimeNullableWithAggregatesFilter<"Project"> | Date | string | null
+  projectDate?: Prisma.StringNullableWithAggregatesFilter<"Project"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Project"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Project"> | Date | string
   content?: Prisma.StringNullableWithAggregatesFilter<"Project"> | string | null
@@ -415,12 +459,16 @@ export type ProjectCreateInput = {
   description: string
   category: string
   techStack?: Prisma.ProjectCreatetechStackInput | string[]
+  tags?: Prisma.ProjectCreatetagsInput | string[]
   liveUrl?: string | null
   repoUrl?: string | null
   imageUrl?: string | null
   featured?: boolean
   visible?: boolean
   order?: number
+  startDate?: Date | string | null
+  endDate?: Date | string | null
+  projectDate?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   content?: string | null
@@ -437,12 +485,16 @@ export type ProjectUncheckedCreateInput = {
   description: string
   category: string
   techStack?: Prisma.ProjectCreatetechStackInput | string[]
+  tags?: Prisma.ProjectCreatetagsInput | string[]
   liveUrl?: string | null
   repoUrl?: string | null
   imageUrl?: string | null
   featured?: boolean
   visible?: boolean
   order?: number
+  startDate?: Date | string | null
+  endDate?: Date | string | null
+  projectDate?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   content?: string | null
@@ -459,12 +511,16 @@ export type ProjectUpdateInput = {
   description?: Prisma.StringFieldUpdateOperationsInput | string
   category?: Prisma.StringFieldUpdateOperationsInput | string
   techStack?: Prisma.ProjectUpdatetechStackInput | string[]
+  tags?: Prisma.ProjectUpdatetagsInput | string[]
   liveUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   repoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   visible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   order?: Prisma.IntFieldUpdateOperationsInput | number
+  startDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  endDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  projectDate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   content?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -481,12 +537,16 @@ export type ProjectUncheckedUpdateInput = {
   description?: Prisma.StringFieldUpdateOperationsInput | string
   category?: Prisma.StringFieldUpdateOperationsInput | string
   techStack?: Prisma.ProjectUpdatetechStackInput | string[]
+  tags?: Prisma.ProjectUpdatetagsInput | string[]
   liveUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   repoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   visible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   order?: Prisma.IntFieldUpdateOperationsInput | number
+  startDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  endDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  projectDate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   content?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -503,12 +563,16 @@ export type ProjectCreateManyInput = {
   description: string
   category: string
   techStack?: Prisma.ProjectCreatetechStackInput | string[]
+  tags?: Prisma.ProjectCreatetagsInput | string[]
   liveUrl?: string | null
   repoUrl?: string | null
   imageUrl?: string | null
   featured?: boolean
   visible?: boolean
   order?: number
+  startDate?: Date | string | null
+  endDate?: Date | string | null
+  projectDate?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   content?: string | null
@@ -523,12 +587,16 @@ export type ProjectUpdateManyMutationInput = {
   description?: Prisma.StringFieldUpdateOperationsInput | string
   category?: Prisma.StringFieldUpdateOperationsInput | string
   techStack?: Prisma.ProjectUpdatetechStackInput | string[]
+  tags?: Prisma.ProjectUpdatetagsInput | string[]
   liveUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   repoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   visible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   order?: Prisma.IntFieldUpdateOperationsInput | number
+  startDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  endDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  projectDate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   content?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -543,12 +611,16 @@ export type ProjectUncheckedUpdateManyInput = {
   description?: Prisma.StringFieldUpdateOperationsInput | string
   category?: Prisma.StringFieldUpdateOperationsInput | string
   techStack?: Prisma.ProjectUpdatetechStackInput | string[]
+  tags?: Prisma.ProjectUpdatetagsInput | string[]
   liveUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   repoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   visible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   order?: Prisma.IntFieldUpdateOperationsInput | number
+  startDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  endDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  projectDate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   content?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -571,12 +643,16 @@ export type ProjectCountOrderByAggregateInput = {
   description?: Prisma.SortOrder
   category?: Prisma.SortOrder
   techStack?: Prisma.SortOrder
+  tags?: Prisma.SortOrder
   liveUrl?: Prisma.SortOrder
   repoUrl?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   featured?: Prisma.SortOrder
   visible?: Prisma.SortOrder
   order?: Prisma.SortOrder
+  startDate?: Prisma.SortOrder
+  endDate?: Prisma.SortOrder
+  projectDate?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   content?: Prisma.SortOrder
@@ -600,6 +676,9 @@ export type ProjectMaxOrderByAggregateInput = {
   featured?: Prisma.SortOrder
   visible?: Prisma.SortOrder
   order?: Prisma.SortOrder
+  startDate?: Prisma.SortOrder
+  endDate?: Prisma.SortOrder
+  projectDate?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   content?: Prisma.SortOrder
@@ -619,6 +698,9 @@ export type ProjectMinOrderByAggregateInput = {
   featured?: Prisma.SortOrder
   visible?: Prisma.SortOrder
   order?: Prisma.SortOrder
+  startDate?: Prisma.SortOrder
+  endDate?: Prisma.SortOrder
+  projectDate?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   content?: Prisma.SortOrder
@@ -638,7 +720,16 @@ export type ProjectCreatetechStackInput = {
   set: string[]
 }
 
+export type ProjectCreatetagsInput = {
+  set: string[]
+}
+
 export type ProjectUpdatetechStackInput = {
+  set?: string[]
+  push?: string | string[]
+}
+
+export type ProjectUpdatetagsInput = {
   set?: string[]
   push?: string | string[]
 }
@@ -653,6 +744,10 @@ export type IntFieldUpdateOperationsInput = {
   decrement?: number
   multiply?: number
   divide?: number
+}
+
+export type NullableDateTimeFieldUpdateOperationsInput = {
+  set?: Date | string | null
 }
 
 export type ProjectCreateNestedOneWithoutContextsInput = {
@@ -691,12 +786,16 @@ export type ProjectCreateWithoutContextsInput = {
   description: string
   category: string
   techStack?: Prisma.ProjectCreatetechStackInput | string[]
+  tags?: Prisma.ProjectCreatetagsInput | string[]
   liveUrl?: string | null
   repoUrl?: string | null
   imageUrl?: string | null
   featured?: boolean
   visible?: boolean
   order?: number
+  startDate?: Date | string | null
+  endDate?: Date | string | null
+  projectDate?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   content?: string | null
@@ -712,12 +811,16 @@ export type ProjectUncheckedCreateWithoutContextsInput = {
   description: string
   category: string
   techStack?: Prisma.ProjectCreatetechStackInput | string[]
+  tags?: Prisma.ProjectCreatetagsInput | string[]
   liveUrl?: string | null
   repoUrl?: string | null
   imageUrl?: string | null
   featured?: boolean
   visible?: boolean
   order?: number
+  startDate?: Date | string | null
+  endDate?: Date | string | null
+  projectDate?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   content?: string | null
@@ -749,12 +852,16 @@ export type ProjectUpdateWithoutContextsInput = {
   description?: Prisma.StringFieldUpdateOperationsInput | string
   category?: Prisma.StringFieldUpdateOperationsInput | string
   techStack?: Prisma.ProjectUpdatetechStackInput | string[]
+  tags?: Prisma.ProjectUpdatetagsInput | string[]
   liveUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   repoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   visible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   order?: Prisma.IntFieldUpdateOperationsInput | number
+  startDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  endDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  projectDate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   content?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -770,12 +877,16 @@ export type ProjectUncheckedUpdateWithoutContextsInput = {
   description?: Prisma.StringFieldUpdateOperationsInput | string
   category?: Prisma.StringFieldUpdateOperationsInput | string
   techStack?: Prisma.ProjectUpdatetechStackInput | string[]
+  tags?: Prisma.ProjectUpdatetagsInput | string[]
   liveUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   repoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   visible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   order?: Prisma.IntFieldUpdateOperationsInput | number
+  startDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  endDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  projectDate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   content?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -791,12 +902,16 @@ export type ProjectCreateWithoutImagesInput = {
   description: string
   category: string
   techStack?: Prisma.ProjectCreatetechStackInput | string[]
+  tags?: Prisma.ProjectCreatetagsInput | string[]
   liveUrl?: string | null
   repoUrl?: string | null
   imageUrl?: string | null
   featured?: boolean
   visible?: boolean
   order?: number
+  startDate?: Date | string | null
+  endDate?: Date | string | null
+  projectDate?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   content?: string | null
@@ -812,12 +927,16 @@ export type ProjectUncheckedCreateWithoutImagesInput = {
   description: string
   category: string
   techStack?: Prisma.ProjectCreatetechStackInput | string[]
+  tags?: Prisma.ProjectCreatetagsInput | string[]
   liveUrl?: string | null
   repoUrl?: string | null
   imageUrl?: string | null
   featured?: boolean
   visible?: boolean
   order?: number
+  startDate?: Date | string | null
+  endDate?: Date | string | null
+  projectDate?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   content?: string | null
@@ -849,12 +968,16 @@ export type ProjectUpdateWithoutImagesInput = {
   description?: Prisma.StringFieldUpdateOperationsInput | string
   category?: Prisma.StringFieldUpdateOperationsInput | string
   techStack?: Prisma.ProjectUpdatetechStackInput | string[]
+  tags?: Prisma.ProjectUpdatetagsInput | string[]
   liveUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   repoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   visible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   order?: Prisma.IntFieldUpdateOperationsInput | number
+  startDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  endDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  projectDate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   content?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -870,12 +993,16 @@ export type ProjectUncheckedUpdateWithoutImagesInput = {
   description?: Prisma.StringFieldUpdateOperationsInput | string
   category?: Prisma.StringFieldUpdateOperationsInput | string
   techStack?: Prisma.ProjectUpdatetechStackInput | string[]
+  tags?: Prisma.ProjectUpdatetagsInput | string[]
   liveUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   repoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   visible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   order?: Prisma.IntFieldUpdateOperationsInput | number
+  startDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  endDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  projectDate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   content?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -931,12 +1058,16 @@ export type ProjectSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   description?: boolean
   category?: boolean
   techStack?: boolean
+  tags?: boolean
   liveUrl?: boolean
   repoUrl?: boolean
   imageUrl?: boolean
   featured?: boolean
   visible?: boolean
   order?: boolean
+  startDate?: boolean
+  endDate?: boolean
+  projectDate?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   content?: boolean
@@ -954,12 +1085,16 @@ export type ProjectSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   description?: boolean
   category?: boolean
   techStack?: boolean
+  tags?: boolean
   liveUrl?: boolean
   repoUrl?: boolean
   imageUrl?: boolean
   featured?: boolean
   visible?: boolean
   order?: boolean
+  startDate?: boolean
+  endDate?: boolean
+  projectDate?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   content?: boolean
@@ -974,12 +1109,16 @@ export type ProjectSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   description?: boolean
   category?: boolean
   techStack?: boolean
+  tags?: boolean
   liveUrl?: boolean
   repoUrl?: boolean
   imageUrl?: boolean
   featured?: boolean
   visible?: boolean
   order?: boolean
+  startDate?: boolean
+  endDate?: boolean
+  projectDate?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   content?: boolean
@@ -994,19 +1133,23 @@ export type ProjectSelectScalar = {
   description?: boolean
   category?: boolean
   techStack?: boolean
+  tags?: boolean
   liveUrl?: boolean
   repoUrl?: boolean
   imageUrl?: boolean
   featured?: boolean
   visible?: boolean
   order?: boolean
+  startDate?: boolean
+  endDate?: boolean
+  projectDate?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   content?: boolean
   thumbnailId?: boolean
 }
 
-export type ProjectOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "slug" | "summary" | "description" | "category" | "techStack" | "liveUrl" | "repoUrl" | "imageUrl" | "featured" | "visible" | "order" | "createdAt" | "updatedAt" | "content" | "thumbnailId", ExtArgs["result"]["project"]>
+export type ProjectOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "slug" | "summary" | "description" | "category" | "techStack" | "tags" | "liveUrl" | "repoUrl" | "imageUrl" | "featured" | "visible" | "order" | "startDate" | "endDate" | "projectDate" | "createdAt" | "updatedAt" | "content" | "thumbnailId", ExtArgs["result"]["project"]>
 export type ProjectInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   contexts?: boolean | Prisma.Project$contextsArgs<ExtArgs>
   images?: boolean | Prisma.Project$imagesArgs<ExtArgs>
@@ -1029,12 +1172,16 @@ export type $ProjectPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     description: string
     category: string
     techStack: string[]
+    tags: string[]
     liveUrl: string | null
     repoUrl: string | null
     imageUrl: string | null
     featured: boolean
     visible: boolean
     order: number
+    startDate: Date | null
+    endDate: Date | null
+    projectDate: string | null
     createdAt: Date
     updatedAt: Date
     content: string | null
@@ -1471,12 +1618,16 @@ export interface ProjectFieldRefs {
   readonly description: Prisma.FieldRef<"Project", 'String'>
   readonly category: Prisma.FieldRef<"Project", 'String'>
   readonly techStack: Prisma.FieldRef<"Project", 'String[]'>
+  readonly tags: Prisma.FieldRef<"Project", 'String[]'>
   readonly liveUrl: Prisma.FieldRef<"Project", 'String'>
   readonly repoUrl: Prisma.FieldRef<"Project", 'String'>
   readonly imageUrl: Prisma.FieldRef<"Project", 'String'>
   readonly featured: Prisma.FieldRef<"Project", 'Boolean'>
   readonly visible: Prisma.FieldRef<"Project", 'Boolean'>
   readonly order: Prisma.FieldRef<"Project", 'Int'>
+  readonly startDate: Prisma.FieldRef<"Project", 'DateTime'>
+  readonly endDate: Prisma.FieldRef<"Project", 'DateTime'>
+  readonly projectDate: Prisma.FieldRef<"Project", 'String'>
   readonly createdAt: Prisma.FieldRef<"Project", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Project", 'DateTime'>
   readonly content: Prisma.FieldRef<"Project", 'String'>

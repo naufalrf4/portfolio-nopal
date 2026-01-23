@@ -1,4 +1,5 @@
 export { aboutApi } from './about';
+export { achievementsApi } from './achievements';
 export { blogsApi } from './blogs';
 export { bookingsApi } from './bookings';
 export { contactApi } from './contact';

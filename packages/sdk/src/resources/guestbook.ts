@@ -1,4 +1,4 @@
-import type { HttpClient } from '../client';
+import type { HttpClient, RequestOptions } from '../client';
 import type {
   GuestbookEntry,
   CreateGuestbookEntryInput,
@@ -9,8 +9,8 @@ import type {
 export class GuestbookClient {
   constructor(private client: HttpClient) {}
 
-  async getAll(): Promise<GuestbookEntriesResponse> {
-    const entries = await this.client.get<GuestbookEntry[]>('/api/v1/public/guestbook');
+  async getAll(options?: RequestOptions): Promise<GuestbookEntriesResponse> {
+    const entries = await this.client.get<GuestbookEntry[]>('/api/v1/public/guestbook', options);
 
     return {
       success: true,

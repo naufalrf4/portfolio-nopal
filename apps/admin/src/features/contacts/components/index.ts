@@ -4,5 +4,6 @@ export { ContactDetailView } from './ContactDetailView';
 export { ContactInfoSection } from './ContactInfoSection';
 export { ContactsTab } from './ContactsTab';
 export { ContactTable } from './ContactTable';
+export { DeleteConfirmModal } from './DeleteConfirmModal';
 export { SettingsTab } from './SettingsTab';
 export { TagInput } from './TagInput';

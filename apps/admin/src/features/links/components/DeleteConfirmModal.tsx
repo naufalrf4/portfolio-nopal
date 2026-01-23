@@ -1,6 +1,8 @@
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+'use client';
+
+import { AlertTriangle } from 'lucide-react';
+import { ResponsiveModal } from '@/components/ui/responsive-modal';
 import { Button } from '@/components/ui/button';
-import { Loader2 } from 'lucide-react';
 
 interface DeleteConfirmModalProps {
   open: boolean;
@@ -18,32 +20,32 @@ export function DeleteConfirmModal({
   deleting,
 }: DeleteConfirmModalProps) {
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent size="sm">
-        <DialogHeader>
-          <DialogTitle>Delete Link</DialogTitle>
-          <DialogDescription>
-            Are you sure you want to delete{' '}
-            <span className="font-semibold text-[#3D4852]">{linkLabel}</span>? This action cannot
-            be undone.
-          </DialogDescription>
-        </DialogHeader>
-        <DialogFooter className="pt-4">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+    <ResponsiveModal
+      open={open}
+      onOpenChange={onOpenChange}
+      title="Delete Link"
+      description={`Are you sure you want to delete "${linkLabel}"? This action cannot be undone.`}
+      size="sm"
+    >
+      <div className="flex flex-col items-center text-center space-y-6">
+        <div className="neu-inset w-16 h-16 rounded-full flex items-center justify-center">
+          <AlertTriangle className="h-8 w-8 text-red-500" />
+        </div>
+
+        <div className="flex w-full gap-3 pt-4">
+          <Button
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            disabled={deleting}
+            className="flex-1"
+          >
             Cancel
           </Button>
-          <Button variant="destructive" onClick={onConfirm} disabled={deleting}>
-            {deleting ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                Deleting...
-              </>
-            ) : (
-              'Delete Link'
-            )}
+          <Button variant="destructive" onClick={onConfirm} disabled={deleting} className="flex-1">
+            {deleting ? 'Deleting...' : 'Delete'}
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </div>
+      </div>
+    </ResponsiveModal>
   );
 }

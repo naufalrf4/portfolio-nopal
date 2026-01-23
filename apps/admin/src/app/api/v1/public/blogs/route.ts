@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
 import { successResponse, serverErrorResponse } from '@/lib/api/responses';
 import { prisma } from '@/lib/db/prisma';
+import { signAssetUrlsMany } from '@/lib/utils/sign-urls';
 
 const DEFAULT_LIMIT = 6;
 const MAX_LIMIT = 50;
@@ -25,6 +26,7 @@ export async function GET(req: NextRequest) {
           description: true,
           imageUrl: true,
           source: true,
+          category: true,
           publishedAt: true,
         },
         orderBy: [{ publishedAt: 'desc' }, { createdAt: 'desc' }],
@@ -33,7 +35,11 @@ export async function GET(req: NextRequest) {
       prisma.blogLink.count({ where }),
     ]);
 
-    return successResponse({ blogs, meta: { total } });
+    const signedBlogs = await signAssetUrlsMany(blogs, {
+      fields: ['imageUrl'],
+    });
+
+    return successResponse({ blogs: signedBlogs, meta: { total } });
   } catch {
     return serverErrorResponse();
   }

@@ -60,6 +60,17 @@ export interface ProjectContext {
   updatedAt: Date;
 }
 
+export interface ProjectImage {
+  id: string;
+  projectId: string;
+  url: string;
+  key: string;
+  order: number;
+  caption?: string;
+  alt?: string;
+  createdAt: Date;
+}
+
 export interface Project {
   id: string;
   title: string;
@@ -68,15 +79,20 @@ export interface Project {
   description: string;
   category: string;
   techStack: string[];
+  tags: string[];
   liveUrl?: string;
   repoUrl?: string;
   imageUrl?: string;
   featured: boolean;
   visible: boolean;
   order: number;
+  startDate?: Date;
+  endDate?: Date;
+  projectDate?: string;
   createdAt: Date;
   updatedAt: Date;
   contexts?: ProjectContext[];
+  images?: ProjectImage[];
 }
 
 export interface BlogLink {
@@ -86,6 +102,7 @@ export interface BlogLink {
   description?: string;
   imageUrl?: string;
   source: string;
+  tags: string[];
   publishedAt?: Date;
   visible: boolean;
   order: number;
@@ -99,6 +116,11 @@ export interface GuestbookEntry {
   message: string;
   reactions: Record<string, unknown>;
   visible: boolean;
+  ipAddress?: string;
+  countryCode?: string;
+  country?: string;
+  city?: string;
+  region?: string;
   createdAt: Date;
   updatedAt: Date;
   user?: User;
@@ -164,8 +186,67 @@ export interface Booking {
   notes?: string;
   status: BookingStatus;
   ipHash: string;
+  ipAddress?: string;
+  countryCode?: string;
+  country?: string;
+  city?: string;
+  region?: string;
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface ContactForm {
+  id: string;
+  name: string;
+  email: string;
+  subject?: string;
+  message: string;
+  ipHash: string;
+  ipAddress?: string;
+  countryCode?: string;
+  country?: string;
+  city?: string;
+  region?: string;
+  read: boolean;
+  replied: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface Achievement {
+  id: string;
+  name: string;
+  location: string;
+  monthYear: string;
+  photos: string[];
+  description: string;
+  externalUrl?: string;
+  order: number;
+  visible: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface CreateAchievementInput {
+  name: string;
+  location: string;
+  monthYear: string;
+  photos: string[];
+  description: string;
+  externalUrl?: string;
+  order?: number;
+  visible?: boolean;
+}
+
+export interface UpdateAchievementInput {
+  name?: string;
+  location?: string;
+  monthYear?: string;
+  photos?: string[];
+  description?: string;
+  externalUrl?: string;
+  order?: number;
+  visible?: boolean;
 }
 
 export interface Experience {
@@ -214,4 +295,98 @@ export interface AboutMe {
   education: Education[];
   createdAt: Date;
   updatedAt: Date;
+}
+
+export type LLMProvider = 'openai' | 'google' | 'groq' | 'deepseek';
+
+export type ChatMessageRole = 'user' | 'assistant' | 'system';
+
+export interface ChatMessage {
+  id: string;
+  role: ChatMessageRole;
+  content: string;
+  timestamp: string;
+  metadata?: {
+    model?: string;
+    provider?: LLMProvider;
+    tokens?: number;
+    duration?: number;
+  };
+}
+
+export interface ChatRequest {
+  sessionId?: string;
+  message: string;
+}
+
+export interface ChatResponse {
+  sessionId: string;
+  message: string;
+  sources: string[];
+  metadata: {
+    model: string;
+    provider: LLMProvider;
+    tokens: {
+      prompt: number;
+      completion: number;
+    };
+    durationMs: number;
+  };
+}
+
+export interface ContentExport {
+  aboutMe: {
+    bio: string;
+    skills: string[];
+    experience: Experience[];
+  };
+  projects: Array<{
+    title: string;
+    slug: string;
+    summary: string;
+    description: string;
+    techStack: string[];
+    contexts: Array<{
+      type: ProjectContextType;
+      title: string;
+      content: string;
+    }>;
+  }>;
+  knowledgeDocs: Array<{
+    id: string;
+    filename: string;
+    content: string;
+  }>;
+}
+
+export interface CreateKnowledgeDocInput {
+  filename: string;
+  content: string;
+}
+
+export interface UpdateKnowledgeDocInput {
+  filename?: string;
+  content?: string;
+}
+
+export interface CreateChatLogInput {
+  sessionId: string;
+  messages: ChatMessage[];
+}
+
+export interface RetrievedChunk {
+  content: string;
+  source: string;
+  score: number;
+}
+
+export interface IngestRequest {
+  documentId?: string;
+  type: 'knowledge' | 'project' | 'about' | 'all';
+}
+
+export interface IngestResponse {
+  success: boolean;
+  chunksIngested: number;
+  source: string;
 }
