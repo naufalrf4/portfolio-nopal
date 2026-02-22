@@ -8,9 +8,11 @@
     "./config": "./src/config.ts"
   },
   "dependencies": {
-    "@auth/prisma-adapter": "^2.11.1",
-    "@prisma/client": "^7.2.0",
+    "@auth/drizzle-adapter": "^1.11.1",
     "next-auth": "5.0.0-beta.30"
+  },
+  "peerDependencies": {
+    "drizzle-orm": "^0.45.1"
   },
   "devDependencies": {
     "@naufalrf/config": "workspace:*",

@@ -1,0 +1,3 @@
+pnpm install (root)
+Succeeded with zero peer dependency warnings.
+Installed packages include drizzle-orm, postgres, @paralleldrive/cuid2, drizzle-kit, @auth/drizzle-adapter.

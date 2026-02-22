@@ -1,0 +1,2 @@
+apps/admin/package.json: 0 matches for prisma references
+packages/auth/package.json: 0 matches for @prisma or prisma references
