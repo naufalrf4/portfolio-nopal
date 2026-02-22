@@ -1,4 +1,6 @@
-import { prisma } from '@/lib/db/prisma';
+import { db } from '@/lib/db';
+import { eq, asc } from 'drizzle-orm';
+import { aboutMe, projects, projectContexts, knowledgeDocs } from '@/lib/db/schema';
 
 interface ExperienceItem {
   title?: string;
@@ -10,21 +12,21 @@ interface ExperienceItem {
 
 export class ContentExportService {
   async exportForRAG() {
-    const [aboutMe, projects, knowledgeDocs] = await Promise.all([
+    const [aboutMeData, projectsData, knowledgeDocsData] = await Promise.all([
       this.getAboutMe(),
       this.getProjects(),
       this.getKnowledgeDocs(),
     ]);
 
     return {
-      aboutMe,
-      projects,
-      knowledgeDocs,
+      aboutMe: aboutMeData,
+      projects: projectsData,
+      knowledgeDocs: knowledgeDocsData,
     };
   }
 
   private async getAboutMe() {
-    const about = await prisma.aboutMe.findFirst();
+    const [about] = await db.select().from(aboutMe).limit(1);
 
     if (!about) {
       return {
@@ -42,22 +44,22 @@ export class ContentExportService {
   }
 
   private async getProjects() {
-    const projects = await prisma.project.findMany({
-      where: { visible: true },
-      include: {
-        contexts: {
-          orderBy: { order: 'asc' },
+    const projectsList = await db.query.projects.findMany({
+      where: eq(projects.visible, true),
+      with: {
+        projectContexts: {
+          orderBy: [asc(projectContexts.order)],
         },
       },
     });
 
-    return projects.map((project) => ({
+    return projectsList.map((project) => ({
       title: project.title,
       slug: project.slug,
       summary: project.summary || '',
       description: project.description || '',
       techStack: project.techStack || [],
-      contexts: project.contexts.map((ctx) => ({
+      contexts: project.projectContexts.map((ctx) => ({
         type: ctx.type,
         title: ctx.title,
         content: ctx.content,
@@ -66,13 +68,13 @@ export class ContentExportService {
   }
 
   private async getKnowledgeDocs() {
-    const docs = await prisma.knowledgeDoc.findMany({
-      select: {
-        id: true,
-        filename: true,
-        content: true,
-      },
-    });
+    const docs = await db
+      .select({
+        id: knowledgeDocs.id,
+        filename: knowledgeDocs.filename,
+        content: knowledgeDocs.content,
+      })
+      .from(knowledgeDocs);
 
     return docs;
   }

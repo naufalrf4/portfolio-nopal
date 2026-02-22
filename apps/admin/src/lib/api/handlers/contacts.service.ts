@@ -1,5 +1,7 @@
-import { Prisma } from '@/prisma/generated/client/client';
-import { prisma } from '@/lib/db/prisma';
+import { db } from '@/lib/db';
+import { eq, and, or, ilike, desc, inArray, count } from 'drizzle-orm';
+import { contactForms } from '@/lib/db/schema';
+import { createId } from '@paralleldrive/cuid2';
 import type {
   CreateContactInput,
   UpdateContactInput,
@@ -11,26 +13,34 @@ export class ContactsService {
     const { page, limit, read, search } = query;
     const skip = (page - 1) * limit;
 
-    const where: Prisma.ContactFormWhereInput = {
-      ...(read !== undefined && { read }),
-      ...(search && {
-        OR: [
-          { name: { contains: search, mode: 'insensitive' } },
-          { email: { contains: search, mode: 'insensitive' } },
-          { subject: { contains: search, mode: 'insensitive' } },
-          { message: { contains: search, mode: 'insensitive' } },
-        ],
-      }),
-    };
+    const conditions = [];
 
-    const [contacts, total] = await Promise.all([
-      prisma.contactForm.findMany({
-        where,
-        skip,
-        take: limit,
-        orderBy: { createdAt: 'desc' },
-      }),
-      prisma.contactForm.count({ where }),
+    if (read !== undefined) {
+      conditions.push(eq(contactForms.read, read));
+    }
+
+    if (search) {
+      conditions.push(
+        or(
+          ilike(contactForms.name, `%${search}%`),
+          ilike(contactForms.email, `%${search}%`),
+          ilike(contactForms.subject, `%${search}%`),
+          ilike(contactForms.message, `%${search}%`)
+        )
+      );
+    }
+
+    const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+
+    const [contacts, [{ total }]] = await Promise.all([
+      db
+        .select()
+        .from(contactForms)
+        .where(whereClause)
+        .limit(limit)
+        .offset(skip)
+        .orderBy(desc(contactForms.createdAt)),
+      db.select({ total: count() }).from(contactForms).where(whereClause),
     ]);
 
     return {
@@ -45,14 +55,16 @@ export class ContactsService {
   }
 
   async getById(id: string) {
-    return prisma.contactForm.findUnique({
-      where: { id },
-    });
+    const [contact] = await db.select().from(contactForms).where(eq(contactForms.id, id)).limit(1);
+    return contact || null;
   }
 
   async create(data: CreateContactInput) {
-    return prisma.contactForm.create({
-      data: {
+    const now = new Date().toISOString();
+    const [created] = await db
+      .insert(contactForms)
+      .values({
+        id: createId(),
         name: data.name,
         email: data.email,
         subject: data.subject || null,
@@ -65,15 +77,22 @@ export class ContactsService {
         region: data.region || null,
         read: false,
         replied: false,
-      },
-    });
+        createdAt: now,
+        updatedAt: now,
+      })
+      .returning();
+    return created;
   }
 
   async update(id: string, data: UpdateContactInput) {
-    return prisma.contactForm.update({
-      where: { id },
-      data,
-    });
+    const now = new Date().toISOString();
+    const [updated] = await db
+      .update(contactForms)
+      .set({ ...data, updatedAt: now })
+      .where(eq(contactForms.id, id))
+      .returning();
+    if (!updated) throw new Error('Contact not found');
+    return updated;
   }
 
   async markAsRead(id: string) {
@@ -81,29 +100,30 @@ export class ContactsService {
   }
 
   async delete(id: string) {
-    return prisma.contactForm.delete({
-      where: { id },
-    });
+    const [deleted] = await db.delete(contactForms).where(eq(contactForms.id, id)).returning();
+    return deleted;
   }
 
   async bulkMarkAsRead(ids: string[]) {
-    return prisma.contactForm.updateMany({
-      where: { id: { in: ids } },
-      data: { read: true },
-    });
+    const now = new Date().toISOString();
+    return db
+      .update(contactForms)
+      .set({ read: true, updatedAt: now })
+      .where(inArray(contactForms.id, ids))
+      .returning();
   }
 
   async bulkMarkAsUnread(ids: string[]) {
-    return prisma.contactForm.updateMany({
-      where: { id: { in: ids } },
-      data: { read: false },
-    });
+    const now = new Date().toISOString();
+    return db
+      .update(contactForms)
+      .set({ read: false, updatedAt: now })
+      .where(inArray(contactForms.id, ids))
+      .returning();
   }
 
   async bulkDelete(ids: string[]) {
-    return prisma.contactForm.deleteMany({
-      where: { id: { in: ids } },
-    });
+    return db.delete(contactForms).where(inArray(contactForms.id, ids)).returning();
   }
 }
 

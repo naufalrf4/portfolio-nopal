@@ -1,17 +1,22 @@
-import { prisma } from '@/lib/db/prisma';
+import { db } from '@/lib/db';
+import { eq, desc, count } from 'drizzle-orm';
+import { anonymousMessages } from '@/lib/db/schema';
 
 export class AnonymousMessagesService {
   async getAll(filters?: { read?: boolean }) {
-    const where = filters?.read !== undefined ? { read: filters.read } : {};
+    const whereClause =
+      filters?.read !== undefined ? eq(anonymousMessages.read, filters.read) : undefined;
 
-    const [messages, unreadCount] = await Promise.all([
-      prisma.anonymousMessage.findMany({
-        where,
-        orderBy: { createdAt: 'desc' },
-      }),
-      prisma.anonymousMessage.count({
-        where: { read: false },
-      }),
+    const [messages, [{ unreadCount }]] = await Promise.all([
+      db
+        .select()
+        .from(anonymousMessages)
+        .where(whereClause)
+        .orderBy(desc(anonymousMessages.createdAt)),
+      db
+        .select({ unreadCount: count() })
+        .from(anonymousMessages)
+        .where(eq(anonymousMessages.read, false)),
     ]);
 
     return {
@@ -21,35 +26,48 @@ export class AnonymousMessagesService {
   }
 
   async getById(id: string) {
-    return prisma.anonymousMessage.findUnique({
-      where: { id },
-    });
+    const [message] = await db
+      .select()
+      .from(anonymousMessages)
+      .where(eq(anonymousMessages.id, id))
+      .limit(1);
+    return message || null;
   }
 
   async markAsRead(id: string) {
-    return prisma.anonymousMessage.update({
-      where: { id },
-      data: { read: true },
-    });
+    const now = new Date().toISOString();
+    const [updated] = await db
+      .update(anonymousMessages)
+      .set({ read: true, updatedAt: now })
+      .where(eq(anonymousMessages.id, id))
+      .returning();
+    return updated;
   }
 
   async markAsUnread(id: string) {
-    return prisma.anonymousMessage.update({
-      where: { id },
-      data: { read: false },
-    });
+    const now = new Date().toISOString();
+    const [updated] = await db
+      .update(anonymousMessages)
+      .set({ read: false, updatedAt: now })
+      .where(eq(anonymousMessages.id, id))
+      .returning();
+    return updated;
   }
 
   async delete(id: string) {
-    return prisma.anonymousMessage.delete({
-      where: { id },
-    });
+    const [deleted] = await db
+      .delete(anonymousMessages)
+      .where(eq(anonymousMessages.id, id))
+      .returning();
+    return deleted;
   }
 
   async getUnreadCount() {
-    return prisma.anonymousMessage.count({
-      where: { read: false },
-    });
+    const [{ total }] = await db
+      .select({ total: count() })
+      .from(anonymousMessages)
+      .where(eq(anonymousMessages.read, false));
+    return total;
   }
 }
 

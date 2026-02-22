@@ -1,5 +1,7 @@
-import { prisma } from '@/lib/db/prisma';
-import type { Prisma } from '@/prisma/generated/client/client';
+import { db } from '@/lib/db';
+import { eq, desc, lt, count } from 'drizzle-orm';
+import { chatLogs } from '@/lib/db/schema';
+import { createId } from '@paralleldrive/cuid2';
 import type { CreateChatLogInput, ChatLogQueryInput } from '@/lib/validations/chat-log.schema';
 
 export class ChatLogsService {
@@ -7,13 +9,9 @@ export class ChatLogsService {
     const { page, limit } = query;
     const skip = (page - 1) * limit;
 
-    const [logs, total] = await Promise.all([
-      prisma.chatLog.findMany({
-        skip,
-        take: limit,
-        orderBy: { updatedAt: 'desc' },
-      }),
-      prisma.chatLog.count(),
+    const [logs, [{ total }]] = await Promise.all([
+      db.select().from(chatLogs).limit(limit).offset(skip).orderBy(desc(chatLogs.updatedAt)),
+      db.select({ total: count() }).from(chatLogs),
     ]);
 
     const logsWithStats = logs.map((log) => {
@@ -37,49 +35,56 @@ export class ChatLogsService {
   }
 
   async getById(id: string) {
-    return prisma.chatLog.findUnique({
-      where: { id },
-    });
+    const [log] = await db.select().from(chatLogs).where(eq(chatLogs.id, id)).limit(1);
+    return log || null;
   }
 
   async getBySessionId(sessionId: string) {
-    return prisma.chatLog.findUnique({
-      where: { sessionId },
-    });
+    const [log] = await db
+      .select()
+      .from(chatLogs)
+      .where(eq(chatLogs.sessionId, sessionId))
+      .limit(1);
+    return log || null;
   }
 
   async upsert(data: CreateChatLogInput) {
-    return prisma.chatLog.upsert({
-      where: { sessionId: data.sessionId },
-      create: {
+    const now = new Date().toISOString();
+    const [result] = await db
+      .insert(chatLogs)
+      .values({
+        id: createId(),
         sessionId: data.sessionId,
-        messages: data.messages as unknown as Prisma.InputJsonValue,
-      },
-      update: {
-        messages: data.messages as unknown as Prisma.InputJsonValue,
-      },
-    });
+        messages: data.messages,
+        createdAt: now,
+        updatedAt: now,
+      })
+      .onConflictDoUpdate({
+        target: chatLogs.sessionId,
+        set: {
+          messages: data.messages,
+          updatedAt: now,
+        },
+      })
+      .returning();
+    return result;
   }
 
   async delete(id: string) {
-    return prisma.chatLog.delete({
-      where: { id },
-    });
+    const [deleted] = await db.delete(chatLogs).where(eq(chatLogs.id, id)).returning();
+    return deleted;
   }
 
   async deleteExpired(daysOld: number = 7) {
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - daysOld);
 
-    const result = await prisma.chatLog.deleteMany({
-      where: {
-        updatedAt: {
-          lt: cutoffDate,
-        },
-      },
-    });
+    const result = await db
+      .delete(chatLogs)
+      .where(lt(chatLogs.updatedAt, cutoffDate.toISOString()))
+      .returning();
 
-    return result.count;
+    return result.length;
   }
 }
 

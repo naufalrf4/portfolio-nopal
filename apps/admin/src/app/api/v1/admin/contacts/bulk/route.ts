@@ -36,7 +36,7 @@ async function handlePatch(req: NextRequest) {
     }
 
     return successResponse(
-      { updated: result.count },
+      { updated: result.length },
       `Bulk action "${action}" completed successfully`
     );
   } catch {

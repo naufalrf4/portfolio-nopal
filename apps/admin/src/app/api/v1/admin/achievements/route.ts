@@ -23,7 +23,7 @@ async function handleGet(req: NextRequest) {
     const signedAchievements = await Promise.all(
       achievements.map(async (achievement) => ({
         ...achievement,
-        photos: await signStringArray(achievement.photos),
+        photos: await signStringArray(achievement.photos ?? []),
       }))
     );
 
@@ -46,7 +46,7 @@ async function handlePost(req: NextRequest) {
 
     const signedAchievement = {
       ...achievement,
-      photos: await signStringArray(achievement.photos),
+      photos: await signStringArray(achievement.photos ?? []),
     };
 
     return successResponse(signedAchievement, 'Achievement created successfully');
