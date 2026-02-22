@@ -1,5 +1,7 @@
-import { Prisma, SlotStatus } from '@/prisma/generated/client/client';
-import { prisma } from '@/lib/db/prisma';
+import { createId } from '@paralleldrive/cuid2';
+import { db } from '@/lib/db';
+import { eq, and, gte, lte, asc } from 'drizzle-orm';
+import { bookingSlots } from '@/lib/db/schema';
 import type {
   CreateBookingSlotInput,
   BulkCreateSlotsInput,
@@ -16,16 +18,15 @@ export class BookingSlotsService {
     startDate.setHours(0, 0, 0, 0);
     endDate.setHours(23, 59, 59, 999);
 
-    const slots = await prisma.bookingSlot.findMany({
-      where: {
-        date: {
-          gte: startDate,
-          lte: endDate,
-        },
-      },
-      include: {
+    const startDateStr = startDate.toISOString().split('T')[0];
+    const endDateStr = endDate.toISOString().split('T')[0];
+
+    const slots = await db.query.bookingSlots.findMany({
+      where: and(gte(bookingSlots.date, startDateStr), lte(bookingSlots.date, endDateStr)),
+      orderBy: [asc(bookingSlots.date), asc(bookingSlots.time)],
+      with: {
         booking: {
-          select: {
+          columns: {
             id: true,
             name: true,
             email: true,
@@ -33,7 +34,6 @@ export class BookingSlotsService {
           },
         },
       },
-      orderBy: [{ date: 'asc' }, { time: 'asc' }],
     });
 
     const transformedSlots = slots.map((slot) => {
@@ -42,20 +42,20 @@ export class BookingSlotsService {
 
       return {
         id: slot.id,
-        date: slot.date.toISOString(),
+        date: slot.date,
         startTime,
         endTime,
         status: slot.status,
         bookerName: slot.booking?.name,
         bookerEmail: slot.booking?.email,
-        createdAt: slot.createdAt.toISOString(),
-        updatedAt: slot.updatedAt.toISOString(),
+        createdAt: slot.createdAt,
+        updatedAt: slot.updatedAt,
       };
     });
 
     const groupedByDate = transformedSlots.reduce(
       (acc, slot) => {
-        const dateKey = slot.date.split('T')[0];
+        const dateKey = slot.date;
         if (!acc[dateKey]) {
           acc[dateKey] = [];
         }
@@ -81,9 +81,9 @@ export class BookingSlotsService {
   }
 
   async getSlotById(id: string) {
-    const slot = await prisma.bookingSlot.findUnique({
-      where: { id },
-      include: {
+    const slot = await db.query.bookingSlots.findFirst({
+      where: eq(bookingSlots.id, id),
+      with: {
         booking: true,
       },
     });
@@ -95,54 +95,57 @@ export class BookingSlotsService {
 
     return {
       id: slot.id,
-      date: slot.date.toISOString(),
+      date: slot.date,
       startTime,
       endTime,
       status: slot.status,
       bookerName: slot.booking?.name,
       bookerEmail: slot.booking?.email,
-      createdAt: slot.createdAt.toISOString(),
-      updatedAt: slot.updatedAt.toISOString(),
+      createdAt: slot.createdAt,
+      updatedAt: slot.updatedAt,
     };
   }
 
   async createSlot(data: CreateBookingSlotInput) {
     const slotDate = new Date(data.date);
     slotDate.setHours(0, 0, 0, 0);
+    const dateStr = slotDate.toISOString().split('T')[0];
 
-    const existingSlot = await prisma.bookingSlot.findUnique({
-      where: {
-        date_time: {
-          date: slotDate,
-          time: data.time,
-        },
-      },
-    });
+    const [existingSlot] = await db
+      .select()
+      .from(bookingSlots)
+      .where(and(eq(bookingSlots.date, dateStr), eq(bookingSlots.time, data.time)))
+      .limit(1);
 
     if (existingSlot) {
       throw new Error('A slot already exists for this date and time');
     }
 
-    const slot = await prisma.bookingSlot.create({
-      data: {
-        date: slotDate,
+    const now = new Date().toISOString();
+    const [slot] = await db
+      .insert(bookingSlots)
+      .values({
+        id: createId(),
+        date: dateStr,
         time: data.time,
         duration: data.duration,
-        status: SlotStatus.AVAILABLE,
-      },
-    });
+        status: 'AVAILABLE',
+        createdAt: now,
+        updatedAt: now,
+      })
+      .returning();
 
     const startTime = slot.time;
     const endTime = this.calculateEndTime(slot.time, slot.duration);
 
     return {
       id: slot.id,
-      date: slot.date.toISOString(),
+      date: slot.date,
       startTime,
       endTime,
       status: slot.status,
-      createdAt: slot.createdAt.toISOString(),
-      updatedAt: slot.updatedAt.toISOString(),
+      createdAt: slot.createdAt,
+      updatedAt: slot.updatedAt,
     };
   }
 
@@ -157,28 +160,28 @@ export class BookingSlotsService {
       try {
         const slotDate = new Date(slotData.date);
         slotDate.setHours(0, 0, 0, 0);
+        const dateStr = slotDate.toISOString().split('T')[0];
 
-        const existingSlot = await prisma.bookingSlot.findUnique({
-          where: {
-            date_time: {
-              date: slotDate,
-              time: slotData.time,
-            },
-          },
-        });
+        const [existingSlot] = await db
+          .select()
+          .from(bookingSlots)
+          .where(and(eq(bookingSlots.date, dateStr), eq(bookingSlots.time, slotData.time)))
+          .limit(1);
 
         if (existingSlot) {
           results.skipped++;
           continue;
         }
 
-        await prisma.bookingSlot.create({
-          data: {
-            date: slotDate,
-            time: slotData.time,
-            duration: slotData.duration,
-            status: SlotStatus.AVAILABLE,
-          },
+        const now = new Date().toISOString();
+        await db.insert(bookingSlots).values({
+          id: createId(),
+          date: dateStr,
+          time: slotData.time,
+          duration: slotData.duration,
+          status: 'AVAILABLE',
+          createdAt: now,
+          updatedAt: now,
         });
         results.created++;
       } catch (error) {
@@ -192,30 +195,29 @@ export class BookingSlotsService {
   }
 
   async updateSlot(id: string, data: UpdateBookingSlotInput) {
-    const existingSlot = await prisma.bookingSlot.findUnique({
-      where: { id },
-      include: { booking: true },
+    const existingSlot = await db.query.bookingSlots.findFirst({
+      where: eq(bookingSlots.id, id),
+      with: {
+        booking: true,
+      },
     });
 
     if (!existingSlot) {
       throw new Error('Slot not found');
     }
 
-    if (existingSlot.status === SlotStatus.BOOKED && data.status === 'BLOCKED') {
+    if (existingSlot.status === 'BOOKED' && data.status === 'BLOCKED') {
       throw new Error('Cannot block a slot that is already booked');
     }
 
-    const updateData: Prisma.BookingSlotUpdateInput = {};
+    const updateData: Record<string, unknown> = {};
 
     if (data.time !== undefined) {
-      const existingAtTime = await prisma.bookingSlot.findUnique({
-        where: {
-          date_time: {
-            date: existingSlot.date,
-            time: data.time,
-          },
-        },
-      });
+      const [existingAtTime] = await db
+        .select()
+        .from(bookingSlots)
+        .where(and(eq(bookingSlots.date, existingSlot.date), eq(bookingSlots.time, data.time)))
+        .limit(1);
 
       if (existingAtTime && existingAtTime.id !== id) {
         throw new Error('A slot already exists for this time');
@@ -224,13 +226,23 @@ export class BookingSlotsService {
     }
 
     if (data.status !== undefined) {
-      updateData.status = data.status as SlotStatus;
+      updateData.status = data.status;
     }
 
-    const slot = await prisma.bookingSlot.update({
-      where: { id },
-      data: updateData,
-      include: { booking: true },
+    const now = new Date().toISOString();
+    updateData.updatedAt = now;
+
+    const [slot] = await db
+      .update(bookingSlots)
+      .set(updateData as any)
+      .where(eq(bookingSlots.id, id))
+      .returning();
+
+    const updatedWithBooking = await db.query.bookingSlots.findFirst({
+      where: eq(bookingSlots.id, id),
+      with: {
+        booking: true,
+      },
     });
 
     const startTime = slot.time;
@@ -238,34 +250,35 @@ export class BookingSlotsService {
 
     return {
       id: slot.id,
-      date: slot.date.toISOString(),
+      date: slot.date,
       startTime,
       endTime,
       status: slot.status,
-      bookerName: slot.booking?.name,
-      bookerEmail: slot.booking?.email,
-      createdAt: slot.createdAt.toISOString(),
-      updatedAt: slot.updatedAt.toISOString(),
+      bookerName: updatedWithBooking?.booking?.name,
+      bookerEmail: updatedWithBooking?.booking?.email,
+      createdAt: slot.createdAt,
+      updatedAt: slot.updatedAt,
     };
   }
 
   async deleteSlot(id: string) {
-    const slot = await prisma.bookingSlot.findUnique({
-      where: { id },
-      include: { booking: true },
+    const slot = await db.query.bookingSlots.findFirst({
+      where: eq(bookingSlots.id, id),
+      with: {
+        booking: true,
+      },
     });
 
     if (!slot) {
       throw new Error('Slot not found');
     }
 
-    if (slot.status === SlotStatus.BOOKED) {
+    if (slot.status === 'BOOKED') {
       throw new Error('Cannot delete a slot that is booked');
     }
 
-    return prisma.bookingSlot.delete({
-      where: { id },
-    });
+    const [deleted] = await db.delete(bookingSlots).where(eq(bookingSlots.id, id)).returning();
+    return deleted;
   }
 
   async copyFromWeek(data: CopyFromWeekInput) {
@@ -279,16 +292,20 @@ export class BookingSlotsService {
     sourceEnd.setDate(sourceEnd.getDate() + 6);
     sourceEnd.setHours(23, 59, 59, 999);
 
-    const sourceSlots = await prisma.bookingSlot.findMany({
-      where: {
-        date: {
-          gte: sourceStart,
-          lte: sourceEnd,
-        },
-        status: SlotStatus.AVAILABLE,
-      },
-      orderBy: [{ date: 'asc' }, { time: 'asc' }],
-    });
+    const sourceStartStr = sourceStart.toISOString().split('T')[0];
+    const sourceEndStr = sourceEnd.toISOString().split('T')[0];
+
+    const sourceSlots = await db
+      .select()
+      .from(bookingSlots)
+      .where(
+        and(
+          gte(bookingSlots.date, sourceStartStr),
+          lte(bookingSlots.date, sourceEndStr),
+          eq(bookingSlots.status, 'AVAILABLE')
+        )
+      )
+      .orderBy(asc(bookingSlots.date), asc(bookingSlots.time));
 
     const results: { created: number; skipped: number } = {
       created: 0,
@@ -296,34 +313,35 @@ export class BookingSlotsService {
     };
 
     for (const slot of sourceSlots) {
+      const slotDate = new Date(slot.date);
       const dayOffset = Math.floor(
-        (slot.date.getTime() - sourceStart.getTime()) / (1000 * 60 * 60 * 24)
+        (slotDate.getTime() - sourceStart.getTime()) / (1000 * 60 * 60 * 24)
       );
 
       const targetDate = new Date(targetStart);
       targetDate.setDate(targetDate.getDate() + dayOffset);
+      const targetDateStr = targetDate.toISOString().split('T')[0];
 
-      const existingSlot = await prisma.bookingSlot.findUnique({
-        where: {
-          date_time: {
-            date: targetDate,
-            time: slot.time,
-          },
-        },
-      });
+      const [existingSlot] = await db
+        .select()
+        .from(bookingSlots)
+        .where(and(eq(bookingSlots.date, targetDateStr), eq(bookingSlots.time, slot.time)))
+        .limit(1);
 
       if (existingSlot) {
         results.skipped++;
         continue;
       }
 
-      await prisma.bookingSlot.create({
-        data: {
-          date: targetDate,
-          time: slot.time,
-          duration: slot.duration,
-          status: SlotStatus.AVAILABLE,
-        },
+      const now = new Date().toISOString();
+      await db.insert(bookingSlots).values({
+        id: createId(),
+        date: targetDateStr,
+        time: slot.time,
+        duration: slot.duration,
+        status: 'AVAILABLE',
+        createdAt: now,
+        updatedAt: now,
       });
       results.created++;
     }

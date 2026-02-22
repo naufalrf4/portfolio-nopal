@@ -1,5 +1,7 @@
-import { Prisma } from '@/prisma/generated/client/client';
-import { prisma } from '@/lib/db/prisma';
+import { db } from '@/lib/db';
+import { bookingAvailability } from '@/lib/db/schema';
+import { and, asc, eq, ne } from 'drizzle-orm';
+import { createId } from '@paralleldrive/cuid2';
 
 type BookingAvailabilityRecord = {
   id: string;
@@ -7,8 +9,8 @@ type BookingAvailabilityRecord = {
   startTime: string;
   endTime: string;
   enabled: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type CreateBookingAvailabilityInput = {
@@ -32,15 +34,20 @@ export type AvailabilityQueryInput = {
 
 export class BookingAvailabilityService {
   async getAll(query: AvailabilityQueryInput) {
-    const where: Prisma.BookingAvailabilityWhereInput = {
-      ...(query.dayOfWeek !== undefined && { dayOfWeek: query.dayOfWeek }),
-      ...(query.enabled !== undefined && { enabled: query.enabled }),
-    };
+    const conditions = [];
 
-    const availabilities = await prisma.bookingAvailability.findMany({
-      where,
-      orderBy: [{ dayOfWeek: 'asc' }, { startTime: 'asc' }],
-    });
+    if (query.dayOfWeek !== undefined) {
+      conditions.push(eq(bookingAvailability.dayOfWeek, query.dayOfWeek));
+    }
+    if (query.enabled !== undefined) {
+      conditions.push(eq(bookingAvailability.enabled, query.enabled));
+    }
+
+    const availabilities = await db
+      .select()
+      .from(bookingAvailability)
+      .where(conditions.length > 0 ? and(...conditions) : undefined)
+      .orderBy(asc(bookingAvailability.dayOfWeek), asc(bookingAvailability.startTime));
 
     const groupedByDay = availabilities.reduce<Record<number, typeof availabilities>>(
       (acc, item) => {
@@ -60,9 +67,12 @@ export class BookingAvailabilityService {
   }
 
   async getById(id: string) {
-    return prisma.bookingAvailability.findUnique({
-      where: { id },
-    });
+    const result = await db
+      .select()
+      .from(bookingAvailability)
+      .where(eq(bookingAvailability.id, id))
+      .limit(1);
+    return result[0] || null;
   }
 
   async create(data: CreateBookingAvailabilityInput) {
@@ -71,9 +81,20 @@ export class BookingAvailabilityService {
       throw new Error('Time slot overlaps with existing availability');
     }
 
-    return prisma.bookingAvailability.create({
-      data,
-    });
+    const now = new Date().toISOString();
+    const [created] = await db
+      .insert(bookingAvailability)
+      .values({
+        id: createId(),
+        dayOfWeek: data.dayOfWeek,
+        startTime: data.startTime,
+        endTime: data.endTime,
+        enabled: data.enabled ?? true,
+        createdAt: now,
+        updatedAt: now,
+      })
+      .returning();
+    return created;
   }
 
   async update(id: string, data: UpdateBookingAvailabilityInput) {
@@ -84,23 +105,31 @@ export class BookingAvailabilityService {
       }
     }
 
-    return prisma.bookingAvailability.update({
-      where: { id },
-      data,
-    });
+    const now = new Date().toISOString();
+    const [updated] = await db
+      .update(bookingAvailability)
+      .set({ ...data, updatedAt: now } as any)
+      .where(eq(bookingAvailability.id, id))
+      .returning();
+    return updated;
   }
 
   async delete(id: string) {
-    return prisma.bookingAvailability.delete({
-      where: { id },
-    });
+    const [deleted] = await db
+      .delete(bookingAvailability)
+      .where(eq(bookingAvailability.id, id))
+      .returning();
+    return deleted;
   }
 
   async bulkUpdate(data: BulkUpdateAvailabilityInput) {
-    return prisma.bookingAvailability.updateMany({
-      where: { dayOfWeek: data.dayOfWeek },
-      data: { enabled: data.enabled },
-    });
+    const now = new Date().toISOString();
+    const result = await db
+      .update(bookingAvailability)
+      .set({ enabled: data.enabled, updatedAt: now })
+      .where(eq(bookingAvailability.dayOfWeek, data.dayOfWeek))
+      .returning();
+    return { count: result.length };
   }
 
   private async checkOverlap(
@@ -109,12 +138,15 @@ export class BookingAvailabilityService {
     endTime: string,
     excludeId?: string
   ) {
-    const existingSlots = await prisma.bookingAvailability.findMany({
-      where: {
-        dayOfWeek,
-        ...(excludeId && { id: { not: excludeId } }),
-      },
-    });
+    const conditions = [eq(bookingAvailability.dayOfWeek, dayOfWeek)];
+    if (excludeId) {
+      conditions.push(ne(bookingAvailability.id, excludeId));
+    }
+
+    const existingSlots = await db
+      .select()
+      .from(bookingAvailability)
+      .where(and(...conditions));
 
     const [newStartHour, newStartMin] = startTime.split(':').map(Number);
     const [newEndHour, newEndMin] = endTime.split(':').map(Number);

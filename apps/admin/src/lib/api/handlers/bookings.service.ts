@@ -1,5 +1,7 @@
-import { prisma } from '@/lib/db/prisma';
-import { Prisma, BookingStatus } from '@/prisma/generated/client/client';
+import { createId } from '@paralleldrive/cuid2';
+import { db } from '@/lib/db';
+import { eq, and, gte, lte, desc, asc, count, inArray } from 'drizzle-orm';
+import { bookings, bookingSlots } from '@/lib/db/schema';
 import type {
   CreateBookingInput,
   UpdateBookingStatusInput,
@@ -12,47 +14,81 @@ export const bookingsService = {
     const { page, limit, status, dateFrom, dateTo } = query;
     const skip = (page - 1) * limit;
 
-    const where: Prisma.BookingWhereInput = {};
+    const conditions = [];
 
     if (status) {
-      where.status = status;
+      conditions.push(eq(bookings.status, status));
     }
 
     if (dateFrom || dateTo) {
-      const dateFilter: Prisma.DateTimeFilter<'BookingSlot'> = {};
+      const slotConditions = [];
       if (dateFrom) {
-        dateFilter.gte = new Date(dateFrom);
+        slotConditions.push(gte(bookingSlots.date, new Date(dateFrom).toISOString().split('T')[0]));
       }
       if (dateTo) {
-        dateFilter.lte = new Date(dateTo);
+        slotConditions.push(lte(bookingSlots.date, new Date(dateTo).toISOString().split('T')[0]));
       }
-      where.slot = { date: dateFilter };
+
+      const matchingSlotIds = await db
+        .select({ id: bookingSlots.id })
+        .from(bookingSlots)
+        .where(slotConditions.length > 1 ? and(...slotConditions) : slotConditions[0]);
+
+      const slotIds = matchingSlotIds.map((s) => s.id);
+
+      if (slotIds.length === 0) {
+        return {
+          bookings: [],
+          pagination: {
+            page,
+            limit,
+            total: 0,
+            totalPages: 0,
+          },
+        };
+      }
+
+      conditions.push(inArray(bookings.slotId, slotIds));
     }
 
-    const [bookings, total] = await Promise.all([
-      prisma.booking.findMany({
-        where,
-        skip,
-        take: limit,
-        orderBy: { createdAt: 'desc' },
-        include: { slot: true },
-      }),
-      prisma.booking.count({ where }),
+    const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+
+    const [rows, countResult] = await Promise.all([
+      db
+        .select()
+        .from(bookings)
+        .where(whereClause)
+        .orderBy(desc(bookings.createdAt))
+        .offset(skip)
+        .limit(limit),
+      db.select({ total: count() }).from(bookings).where(whereClause),
     ]);
 
-    const transformedBookings = bookings.map((booking) => ({
-      id: booking.id,
-      name: booking.name,
-      email: booking.email,
-      phone: booking.phone,
-      date: booking.slot?.date?.toISOString() || '',
-      time: booking.slot?.time || '',
-      timezone: 'UTC',
-      notes: booking.notes,
-      status: booking.status,
-      createdAt: booking.createdAt.toISOString(),
-      updatedAt: booking.updatedAt.toISOString(),
-    }));
+    const total = countResult[0]?.total ?? 0;
+
+    const slotIds = rows.map((b) => b.slotId).filter(Boolean) as string[];
+    let slotsMap: Record<string, typeof bookingSlots.$inferSelect> = {};
+    if (slotIds.length > 0) {
+      const slots = await db.select().from(bookingSlots).where(inArray(bookingSlots.id, slotIds));
+      slotsMap = Object.fromEntries(slots.map((s) => [s.id, s]));
+    }
+
+    const transformedBookings = rows.map((booking) => {
+      const slot = booking.slotId ? slotsMap[booking.slotId] : undefined;
+      return {
+        id: booking.id,
+        name: booking.name,
+        email: booking.email,
+        phone: booking.phone,
+        date: slot?.date || '',
+        time: slot?.time || '',
+        timezone: 'UTC',
+        notes: booking.notes,
+        status: booking.status,
+        createdAt: booking.createdAt,
+        updatedAt: booking.updatedAt,
+      };
+    });
 
     return {
       bookings: transformedBookings,
@@ -66,9 +102,11 @@ export const bookingsService = {
   },
 
   async getById(id: string) {
-    return prisma.booking.findUnique({
-      where: { id },
-      include: { slot: true },
+    return db.query.bookings.findFirst({
+      where: eq(bookings.id, id),
+      with: {
+        bookingSlot: true,
+      },
     });
   },
 
@@ -79,17 +117,26 @@ export const bookingsService = {
       throw new Error('Booking date must be in the future');
     }
 
-    const slot = await prisma.bookingSlot.create({
-      data: {
-        date: bookingDate,
+    const now = new Date().toISOString();
+    const dateStr = bookingDate.toISOString().split('T')[0];
+
+    const [slot] = await db
+      .insert(bookingSlots)
+      .values({
+        id: createId(),
+        date: dateStr,
         time: data.time,
         duration: 60,
         status: 'BOOKED',
-      },
-    });
+        createdAt: now,
+        updatedAt: now,
+      })
+      .returning();
 
-    return prisma.booking.create({
-      data: {
+    const [booking] = await db
+      .insert(bookings)
+      .values({
+        id: createId(),
         name: data.name,
         email: data.email,
         phone: data.phone,
@@ -102,37 +149,54 @@ export const bookingsService = {
         region: data.region || null,
         status: 'PENDING',
         slotId: slot.id,
+        createdAt: now,
+        updatedAt: now,
+      })
+      .returning();
+
+    return db.query.bookings.findFirst({
+      where: eq(bookings.id, booking.id),
+      with: {
+        bookingSlot: true,
       },
-      include: { slot: true },
     });
   },
 
   async updateStatus(id: string, data: UpdateBookingStatusInput) {
-    return prisma.booking.update({
-      where: { id },
-      data: {
+    const now = new Date().toISOString();
+    const [updated] = await db
+      .update(bookings)
+      .set({
         status: data.status,
         notes: data.notes,
+        updatedAt: now,
+      } as any)
+      .where(eq(bookings.id, id))
+      .returning();
+
+    if (!updated) return null;
+
+    return db.query.bookings.findFirst({
+      where: eq(bookings.id, id),
+      with: {
+        bookingSlot: true,
       },
-      include: { slot: true },
     });
   },
 
   async delete(id: string) {
-    const booking = await prisma.booking.findUnique({
-      where: { id },
-      select: { slotId: true },
-    });
+    const [booking] = await db
+      .select({ slotId: bookings.slotId })
+      .from(bookings)
+      .where(eq(bookings.id, id))
+      .limit(1);
 
-    const deleted = await prisma.booking.delete({
-      where: { id },
-    });
+    const [deleted] = await db.delete(bookings).where(eq(bookings.id, id)).returning();
 
     if (booking?.slotId) {
-      await prisma.bookingSlot
-        .delete({
-          where: { id: booking.slotId },
-        })
+      await db
+        .delete(bookingSlots)
+        .where(eq(bookingSlots.id, booking.slotId))
         .catch(() => {});
     }
 
@@ -145,24 +209,33 @@ export const bookingsService = {
     const startDate = new Date(year, month - 1, 1);
     const endDate = new Date(year, month, 0, 23, 59, 59);
 
-    const bookings = await prisma.booking.findMany({
-      where: {
-        slot: {
-          date: {
-            gte: startDate,
-            lte: endDate,
-          },
-        },
+    const startDateStr = startDate.toISOString().split('T')[0];
+    const endDateStr = endDate.toISOString().split('T')[0];
+
+    const matchingSlots = await db
+      .select({ id: bookingSlots.id })
+      .from(bookingSlots)
+      .where(and(gte(bookingSlots.date, startDateStr), lte(bookingSlots.date, endDateStr)));
+
+    const slotIds = matchingSlots.map((s) => s.id);
+
+    if (slotIds.length === 0) {
+      return { dates: {} };
+    }
+
+    const allBookings = await db.query.bookings.findMany({
+      where: inArray(bookings.slotId, slotIds),
+      orderBy: [asc(bookings.createdAt)],
+      with: {
+        bookingSlot: true,
       },
-      include: { slot: true },
-      orderBy: { createdAt: 'asc' },
     });
 
-    const groupedByDate: Record<string, typeof bookings> = {};
+    const groupedByDate: Record<string, typeof allBookings> = {};
 
-    bookings.forEach((booking) => {
-      if (booking.slot?.date) {
-        const dateKey = booking.slot.date.toISOString().split('T')[0];
+    allBookings.forEach((booking) => {
+      if (booking.bookingSlot?.date) {
+        const dateKey = booking.bookingSlot.date;
         if (!groupedByDate[dateKey]) {
           groupedByDate[dateKey] = [];
         }
