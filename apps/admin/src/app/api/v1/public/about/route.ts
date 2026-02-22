@@ -1,4 +1,5 @@
-import { prisma } from '@/lib/db/prisma';
+import { db } from '@/lib/db';
+import { aboutMe } from '@/lib/db/schema';
 import { successResponse, notFoundResponse, serverErrorResponse } from '@/lib/api/responses';
 import { signAssetUrls } from '@/lib/utils/sign-urls';
 
@@ -52,29 +53,30 @@ function parseJsonField<T>(value: unknown, defaultValue: T): T {
 
 export async function GET() {
   try {
-    const aboutMe = await prisma.aboutMe.findFirst();
+    const result = await db.select().from(aboutMe).limit(1);
+    const aboutMeData = result[0];
 
-    if (!aboutMe) {
+    if (!aboutMeData) {
       return notFoundResponse('About me');
     }
 
-    const availability = aboutMe.availabilityStatus;
+    const availability = aboutMeData.availabilityStatus;
     const publicData: PublicAboutData = {
-      fullName: aboutMe.fullName,
-      tagline: aboutMe.tagline,
-      roles: aboutMe.roles,
-      bio: aboutMe.bio,
-      email: aboutMe.email,
-      location: aboutMe.location,
-      avatarUrl: aboutMe.avatarUrl,
-      resumeUrl: aboutMe.resumeUrl,
+      fullName: aboutMeData.fullName,
+      tagline: aboutMeData.tagline,
+      roles: aboutMeData.roles || [],
+      bio: aboutMeData.bio,
+      email: aboutMeData.email,
+      location: aboutMeData.location,
+      avatarUrl: aboutMeData.avatarUrl,
+      resumeUrl: aboutMeData.resumeUrl,
       availabilityStatus:
         availability === 'available' || availability === 'busy' || availability === 'unavailable'
           ? availability
           : null,
-      skills: parseJsonField<Skill[]>(aboutMe.skills, []),
-      experience: parseJsonField<Experience[]>(aboutMe.experience, []),
-      socialLinks: parseJsonField<SocialLink[]>(aboutMe.socialLinks, []),
+      skills: parseJsonField<Skill[]>(aboutMeData.skills, []),
+      experience: parseJsonField<Experience[]>(aboutMeData.experience, []),
+      socialLinks: parseJsonField<SocialLink[]>(aboutMeData.socialLinks, []),
     };
 
     const signedData = await signAssetUrls(publicData, {

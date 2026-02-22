@@ -1,5 +1,7 @@
 import { NextRequest } from 'next/server';
-import { prisma } from '@/lib/db/prisma';
+import { db } from '@/lib/db';
+import { users } from '@/lib/db/schema';
+import { eq } from 'drizzle-orm';
 import { guestbookService } from '@/lib/api/handlers/guestbook.service';
 import {
   successResponse,
@@ -64,10 +66,13 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const user = await prisma.user.findUnique({
-      where: { email: userEmail },
-      select: { id: true },
-    });
+    const userResult = await db
+      .select({ id: users.id })
+      .from(users)
+      .where(eq(users.email, userEmail))
+      .limit(1);
+
+    const user = userResult[0];
 
     if (!user) {
       return unauthorizedResponse('User not found. Please sign in again.');

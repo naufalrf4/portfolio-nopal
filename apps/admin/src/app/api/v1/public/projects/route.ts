@@ -1,5 +1,7 @@
 import { NextRequest } from 'next/server';
-import { prisma } from '@/lib/db/prisma';
+import { db } from '@/lib/db';
+import { projects, projectImages } from '@/lib/db/schema';
+import { eq, and, desc, count, asc } from 'drizzle-orm';
 import { successResponse, serverErrorResponse } from '@/lib/api/responses';
 import { signAssetUrlsMany } from '@/lib/utils/sign-urls';
 
@@ -10,48 +12,57 @@ export async function GET(req: NextRequest) {
     const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!, 10) : undefined;
     const category = searchParams.get('category') || undefined;
 
-    const where = {
-      visible: true,
-      ...(featured !== undefined && { featured }),
-      ...(category && { category }),
-    };
+    const where = and(
+      eq(projects.visible, true),
+      featured !== undefined ? eq(projects.featured, featured) : undefined,
+      category ? eq(projects.category, category) : undefined
+    );
 
-    const [projects, total, featuredCount] = await Promise.all([
-      prisma.project.findMany({
-        where,
-        take: limit,
-        orderBy: [{ featured: 'desc' }, { createdAt: 'desc' }],
-        select: {
-          id: true,
-          title: true,
-          slug: true,
-          summary: true,
-          category: true,
-          techStack: true,
-          liveUrl: true,
-          repoUrl: true,
-          imageUrl: true,
-          featured: true,
-          createdAt: true,
-          images: {
-            select: {
-              id: true,
-              url: true,
-              order: true,
-              alt: true,
-              caption: true,
-            },
-            orderBy: {
-              order: 'asc',
-            },
-          },
-        },
-      }),
-      prisma.project.count({ where }),
-      prisma.project.count({ where: { visible: true, featured: true } }),
+    const featuredWhere = and(eq(projects.visible, true), eq(projects.featured, true));
+
+    const projectsQuery = db
+      .select({
+        id: projects.id,
+        title: projects.title,
+        slug: projects.slug,
+        summary: projects.summary,
+        category: projects.category,
+        techStack: projects.techStack,
+        liveUrl: projects.liveUrl,
+        repoUrl: projects.repoUrl,
+        imageUrl: projects.imageUrl,
+        featured: projects.featured,
+        createdAt: projects.createdAt,
+      })
+      .from(projects)
+      .where(where)
+      .orderBy(desc(projects.featured), desc(projects.createdAt));
+
+    const [projectsList, [{ total }], [{ featured: featuredCount }]] = await Promise.all([
+      limit ? projectsQuery.limit(limit) : projectsQuery,
+      db.select({ total: count() }).from(projects).where(where),
+      db.select({ featured: count() }).from(projects).where(featuredWhere),
     ]);
 
-    const signedProjects = await signAssetUrlsMany(projects, {
+    const projectsWithImages = await Promise.all(
+      projectsList.map(async (project) => {
+        const images = await db
+          .select({
+            id: projectImages.id,
+            url: projectImages.url,
+            order: projectImages.order,
+            alt: projectImages.alt,
+            caption: projectImages.caption,
+          })
+          .from(projectImages)
+          .where(eq(projectImages.projectId, project.id))
+          .orderBy(asc(projectImages.order));
+
+        return { ...project, images };
+      })
+    );
+
+    const signedProjects = await signAssetUrlsMany(projectsWithImages, {
       fields: ['imageUrl'],
       nested: { images: ['url'] },
     });

@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@naufalrf/auth';
-import { prisma } from '@/lib/db/prisma';
+import { db } from '@/lib/db';
+import { projectImages, projects } from '@/lib/db/schema';
+import { eq, asc, desc } from 'drizzle-orm';
+import { createId } from '@paralleldrive/cuid2';
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -10,10 +13,11 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     }
 
     const { id } = await params;
-    const images = await prisma.projectImage.findMany({
-      where: { projectId: id },
-      orderBy: { order: 'asc' },
-    });
+    const images = await db
+      .select()
+      .from(projectImages)
+      .where(eq(projectImages.projectId, id))
+      .orderBy(asc(projectImages.order));
 
     return NextResponse.json({
       success: true,
@@ -39,30 +43,35 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       return NextResponse.json({ error: 'URL and key are required' }, { status: 400 });
     }
 
-    const maxOrder = await prisma.projectImage.findFirst({
-      where: { projectId: id },
-      orderBy: { order: 'desc' },
-      select: { order: true },
-    });
+    const maxOrderResult = await db
+      .select({ order: projectImages.order })
+      .from(projectImages)
+      .where(eq(projectImages.projectId, id))
+      .orderBy(desc(projectImages.order))
+      .limit(1);
 
-    const order = maxOrder ? maxOrder.order + 1 : 0;
+    const order = maxOrderResult.length > 0 ? maxOrderResult[0].order + 1 : 0;
 
-    const image = await prisma.projectImage.create({
-      data: {
+    const now = new Date().toISOString();
+    const [image] = await db
+      .insert(projectImages)
+      .values({
+        id: createId(),
         projectId: id,
         url,
         key,
         caption,
         alt,
         order,
-      },
-    });
+        createdAt: now,
+      } as any)
+      .returning();
 
     if (order === 0) {
-      await prisma.project.update({
-        where: { id },
-        data: { thumbnailId: image.id },
-      });
+      await db
+        .update(projects)
+        .set({ thumbnailId: image.id, updatedAt: now } as any)
+        .where(eq(projects.id, id));
     }
 
     return NextResponse.json({

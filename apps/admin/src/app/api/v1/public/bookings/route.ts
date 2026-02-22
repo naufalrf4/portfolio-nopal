@@ -1,7 +1,8 @@
 import { NextRequest } from 'next/server';
 import { z } from 'zod';
-import { prisma } from '@/lib/db/prisma';
-import { SlotStatus, BookingStatus } from '@/prisma/generated/client/client';
+import { db } from '@/lib/db';
+import { bookings, bookingSlots, bookingSettings } from '@/lib/db/schema';
+import { eq } from 'drizzle-orm';
 import {
   successResponse,
   validationErrorResponse,
@@ -12,6 +13,7 @@ import {
 import { verifyTurnstileToken, isTurnstileConfigured } from '@/lib/services/turnstile';
 import { createHash } from 'crypto';
 import { emailService } from '@/lib/services/emailService';
+import { createId } from '@paralleldrive/cuid2';
 
 const publicBookingSchema = z.object({
   slotId: z.string().min(1),
@@ -54,27 +56,27 @@ export async function POST(request: NextRequest) {
 
     const { slotId, name, email, phone, notes } = parsed.data;
 
-    const slot = await prisma.bookingSlot.findUnique({
-      where: { id: slotId },
-      include: { booking: true },
+    const slotResult = await db.query.bookingSlots.findFirst({
+      where: eq(bookingSlots.id, slotId),
+      with: { booking: true },
     });
 
-    if (!slot) {
+    if (!slotResult) {
       return notFoundResponse('Booking slot');
     }
 
-    if (slot.status !== SlotStatus.AVAILABLE) {
+    if (slotResult.status !== 'AVAILABLE') {
       return errorResponse('This time slot is no longer available', 409);
     }
 
-    if (slot.booking) {
+    if (slotResult.booking) {
       return errorResponse('This time slot is already booked', 409);
     }
 
     const now = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Jakarta' }));
 
-    const slotDateTime = new Date(slot.date);
-    const [hours, minutes] = slot.time.split(':').map(Number);
+    const slotDateTime = new Date(slotResult.date + 'T00:00:00');
+    const [hours, minutes] = slotResult.time.split(':').map(Number);
     slotDateTime.setHours(hours, minutes, 0, 0);
 
     if (slotDateTime < now) {
@@ -85,24 +87,37 @@ export async function POST(request: NextRequest) {
     const ip = forwarded?.split(',')[0]?.trim() || 'unknown';
     const ipHash = hashIp(ip);
 
-    const booking = await prisma.$transaction(async (tx) => {
-      await tx.bookingSlot.update({
-        where: { id: slotId },
-        data: { status: SlotStatus.BOOKED },
-      });
+    const nowStr = new Date().toISOString();
+    const booking = await db.transaction(async (tx) => {
+      await tx
+        .update(bookingSlots)
+        .set({ status: 'BOOKED', updatedAt: nowStr } as any)
+        .where(eq(bookingSlots.id, slotId));
 
-      return tx.booking.create({
-        data: {
+      const [created] = await tx
+        .insert(bookings)
+        .values({
+          id: createId(),
           name,
           email,
           phone: phone || null,
           notes: notes || null,
           ipHash,
-          status: BookingStatus.PENDING,
+          status: 'PENDING',
           slotId,
-        },
-        include: { slot: true },
-      });
+          createdAt: nowStr,
+          updatedAt: nowStr,
+        } as any)
+        .returning();
+
+      return created;
+    });
+
+    const dateFormatted = new Date(slotResult.date + 'T00:00:00').toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
     });
 
     const responseData = {
@@ -112,46 +127,37 @@ export async function POST(request: NextRequest) {
       phone: booking.phone,
       notes: booking.notes,
       status: booking.status,
-      date: booking.slot?.date.toISOString().split('T')[0],
-      time: booking.slot?.time,
-      duration: booking.slot?.duration,
-      createdAt: booking.createdAt.toISOString(),
+      date: slotResult.date,
+      time: slotResult.time,
+      duration: slotResult.duration,
+      createdAt: booking.createdAt,
     };
 
     try {
       await emailService.sendBookingConfirmation(booking.email, {
         bookingId: booking.id,
         name: booking.name,
-        date: booking.slot!.date.toLocaleDateString('en-US', {
-          weekday: 'long',
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
-        }),
-        time: booking.slot!.time,
-        duration: booking.slot!.duration,
+        date: dateFormatted,
+        time: slotResult.time,
+        duration: slotResult.duration,
       });
     } catch (emailError) {
       console.error('[Booking API] User confirmation email failed:', emailError);
     }
 
     try {
-      const bookingSettings = await prisma.bookingSettings.findFirst();
+      const settingsResult = await db.select().from(bookingSettings).limit(1);
+      const settings = settingsResult[0];
 
-      if (bookingSettings?.notificationEmail) {
-        await emailService.sendAdminBookingNotification(bookingSettings.notificationEmail, {
+      if (settings?.notificationEmail) {
+        await emailService.sendAdminBookingNotification(settings.notificationEmail, {
           booking: {
             id: booking.id,
             name: booking.name,
             email: booking.email,
             phone: booking.phone,
-            date: booking.slot!.date.toLocaleDateString('en-US', {
-              weekday: 'long',
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-            }),
-            time: booking.slot!.time,
+            date: dateFormatted,
+            time: slotResult.time,
             notes: booking.notes,
           },
           dashboardLink: `${process.env.NEXTAUTH_URL || 'http://localhost:3001'}/admin/bookings/${booking.id}`,

@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import { prisma } from '@/lib/db/prisma';
+import { db } from '@/lib/db';
+import { projects } from '@/lib/db/schema';
+import { eq, isNotNull } from 'drizzle-orm';
 
 export async function POST() {
   try {
@@ -9,18 +11,14 @@ export async function POST() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const projects = await prisma.project.findMany({
-      where: {
-        content: {
-          not: null,
-        },
-      },
-      select: { id: true, title: true, content: true },
-    });
+    const allProjects = await db
+      .select({ id: projects.id, title: projects.title, content: projects.content })
+      .from(projects)
+      .where(isNotNull(projects.content));
 
     const fixedProjects = [];
 
-    for (const project of projects) {
+    for (const project of allProjects) {
       if (!project.content) continue;
 
       let content = project.content;
@@ -31,10 +29,11 @@ export async function POST() {
         try {
           const parsed = JSON.parse(content);
           if (typeof parsed === 'object' && parsed !== null && parsed.type === 'doc') {
-            await prisma.project.update({
-              where: { id: project.id },
-              data: { content: JSON.stringify(parsed) },
-            });
+            const now = new Date().toISOString();
+            await db
+              .update(projects)
+              .set({ content: JSON.stringify(parsed), updatedAt: now } as any)
+              .where(eq(projects.id, project.id));
 
             fixedProjects.push({
               id: project.id,
@@ -47,10 +46,11 @@ export async function POST() {
             iterations++;
           }
         } catch {
-          await prisma.project.update({
-            where: { id: project.id },
-            data: { content: '{"type":"doc","content":[]}' },
-          });
+          const now = new Date().toISOString();
+          await db
+            .update(projects)
+            .set({ content: '{"type":"doc","content":[]}', updatedAt: now } as any)
+            .where(eq(projects.id, project.id));
 
           fixedProjects.push({
             id: project.id,
@@ -62,10 +62,11 @@ export async function POST() {
       }
 
       if (iterations >= maxIterations) {
-        await prisma.project.update({
-          where: { id: project.id },
-          data: { content: '{"type":"doc","content":[]}' },
-        });
+        const now = new Date().toISOString();
+        await db
+          .update(projects)
+          .set({ content: '{"type":"doc","content":[]}', updatedAt: now } as any)
+          .where(eq(projects.id, project.id));
 
         fixedProjects.push({
           id: project.id,

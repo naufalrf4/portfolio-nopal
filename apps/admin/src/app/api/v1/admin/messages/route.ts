@@ -4,7 +4,9 @@ import { anonymousMessagesService } from '@/lib/api/handlers/anonymous-messages.
 import { successResponse, serverErrorResponse, validationErrorResponse } from '@/lib/api/responses';
 import { createAnonymousMessageSchema } from '@/lib/validations/anonymous-message.schema';
 import { getIpLocation } from '@/lib/services/geoIpService';
-import { prisma } from '@/lib/db/prisma';
+import { db } from '@/lib/db';
+import { anonymousMessages } from '@/lib/db/schema';
+import { createId } from '@paralleldrive/cuid2';
 
 async function handleGet(req: NextRequest) {
   try {
@@ -30,10 +32,14 @@ async function handlePost(req: NextRequest) {
 
     const geoLocation = getIpLocation(clientIp);
 
+    const now = new Date().toISOString();
     const data: any = {
+      id: createId(),
       content: parsed.content,
       ipHash: parsed.ipHash,
       ipAddress: clientIp,
+      createdAt: now,
+      updatedAt: now,
     };
 
     if (geoLocation) {
@@ -43,7 +49,7 @@ async function handlePost(req: NextRequest) {
       if (geoLocation.region) data.region = geoLocation.region;
     }
 
-    const message = await prisma.anonymousMessage.create({ data });
+    const [message] = await db.insert(anonymousMessages).values(data).returning();
 
     return successResponse(message, 'Message sent successfully');
   } catch (error) {

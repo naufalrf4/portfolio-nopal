@@ -1,7 +1,8 @@
 import { NextRequest } from 'next/server';
 import { z } from 'zod';
-import { prisma } from '@/lib/db/prisma';
-import { SlotStatus } from '@/prisma/generated/client/client';
+import { db } from '@/lib/db';
+import { bookingSlots } from '@/lib/db/schema';
+import { eq, and, gte, lte, asc } from 'drizzle-orm';
 import { successResponse, validationErrorResponse, serverErrorResponse } from '@/lib/api/responses';
 
 const availableSlotsQuerySchema = z.object({
@@ -39,19 +40,23 @@ export async function GET(request: NextRequest) {
     endDate.setDate(endDate.getDate() + days);
     endDate.setHours(23, 59, 59, 999);
 
-    const slots = await prisma.bookingSlot.findMany({
-      where: {
-        status: SlotStatus.AVAILABLE,
-        date: {
-          gte: today,
-          lte: endDate,
-        },
-      },
-      orderBy: [{ date: 'asc' }, { time: 'asc' }],
-    });
+    const todayStr = today.toISOString().split('T')[0];
+    const endDateStr = endDate.toISOString().split('T')[0];
+
+    const slots = await db
+      .select()
+      .from(bookingSlots)
+      .where(
+        and(
+          eq(bookingSlots.status, 'AVAILABLE'),
+          gte(bookingSlots.date, todayStr),
+          lte(bookingSlots.date, endDateStr)
+        )
+      )
+      .orderBy(asc(bookingSlots.date), asc(bookingSlots.time));
 
     const filteredSlots = slots.filter((slot) => {
-      const slotDateTime = new Date(slot.date);
+      const slotDateTime = new Date(slot.date + 'T00:00:00');
       const [hours, minutes] = slot.time.split(':').map(Number);
       slotDateTime.setHours(hours, minutes, 0, 0);
 
@@ -70,7 +75,7 @@ export async function GET(request: NextRequest) {
     > = {};
 
     for (const slot of filteredSlots) {
-      const dateKey = slot.date.toISOString().split('T')[0];
+      const dateKey = slot.date;
 
       if (!groupedByDate[dateKey]) {
         groupedByDate[dateKey] = [];

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@naufalrf/auth';
-import { prisma } from '@/lib/db/prisma';
+import { db } from '@/lib/db';
+import { projectImages, projects } from '@/lib/db/schema';
+import { eq, asc } from 'drizzle-orm';
 
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -17,26 +19,28 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       return NextResponse.json({ error: 'imageIds must be an array' }, { status: 400 });
     }
 
-    await Promise.all(
-      imageIds.map((id, index) =>
-        prisma.projectImage.update({
-          where: { id },
-          data: { order: index },
-        })
-      )
-    );
+    await db.transaction(async (tx) => {
+      for (let index = 0; index < imageIds.length; index++) {
+        await tx
+          .update(projectImages)
+          .set({ order: index } as any)
+          .where(eq(projectImages.id, imageIds[index]));
+      }
+    });
 
     if (imageIds.length > 0) {
-      await prisma.project.update({
-        where: { id },
-        data: { thumbnailId: imageIds[0] },
-      });
+      const now = new Date().toISOString();
+      await db
+        .update(projects)
+        .set({ thumbnailId: imageIds[0], updatedAt: now } as any)
+        .where(eq(projects.id, id));
     }
 
-    const images = await prisma.projectImage.findMany({
-      where: { projectId: id },
-      orderBy: { order: 'asc' },
-    });
+    const images = await db
+      .select()
+      .from(projectImages)
+      .where(eq(projectImages.projectId, id))
+      .orderBy(asc(projectImages.order));
 
     return NextResponse.json({
       success: true,

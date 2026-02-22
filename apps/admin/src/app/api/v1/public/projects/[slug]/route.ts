@@ -1,5 +1,7 @@
 import { NextRequest } from 'next/server';
-import { prisma } from '@/lib/db/prisma';
+import { db } from '@/lib/db';
+import { projects } from '@/lib/db/schema';
+import { eq } from 'drizzle-orm';
 import { successResponse, notFoundResponse, serverErrorResponse } from '@/lib/api/responses';
 import { signAssetUrls } from '@/lib/utils/sign-urls';
 
@@ -11,14 +13,14 @@ export async function GET(req: NextRequest, context: RouteContext) {
   try {
     const { slug } = await context.params;
 
-    const project = await prisma.project.findUnique({
-      where: { slug },
-      include: {
-        contexts: {
-          orderBy: { order: 'asc' },
+    const project = await db.query.projects.findFirst({
+      where: eq(projects.slug, slug),
+      with: {
+        projectContexts: {
+          orderBy: (ctx, { asc }) => [asc(ctx.order)],
         },
-        images: {
-          orderBy: { order: 'asc' },
+        projectImages: {
+          orderBy: (img, { asc }) => [asc(img.order)],
         },
       },
     });
@@ -27,7 +29,13 @@ export async function GET(req: NextRequest, context: RouteContext) {
       return notFoundResponse('Project');
     }
 
-    const signedProject = await signAssetUrls(project, {
+    const projectData = {
+      ...project,
+      contexts: project.projectContexts,
+      images: project.projectImages,
+    };
+
+    const signedProject = await signAssetUrls(projectData, {
       fields: ['imageUrl'],
       nested: { images: ['url'] },
     });

@@ -1,10 +1,12 @@
 import { NextRequest } from 'next/server';
 import { successResponse, serverErrorResponse, validationErrorResponse } from '@/lib/api/responses';
-import { prisma } from '@/lib/db/prisma';
+import { db } from '@/lib/db';
+import { contactForms, contactSettings } from '@/lib/db/schema';
 import { z } from 'zod';
 import { getIpLocation } from '@/lib/services/geoIpService';
 import { hashIp } from '@/lib/utils/hash';
 import { emailService } from '@/lib/services/emailService';
+import { createId } from '@paralleldrive/cuid2';
 
 const createContactSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -26,15 +28,18 @@ export async function POST(request: NextRequest) {
     const forwarded = request.headers.get('x-forwarded-for');
     const clientIp = forwarded?.split(',')[0]?.trim() || 'unknown';
     const geoLocation = getIpLocation(clientIp);
-    const ipHash = hashIp(clientIp);
+    const ipHashValue = hashIp(clientIp);
 
-    const contact = await prisma.contactForm.create({
-      data: {
+    const now = new Date().toISOString();
+    const [contact] = await db
+      .insert(contactForms)
+      .values({
+        id: createId(),
         name: parsed.data.name,
         email: parsed.data.email,
         subject: parsed.data.subject || null,
         message: parsed.data.message,
-        ipHash,
+        ipHash: ipHashValue,
         ipAddress: clientIp !== 'unknown' ? clientIp : null,
         countryCode: geoLocation?.countryCode || null,
         country: geoLocation?.country || null,
@@ -42,8 +47,10 @@ export async function POST(request: NextRequest) {
         region: geoLocation?.region || null,
         read: false,
         replied: false,
-      },
-    });
+        createdAt: now,
+        updatedAt: now,
+      } as any)
+      .returning();
 
     try {
       await emailService.sendContactConfirmation(parsed.data.email, {
@@ -61,10 +68,11 @@ export async function POST(request: NextRequest) {
     }
 
     try {
-      const contactSettings = await prisma.contactSettings.findFirst();
+      const settingsResult = await db.select().from(contactSettings).limit(1);
+      const settings = settingsResult[0];
 
-      if (contactSettings?.notificationEmail) {
-        await emailService.sendAdminContactNotification(contactSettings.notificationEmail, {
+      if (settings?.notificationEmail) {
+        await emailService.sendAdminContactNotification(settings.notificationEmail, {
           contact: {
             id: contact.id,
             name: parsed.data.name,

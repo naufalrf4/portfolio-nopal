@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@naufalrf/auth';
-import { prisma } from '@/lib/db/prisma';
+import { db } from '@/lib/db';
+import { projects } from '@/lib/db/schema';
+import { eq } from 'drizzle-orm';
 
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -17,7 +19,6 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       return NextResponse.json({ error: 'Content or summary is required' }, { status: 400 });
     }
 
-    
     const contentToSave =
       content !== undefined
         ? typeof content === 'string'
@@ -25,14 +26,16 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
           : JSON.stringify(content)
         : undefined;
 
-    const project = await prisma.project.update({
-      where: { id },
-      data: {
+    const now = new Date().toISOString();
+    const [project] = await db
+      .update(projects)
+      .set({
         ...(contentToSave !== undefined && { content: contentToSave }),
         ...(summary !== undefined && { summary }),
-        updatedAt: new Date(),
-      },
-    });
+        updatedAt: now,
+      } as any)
+      .where(eq(projects.id, id))
+      .returning();
 
     return NextResponse.json({
       success: true,
@@ -59,15 +62,18 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     }
 
     const { id } = await params;
-    const project = await prisma.project.findUnique({
-      where: { id },
-      select: {
-        id: true,
-        content: true,
-        summary: true,
-        updatedAt: true,
-      },
-    });
+    const result = await db
+      .select({
+        id: projects.id,
+        content: projects.content,
+        summary: projects.summary,
+        updatedAt: projects.updatedAt,
+      })
+      .from(projects)
+      .where(eq(projects.id, id))
+      .limit(1);
+
+    const project = result[0];
 
     if (!project) {
       return NextResponse.json({ error: 'Project not found' }, { status: 404 });

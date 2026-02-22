@@ -1,31 +1,45 @@
-import { prisma } from '@/lib/db/prisma';
+import { db } from '@/lib/db';
+import {
+  projects,
+  blogLink,
+  guestbookEntries,
+  anonymousMessages,
+  profileLinks,
+} from '@/lib/db/schema';
+import { eq, count } from 'drizzle-orm';
 import { withAdminAuth } from '@/lib/api/middleware/auth';
 import { NextResponse } from 'next/server';
 
 export const GET = withAdminAuth(async () => {
   try {
     const [
-      totalProjects,
-      visibleProjects,
-      totalBlogLinks,
-      visibleBlogLinks,
-      totalGuestbookEntries,
-      visibleGuestbookEntries,
-      totalMessages,
-      unreadMessages,
-      totalProfileLinks,
-      visibleProfileLinks,
+      [{ total: totalProjects }],
+      [{ total: visibleProjects }],
+      [{ total: totalBlogLinks }],
+      [{ total: visibleBlogLinks }],
+      [{ total: totalGuestbookEntries }],
+      [{ total: visibleGuestbookEntries }],
+      [{ total: totalMessages }],
+      [{ total: unreadMessages }],
+      [{ total: totalProfileLinks }],
+      [{ total: visibleProfileLinks }],
     ] = await Promise.all([
-      prisma.project.count(),
-      prisma.project.count({ where: { visible: true } }),
-      prisma.blogLink.count(),
-      prisma.blogLink.count({ where: { visible: true } }),
-      prisma.guestbookEntry.count(),
-      prisma.guestbookEntry.count({ where: { visible: true } }),
-      prisma.anonymousMessage.count(),
-      prisma.anonymousMessage.count({ where: { read: false } }),
-      prisma.profileLink.count(),
-      prisma.profileLink.count({ where: { visible: true } }),
+      db.select({ total: count() }).from(projects),
+      db.select({ total: count() }).from(projects).where(eq(projects.visible, true)),
+      db.select({ total: count() }).from(blogLink),
+      db.select({ total: count() }).from(blogLink).where(eq(blogLink.visible, true)),
+      db.select({ total: count() }).from(guestbookEntries),
+      db
+        .select({ total: count() })
+        .from(guestbookEntries)
+        .where(eq(guestbookEntries.visible, true)),
+      db.select({ total: count() }).from(anonymousMessages),
+      db
+        .select({ total: count() })
+        .from(anonymousMessages)
+        .where(eq(anonymousMessages.read, false)),
+      db.select({ total: count() }).from(profileLinks),
+      db.select({ total: count() }).from(profileLinks).where(eq(profileLinks.visible, true)),
     ]);
 
     const stats = {

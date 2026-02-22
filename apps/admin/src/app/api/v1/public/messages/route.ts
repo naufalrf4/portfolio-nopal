@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { prisma } from '@/lib/db/prisma';
+import { db } from '@/lib/db';
+import { anonymousMessages } from '@/lib/db/schema';
 import {
   successResponse,
   validationErrorResponse,
@@ -11,6 +12,7 @@ import { checkRateLimit, getRateLimitHeaders } from '@/lib/services/rate-limiter
 import { getIpLocation } from '@/lib/services/geoIpService';
 import { createHash } from 'crypto';
 import { verifyTurnstileToken, isTurnstileConfigured } from '@/lib/services/turnstile';
+import { createId } from '@paralleldrive/cuid2';
 
 const publicMessageSchema = z.object({
   content: z
@@ -80,20 +82,15 @@ export async function POST(request: NextRequest) {
 
     const geoLocation = getIpLocation(clientIp);
 
-    const messageData: {
-      content: string;
-      ipHash: string;
-      ipAddress: string;
-      read: boolean;
-      countryCode?: string;
-      country?: string;
-      city?: string;
-      region?: string;
-    } = {
+    const now = new Date().toISOString();
+    const messageData: any = {
+      id: createId(),
       content,
       ipHash,
       ipAddress: clientIp,
       read: false,
+      createdAt: now,
+      updatedAt: now,
     };
 
     if (geoLocation) {
@@ -103,7 +100,7 @@ export async function POST(request: NextRequest) {
       if (geoLocation.region) messageData.region = geoLocation.region;
     }
 
-    await prisma.anonymousMessage.create({ data: messageData });
+    await db.insert(anonymousMessages).values(messageData);
 
     const response = successResponse({ success: true }, 'Message sent successfully');
 

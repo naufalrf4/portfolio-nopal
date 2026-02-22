@@ -1,25 +1,21 @@
 import { NextRequest } from 'next/server';
 import { withAdminAuth } from '@/lib/api/middleware/auth';
 import { successResponse, serverErrorResponse } from '@/lib/api/responses';
-import { prisma } from '@/lib/db/prisma';
+import { db } from '@/lib/db';
+import { anonymousMessages } from '@/lib/db/schema';
+import { isNotNull } from 'drizzle-orm';
 
 interface LocationStat {
   countryCode: string;
   count: number;
 }
 
-async function handleGet(req: NextRequest) {
+async function handleGet(_req: NextRequest) {
   try {
-    const messages = await prisma.anonymousMessage.findMany({
-      where: {
-        countryCode: {
-          not: null,
-        },
-      },
-      select: {
-        countryCode: true,
-      },
-    });
+    const messages = await db
+      .select({ countryCode: anonymousMessages.countryCode })
+      .from(anonymousMessages)
+      .where(isNotNull(anonymousMessages.countryCode));
 
     const locationStats = messages.reduce(
       (acc, message) => {

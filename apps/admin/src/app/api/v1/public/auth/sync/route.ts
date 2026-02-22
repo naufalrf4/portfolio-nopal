@@ -1,7 +1,9 @@
 import { NextRequest } from 'next/server';
-import { prisma } from '@/lib/db/prisma';
+import { db } from '@/lib/db';
+import { users } from '@/lib/db/schema';
 import { successResponse, serverErrorResponse, validationErrorResponse } from '@/lib/api/responses';
 import { z } from 'zod';
+import { createId } from '@paralleldrive/cuid2';
 
 const syncUserSchema = z.object({
   email: z.string().email('Invalid email'),
@@ -20,25 +22,32 @@ export async function POST(request: NextRequest) {
 
     const { email, name, image } = parsed.data;
 
-    const user = await prisma.user.upsert({
-      where: { email },
-      update: {
-        name: name || undefined,
-        image: image || undefined,
-      },
-      create: {
+    const now = new Date().toISOString();
+    const [user] = await db
+      .insert(users)
+      .values({
+        id: createId(),
         email,
         name,
         image,
         role: 'USER',
-      },
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        image: true,
-      },
-    });
+        createdAt: now,
+        updatedAt: now,
+      } as any)
+      .onConflictDoUpdate({
+        target: users.email,
+        set: {
+          ...(name && { name }),
+          ...(image && { image }),
+          updatedAt: now,
+        } as any,
+      })
+      .returning({
+        id: users.id,
+        email: users.email,
+        name: users.name,
+        image: users.image,
+      });
 
     return successResponse(user, 'User synced successfully');
   } catch {

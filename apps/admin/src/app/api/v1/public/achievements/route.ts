@@ -1,5 +1,7 @@
 import { NextRequest } from 'next/server';
-import { prisma } from '@/lib/db/prisma';
+import { db } from '@/lib/db';
+import { achievements } from '@/lib/db/schema';
+import { eq, count, asc } from 'drizzle-orm';
 import { successResponse, serverErrorResponse } from '@/lib/api/responses';
 import { signStringArray } from '@/lib/utils/sign-urls';
 
@@ -14,32 +16,33 @@ export async function GET(req: NextRequest) {
       ? Math.min(Math.max(1, parseInt(limitParam, 10) || DEFAULT_LIMIT), MAX_LIMIT)
       : undefined;
 
-    const where = { visible: true };
+    const achievementsQuery = db
+      .select({
+        id: achievements.id,
+        name: achievements.name,
+        location: achievements.location,
+        monthYear: achievements.monthYear,
+        photos: achievements.photos,
+        description: achievements.description,
+        externalUrl: achievements.externalUrl,
+        order: achievements.order,
+        createdAt: achievements.createdAt,
+      })
+      .from(achievements)
+      .where(eq(achievements.visible, true))
+      .orderBy(asc(achievements.order));
 
-    const [achievements, total] = await Promise.all([
-      prisma.achievement.findMany({
-        where,
-        select: {
-          id: true,
-          name: true,
-          location: true,
-          monthYear: true,
-          photos: true,
-          description: true,
-          externalUrl: true,
-          order: true,
-          createdAt: true,
-        },
-        orderBy: { order: 'asc' },
-        take: limit,
-      }),
-      prisma.achievement.count({ where }),
-    ]);
+    const achievementsList = limit ? await achievementsQuery.limit(limit) : await achievementsQuery;
+
+    const [{ total }] = await db
+      .select({ total: count() })
+      .from(achievements)
+      .where(eq(achievements.visible, true));
 
     const signedAchievements = await Promise.all(
-      achievements.map(async (achievement) => ({
+      achievementsList.map(async (achievement) => ({
         ...achievement,
-        photos: await signStringArray(achievement.photos),
+        photos: await signStringArray(achievement.photos || []),
       }))
     );
 

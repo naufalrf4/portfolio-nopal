@@ -1,7 +1,8 @@
 import { NextRequest } from 'next/server';
 import { z } from 'zod';
-import { prisma } from '@/lib/db/prisma';
-import { BookingStatus } from '@/prisma/generated/client/client';
+import { db } from '@/lib/db';
+import { eq } from 'drizzle-orm';
+import { bookings } from '@/lib/db/schema';
 import {
   successResponse,
   validationErrorResponse,
@@ -31,22 +32,26 @@ export async function PUT(request: NextRequest, context: RouteContext) {
         return validationErrorResponse(parsed.error.flatten().fieldErrors);
       }
 
-      const booking = await prisma.booking.findUnique({
-        where: { id },
-        include: { slot: true },
+      const bookingResult = await db.query.bookings.findFirst({
+        where: eq(bookings.id, id),
+        with: { bookingSlot: true },
       });
 
-      if (!booking) {
+      if (!bookingResult) {
         return errorResponse('Booking not found', 404);
       }
 
-      const updated = await prisma.booking.update({
-        where: { id },
-        data: { status: BookingStatus[parsed.data.status] },
-        include: { slot: true },
-      });
+      const now = new Date().toISOString();
+      const [updated] = await db
+        .update(bookings)
+        .set({ status: parsed.data.status, updatedAt: now } as any)
+        .where(eq(bookings.id, id))
+        .returning();
 
-      const dateFormatted = updated.slot!.date.toLocaleDateString('en-US', {
+      const slot = bookingResult.bookingSlot!;
+
+      const dateObj = new Date(slot.date + 'T00:00:00');
+      const dateFormatted = dateObj.toLocaleDateString('en-US', {
         weekday: 'long',
         year: 'numeric',
         month: 'long',
@@ -59,8 +64,8 @@ export async function PUT(request: NextRequest, context: RouteContext) {
             bookingId: updated.id,
             name: updated.name,
             date: dateFormatted,
-            time: updated.slot!.time,
-            duration: updated.slot!.duration,
+            time: slot.time,
+            duration: slot.duration,
             message: parsed.data.message || 'Your booking has been confirmed!',
             status: 'confirmed',
           });
@@ -69,8 +74,8 @@ export async function PUT(request: NextRequest, context: RouteContext) {
             bookingId: updated.id,
             name: updated.name,
             date: dateFormatted,
-            time: updated.slot!.time,
-            duration: updated.slot!.duration,
+            time: slot.time,
+            duration: slot.duration,
             message: parsed.data.message || 'Your booking could not be confirmed at this time.',
             status: 'rejected',
           });
@@ -84,7 +89,7 @@ export async function PUT(request: NextRequest, context: RouteContext) {
           id: updated.id,
           status: updated.status,
           date: dateFormatted,
-          time: updated.slot!.time,
+          time: slot.time,
         },
         `Booking ${parsed.data.status.toLowerCase()}`
       );
