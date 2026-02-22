@@ -1,42 +1,51 @@
-import { Prisma } from '@/prisma/generated/client/client';
-import { prisma } from '@/lib/db/prisma';
+import { db } from '@/lib/db';
+import { eq, and, gte, asc, desc, count, isNotNull } from 'drizzle-orm';
+import { analyticsEvents } from '@/lib/db/schema';
+import { createId } from '@paralleldrive/cuid2';
 import type { CreateAnalyticsEventInput } from '@/lib/validations/analytics.schema';
 
 export class AnalyticsService {
   async trackEvent(event: CreateAnalyticsEventInput) {
-    return prisma.analyticsEvent.create({
-      data: {
+    const now = new Date().toISOString();
+    const [created] = await db
+      .insert(analyticsEvents)
+      .values({
+        id: createId(),
         page: event.page,
         eventType: event.eventType,
         entityType: event.entityType,
         entityId: event.entityId,
-        data: event.data as Prisma.InputJsonValue,
+        data: event.data,
         userSession: event.userSession,
         ipAddress: event.ipAddress,
         countryCode: event.countryCode,
         city: event.city,
-      },
-    });
+        createdAt: now,
+      } as any)
+      .returning();
+    return created;
   }
 
   async getPageViews(page?: string, days: number = 30) {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
 
-    const where: Prisma.AnalyticsEventWhereInput = {
-      eventType: 'pageview',
-      createdAt: { gte: startDate },
-      ...(page && { page }),
-    };
+    const conditions = [
+      eq(analyticsEvents.eventType, 'pageview'),
+      gte(analyticsEvents.createdAt, startDate.toISOString()),
+    ];
+    if (page) {
+      conditions.push(eq(analyticsEvents.page, page));
+    }
 
-    const events = await prisma.analyticsEvent.findMany({
-      where,
-      orderBy: { createdAt: 'asc' },
-      select: {
-        createdAt: true,
-        page: true,
-      },
-    });
+    const events = await db
+      .select({
+        createdAt: analyticsEvents.createdAt,
+        page: analyticsEvents.page,
+      })
+      .from(analyticsEvents)
+      .where(and(...conditions))
+      .orderBy(asc(analyticsEvents.createdAt));
 
     const groupedByDate = events.reduce(
       (acc, event) => {
@@ -57,16 +66,18 @@ export class AnalyticsService {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
 
-    const events = await prisma.analyticsEvent.findMany({
-      where: {
-        entityType,
-        createdAt: { gte: startDate },
-      },
-      select: {
-        entityId: true,
-        eventType: true,
-      },
-    });
+    const events = await db
+      .select({
+        entityId: analyticsEvents.entityId,
+        eventType: analyticsEvents.eventType,
+      })
+      .from(analyticsEvents)
+      .where(
+        and(
+          eq(analyticsEvents.entityType, entityType),
+          gte(analyticsEvents.createdAt, startDate.toISOString())
+        )
+      );
 
     const stats = events.reduce(
       (acc, event) => {
@@ -92,16 +103,18 @@ export class AnalyticsService {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
 
-    const events = await prisma.analyticsEvent.findMany({
-      where: {
-        eventType: 'pageview',
-        createdAt: { gte: startDate },
-        countryCode: { not: null },
-      },
-      select: {
-        countryCode: true,
-      },
-    });
+    const events = await db
+      .select({
+        countryCode: analyticsEvents.countryCode,
+      })
+      .from(analyticsEvents)
+      .where(
+        and(
+          eq(analyticsEvents.eventType, 'pageview'),
+          gte(analyticsEvents.createdAt, startDate.toISOString()),
+          isNotNull(analyticsEvents.countryCode)
+        )
+      );
 
     const stats = events.reduce(
       (acc, event) => {
@@ -119,16 +132,18 @@ export class AnalyticsService {
   }
 
   async getPopularEntities(entityType: string, limit: number = 10) {
-    const events = await prisma.analyticsEvent.findMany({
-      where: {
-        entityType,
-        eventType: 'pageview',
-        entityId: { not: null },
-      },
-      select: {
-        entityId: true,
-      },
-    });
+    const events = await db
+      .select({
+        entityId: analyticsEvents.entityId,
+      })
+      .from(analyticsEvents)
+      .where(
+        and(
+          eq(analyticsEvents.entityType, entityType),
+          eq(analyticsEvents.eventType, 'pageview'),
+          isNotNull(analyticsEvents.entityId)
+        )
+      );
 
     const counts = events.reduce(
       (acc, event) => {
@@ -149,50 +164,53 @@ export class AnalyticsService {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
 
-    const [totalViews, uniqueSessions, topPagesData, totalEvents] = await Promise.all([
-      prisma.analyticsEvent.count({
-        where: {
-          eventType: 'pageview',
-          createdAt: { gte: startDate },
-        },
-      }),
-      prisma.analyticsEvent.groupBy({
-        by: ['userSession'],
-        where: {
-          createdAt: { gte: startDate },
-          userSession: { not: null },
-        },
-      }),
-      prisma.analyticsEvent.groupBy({
-        by: ['page'],
-        where: {
-          eventType: 'pageview',
-          createdAt: { gte: startDate },
-        },
-        _count: {
-          page: true,
-        },
-        orderBy: {
-          _count: {
-            page: 'desc',
-          },
-        },
-        take: 10,
-      }),
-      prisma.analyticsEvent.count({
-        where: {
-          createdAt: { gte: startDate },
-        },
-      }),
+    const startDateStr = startDate.toISOString();
+
+    const [totalViewsResult, uniqueSessions, topPagesData, totalEventsResult] = await Promise.all([
+      db
+        .select({ value: count() })
+        .from(analyticsEvents)
+        .where(
+          and(
+            eq(analyticsEvents.eventType, 'pageview'),
+            gte(analyticsEvents.createdAt, startDateStr)
+          )
+        ),
+      db
+        .select({ userSession: analyticsEvents.userSession })
+        .from(analyticsEvents)
+        .where(
+          and(gte(analyticsEvents.createdAt, startDateStr), isNotNull(analyticsEvents.userSession))
+        )
+        .groupBy(analyticsEvents.userSession),
+      db
+        .select({
+          page: analyticsEvents.page,
+          views: count(),
+        })
+        .from(analyticsEvents)
+        .where(
+          and(
+            eq(analyticsEvents.eventType, 'pageview'),
+            gte(analyticsEvents.createdAt, startDateStr)
+          )
+        )
+        .groupBy(analyticsEvents.page)
+        .orderBy(desc(count()))
+        .limit(10),
+      db
+        .select({ value: count() })
+        .from(analyticsEvents)
+        .where(gte(analyticsEvents.createdAt, startDateStr)),
     ]);
 
     return {
-      totalViews,
+      totalViews: totalViewsResult[0].value,
       uniqueVisitors: uniqueSessions.length,
-      totalEvents,
+      totalEvents: totalEventsResult[0].value,
       topPages: topPagesData.map((item) => ({
         page: item.page,
-        views: item._count.page,
+        views: item.views,
       })),
     };
   }
