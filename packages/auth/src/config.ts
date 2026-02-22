@@ -1,10 +1,15 @@
 import NextAuth from 'next-auth';
 import Google from 'next-auth/providers/google';
-import { PrismaAdapter } from '@auth/prisma-adapter';
+import { DrizzleAdapter } from '@auth/drizzle-adapter';
 
-export function createAuthConfig(prisma: any) {
+export interface AuthDbCallbacks {
+  getUserByEmail(email: string): Promise<{ id: string; role: string } | null>;
+  upsertUser(data: { email: string; name?: string | null; image?: string | null }): Promise<void>;
+}
+
+export function createAuthConfig(db: any, authCallbacks: AuthDbCallbacks) {
   return NextAuth({
-    adapter: PrismaAdapter(prisma),
+    adapter: DrizzleAdapter(db) as any,
     trustHost: true,
     providers: [
       Google({
@@ -33,19 +38,10 @@ export function createAuthConfig(prisma: any) {
           const isAdmin = isAdminEmail(email);
           if (!isAdmin) return '/auth/signin?error=access_denied';
 
-          await prisma.user.upsert({
-            where: { email },
-            update: {
-              name: profile?.name || user?.name,
-              image: profile?.picture || (profile as any)?.image || user?.image,
-              role: 'ADMIN',
-            },
-            create: {
-              email,
-              name: profile?.name || user?.name,
-              image: profile?.picture || (profile as any)?.image || user?.image,
-              role: 'ADMIN',
-            },
+          await authCallbacks.upsertUser({
+            email,
+            name: profile?.name || user?.name,
+            image: profile?.picture || (profile as any)?.image || user?.image,
           });
 
           return true;
@@ -60,10 +56,7 @@ export function createAuthConfig(prisma: any) {
 
         if (trigger === 'update' || trigger === 'signIn') {
           if (token.email) {
-            const dbUser = await prisma.user.findUnique({
-              where: { email: token.email },
-              select: { id: true, role: true },
-            });
+            const dbUser = await authCallbacks.getUserByEmail(token.email);
             if (dbUser) {
               token.userId = dbUser.id;
               token.role = dbUser.role;

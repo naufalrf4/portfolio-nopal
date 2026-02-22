@@ -1,3 +1,3 @@
 export { createAuthConfig, isAdminEmail } from './config';
-export { auth } from './auth';
+export type { AuthDbCallbacks } from './config';
 export type { Session } from 'next-auth';
