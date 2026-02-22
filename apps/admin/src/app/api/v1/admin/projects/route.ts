@@ -1,7 +1,12 @@
 import { NextRequest } from 'next/server';
 import { withAdminAuth } from '@/lib/api/middleware/auth';
 import { projectsService } from '@/lib/api/handlers/projects.service';
-import { successResponse, errorResponse, validationErrorResponse } from '@/lib/api/responses';
+import {
+  successResponse,
+  errorResponse,
+  validationErrorResponse,
+  serverErrorResponse,
+} from '@/lib/api/responses';
 import { projectQuerySchema, createProjectSchema } from '@/lib/validations/project.schema';
 import { logger } from '@/lib/utils/logger';
 import { handleApiError } from '@/lib/api/utils/error-handler';
@@ -64,7 +69,9 @@ async function handlePost(req: NextRequest) {
       slug: validation.data.slug,
     });
     const project = await projectsService.create(validation.data);
-
+    if (!project) {
+      return serverErrorResponse();
+    }
     const signedProject = await signAssetUrls(project, {
       fields: ['imageUrl'],
     });

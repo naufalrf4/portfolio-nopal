@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { auth } from '@naufalrf/auth';
+import { auth } from '@/lib/auth';
 import type { Session } from 'next-auth';
 import { knowledgeDocsService } from '@/lib/api/handlers/knowledge-docs.service';
 import {

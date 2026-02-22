@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { storageService, UploadFolder } from '@/lib/services/storage';
-import { auth } from '@naufalrf/auth';
+import { auth } from '@/lib/auth';
 import { logger } from '@/lib/utils/logger';
 import { handleApiError } from '@/lib/api/utils/error-handler';
 

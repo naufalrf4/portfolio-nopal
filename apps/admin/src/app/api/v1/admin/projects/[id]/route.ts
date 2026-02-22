@@ -60,7 +60,9 @@ export async function PUT(req: NextRequest, context: RouteContext) {
       }
 
       const project = await projectsService.update(id, validation.data);
-
+      if (!project) {
+        return serverErrorResponse();
+      }
       const signedProject = await signAssetUrls(project, {
         fields: ['imageUrl'],
       });

@@ -1,9 +1,10 @@
 import { z } from 'zod';
-import { ProjectContextType } from '@/prisma/generated/client/client';
+
+const projectContextTypeEnum = z.enum(['CONTEXT', 'ROLE', 'DECISIONS', 'TRADEOFFS', 'RESULT']);
 
 export const createProjectContextSchema = z.object({
   projectId: z.string().cuid(),
-  type: z.nativeEnum(ProjectContextType),
+  type: projectContextTypeEnum,
   title: z.string().min(1).max(200),
   content: z.string().min(1),
   order: z.number().int().default(0),
@@ -15,7 +16,7 @@ export const updateProjectContextSchema = createProjectContextSchema
 
 export const projectContextQuerySchema = z.object({
   projectId: z.string().cuid().optional(),
-  type: z.nativeEnum(ProjectContextType).optional(),
+  type: projectContextTypeEnum.optional(),
 });
 
 export const reorderProjectContextsSchema = z.object({

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@naufalrf/auth';
+import { auth } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { projects } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
