@@ -9,7 +9,7 @@
     "start": "next start -p 3003",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "clean": "rm -rf .next .turbo node_modules"
+    "clean": "rm -rf .next node_modules"
   },
   "dependencies": {
     "@naufalrf/config": "workspace:*",

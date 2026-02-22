@@ -7,12 +7,12 @@
   },
   "packageManager": "pnpm@9.15.0",
   "scripts": {
-    "build": "turbo run build",
-    "dev": "turbo run dev",
-    "start": "turbo run start",
-    "typecheck": "turbo run typecheck",
-    "test": "turbo run test",
-    "clean": "turbo run clean && rm -rf node_modules && rm -rf .turbo",
+    "build": "pnpm -r --filter=!rag-service run build",
+    "dev": "pnpm -r --parallel --filter=!rag-service run dev",
+    "start": "pnpm -r --parallel --filter=!rag-service run start",
+    "typecheck": "pnpm -r --filter=!rag-service run typecheck",
+    "test": "pnpm -r run test",
+    "clean": "pnpm -r run clean && rm -rf node_modules",
     "prepare": "husky"
   },
   "devDependencies": {
@@ -26,7 +26,6 @@
     "husky": "^9.1.7",
     "lint-staged": "^16.2.7",
     "prettier": "latest",
-    "turbo": "latest",
     "typescript": "latest"
   }
 }

@@ -528,8 +528,6 @@ pnpm typecheck
 
 ```bash
 # Clear Turbo cache
-rm -rf .turbo
-
 # Clear Next.js cache
 rm -rf apps/*/.next
 

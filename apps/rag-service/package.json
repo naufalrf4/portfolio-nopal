@@ -9,7 +9,7 @@
     "start": "node dist/index.js",
     "lint": "eslint src --ext .ts",
     "typecheck": "tsc --noEmit",
-    "clean": "rm -rf dist .turbo node_modules"
+    "clean": "rm -rf dist node_modules"
   },
   "dependencies": {
     "@ai-sdk/google": "^3.0.7",

@@ -139,7 +139,6 @@ This guide helps you diagnose and resolve common issues in the NaufalRF Portfoli
 
 3. **Clear Turbo cache**
    ```bash
-   rm -rf .turbo
    pnpm build
    ```
 
@@ -705,13 +704,16 @@ This guide helps you diagnose and resolve common issues in the NaufalRF Portfoli
 
    ```typescript
    // Use select to limit fields
-   const projects = await db.select().from(projects).where({
-     select: {
-       id: true,
-       title: true,
-       slug: true,
-     },
-   });
+   const projects = await db
+     .select()
+     .from(projects)
+     .where({
+       select: {
+         id: true,
+         title: true,
+         slug: true,
+       },
+     });
    ```
 
 4. **Enable compression**
@@ -774,10 +776,13 @@ This guide helps you diagnose and resolve common issues in the NaufalRF Portfoli
 
    ```typescript
    // Use cursor-based pagination for large datasets
-   const projects = await db.select().from(projects).where({
-     take: 10,
-     cursor: { id: lastId },
-   });
+   const projects = await db
+     .select()
+     .from(projects)
+     .where({
+       take: 10,
+       cursor: { id: lastId },
+     });
    ```
 
 4. **Enable connection pooling**
@@ -937,7 +942,6 @@ docker-compose up -d
 # Clear all caches and rebuild
 pnpm clean
 rm -rf node_modules
-rm -rf .turbo
 rm -rf apps/*/.next
 rm -rf apps/*/tsconfig.tsbuildinfo
 pnpm install

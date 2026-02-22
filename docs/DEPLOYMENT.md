@@ -1082,12 +1082,12 @@ curl https://admin.yourdomain.com/api/v1/public/guestbook
 
 **Solutions:**
 
-```bash
 # Clear all caches
+
+```bash
 pnpm clean
 rm -rf node_modules
 rm -rf .next
-rm -rf .turbo
 rm -rf apps/*/node_modules
 rm -rf apps/*/.next
 
