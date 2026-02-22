@@ -1,89 +1,107 @@
-import { Prisma } from '@/prisma/generated/client/client';
-import { prisma } from '@/lib/db/prisma';
+import { db } from '@/lib/db';
+import { blogLink } from '@/lib/db/schema';
+import { eq, asc, and, max } from 'drizzle-orm';
 import type { CreateBlogLinkInput } from '@/lib/validations/blog-link.schema';
+import { createId } from '@paralleldrive/cuid2';
 
 export type BlogLinkCreateInput = CreateBlogLinkInput;
 
 export class BlogLinksService {
   async getAll(query?: { source?: string; visible?: boolean }) {
-    const where: Prisma.BlogLinkWhereInput = {
-      ...(query?.source && { source: query.source }),
-      ...(query?.visible !== undefined && { visible: query.visible }),
-    };
+    let queryBuilder = db.select().from(blogLink);
 
-    return prisma.blogLink.findMany({
-      where,
-      orderBy: { order: 'asc' },
-    });
+    const conditions = [];
+    if (query?.source) {
+      conditions.push(eq(blogLink.source, query.source));
+    }
+    if (query?.visible !== undefined) {
+      conditions.push(eq(blogLink.visible, query.visible));
+    }
+
+    if (conditions.length > 0) {
+      queryBuilder = queryBuilder.where(and(...conditions)) as any;
+    }
+
+    return queryBuilder.orderBy(asc(blogLink.order));
   }
 
   async getById(id: string) {
-    return prisma.blogLink.findUnique({
-      where: { id },
-    });
+    const result = await db.select().from(blogLink).where(eq(blogLink.id, id)).limit(1);
+    return result[0] || null;
   }
 
   async create(data: BlogLinkCreateInput) {
-    const maxOrder = await prisma.blogLink.aggregate({
-      _max: { order: true },
-    });
+    const maxOrderResult = await db.select({ maxOrder: max(blogLink.order) }).from(blogLink);
+    const maxOrder = maxOrderResult[0]?.maxOrder ?? -1;
 
-    return prisma.blogLink.create({
-      data: {
+    const [created] = await db
+      .insert(blogLink)
+      .values({
+        id: createId(),
+        updatedAt: new Date().toISOString(),
         url: data.url,
         title: data.title,
         description: data.description || null,
         imageUrl: data.imageUrl || null,
         source: data.source,
         tags: data.tags || [],
-        publishedAt: data.publishedAt ? new Date(data.publishedAt) : new Date(),
-        order: (maxOrder._max.order ?? -1) + 1,
+        publishedAt: data.publishedAt
+          ? new Date(data.publishedAt).toISOString()
+          : new Date().toISOString(),
+        order: maxOrder + 1,
         visible: true,
-      },
-    });
+      })
+      .returning();
+
+    return created;
   }
 
-  async update(id: string, data: Prisma.BlogLinkUpdateInput) {
-    return prisma.blogLink.update({
-      where: { id },
-      data,
-    });
+  async update(id: string, data: any) {
+    const [updated] = await db
+      .update(blogLink)
+      .set({
+        ...data,
+        updatedAt: new Date().toISOString(),
+      })
+      .where(eq(blogLink.id, id))
+      .returning();
+    return updated;
   }
 
   async delete(id: string) {
-    return prisma.blogLink.delete({
-      where: { id },
-    });
+    await db.delete(blogLink).where(eq(blogLink.id, id));
   }
 
   async reorder(blogIds: string[]) {
-    await prisma.$transaction(
-      blogIds.map((id, index) =>
-        prisma.blogLink.update({
-          where: { id },
-          data: { order: index },
-        })
-      )
-    );
-
-    return prisma.blogLink.findMany({
-      orderBy: { order: 'asc' },
+    await db.transaction(async (tx) => {
+      for (const [index, id] of blogIds.entries()) {
+        await tx
+          .update(blogLink)
+          .set({ order: index, updatedAt: new Date().toISOString() })
+          .where(eq(blogLink.id, id));
+      }
     });
+
+    return db.select().from(blogLink).orderBy(asc(blogLink.order));
   }
 
   async toggleVisibility(id: string) {
-    const blogLink = await prisma.blogLink.findUnique({
-      where: { id },
-    });
+    const result = await db.select().from(blogLink).where(eq(blogLink.id, id)).limit(1);
+    const blogLinkData = result[0];
 
-    if (!blogLink) {
+    if (!blogLinkData) {
       return null;
     }
 
-    return prisma.blogLink.update({
-      where: { id },
-      data: { visible: !blogLink.visible },
-    });
+    const [updated] = await db
+      .update(blogLink)
+      .set({
+        visible: !blogLinkData.visible,
+        updatedAt: new Date().toISOString(),
+      })
+      .where(eq(blogLink.id, id))
+      .returning();
+    return updated;
   }
 }
 

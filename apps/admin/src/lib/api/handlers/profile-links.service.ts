@@ -1,54 +1,63 @@
-import { Prisma } from '@/prisma/generated/client/client';
-import { prisma } from '@/lib/db/prisma';
+import { db } from '@/lib/db';
+import { profileLinks } from '@/lib/db/schema';
+import { eq, asc } from 'drizzle-orm';
+import { createId } from '@paralleldrive/cuid2';
 
 export class ProfileLinksService {
   async getAll(query?: { visible?: boolean }) {
-    const where: Prisma.ProfileLinkWhereInput = {
-      ...(query?.visible !== undefined && { visible: query.visible }),
-    };
+    let queryBuilder = db.select().from(profileLinks);
 
-    return prisma.profileLink.findMany({
-      where,
-      orderBy: { order: 'asc' },
-    });
+    if (query?.visible !== undefined) {
+      queryBuilder = queryBuilder.where(eq(profileLinks.visible, query.visible)) as any;
+    }
+
+    return queryBuilder.orderBy(asc(profileLinks.order));
   }
 
   async getById(id: string) {
-    return prisma.profileLink.findUnique({
-      where: { id },
-    });
+    const result = await db.select().from(profileLinks).where(eq(profileLinks.id, id)).limit(1);
+    return result[0] || null;
   }
 
-  async create(data: Prisma.ProfileLinkCreateInput) {
-    return prisma.profileLink.create({ data });
+  async create(data: any) {
+    const [created] = await db
+      .insert(profileLinks)
+      .values({
+        id: createId(),
+        updatedAt: new Date().toISOString(),
+        ...data,
+      })
+      .returning();
+    return created;
   }
 
-  async update(id: string, data: Prisma.ProfileLinkUpdateInput) {
-    return prisma.profileLink.update({
-      where: { id },
-      data,
-    });
+  async update(id: string, data: any) {
+    const [updated] = await db
+      .update(profileLinks)
+      .set({
+        ...data,
+        updatedAt: new Date().toISOString(),
+      })
+      .where(eq(profileLinks.id, id))
+      .returning();
+    return updated;
   }
 
   async delete(id: string) {
-    return prisma.profileLink.delete({
-      where: { id },
-    });
+    await db.delete(profileLinks).where(eq(profileLinks.id, id));
   }
 
   async reorder(linkIds: string[]) {
-    await prisma.$transaction(
-      linkIds.map((id, index) =>
-        prisma.profileLink.update({
-          where: { id },
-          data: { order: index },
-        })
-      )
-    );
-
-    return prisma.profileLink.findMany({
-      orderBy: { order: 'asc' },
+    await db.transaction(async (tx) => {
+      for (const [index, id] of linkIds.entries()) {
+        await tx
+          .update(profileLinks)
+          .set({ order: index, updatedAt: new Date().toISOString() })
+          .where(eq(profileLinks.id, id));
+      }
     });
+
+    return db.select().from(profileLinks).orderBy(asc(profileLinks.order));
   }
 }
 

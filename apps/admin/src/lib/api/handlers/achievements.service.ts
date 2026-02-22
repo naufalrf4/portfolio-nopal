@@ -1,69 +1,82 @@
-import { Prisma } from '@/prisma/generated/client/client';
-import { prisma } from '@/lib/db/prisma';
+import { db } from '@/lib/db';
+import { achievements } from '@/lib/db/schema';
+import { eq, asc } from 'drizzle-orm';
+import { createId } from '@paralleldrive/cuid2';
 
 export class AchievementsService {
   async getAll(query?: { visible?: boolean }) {
-    const where: Prisma.AchievementWhereInput = {
-      ...(query?.visible !== undefined && { visible: query.visible }),
-    };
+    let queryBuilder = db.select().from(achievements);
 
-    return prisma.achievement.findMany({
-      where,
-      orderBy: { order: 'asc' },
-    });
+    if (query?.visible !== undefined) {
+      queryBuilder = queryBuilder.where(eq(achievements.visible, query.visible)) as any;
+    }
+
+    return queryBuilder.orderBy(asc(achievements.order));
   }
 
   async getById(id: string) {
-    return prisma.achievement.findUnique({
-      where: { id },
-    });
+    const result = await db.select().from(achievements).where(eq(achievements.id, id)).limit(1);
+    return result[0] || null;
   }
 
-  async create(data: Prisma.AchievementCreateInput) {
-    return prisma.achievement.create({ data });
+  async create(data: any) {
+    const [created] = await db
+      .insert(achievements)
+      .values({
+        id: createId(),
+        updatedAt: new Date().toISOString(),
+        ...data,
+      })
+      .returning();
+    return created;
   }
 
-  async update(id: string, data: Prisma.AchievementUpdateInput) {
-    return prisma.achievement.update({
-      where: { id },
-      data,
-    });
+  async update(id: string, data: any) {
+    const [updated] = await db
+      .update(achievements)
+      .set({
+        ...data,
+        updatedAt: new Date().toISOString(),
+      })
+      .where(eq(achievements.id, id))
+      .returning();
+    return updated;
   }
 
   async delete(id: string) {
-    return prisma.achievement.delete({
-      where: { id },
-    });
+    await db.delete(achievements).where(eq(achievements.id, id));
   }
 
   async reorder(achievementIds: string[]) {
-    await prisma.$transaction(
-      achievementIds.map((id, index) =>
-        prisma.achievement.update({
-          where: { id },
-          data: { order: index },
-        })
-      )
-    );
-
-    return prisma.achievement.findMany({
-      orderBy: { order: 'asc' },
+    await db.transaction(async (tx) => {
+      for (const [index, id] of achievementIds.entries()) {
+        await tx
+          .update(achievements)
+          .set({ order: index, updatedAt: new Date().toISOString() })
+          .where(eq(achievements.id, id));
+      }
     });
+
+    return db.select().from(achievements).orderBy(asc(achievements.order));
   }
 
   async toggleVisibility(id: string) {
-    const achievement = await prisma.achievement.findUnique({
-      where: { id },
-    });
+    const result = await db.select().from(achievements).where(eq(achievements.id, id)).limit(1);
+    const achievement = result[0];
 
     if (!achievement) {
       return null;
     }
 
-    return prisma.achievement.update({
-      where: { id },
-      data: { visible: !achievement.visible },
-    });
+    const [updated] = await db
+      .update(achievements)
+      .set({
+        visible: !achievement.visible,
+        updatedAt: new Date().toISOString(),
+      })
+      .where(eq(achievements.id, id))
+      .returning();
+    return updated;
   }
 }
 
