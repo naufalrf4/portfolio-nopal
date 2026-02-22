@@ -1,19 +1,22 @@
-import { Prisma } from '@/prisma/generated/client/client';
-import { prisma } from '@/lib/db/prisma';
+import { createId } from '@paralleldrive/cuid2';
+import { db } from '@/lib/db';
+import { eq, and, desc } from 'drizzle-orm';
+import { guestbookEntries } from '@/lib/db/schema';
 
 export class GuestbookService {
   async getAll(query?: { userId?: string; visible?: boolean }) {
-    const where: Prisma.GuestbookEntryWhereInput = {
-      ...(query?.userId && { userId: query.userId }),
-      ...(query?.visible !== undefined && { visible: query.visible }),
-    };
+    const conditions = [];
+    if (query?.userId) conditions.push(eq(guestbookEntries.userId, query.userId));
+    if (query?.visible !== undefined) conditions.push(eq(guestbookEntries.visible, query.visible));
 
-    return prisma.guestbookEntry.findMany({
-      where,
-      orderBy: { createdAt: 'desc' },
-      include: {
+    const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+
+    return db.query.guestbookEntries.findMany({
+      where: whereClause,
+      orderBy: [desc(guestbookEntries.createdAt)],
+      with: {
         user: {
-          select: {
+          columns: {
             id: true,
             name: true,
             email: true,
@@ -25,11 +28,11 @@ export class GuestbookService {
   }
 
   async getById(id: string) {
-    return prisma.guestbookEntry.findUnique({
-      where: { id },
-      include: {
+    return db.query.guestbookEntries.findFirst({
+      where: eq(guestbookEntries.id, id),
+      with: {
         user: {
-          select: {
+          columns: {
             id: true,
             name: true,
             email: true,
@@ -51,8 +54,11 @@ export class GuestbookService {
       region?: string;
     }
   ) {
-    return prisma.guestbookEntry.create({
-      data: {
+    const now = new Date().toISOString();
+    const [created] = await db
+      .insert(guestbookEntries)
+      .values({
+        id: createId(),
         userId,
         message,
         visible: true,
@@ -61,10 +67,17 @@ export class GuestbookService {
         country: locationData?.country || null,
         city: locationData?.city || null,
         region: locationData?.region || null,
-      },
-      include: {
+        reactions: [],
+        createdAt: now,
+        updatedAt: now,
+      })
+      .returning();
+
+    return db.query.guestbookEntries.findFirst({
+      where: eq(guestbookEntries.id, created.id),
+      with: {
         user: {
-          select: {
+          columns: {
             id: true,
             name: true,
             email: true,
@@ -75,13 +88,22 @@ export class GuestbookService {
     });
   }
 
-  async update(id: string, data: Prisma.GuestbookEntryUpdateInput) {
-    return prisma.guestbookEntry.update({
-      where: { id },
-      data,
-      include: {
+  async update(id: string, data: any) {
+    const [updated] = await db
+      .update(guestbookEntries)
+      .set({ ...data, updatedAt: new Date().toISOString() } as any)
+      .where(eq(guestbookEntries.id, id))
+      .returning();
+
+    if (!updated) {
+      throw new Error('Guestbook entry not found');
+    }
+
+    return db.query.guestbookEntries.findFirst({
+      where: eq(guestbookEntries.id, id),
+      with: {
         user: {
-          select: {
+          columns: {
             id: true,
             name: true,
             email: true,
@@ -93,27 +115,34 @@ export class GuestbookService {
   }
 
   async delete(id: string) {
-    return prisma.guestbookEntry.delete({
-      where: { id },
-    });
+    const [deleted] = await db
+      .delete(guestbookEntries)
+      .where(eq(guestbookEntries.id, id))
+      .returning();
+    return deleted;
   }
 
   async toggleVisibility(id: string) {
-    const entry = await prisma.guestbookEntry.findUnique({
-      where: { id },
-      select: { visible: true },
-    });
-
+    const [entry] = await db
+      .select({ visible: guestbookEntries.visible })
+      .from(guestbookEntries)
+      .where(eq(guestbookEntries.id, id))
+      .limit(1);
     if (!entry) {
       throw new Error('Guestbook entry not found');
     }
 
-    return prisma.guestbookEntry.update({
-      where: { id },
-      data: { visible: !entry.visible },
-      include: {
+    const [updated] = await db
+      .update(guestbookEntries)
+      .set({ visible: !entry.visible, updatedAt: new Date().toISOString() })
+      .where(eq(guestbookEntries.id, id))
+      .returning();
+
+    return db.query.guestbookEntries.findFirst({
+      where: eq(guestbookEntries.id, updated.id),
+      with: {
         user: {
-          select: {
+          columns: {
             id: true,
             name: true,
             email: true,
@@ -125,12 +154,21 @@ export class GuestbookService {
   }
 
   async updateReactions(id: string, reactions: object) {
-    return prisma.guestbookEntry.update({
-      where: { id },
-      data: { reactions },
-      include: {
+    const [updated] = await db
+      .update(guestbookEntries)
+      .set({ reactions: reactions as any, updatedAt: new Date().toISOString() })
+      .where(eq(guestbookEntries.id, id))
+      .returning();
+
+    if (!updated) {
+      throw new Error('Guestbook entry not found');
+    }
+
+    return db.query.guestbookEntries.findFirst({
+      where: eq(guestbookEntries.id, id),
+      with: {
         user: {
-          select: {
+          columns: {
             id: true,
             name: true,
             email: true,
@@ -140,32 +178,34 @@ export class GuestbookService {
       },
     });
   }
-
   async addReaction(id: string, userId: string, emoji: string) {
-    const entry = await prisma.guestbookEntry.findUnique({
-      where: { id },
-      select: { reactions: true },
-    });
-
+    const [entry] = await db
+      .select({ reactions: guestbookEntries.reactions })
+      .from(guestbookEntries)
+      .where(eq(guestbookEntries.id, id))
+      .limit(1);
     if (!entry) {
       throw new Error('Guestbook entry not found');
     }
-
     const reactions = (entry.reactions as Array<{ userId: string; emoji: string }>) || [];
     const existingIndex = reactions.findIndex((r) => r.userId === userId && r.emoji === emoji);
-
     if (existingIndex !== -1) {
       reactions.splice(existingIndex, 1);
     } else {
       reactions.push({ userId, emoji });
     }
 
-    return prisma.guestbookEntry.update({
-      where: { id },
-      data: { reactions },
-      include: {
+    await db
+      .update(guestbookEntries)
+      .set({ reactions: reactions as any, updatedAt: new Date().toISOString() })
+      .where(eq(guestbookEntries.id, id))
+      .returning();
+
+    return db.query.guestbookEntries.findFirst({
+      where: eq(guestbookEntries.id, id),
+      with: {
         user: {
-          select: {
+          columns: {
             id: true,
             name: true,
             email: true,

@@ -1,4 +1,7 @@
-import { prisma } from '@/lib/db/prisma';
+import { createId } from '@paralleldrive/cuid2';
+import { db } from '@/lib/db';
+import { eq, count, desc } from 'drizzle-orm';
+import { knowledgeDocs } from '@/lib/db/schema';
 import type {
   CreateKnowledgeDocInput,
   UpdateKnowledgeDocInput,
@@ -8,20 +11,20 @@ import type {
 export class KnowledgeDocsService {
   async getAll(query: KnowledgeDocQueryInput) {
     const { page, limit, indexed } = query;
-    const skip = (page - 1) * limit;
+    const offset = (page - 1) * limit;
 
-    const where = indexed !== undefined ? { indexed } : {};
+    const whereClause = indexed !== undefined ? eq(knowledgeDocs.indexed, indexed) : undefined;
 
-    const [docs, total] = await Promise.all([
-      prisma.knowledgeDoc.findMany({
-        where,
-        skip,
-        take: limit,
-        orderBy: { updatedAt: 'desc' },
-      }),
-      prisma.knowledgeDoc.count({ where }),
+    const [docs, [{ total }]] = await Promise.all([
+      db
+        .select()
+        .from(knowledgeDocs)
+        .where(whereClause)
+        .offset(offset)
+        .limit(limit)
+        .orderBy(desc(knowledgeDocs.updatedAt)),
+      db.select({ total: count() }).from(knowledgeDocs).where(whereClause),
     ]);
-
     return {
       docs,
       pagination: {
@@ -34,58 +37,70 @@ export class KnowledgeDocsService {
   }
 
   async getById(id: string) {
-    return prisma.knowledgeDoc.findUnique({
-      where: { id },
+    return db.query.knowledgeDocs.findFirst({
+      where: eq(knowledgeDocs.id, id),
     });
   }
 
   async getByFilename(filename: string) {
-    return prisma.knowledgeDoc.findUnique({
-      where: { filename },
+    return db.query.knowledgeDocs.findFirst({
+      where: eq(knowledgeDocs.filename, filename),
     });
   }
 
   async create(data: CreateKnowledgeDocInput) {
-    return prisma.knowledgeDoc.create({
-      data: {
+    const now = new Date().toISOString();
+    const [created] = await db
+      .insert(knowledgeDocs)
+      .values({
+        id: createId(),
         filename: data.filename,
         content: data.content,
         indexed: false,
-      },
-    });
+        createdAt: now,
+        updatedAt: now,
+      })
+      .returning();
+    return created;
   }
 
   async update(id: string, data: UpdateKnowledgeDocInput) {
-    return prisma.knowledgeDoc.update({
-      where: { id },
-      data: {
+    const [updated] = await db
+      .update(knowledgeDocs)
+      .set({
         ...data,
         indexed: false,
-      },
-    });
+        updatedAt: new Date().toISOString(),
+      })
+      .where(eq(knowledgeDocs.id, id))
+      .returning();
+    if (!updated) throw new Error('Knowledge doc not found');
+    return updated;
   }
 
   async delete(id: string) {
-    return prisma.knowledgeDoc.delete({
-      where: { id },
-    });
+    const [deleted] = await db.delete(knowledgeDocs).where(eq(knowledgeDocs.id, id)).returning();
+    return deleted;
   }
 
   async markIndexed(id: string) {
-    return prisma.knowledgeDoc.update({
-      where: { id },
-      data: { indexed: true },
-    });
+    const [updated] = await db
+      .update(knowledgeDocs)
+      .set({ indexed: true, updatedAt: new Date().toISOString() })
+      .where(eq(knowledgeDocs.id, id))
+      .returning();
+    if (!updated) throw new Error('Knowledge doc not found');
+    return updated;
   }
 
   async getAllForExport() {
-    return prisma.knowledgeDoc.findMany({
-      select: {
-        id: true,
-        filename: true,
-        content: true,
-      },
-    });
+    return db
+      .select({
+        id: knowledgeDocs.id,
+        filename: knowledgeDocs.filename,
+        content: knowledgeDocs.content,
+      })
+      .from(knowledgeDocs);
   }
 }
 

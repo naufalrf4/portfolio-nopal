@@ -1,5 +1,7 @@
-import { Prisma } from '@/prisma/generated/client/client';
-import { prisma } from '@/lib/db/prisma';
+import { createId } from '@paralleldrive/cuid2';
+import { db } from '@/lib/db';
+import { eq, and, or, ilike, asc, count } from 'drizzle-orm';
+import { projects, projectContexts, projectImages } from '@/lib/db/schema';
 import type {
   CreateProjectInput,
   UpdateProjectInput,
@@ -9,38 +11,40 @@ import type {
 export class ProjectsService {
   async getAll(query: ProjectQueryInput) {
     const { page, limit, category, featured, visible, search } = query;
-    const skip = (page - 1) * limit;
+    const offset = (page - 1) * limit;
 
-    const where: Prisma.ProjectWhereInput = {
-      ...(category && { category }),
-      ...(featured !== undefined && { featured }),
-      ...(visible !== undefined && { visible }),
-      ...(search && {
-        OR: [
-          { title: { contains: search, mode: 'insensitive' } },
-          { summary: { contains: search, mode: 'insensitive' } },
-          { description: { contains: search, mode: 'insensitive' } },
-        ],
-      }),
-    };
+    const conditions = [];
+    if (category) conditions.push(eq(projects.category, category));
+    if (featured !== undefined) conditions.push(eq(projects.featured, featured));
+    if (visible !== undefined) conditions.push(eq(projects.visible, visible));
+    if (search) {
+      conditions.push(
+        or(
+          ilike(projects.title, `%${search}%`),
+          ilike(projects.summary, `%${search}%`),
+          ilike(projects.description, `%${search}%`)
+        )
+      );
+    }
 
-    const [projects, total] = await Promise.all([
-      prisma.project.findMany({
-        where,
-        skip,
-        take: limit,
-        orderBy: { order: 'asc' },
-        include: {
-          contexts: {
-            orderBy: { order: 'asc' },
+    const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+
+    const [projectsResult, [{ total }]] = await Promise.all([
+      db.query.projects.findMany({
+        where: whereClause,
+        offset,
+        limit,
+        orderBy: [asc(projects.order)],
+        with: {
+          projectContexts: {
+            orderBy: [asc(projectContexts.order)],
           },
         },
       }),
-      prisma.project.count({ where }),
+      db.select({ total: count() }).from(projects).where(whereClause),
     ]);
-
     return {
-      projects,
+      projects: projectsResult,
       pagination: {
         page,
         limit,
@@ -51,25 +55,25 @@ export class ProjectsService {
   }
 
   async getById(id: string) {
-    return prisma.project.findUnique({
-      where: { id },
-      include: {
-        contexts: {
-          orderBy: { order: 'asc' },
+    return db.query.projects.findFirst({
+      where: eq(projects.id, id),
+      with: {
+        projectContexts: {
+          orderBy: [asc(projectContexts.order)],
         },
       },
     });
   }
 
   async getBySlug(slug: string) {
-    return prisma.project.findUnique({
-      where: { slug },
-      include: {
-        contexts: {
-          orderBy: { order: 'asc' },
+    return db.query.projects.findFirst({
+      where: eq(projects.slug, slug),
+      with: {
+        projectContexts: {
+          orderBy: [asc(projectContexts.order)],
         },
-        images: {
-          orderBy: { order: 'asc' },
+        projectImages: {
+          orderBy: [asc(projectImages.order)],
         },
       },
     });
@@ -77,57 +81,71 @@ export class ProjectsService {
 
   async create(data: CreateProjectInput) {
     const { description, liveUrl, repoUrl, startDate, endDate, projectDate, tags, ...rest } = data;
-
-    return prisma.project.create({
-      data: {
+    const now = new Date().toISOString();
+    const [created] = await db
+      .insert(projects)
+      .values({
+        id: createId(),
         ...rest,
         description: description || '',
         liveUrl: liveUrl || null,
         repoUrl: repoUrl || null,
         tags: tags || [],
-        startDate: startDate ? new Date(startDate) : null,
-        endDate: endDate ? new Date(endDate) : null,
+        startDate: startDate ? new Date(startDate).toISOString() : null,
+        endDate: endDate ? new Date(endDate).toISOString() : null,
         projectDate: projectDate || null,
-      },
-      include: {
-        contexts: true,
+        createdAt: now,
+        updatedAt: now,
+      } as any)
+      .returning();
+
+    return db.query.projects.findFirst({
+      where: eq(projects.id, created.id),
+      with: {
+        projectContexts: true,
       },
     });
   }
 
   async update(id: string, data: UpdateProjectInput) {
     const { startDate, endDate, ...rest } = data;
-
-    const updateData: Record<string, unknown> = { ...rest };
-
+    const updateData: Record<string, unknown> = { ...rest, updatedAt: new Date().toISOString() };
     if (startDate !== undefined) {
-      updateData.startDate = startDate ? new Date(startDate) : null;
+      updateData.startDate = startDate ? new Date(startDate).toISOString() : null;
     }
     if (endDate !== undefined) {
-      updateData.endDate = endDate ? new Date(endDate) : null;
+      updateData.endDate = endDate ? new Date(endDate).toISOString() : null;
     }
 
-    return prisma.project.update({
-      where: { id },
-      data: updateData,
-      include: {
-        contexts: true,
+    const [updated] = await db
+      .update(projects)
+      .set(updateData as any)
+      .where(eq(projects.id, id))
+      .returning();
+
+    if (!updated) {
+      throw new Error('Project not found');
+    }
+
+    return db.query.projects.findFirst({
+      where: eq(projects.id, id),
+      with: {
+        projectContexts: true,
       },
     });
   }
 
   async delete(id: string) {
-    return prisma.project.delete({
-      where: { id },
-    });
+    const [deleted] = await db.delete(projects).where(eq(projects.id, id)).returning();
+    return deleted;
   }
 
   async checkSlugExists(slug: string, excludeId?: string) {
-    const project = await prisma.project.findUnique({
-      where: { slug },
-      select: { id: true },
-    });
-
+    const [project] = await db
+      .select({ id: projects.id })
+      .from(projects)
+      .where(eq(projects.slug, slug))
+      .limit(1);
     if (!project) return false;
     if (excludeId && project.id === excludeId) return false;
     return true;
