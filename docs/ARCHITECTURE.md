@@ -4,7 +4,7 @@ This document describes the system architecture, component relationships, and de
 
 ## System Overview
 
-The NaufalRF Portfolio Ecosystem is a multi-application platform built as a monorepo using Turborepo. It consists of five interconnected applications that work together to provide a comprehensive portfolio experience.
+The NaufalRF Portfolio Ecosystem is a multi-application platform built as a monorepo using pnpm native workspaces. It consists of five interconnected applications that work together to provide a comprehensive portfolio experience.
 
 ### Applications
 
@@ -46,7 +46,7 @@ The NaufalRF Portfolio Ecosystem is a multi-application platform built as a mono
                                                      │
                                                      ▼
                                               ┌──────────────┐
-                                              │    Qdrant    │
+                                              │    pgvector    │
                                               │ (Vector DB)  │
                                               └──────────────┘
 ```
@@ -61,7 +61,7 @@ All applications communicate through well-defined APIs. The Admin application se
 
 - Only the Admin app has direct database access
 - Public, Links, and NGL apps consume data through Admin API
-- RAG Service calls Admin API for content and uses Qdrant for vectors
+- RAG Service calls Admin API for content and uses pgvector for vectors
 - All cross-app communication uses typed contracts from `packages/types`
 
 ### 2. Centralized Data Authority
@@ -134,7 +134,7 @@ User Request → Server Component → Admin API → PostgreSQL
 **Technology Stack:**
 
 - Next.js 14+ (App Router)
-- Prisma ORM
+- Drizzle ORM
 - PostgreSQL (Neon)
 - NextAuth.js (Google OAuth with allowlist)
 - Cloudflare R2 (file storage)
@@ -214,8 +214,8 @@ User Request → Server Component → Admin API → PostgreSQL
 **Technology Stack:**
 
 - Node.js
-- Fastify (web framework)
-- Qdrant (vector database)
+- FastAPI
+- pgvector (PostgreSQL extension)
 - OpenAI/Gemini/Groq/DeepSeek APIs
 
 **Responsibilities:**
@@ -241,7 +241,7 @@ User Request → Server Component → Admin API → PostgreSQL
 │         │                   │                    │          │
 │         │                   ▼                    ▼          │
 │         │            ┌──────────────┐    ┌──────────────┐  │
-│         │            │    Qdrant    │    │  LLM APIs    │  │
+│         │            │    pgvector    │    │  LLM APIs    │  │
 │         │            │ (Embeddings) │    │  (Primary/   │  │
 │         │            └──────────────┘    │   Fallback)  │  │
 │         │                                └──────────────┘  │
@@ -349,7 +349,7 @@ Visitor → NGL App → Admin API (/api/v1/public-write/messages)
 Visitor → Public Portfolio → RAG Service
                                   │
                                   ├──▶ Session Memory Load
-                                  ├──▶ Qdrant Similarity Search
+                                  ├──▶ pgvector Similarity Search
                                   ├──▶ LLM Generation (Primary)
                                   │         │
                                   │         ├──▶ Success → Response
@@ -372,7 +372,7 @@ Admin → Admin Dashboard → Upload Knowledge Doc
                                   ├──▶ Fetch Content from Admin API
                                   ├──▶ Chunk Documents
                                   ├──▶ Generate Embeddings (OpenAI)
-                                  └──▶ Index to Qdrant
+                                  └──▶ Index to pgvector
 ```
 
 ## Security Boundaries
@@ -417,7 +417,7 @@ Admin → Admin Dashboard → Upload Knowledge Doc
                               │                    │
                               ▼                    ▼
                      ┌─────────────────┐  ┌─────────────────┐
-                     │   PostgreSQL    │  │     Qdrant      │
+                     │   PostgreSQL    │  │     pgvector      │
                      │   (Neon)        │  │   (Internal)    │
                      │                 │  │                 │
                      │ [ADMIN ONLY]    │  │ [RAG ONLY]      │
@@ -462,9 +462,9 @@ services:
   rag-service:
     - Node.js app
     - Calls admin API
-    - Uses Qdrant
+    - Uses pgvector
 
-  qdrant:
+  pgvector:
     - Vector database
     - Internal only
 ```

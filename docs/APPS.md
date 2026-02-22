@@ -153,7 +153,7 @@ pnpm --filter public typecheck
 
 **Domain:** `admin.naufalrf.tech`  
 **Port:** 3001  
-**Technology:** Next.js 14+ (App Router), Prisma, PostgreSQL, NextAuth.js
+**Technology:** Next.js 14+ (App Router), Drizzle ORM, PostgreSQL, NextAuth.js v5
 
 ### Purpose
 
@@ -206,13 +206,13 @@ apps/admin/
 │   │   └── settings/
 │   ├── components/
 │   ├── lib/
-│   │   ├── db/                   # Prisma client
+│   │   ├── db/                   # Drizzle client
 │   │   ├── services/             # Business logic services
 │   │   ├── validations/          # Zod schemas
 │   │   └── utils/
 │   └── types/
-├── prisma/
-│   ├── schema.prisma             # Database schema
+├── db/
+│   ├── db/schema.ts             # Database schema
 │   ├── migrations/               # Database migrations
 │   └── seed.ts                   # Seed script
 └── public/
@@ -286,7 +286,7 @@ pnpm --filter admin build
 
 **Domain:** `links.naufalrf.tech`  
 **Port:** 3002  
-**Technology:** Next.js 14+ (App Router), TypeScript, Tailwind CSS
+**Technology:** Astro SSR, TypeScript, Tailwind CSS
 
 ### Purpose
 
@@ -342,7 +342,7 @@ pnpm --filter links build
 
 **Domain:** `ngl.naufalrf.tech`  
 **Port:** 3003  
-**Technology:** Next.js 14+ (App Router), TypeScript, Tailwind CSS
+**Technology:** Astro SSR, TypeScript, Tailwind CSS
 
 ### Purpose
 
@@ -395,7 +395,7 @@ pnpm --filter ngl build
 
 **Domain:** `rag.naufalrf.tech`  
 **Port:** 3004  
-**Technology:** Node.js, Fastify, Qdrant, OpenAI/Gemini/Groq/DeepSeek
+**Technology:** Python FastAPI, pgvector, OpenAI/Gemini/Groq/DeepSeek
 
 ### Purpose
 
@@ -404,7 +404,7 @@ AI-powered conversational interface for exploring portfolio content using retrie
 ### Key Features
 
 - **Chat Endpoint**: Public chat API with session management
-- **RAG Pipeline**: Retrieval-augmented generation with Qdrant
+- **RAG Pipeline**: Retrieval-augmented generation with pgvector
 - **Session Memory**: Context-aware conversations with pruning
 - **LLM Routing**: Primary and fallback LLM configuration
 - **Deep Links**: Suggests relevant portfolio pages
@@ -422,11 +422,11 @@ apps/rag-service/
 │   │   └── health.ts             # Health check
 │   ├── services/
 │   │   ├── llm.service.ts        # LLM provider routing
-│   │   ├── retriever.service.ts  # Qdrant retrieval
+│   │   ├── retriever.service.ts  # pgvector retrieval
 │   │   ├── session.service.ts    # Session management
 │   │   └── ingestion.service.ts  # Document ingestion
 │   ├── lib/
-│   │   ├── qdrant.ts             # Qdrant client
+│   │   ├── pgvector.ts             # pgvector client
 │   │   ├── embeddings.ts         # Embedding generation
 │   │   └── chunking.ts           # Document chunking
 │   ├── types/
@@ -452,13 +452,13 @@ GEMINI_API_KEY="..."
 GROQ_API_KEY="gsk_..."
 DEEPSEEK_API_KEY="..."
 
-# Qdrant
-QDRANT_URL="http://localhost:6333"
-QDRANT_API_KEY=""  # Optional
+# pgvector
+DATABASE_URL=  # Uses same PostgreSQL as admin with pgvector"http://localhost:6333"
+# No separate vector DB - uses PostgreSQL pgvector""  # Optional
 
 # Server
 PORT="3004"
-NODE_ENV="development"
+# Python service uses uvicorn, not NODE_ENV
 ```
 
 ### LLM Providers
@@ -509,18 +509,18 @@ pnpm --filter rag-service build
 pnpm --filter rag-service start
 ```
 
-### Qdrant Setup
+### pgvector Setup
 
 ```bash
-# Start Qdrant with Docker
+# Start pgvector with Docker
 docker run -d \
-  --name qdrant \
+  --name pgvector \
   -p 6333:6333 \
-  -v $(pwd)/qdrant_storage:/qdrant/storage \
-  qdrant/qdrant
+  -v $(pwd)/pgvector_storage:/pgvector/storage \
+  pgvector/pgvector
 
 # Or use Docker Compose
-docker-compose up -d qdrant
+docker-compose up -d pgvector
 ```
 
 ---
@@ -584,7 +584,7 @@ Links App ───┼──▶ Admin API ──▶ PostgreSQL
 NGL App ─────┘
 
 RAG Service ──▶ Admin API ──▶ PostgreSQL
-             └──▶ Qdrant
+             └──▶ pgvector
 ```
 
 **Rules:**

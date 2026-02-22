@@ -555,7 +555,7 @@ aws logs tail /ecs/naufalrf-portfolio --follow
 
 3. **Build Failures**
    - Check Node.js version (requires >=22.0.0)
-   - Verify pnpm version (>=8.0.0)
+   - Verify pnpm version (>=9.0.0)
    - Clear build cache and retry
 
 4. **API Calls Failing**

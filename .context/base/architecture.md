@@ -43,8 +43,8 @@ Public Portfolio
 |-----------|-------|
 | Domain | `admin.naufalrf.tech` |
 | Type | Next.js App (App Router) |
-| Auth | Google OAuth with allowlist enforcement |
-| Data Access | Direct PostgreSQL via Prisma |
+| Auth | Google OAuth with allowlist enforcement (NextAuth v5) |
+| Data Access | Direct PostgreSQL via Drizzle ORM |
 | API Style | Next.js Route Handlers |
 
 **Responsibilities:**
@@ -180,9 +180,9 @@ Public Portfolio
 | Attribute | Value |
 |-----------|-------|
 | Domain | `rag.naufalrf.tech` |
-| Type | Node.js service (Express/Fastify) |
+| Type | Python FastAPI + uvicorn |
 | Auth | Public endpoint (rate-limited) |
-| Data Access | Via Admin API + Qdrant |
+| Data Access | Via Admin API + pgvector (PostgreSQL) |
 
 **Responsibilities:**
 - Public chat endpoint
@@ -205,8 +205,8 @@ Public Portfolio
 │         │                   │                    │          │
 │         │                   ▼                    ▼          │
 │         │            ┌──────────────┐    ┌──────────────┐  │
-│         │            │    Qdrant    │    │  LLM APIs    │  │
-│         │            │ (Embeddings) │    │  (Primary/   │  │
+│         │            │  pgvector    │    │  LLM APIs    │  │
+│         │            │ (PostgreSQL) │    │  (Primary/   │  │
 │         │            └──────────────┘    │   Fallback)  │  │
 │         │                                └──────────────┘  │
 │         │                                                   │
@@ -278,21 +278,22 @@ apps/rag-service ─┬──▶ packages/types
 | `ngl.naufalrf.tech` | apps/ngl | 3003 |
 | `rag.naufalrf.tech` | apps/rag-service | 3004 |
 
-#### Qdrant (Vector Store)
+#### pgvector (Vector Extension)
 | Attribute | Value |
 |-----------|-------|
-| Exposure | Internal only (no public access) |
-| Persistence | Docker volume |
-| Port | 6333 (internal) |
-| Purpose | RAG embeddings storage and similarity search |
+| Type | PostgreSQL extension (in Neon database) |
+| Exposure | Internal only (accessed via Admin API / Drizzle) |
+| Purpose | RAG embeddings storage and cosine similarity search |
+| Dimensions | 1536 (OpenAI text-embedding-3-small) |
 
 #### PostgreSQL (Neon)
 | Attribute | Value |
 |-----------|-------|
 | Provider | Neon (managed) |
-| Access | Admin app only |
-| Connection | Pooled via Neon proxy |
-| ORM | Prisma |
+| Access | Admin app only (direct), RAG service via pgvector extension |
+| Connection | Pooled via Neon proxy (postgres.js driver) |
+| ORM | Drizzle ORM |
+| Vector Extension | pgvector (1536-dim embeddings, OpenAI text-embedding-3-small) |
 
 ---
 
@@ -339,7 +340,7 @@ Visitor ──▶ NGL App ──▶ Admin API (/api/public-write/messages)
 Visitor ──▶ Public Portfolio ──▶ RAG Service
                                       │
                                       ├──▶ Session Memory Load
-                                      ├──▶ Qdrant Similarity Search
+                                      ├──▶ pgvector Similarity Search
                                       ├──▶ LLM Generation (Primary)
                                       │         │
                                       │         ├──▶ Success ──▶ Response
@@ -360,8 +361,8 @@ Admin ──▶ Admin Dashboard ──▶ Upload Knowledge Doc
                                       │
                                       ├──▶ Fetch Content from Admin API
                                       ├──▶ Chunk Documents
-                                      ├──▶ Generate Embeddings (OpenAI)
-                                      └──▶ Index to Qdrant
+                                      ├──▶ Generate Embeddings (OpenAI text-embedding-3-small)
+                                      └──▶ Store in pgvector (PostgreSQL)
 ```
 
 ---
@@ -402,12 +403,12 @@ Admin ──▶ Admin Dashboard ──▶ Upload Knowledge Doc
                               │                    │
                               │                    │
                               ▼                    ▼
-                     ┌─────────────────┐  ┌─────────────────┐
-                     │   PostgreSQL    │  │     Qdrant      │
-                     │   (Neon)        │  │   (Internal)    │
-                     │                 │  │                 │
-                     │ [ADMIN ONLY]    │  │ [RAG ONLY]      │
-                     └─────────────────┘  └─────────────────┘
+                     ┌─────────────────────────────────┐
+                     │         PostgreSQL (Neon)        │
+                     │                                 │
+                     │  ADMIN: Drizzle ORM (direct)    │
+                     │  RAG: pgvector (via API call)   │
+                     └─────────────────────────────────┘
 ```
 
 ### Application Boundaries
@@ -418,7 +419,7 @@ Admin ──▶ Admin Dashboard ──▶ Upload Knowledge Doc
 | Admin Dashboard | All | All | Yes |
 | Links Hub | ProfileLinks | None | No |
 | NGL App | None | AnonymousMessages | No |
-| RAG Service | Content (internal API) | ChatLogs (internal API), Qdrant | No |
+| RAG Service | Content (internal API) | ChatLogs (internal API), pgvector embeddings | No |
 
 ### API Contract Boundaries
 

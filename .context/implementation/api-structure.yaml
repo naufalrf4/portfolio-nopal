@@ -1944,7 +1944,7 @@ middleware:
     description: Global error handler for API routes
     implementation: |
       import { NextResponse } from 'next/server'
-      import { Prisma } from '@prisma/client'
+      import { DrizzleError, NotFoundError } from 'drizzle-orm'
       import { logger } from '@/lib/logger'
       
       export class ApiError extends Error {
@@ -1987,30 +1987,17 @@ middleware:
               }, { status: error.status })
             }
             
-            // Prisma errors
-            if (error instanceof Prisma.PrismaClientKnownRequestError) {
-              if (error.code === 'P2002') {
-                return NextResponse.json({
-                  success: false,
-                  error: {
-                    code: 'CONFLICT',
-                    message: 'Resource already exists',
-                    requestId,
-                    timestamp: new Date().toISOString(),
-                  },
-                }, { status: 409 })
-              }
-              if (error.code === 'P2025') {
-                return NextResponse.json({
-                  success: false,
-                  error: {
-                    code: 'NOT_FOUND',
-                    message: 'Resource not found',
-                    requestId,
-                    timestamp: new Date().toISOString(),
-                  },
-                }, { status: 404 })
-              }
+            // Database errors (Drizzle/postgres.js)
+            if (error instanceof Error && error.message.includes('duplicate key')) {
+              return NextResponse.json({
+                success: false,
+                error: {
+                  code: 'CONFLICT',
+                  message: 'Resource already exists',
+                  requestId,
+                  timestamp: new Date().toISOString(),
+                },
+              }, { status: 409 })
             }
             
             // Generic error
@@ -2263,8 +2250,8 @@ pagination:
         const skip = (page - 1) * limit
         
         const [data, total] = await Promise.all([
-          prisma.model.findMany({ skip, take: limit, ...query }),
-          prisma.model.count({ where: query.where }),
+          db.select().from(model).where(query.where).limit(limit).offset(skip).orderBy(query.orderBy),
+          db.select({ count: sql<number>`count(*)::int` }).from(model).where(query.where),
         ])
         
         return {
@@ -2290,14 +2277,10 @@ pagination:
         const limit = Math.min(100, Math.max(1, params.limit))
         const cursor = params.cursor
         
-        const data = await prisma.model.findMany({
-          take: limit + 1, // Fetch one extra to check hasNext
-          ...(cursor && {
-            skip: 1,
-            cursor: { id: cursor },
-          }),
-          ...query,
-        })
+        const data = await db.select().from(model)
+          .where(cursor ? and(query.where, gt(model.id, cursor)) : query.where)
+          .limit(limit + 1) // Fetch one extra to check hasNext
+          .orderBy(model.id)
         
         const hasNext = data.length > limit
         if (hasNext) data.pop()
@@ -2664,7 +2647,9 @@ file_structure:
     path: apps/admin/app/api/admin/projects/route.ts
     content: |
       import { NextResponse } from 'next/server'
-      import { prisma } from '@/lib/prisma'
+      import { db } from '@/db'
+      import { projects } from '@/db/schema'
+      import { eq, ilike, or, sql } from 'drizzle-orm'
       import { withAuth, withErrorHandler, withValidation } from '@/lib/middleware'
       import { ProjectCreateSchema, PaginationQuerySchema } from '@/lib/schemas'
       import { composeMiddleware } from '@/lib/middleware/compose'
@@ -2689,14 +2674,16 @@ file_structure:
         }
         
         const [data, total] = await Promise.all([
-          prisma.project.findMany({
-            where,
-            skip: (params.page - 1) * params.limit,
-            take: params.limit,
-            orderBy: { [params.sort || 'createdAt']: params.order },
-            include: { _count: { select: { contexts: true } } },
-          }),
-          prisma.project.count({ where }),
+          db.select().from(projects)
+            .where(where)
+            .limit(params.limit)
+            .offset((params.page - 1) * params.limit)
+            .orderBy(
+              params.order === 'asc'
+                ? asc(projects[params.sort || 'createdAt'])
+                : desc(projects[params.sort || 'createdAt'])
+            ),
+          db.select({ count: sql<number>`count(*)::int` }).from(projects).where(where),
         ])
         
         return NextResponse.json({
@@ -2723,7 +2710,7 @@ file_structure:
         withAuth({ requireAdmin: true }),
         withValidation(ProjectCreateSchema)
       )(async (request, data) => {
-        const project = await prisma.project.create({ data })
+        const [project] = await db.insert(projects).values(data).returning()
         
         return NextResponse.json({
           success: true,

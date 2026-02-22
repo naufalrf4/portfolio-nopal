@@ -172,9 +172,9 @@ GEMINI_API_KEY="..."
 GROQ_API_KEY="gsk_..."
 DEEPSEEK_API_KEY="..."
 
-# Qdrant
-QDRANT_URL="http://localhost:6333"
-QDRANT_API_KEY="" # Optional for local development
+# pgvector
+DATABASE_URL=  # Uses same PostgreSQL as admin with pgvector"http://localhost:6333"
+# No separate vector DB - uses PostgreSQL pgvector"" # Optional for local development
 ```
 
 ### 4. Set Up Database
@@ -224,7 +224,7 @@ DATABASE_URL="postgresql://localhost:5432/portfolio?schema=public"
 # Navigate to admin app
 cd apps/admin
 
-# Generate Prisma client
+# Generate Drizzle client
 pnpm db:generate
 
 # Run migrations
@@ -343,7 +343,7 @@ Install these extensions for the best development experience:
     "dbaeumer.vscode-eslint",
     "esbenp.prettier-vscode",
     "bradlc.vscode-tailwindcss",
-    "prisma.prisma",
+    "drizzle.drizzle-vscode",
     "ms-vscode.vscode-typescript-next",
     "usernamehw.errorlens",
     "christian-kohler.path-intellisense",
@@ -401,9 +401,9 @@ Create `.vscode/launch.json`:
 
 ## Database Management
 
-### Prisma Studio
+### Drizzle Studio
 
-Open Prisma Studio to view and edit database records:
+Open Drizzle Studio to view and edit database records (drizzle-kit studio):
 
 ```bash
 pnpm --filter admin db:studio
@@ -414,7 +414,7 @@ Access at: http://localhost:5555
 ### Common Database Commands
 
 ```bash
-# Generate Prisma client after schema changes
+# Generate Drizzle client after schema changes
 pnpm --filter admin db:generate
 
 # Create a new migration
@@ -430,7 +430,7 @@ pnpm --filter admin db:reset
 pnpm --filter admin db:seed
 
 # View migration status
-pnpm --filter admin prisma migrate status
+pnpm --filter admin db:migrate  # Check migration status
 ```
 
 ### Database Backup
@@ -495,8 +495,8 @@ psql "postgresql://user:password@localhost:5432/portfolio"
 # Check if PostgreSQL is running
 pg_isready -h localhost -p 5432
 
-# View Prisma connection logs
-DEBUG="prisma:*" pnpm --filter admin dev
+# View database connection logs
+DEBUG="*" pnpm --filter admin dev
 ```
 
 ### Module Not Found Errors
@@ -507,7 +507,7 @@ pnpm clean
 rm -rf node_modules
 pnpm install
 
-# Regenerate Prisma client
+# Regenerate Drizzle client
 pnpm --filter admin db:generate
 ```
 
@@ -635,9 +635,9 @@ pnpm format
 
 ## Additional Resources
 
-- [Turborepo Documentation](https://turbo.build/repo/docs)
+- [pnpm native workspaces Documentation](https://pnpm.io/workspaces)
 - [Next.js Documentation](https://nextjs.org/docs)
-- [Prisma Documentation](https://www.prisma.io/docs)
+- [Drizzle ORM Documentation](https://orm.drizzle.team/docs)
 - [NextAuth.js Documentation](https://next-auth.js.org)
 - [Tailwind CSS Documentation](https://tailwindcss.com/docs)
 

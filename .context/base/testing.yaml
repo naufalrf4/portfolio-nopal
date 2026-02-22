@@ -164,15 +164,15 @@ levels:
 
     scope_paths:
       api_routes: apps/admin/src/app/api/**
-      database_operations: Prisma queries
+      database_operations: Drizzle ORM queries
       auth_flows: authentication and authorization
       cross_service: Admin API consumption
 
     characteristics:
-      real_database: use test database
-      real_prisma: no ORM mocking
-      mock_externals: LLM APIs and external services
-      transaction_isolation: rollback after each test
+    real_database: use test database
+    real_drizzle: no ORM mocking
+    mock_externals: LLM APIs and external services
+    transaction_isolation: rollback after each test
 
     patterns:
       api_route_testing:
@@ -191,7 +191,7 @@ levels:
       approach: test_database_with_transactions
       setup_steps:
         - create test database
-        - run migrations
+        - run drizzle migrations
         - seed minimal fixtures
       cleanup_steps:
         - transaction rollback per test

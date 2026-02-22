@@ -292,8 +292,8 @@ functional:
     feature: retrieval
     description: System shall retrieve relevant content from vector store for context.
     acceptance_criteria:
-      - User query is embedded using OpenAI embeddings
-      - Top-k similar documents are retrieved from Qdrant
+      - User query is embedded using OpenAI text-embedding-3-small
+      - Top-k similar documents are retrieved from pgvector (PostgreSQL extension)
       - Retrieved context is included in LLM prompt
     priority: high
 
@@ -325,8 +325,8 @@ functional:
     acceptance_criteria:
       - POST /api/internal/ingest triggers ingestion (token auth)
       - Content is fetched from Admin internal API
-      - Documents are chunked and embedded
-      - Embeddings are stored in Qdrant
+      - Documents are chunked and embedded (OpenAI text-embedding-3-small, 1536 dims)
+      - Embeddings are stored in pgvector (PostgreSQL)
     priority: high
 
   - id: FR-RAG-007
@@ -475,7 +475,7 @@ non_functional:
   - id: NFR-SCL-003
     category: scalability
     description: Vector store shall support up to 100,000 embeddings.
-    measurement: Qdrant metrics
+    measurement: pgvector query performance metrics
     target: "100k embeddings"
 
   # ---------------------------------------------------------------------------

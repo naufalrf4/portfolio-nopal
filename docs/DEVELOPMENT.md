@@ -686,7 +686,7 @@ If issues are detected:
 ./scripts/rollback.sh v0.9.9
 
 # Or rollback database migration
-pnpm --filter admin prisma migrate resolve --rolled-back <migration-name>
+pnpm --filter admin db:migrate  # Resolve migration issues --rolled-back <migration-name>
 ```
 
 ## Best Practices
@@ -728,7 +728,7 @@ pnpm --filter admin prisma migrate resolve --rolled-back <migration-name>
 - [Next.js Documentation](https://nextjs.org/docs)
 - [React Documentation](https://react.dev)
 - [TypeScript Handbook](https://www.typescriptlang.org/docs/)
-- [Prisma Documentation](https://www.prisma.io/docs)
+- [Drizzle ORM Documentation](https://orm.drizzle.team/docs)
 - [Testing Library](https://testing-library.com/docs/)
 - [Conventional Commits](https://www.conventionalcommits.org/)
 

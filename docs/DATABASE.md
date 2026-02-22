@@ -4,10 +4,10 @@ This document provides comprehensive documentation for the PostgreSQL database s
 
 ## Overview
 
-The NaufalRF Portfolio Ecosystem uses a single PostgreSQL database accessed exclusively through the Admin application. All data operations are managed via Prisma ORM.
+The NaufalRF Portfolio Ecosystem uses a single PostgreSQL database accessed exclusively through the Admin application. All data operations are managed via Drizzle ORM.
 
 **Database Provider:** PostgreSQL 14+ (Neon recommended)  
-**ORM:** Prisma  
+**ORM:** Drizzle ORM  
 **Access:** Admin app only
 
 ## Database Schema
@@ -91,7 +91,7 @@ The NaufalRF Portfolio Ecosystem uses a single PostgreSQL database accessed excl
 
 Stores user accounts for authentication and guestbook entries.
 
-```prisma
+```typescript
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
@@ -135,7 +135,7 @@ enum UserRole {
 
 Portfolio projects with full details.
 
-```prisma
+```typescript
 model Project {
   id          String   @id @default(cuid())
   title       String
@@ -196,7 +196,7 @@ model Project {
 
 Detailed context sections for each project.
 
-```prisma
+```typescript
 model ProjectContext {
   id        String             @id @default(cuid())
   projectId String
@@ -254,7 +254,7 @@ enum ProjectContextType {
 
 Additional images for projects.
 
-```prisma
+```typescript
 model ProjectImage {
   id        String   @id @default(cuid())
   projectId String
@@ -276,7 +276,7 @@ model ProjectImage {
 
 External blog posts and articles.
 
-```prisma
+```typescript
 model BlogLink {
   id          String    @id @default(cuid())
   url         String    @unique
@@ -318,7 +318,7 @@ model BlogLink {
 
 Guestbook messages from authenticated users.
 
-```prisma
+```typescript
 model GuestbookEntry {
   id        String   @id @default(cuid())
   userId    String
@@ -371,7 +371,7 @@ model GuestbookEntry {
 
 Anonymous messages from visitors.
 
-```prisma
+```typescript
 model AnonymousMessage {
   id        String   @id @default(cuid())
   content   String   @db.Text
@@ -401,7 +401,7 @@ model AnonymousMessage {
 
 AI chat conversation logs.
 
-```prisma
+```typescript
 model ChatLog {
   id        String   @id @default(cuid())
   sessionId String   @unique
@@ -446,7 +446,7 @@ model ChatLog {
 
 Social and professional profile links.
 
-```prisma
+```typescript
 model ProfileLink {
   id        String   @id @default(cuid())
   label     String
@@ -468,7 +468,7 @@ model ProfileLink {
 
 Documents for RAG knowledge base.
 
-```prisma
+```typescript
 model KnowledgeDoc {
   id        String   @id @default(cuid())
   filename  String   @unique
@@ -491,35 +491,35 @@ model KnowledgeDoc {
 
 ```bash
 # Create a new migration
-pnpm --filter admin prisma migrate dev --name descriptive_name
+pnpm --filter admin db:generate && pnpm --filter admin db:migrate  # (migration naming in Drizzle) descriptive_name
 
 # Example: Add new field
-pnpm --filter admin prisma migrate dev --name add_project_featured_field
+pnpm --filter admin db:generate && pnpm --filter admin db:migrate  # (migration naming in Drizzle) add_project_featured_field
 ```
 
 ### Applying Migrations
 
 ```bash
 # Development
-pnpm --filter admin prisma migrate dev
+pnpm --filter admin db:migrate
 
 # Production
-pnpm --filter admin prisma migrate deploy
+pnpm --filter admin db:migrate
 ```
 
 ### Migration Status
 
 ```bash
 # Check migration status
-pnpm --filter admin prisma migrate status
+pnpm --filter admin db:migrate  # Check migration status
 
 # View migration history
-pnpm --filter admin prisma migrate history
+pnpm --filter admin db:migrate  # View migration history
 ```
 
 ### Rollback Strategy
 
-Prisma doesn't support automatic rollbacks. For production:
+Drizzle ORM migrations require manual rollback. For production:
 
 1. **Backup database before migrations**
 
@@ -542,7 +542,7 @@ Prisma doesn't support automatic rollbacks. For production:
 
 ### Seed Script
 
-Location: `apps/admin/prisma/seed.ts`
+Location: `apps/admin/db/seed.ts`
 
 ```bash
 # Run seed script
@@ -571,7 +571,7 @@ The seed script creates:
 
 ```typescript
 // Get all visible projects
-const projects = await prisma.project.findMany({
+const projects = await db.select().from(projects).where({
   where: { visible: true },
   include: {
     contexts: {
@@ -585,7 +585,7 @@ const projects = await prisma.project.findMany({
 });
 
 // Get featured projects
-const featured = await prisma.project.findMany({
+const featured = await db.select().from(projects).where({
   where: {
     visible: true,
     featured: true,
@@ -595,7 +595,7 @@ const featured = await prisma.project.findMany({
 });
 
 // Get project by slug
-const project = await prisma.project.findUnique({
+const project = await db.query.projects.findFirst({
   where: { slug: 'project-slug' },
   include: {
     contexts: {
@@ -612,7 +612,7 @@ const project = await prisma.project.findUnique({
 
 ```typescript
 // Get visible guestbook entries with user info
-const entries = await prisma.guestbookEntry.findMany({
+const entries = await db.select().from(guestbookEntries).where({
   where: { visible: true },
   include: {
     user: {
@@ -628,7 +628,7 @@ const entries = await prisma.guestbookEntry.findMany({
 });
 
 // Create guestbook entry
-const entry = await prisma.guestbookEntry.create({
+const [entry] = await db.insert(guestbookEntries).values({
   data: {
     userId: user.id,
     message: 'Great portfolio!',
@@ -649,14 +649,14 @@ const entry = await prisma.guestbookEntry.create({
 
 ```typescript
 // Get visible blog links
-const blogs = await prisma.blogLink.findMany({
+const blogs = await db.select().from(blogLinks).where({
   where: { visible: true },
   orderBy: [{ publishedAt: 'desc' }, { order: 'asc' }],
   take: 10,
 });
 
 // Filter by source
-const mediumPosts = await prisma.blogLink.findMany({
+const mediumPosts = await db.select().from(blogLinks).where({
   where: {
     visible: true,
     source: 'medium',
@@ -710,7 +710,7 @@ REINDEX TABLE projects;
 
 ```typescript
 // Use select to limit fields
-const projects = await prisma.project.findMany({
+const projects = await db.select().from(projects).where({
   select: {
     id: true,
     title: true,
@@ -720,13 +720,13 @@ const projects = await prisma.project.findMany({
 });
 
 // Use pagination
-const projects = await prisma.project.findMany({
+const projects = await db.select().from(projects).where({
   skip: (page - 1) * limit,
   take: limit,
 });
 
 // Use cursor-based pagination for large datasets
-const projects = await prisma.project.findMany({
+const projects = await db.select().from(projects).where({
   take: 10,
   cursor: {
     id: lastProjectId,
@@ -750,34 +750,34 @@ DATABASE_URL="postgresql://user:password@host:5432/db?connection_limit=10"
 # Test connection
 psql "postgresql://user:password@host:5432/database"
 
-# Check Prisma connection
-DEBUG="prisma:*" pnpm --filter admin dev
+# Check database connection
+DEBUG="*" pnpm --filter admin dev
 ```
 
 ### Migration Issues
 
 ```bash
 # Reset database (WARNING: deletes all data)
-pnpm --filter admin prisma migrate reset
+pnpm --filter admin db:push  # Reset and push schema
 
 # Mark migration as applied without running
-pnpm --filter admin prisma migrate resolve --applied <migration-name>
+pnpm --filter admin db:migrate  # Resolve migration issues --applied <migration-name>
 
 # Mark migration as rolled back
-pnpm --filter admin prisma migrate resolve --rolled-back <migration-name>
+pnpm --filter admin db:migrate  # Resolve migration issues --rolled-back <migration-name>
 ```
 
 ### Schema Sync Issues
 
 ```bash
-# Generate Prisma client
-pnpm --filter admin prisma generate
+# Generate Drizzle client
+pnpm --filter admin db:generate
 
 # Push schema without migration (dev only)
-pnpm --filter admin prisma db push
+pnpm --filter admin db:push
 
 # Pull schema from database
-pnpm --filter admin prisma db pull
+pnpm --filter admin db:pull
 ```
 
 ## Security
@@ -788,7 +788,7 @@ pnpm --filter admin prisma db pull
 - Use connection pooling
 - Implement rate limiting on write operations
 - Hash sensitive data (IP addresses)
-- Use parameterized queries (Prisma handles this)
+- Use parameterized queries (Drizzle ORM handles this)
 - Regular backups
 - Monitor for suspicious activity
 
@@ -801,6 +801,6 @@ pnpm --filter admin prisma db pull
 
 ## Resources
 
-- [Prisma Documentation](https://www.prisma.io/docs)
+- [Drizzle ORM Documentation](https://orm.drizzle.team/docs)
 - [PostgreSQL Documentation](https://www.postgresql.org/docs/)
 - [Neon Documentation](https://neon.tech/docs)

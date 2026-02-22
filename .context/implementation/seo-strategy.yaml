@@ -874,15 +874,22 @@ performance_seo:
   # Font Optimization
   # ---------------------------------------------------------------------------
   font_optimization:
-    strategy: "next/font with local fonts and preloading"
+    strategy: "next/font with local fonts and preloading (admin); Astro font optimization (public/links)"
     implementation: |
-      // src/app/layout.tsx
-      import { Inter, JetBrains_Mono } from 'next/font/google'
+      // apps/admin: src/app/layout.tsx (Next.js)
+      import { Plus_Jakarta_Sans, DM_Sans, JetBrains_Mono } from 'next/font/google'
 
-      const inter = Inter({
+      const plusJakartaSans = Plus_Jakarta_Sans({
         subsets: ['latin'],
         display: 'swap',
-        variable: '--font-inter',
+        variable: '--font-sans',
+        preload: true,
+      })
+
+      const dmSans = DM_Sans({
+        subsets: ['latin'],
+        display: 'swap',
+        variable: '--font-body',
         preload: true,
       })
 
@@ -890,8 +897,10 @@ performance_seo:
         subsets: ['latin'],
         display: 'swap',
         variable: '--font-mono',
-        preload: false, // Only preload primary font
+        preload: false,
       })
+
+      // apps/public: astro.config.mjs (Astro) - handled via @fontsource or Astro font integration
 
       export default function RootLayout({ children }) {
         return (
@@ -916,27 +925,22 @@ performance_seo:
       below_fold: "loading='lazy' (default in next/image)"
 
     components:
-      strategy: "Dynamic imports with loading states"
+      strategy: "Dynamic imports with loading states (admin/Next.js); Astro islands with client directives (public/links)"
       implementation: |
-        // Lazy load heavy components
+        // apps/admin (Next.js): lazy load heavy components
         import dynamic from 'next/dynamic'
 
         const ProjectGallery = dynamic(
           () => import('@/components/project-gallery'),
           {
             loading: () => <ProjectGallerySkeleton />,
-            ssr: true, // Enable SSR for SEO
+            ssr: true,
           }
         )
 
-        // For client-only components
-        const ThreeScene = dynamic(
-          () => import('@/components/three-scene'),
-          {
-            ssr: false,
-            loading: () => <div className="scene-placeholder" />,
-          }
-        )
+        // apps/public (Astro): use client directives for island hydration
+        // <HeavyComponent client:visible />
+        // <ChatWidget client:idle />
 
     intersection_observer: |
       // Custom hook for lazy loading sections
@@ -1238,18 +1242,16 @@ implementation_examples:
   # ---------------------------------------------------------------------------
   metadata_files:
     root_layout: |
-      // src/app/layout.tsx
+      // apps/admin: src/app/layout.tsx
       import type { Metadata, Viewport } from 'next'
-      import { Inter } from 'next/font/google'
+      import { Plus_Jakarta_Sans, DM_Sans, JetBrains_Mono } from 'next/font/google'
       import './globals.css'
 
-      const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
+      const plusJakartaSans = Plus_Jakarta_Sans({ subsets: ['latin'], variable: '--font-sans' })
+      const dmSans = DM_Sans({ subsets: ['latin'], variable: '--font-body' })
 
       export const viewport: Viewport = {
-        themeColor: [
-          { media: '(prefers-color-scheme: light)', color: '#ffffff' },
-          { media: '(prefers-color-scheme: dark)', color: '#0a0a0a' },
-        ],
+        themeColor: '#E0E5EC',
         width: 'device-width',
         initialScale: 1,
         maximumScale: 5,

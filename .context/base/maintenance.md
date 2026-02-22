@@ -16,12 +16,12 @@ Every service exposes a health endpoint for monitoring and load balancer integra
 | Admin Dashboard | `GET /api/health` | `{ "status": "ok", "db": "connected", "timestamp": "..." }` |
 | Links Hub | `GET /api/health` | `{ "status": "ok", "timestamp": "..." }` |
 | NGL App | `GET /api/health` | `{ "status": "ok", "timestamp": "..." }` |
-| RAG Service | `GET /health` | `{ "status": "ok", "qdrant": "connected", "timestamp": "..." }` |
+| RAG Service | `GET /health` | `{ "status": "ok", "pgvector": "connected", "timestamp": "..." }` |
 
 **Health Check Implementation:**
 - Return `200 OK` when service is healthy
 - Return `503 Service Unavailable` when dependencies are down
-- Include dependency status (database, Qdrant) where applicable
+- Include dependency status (database, pgvector) where applicable
 - Keep response lightweight (< 100ms)
 
 ### Uptime Monitoring
@@ -49,8 +49,8 @@ Every service exposes a health endpoint for monitoring and load balancer integra
 | Error rate | Application logs | < 0.1% |
 | CPU usage | Container metrics | < 80% sustained |
 | Memory usage | Container metrics | < 80% sustained |
-| Database connections | Prisma metrics | < pool limit |
-| Qdrant query time | RAG service logs | < 200ms |
+| Database connections | Drizzle/postgres.js metrics | < pool limit |
+| pgvector query time | RAG service logs | < 200ms |
 
 **Logging Strategy:**
 - Use structured JSON logging (Pino)
@@ -126,8 +126,8 @@ For advanced monitoring, consider:
 
 **Database Migrations:**
 - Always backup before migration
-- Run `prisma migrate deploy` in production
-- Never use `prisma migrate dev` in production
+- Run `pnpm --filter admin db:migrate` in production (drizzle-kit)
+- Never use `pnpm --filter admin db:push` in production (dev only)
 - Test rollback procedure
 
 **Node.js Updates:**
@@ -199,10 +199,7 @@ docker compose logs --tail 100 <service>
 docker stats
 
 # Check database connectivity
-docker compose exec admin npx prisma db execute --stdin <<< "SELECT 1"
-
-# Check Qdrant status
-curl http://localhost:6333/health
+docker compose exec admin npx tsx -e "import { db } from './src/db'; db.execute('SELECT 1').then(() => console.log('ok'))"
 ```
 
 **4. Mitigation**
@@ -239,7 +236,7 @@ docker compose ps
 - Environment variable missing → Check .env file
 - Port conflict → Check for other services on port
 - Build failure → Rebuild image
-- Dependency unavailable → Check database/Qdrant
+- Dependency unavailable → Check database/pgvector
 
 **Solution:**
 ```bash
@@ -311,20 +308,17 @@ docker compose restart <service>
 **Diagnosis:**
 ```bash
 docker compose logs rag-service
-curl http://localhost:6333/health  # Check Qdrant
+curl http://localhost:3004/health  # Check RAG service
 ```
 
 **Common Causes:**
-- Qdrant container down
+- pgvector not responding
 - LLM API rate limited
 - Memory exhaustion
-- Service crash
+- Python service crash
 
 **Solution:**
 ```bash
-# Restart Qdrant
-docker compose restart qdrant
-
 # Restart RAG service
 docker compose restart rag-service
 
@@ -391,7 +385,7 @@ curl https://naufalrf.tech/api/health
 ```
 
 **Database Rollback:**
-- Prisma migrations are forward-only by design
+- Drizzle migrations are forward-only by design
 - For critical issues, restore from backup
 - Test rollback procedure regularly
 
@@ -407,19 +401,6 @@ curl https://naufalrf.tech/api/health
 ```bash
 # Export database (if needed)
 pg_dump $DATABASE_URL > backup-$(date +%Y%m%d).sql
-```
-
-**Qdrant Backup:**
-```bash
-# Stop Qdrant for consistent backup
-docker compose stop qdrant
-
-# Backup volume
-docker run --rm -v portfolio_qdrant:/data -v $(pwd):/backup alpine \
-  tar czf /backup/qdrant-backup-$(date +%Y%m%d).tar.gz /data
-
-# Restart Qdrant
-docker compose start qdrant
 ```
 
 **Configuration Backup:**

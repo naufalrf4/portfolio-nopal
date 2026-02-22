@@ -1,444 +1,153 @@
-# Tech Stack
+---
+# Tech Stack — Migration Target
+# Source of truth: AGENTS.md
+# This file describes the TARGET stack (post-migration), not the legacy codebase.
 
-# =============================================================================
-# TECHNOLOGY CHOICES
-# =============================================================================
-# All approved technologies for the NaufalRF Portfolio Ecosystem.
-# Organized by category with version constraints and usage scope.
-# =============================================================================
+project: naufalrf-portfolio
+type: personal-portfolio-monorepo
 
-# -----------------------------------------------------------------------------
-# LANGUAGES
-# -----------------------------------------------------------------------------
-language:
-  primary:
-    name: TypeScript
-    version: ">=5.3"
-    strict_mode: true
-    scope: all_applications_and_packages
-    config_location: packages/config/tsconfig
+monorepo:
+  tooling: pnpm workspaces (native)
+  package_manager: pnpm
+  pnpm_version: '>=9.0.0'
+  no_turborepo: true
 
-  secondary:
-    name: JavaScript
-    scope: configuration_files_only
-    allowed_files:
-      - "*.config.js"
-      - "*.config.mjs"
-
-  markup:
-    - name: HTML5
-      scope: templates_and_jsx
-    - name: Markdown
-      scope: content_and_documentation
-    - name: YAML
-      scope: configuration_and_context
-
-# -----------------------------------------------------------------------------
-# RUNTIME
-# -----------------------------------------------------------------------------
 runtime:
-  primary:
-    name: Node.js
-    version: ">=22.0.0"
-    package_manager: pnpm
-    pnpm_version: ">=8.0.0"
+  node_version: '22 LTS'
+  python_version: '3.12'
 
-  container:
-    name: Docker
-    compose_version: "3.8"
-    base_images:
-      node: node:22-alpine
-      traefik: traefik:v3.0
+applications:
+  apps/admin:
+    framework: Next.js 14+ App Router
+    port: 3001
+    auth: NextAuth v5 + Google OAuth
+    db_access: Direct Drizzle ORM
+    language: TypeScript 5.x strict
 
-# -----------------------------------------------------------------------------
-# FRAMEWORKS
-# -----------------------------------------------------------------------------
+  apps/public:
+    framework: Astro SSR
+    port: 3000
+    auth: Lucia Auth v3 + Google OAuth
+    db_access: Admin API (SDK)
+    language: TypeScript 5.x strict
+
+  apps/links:
+    framework: Astro SSR
+    port: 3002
+    auth: None
+    db_access: Admin API (read-only, SDK)
+    language: TypeScript 5.x strict
+
+  apps/ngl:
+    framework: SvelteKit
+    port: 3003
+    auth: None
+    db_access: Admin API (write-only, SDK)
+    language: TypeScript 5.x strict
+
+  apps/rag-service:
+    framework: Python FastAPI + uvicorn
+    port: 3004
+    auth: X-Service-Token header
+    db_access: Admin API + pgvector
+    language: Python 3.12 (type hints throughout)
+    dependency_manager: uv
+
+shared_packages:
+  packages/ui:
+    contents: Shared React components (Neumorphism + shadcn/ui base)
+  packages/types:
+    contents: TypeScript DTOs, enums, API contracts
+  packages/sdk:
+    contents: Typed API clients (used by all non-admin apps)
+  packages/config:
+    contents: Shared ESLint, TypeScript, Tailwind configs
+  packages/auth:
+    contents: Shared NextAuth v5 config (DrizzleAdapter)
+
+database:
+  engine: PostgreSQL (Neon — serverless)
+  orm: Drizzle ORM
+  driver: postgres.js
+  vector_extension: pgvector
+  schema_location: apps/admin/db/schema.ts
+  migrations_location: apps/admin/db/migrations/
+  drizzle_config: apps/admin/drizzle.config.ts
+  access_boundary: ONLY apps/admin connects directly; all others use Admin API
+
+storage:
+  primary_db: PostgreSQL on Neon (serverless)
+  vector_store: pgvector (PostgreSQL extension — NOT a separate service)
+
+auth:
+  admin:
+    library: NextAuth v5
+    provider: Google OAuth
+    adapter: DrizzleAdapter
+    session: database sessions
+  public:
+    library: Lucia Auth v3 + arctic
+    provider: Google OAuth
+    session: cookies via Astro middleware
+
 frameworks:
   web:
-    primary:
-      name: Next.js
-      version: ">=16.0.0"
-      app_router: true
-      scope:
-        - apps/public
-        - apps/admin
-        - apps/links
-        - apps/ngl
-      features_used:
-        - app_router
-        - server_components
-        - server_actions
-        - api_routes
-        - middleware
-        - image_optimization
+    admin: Next.js 14+ App Router
+    public: Astro SSR (node adapter)
+    links: Astro SSR (node adapter)
+    ngl: SvelteKit (node adapter)
+  backend_service:
+    rag: FastAPI (Python 3.12) + uvicorn
 
-    backend_service:
-      name: Fastify
-      version: ">=4.0.0"
-      scope: apps/rag-service
-      alternatives_considered:
-        - name: Express
-          reason_rejected: Performance and TypeScript support inferior
-
-  monorepo:
-    name: Turborepo
-    version: ">=2.0.0"
-    features_used:
-      - task_caching
-      - parallel_execution
-      - dependency_graph
-      - remote_caching_optional
-
-# -----------------------------------------------------------------------------
-# UI & STYLING
-# -----------------------------------------------------------------------------
-ui:
-  component_library:
-    name: shadcn/ui
-    approach: copy_paste_components
-    location: packages/ui/src/components
-    customization: fully_owned_code
-
-  styling:
-    primary:
-      name: Tailwind CSS
-      version: ">=3.4.0"
-      config_location: packages/config/tailwind
-
-    utilities:
-      - name: tailwind-merge
-        purpose: class_name_merging
-      - name: clsx
-        purpose: conditional_classes
-      - name: class-variance-authority
-        purpose: component_variants
-
-  design_system:
-    theme: playful_geometric
-    color_mode: light_and_dark
-    typography:
-      font_sans: Inter
-      font_mono: JetBrains Mono
-    animations: framer-motion
-
-  icons:
-    primary:
-      name: Lucide React
-      scope: ui_icons
-    secondary:
-      name: Simple Icons
-      scope: brand_icons
-
-# -----------------------------------------------------------------------------
-# DATABASE & ORM
-# -----------------------------------------------------------------------------
-storage:
-  database:
-    primary:
-      type: PostgreSQL
-      provider: Neon
-      version: ">=16"
-      features_used:
-        - connection_pooling
-        - serverless_driver
-        - branching_optional
-      access_restriction: apps/admin_only
-
-  orm:
-    name: Prisma
-    version: ">=7.0.0"
-    features_used:
-      - schema_definition
-      - migrations
-      - type_safe_queries
-      - relation_queries
-    schema_location: apps/admin/prisma/schema.prisma
-
-  vector_store:
-    name: Qdrant
-    version: ">=1.7.0"
-    deployment: docker_container
-    persistence: docker_volume
-    port: 6333
-    access_restriction: apps/rag-service_only
-    embedding_dimension: 1536
-
-  caching:
-    strategy: fetch_cache_and_revalidation
-    layers:
-      - next_js_fetch_cache
-      - next_js_data_cache
-      - api_response_headers
-
-# -----------------------------------------------------------------------------
-# AUTHENTICATION
-# -----------------------------------------------------------------------------
-auth:
-  library:
-    name: NextAuth.js
-    version: ">=5.0.0"
-    scope:
-      - apps/public
-      - apps/admin
-    package_location: packages/auth
-
-  providers:
-    - name: Google OAuth
-      purpose: user_and_admin_authentication
-      scopes:
-        - email
-        - profile
-
-  session:
-    strategy: jwt
-    max_age: 30_days
-
-  authorization:
-    method: role_based
-    roles:
-      - admin
-      - user
-    admin_allowlist:
-      - naufalrf32@gmail.com
-      - naufalrf4@gmail.com
-
-# -----------------------------------------------------------------------------
-# AI & LLM
-# -----------------------------------------------------------------------------
 ai:
   embeddings:
     provider: OpenAI
     model: text-embedding-3-small
     dimensions: 1536
-    scope: apps/rag-service
-
   llm:
-    routing: primary_with_fallback
-    selection: environment_variable
-    providers:
-      gemini:
-        api: Google Gemini API
-        model: gemini-2.0-flash
-        sdk: "@google/generative-ai"
+    primary: configurable (PRIMARY_LLM env var)
+    fallback: configurable (FALLBACK_LLM env var)
+    supported_providers: [openai, gemini, groq]
+  vector_search: pgvector (cosine similarity)
+  no_langchain: true
 
-      groq:
-        api: Groq API
-        model: llama-3.3-70b-versatile
-        sdk: groq-sdk
+ui:
+  design_system:
+    theme: neumorphism
+    color_mode: light_only
+    background: '#E0E5EC'
+    text: '#3D4852'
+    accent: '#6C63FF'
+    shadow_system: dual (extruded + inset)
+  typography:
+    font_sans: Plus Jakarta Sans
+    font_ui: DM Sans
+    font_mono: JetBrains Mono
+  component_base: shadcn/ui (modified for Neumorphism)
+  css_framework: Tailwind CSS
 
-      openai:
-        api: OpenAI API
-        model: gpt-4o-mini
-        sdk: openai
+forms:
+  library: react-hook-form
+  validation: zod
+  resolver: '@hookform/resolvers/zod'
 
-      deepseek:
-        api: DeepSeek API
-        model: deepseek-chat
-        sdk: openai-compatible
+state:
+  client: Zustand or React context (feature-scoped, if needed)
 
-  orchestration:
-    library: LangChain.js
-    version: ">=0.1.0"
-    features_used:
-      - document_loaders
-      - text_splitters
-      - vector_stores
-      - retrievers
-      - chains
+analytics:
+  provider: Google Analytics 4
 
-# -----------------------------------------------------------------------------
-# VALIDATION
-# -----------------------------------------------------------------------------
-validation:
-  schema:
-    name: Zod
-    version: ">=3.22.0"
-    scope: all_applications
-    uses:
-      - api_request_validation
-      - form_validation
-      - environment_variable_validation
-      - dto_definitions
+notifications:
+  provider: Telegram Bot API
 
-# -----------------------------------------------------------------------------
-# INFRASTRUCTURE
-# -----------------------------------------------------------------------------
-infrastructure:
-  reverse_proxy:
-    name: Traefik
-    version: ">=3.0.0"
-    features_used:
-      - host_based_routing
-      - tls_termination
-      - automatic_https
-      - docker_provider
-
-  tls:
-    provider: Let's Encrypt
-    challenge: http-01
-    auto_renewal: true
-
-  containerization:
-    name: Docker
-    compose: docker-compose.yaml
-    orchestration: docker_compose_only
-    no_kubernetes: true
-
-  hosting:
-    mode: self_hosted
-    server: single_vps
-    provider: user_choice
-
-# -----------------------------------------------------------------------------
-# TOOLING - DEVELOPMENT
-# -----------------------------------------------------------------------------
-tooling:
-  linting:
-    - name: ESLint
-      version: ">=8.0.0"
-      config_location: packages/config/eslint
-      extends:
-        - eslint:recommended
-        - plugin:@typescript-eslint/recommended
-        - plugin:react/recommended
-        - plugin:react-hooks/recommended
-        - next/core-web-vitals
-
-  formatting:
-    name: Prettier
-    version: ">=3.0.0"
-    config_location: packages/config/prettier
-
-  git_hooks:
-    name: Husky
-    version: ">=9.0.0"
-    hooks:
-      - pre-commit: lint-staged
-      - commit-msg: commitlint
-
-  commit_linting:
-    name: commitlint
-    convention: conventional_commits
-    types:
-      - feat
-      - fix
-      - docs
-      - style
-      - refactor
-      - perf
-      - test
-      - build
-      - ci
-      - chore
-      - revert
-
-  staged_linting:
-    name: lint-staged
-    rules:
-      "*.{ts,tsx}": ["eslint --fix", "prettier --write"]
-      "*.{json,md,yaml}": ["prettier --write"]
-
-# -----------------------------------------------------------------------------
-# TOOLING - TESTING
-# -----------------------------------------------------------------------------
-testing:
-  unit:
-    name: Vitest
-    version: ">=1.0.0"
-    scope: all_packages_and_apps
-    coverage: v8
-
-  component:
-    name: Testing Library
-    packages:
-      - "@testing-library/react"
-      - "@testing-library/user-event"
-      - "@testing-library/jest-dom"
-
-  e2e:
-    name: Playwright
-    version: ">=1.40.0"
-    browsers:
-      - chromium
-      - firefox
-      - webkit
-
-  api:
-    name: Supertest
-    scope: api_route_testing
-
-# -----------------------------------------------------------------------------
-# TOOLING - CI/CD
-# -----------------------------------------------------------------------------
 ci_cd:
-  platform: GitHub Actions
-  workflows:
-    - ci: lint_typecheck_test_build
-    - deploy: docker_build_and_push
-  caching:
-    - pnpm_store
-    - turbo_cache
-    - docker_layers
+  commands:
+    lint: pnpm lint
+    typecheck: pnpm typecheck
+    test: pnpm test
+    build: pnpm build
+  no_turbo_cache: true
 
-# -----------------------------------------------------------------------------
-# OBSERVABILITY
-# -----------------------------------------------------------------------------
-observability:
-  logging:
-    library: pino
-    format: json
-    levels:
-      - error
-      - warn
-      - info
-      - debug
-
-  monitoring:
-    uptime:
-      options:
-        - UptimeRobot
-        - Better Uptime
-    metrics:
-      options:
-        - self_hosted_prometheus
-        - simple_health_endpoints
-
-  error_tracking:
-    options:
-      - Sentry
-      - self_hosted_logging
-    scope: production_only
-
-# -----------------------------------------------------------------------------
-# PACKAGE STRUCTURE
-# -----------------------------------------------------------------------------
-packages:
-  shared:
-    - path: packages/ui
-      purpose: shared_react_components
-      exports: components_and_utilities
-
-    - path: packages/types
-      purpose: shared_typescript_types
-      exports: dtos_enums_api_contracts
-
-    - path: packages/sdk
-      purpose: typed_api_clients
-      exports: admin_api_client_rag_api_client
-
-    - path: packages/config
-      purpose: shared_configurations
-      exports: eslint_prettier_tsconfig_tailwind
-
-    - path: packages/auth
-      purpose: shared_nextauth_configuration
-      exports: auth_options_utilities_hooks
-
-# -----------------------------------------------------------------------------
-# VERSION PINNING POLICY
-# -----------------------------------------------------------------------------
-versioning:
-  policy: semver_compatible
-  lock_file: pnpm-lock.yaml
-  update_strategy: dependabot_weekly
-  breaking_changes: manual_review_required
+dockerfile_pattern:
+  base: node:22-alpine
+  python_base: python:3.12-slim

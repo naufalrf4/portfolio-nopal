@@ -93,7 +93,7 @@ This guide helps you diagnose and resolve common issues in the NaufalRF Portfoli
 
 **Solutions:**
 
-1. **Regenerate Prisma client**
+1. **Regenerate Drizzle client**
 
    ```bash
    pnpm --filter admin db:generate
@@ -310,7 +310,7 @@ This guide helps you diagnose and resolve common issues in the NaufalRF Portfoli
    - Ensure port 5432 is open
    - Check cloud provider security groups
 
-### Prisma migration fails
+### Drizzle migration fails
 
 **Symptoms:**
 
@@ -323,37 +323,37 @@ This guide helps you diagnose and resolve common issues in the NaufalRF Portfoli
 1. **Check migration status**
 
    ```bash
-   pnpm --filter admin prisma migrate status
+   pnpm --filter admin db:migrate  # Check migration status
    ```
 
 2. **Reset database (dev only)**
 
    ```bash
    # WARNING: This deletes all data
-   pnpm --filter admin prisma migrate reset
+   pnpm --filter admin db:push  # Reset and push schema
    ```
 
 3. **Mark migration as applied**
 
    ```bash
-   pnpm --filter admin prisma migrate resolve --applied <migration-name>
+   pnpm --filter admin db:migrate  # Resolve migration issues --applied <migration-name>
    ```
 
 4. **Create new migration**
    ```bash
-   pnpm --filter admin prisma migrate dev --name fix_schema
+   pnpm --filter admin db:generate && pnpm --filter admin db:migrate  # (Drizzle migration)
    ```
 
-### Prisma Client not generated
+### Drizzle client not generated
 
 **Symptoms:**
 
-- "Cannot find module '@prisma/client'"
-- Type errors for Prisma models
+- "Cannot find module 'drizzle-orm'"
+- Type errors for Drizzle schema types
 
 **Solutions:**
 
-1. **Generate Prisma Client**
+1. **Generate Drizzle client**
 
    ```bash
    pnpm --filter admin db:generate
@@ -368,9 +368,9 @@ This guide helps you diagnose and resolve common issues in the NaufalRF Portfoli
    pnpm db:generate
    ```
 
-3. **Check Prisma schema**
-   - Ensure schema.prisma is valid
-   - Run `pnpm --filter admin prisma validate`
+3. **Check Drizzle schema**
+   - Ensure db/schema.ts is valid
+   - Run `pnpm --filter admin typecheck  # Validate schema with TypeScript`
 
 ---
 
@@ -542,8 +542,8 @@ This guide helps you diagnose and resolve common issues in the NaufalRF Portfoli
 2. **Check database connection**
 
    ```bash
-   # Test Prisma connection
-   pnpm --filter admin prisma studio
+   # Test database connection
+   pnpm --filter admin db:studio
    ```
 
 3. **Add error logging**
@@ -628,13 +628,13 @@ This guide helps you diagnose and resolve common issues in the NaufalRF Portfoli
    ```bash
    # SSH into production server
    cd apps/admin
-   pnpm prisma migrate deploy
+   pnpm pnpm --filter admin db:migrate
    ```
 
 2. **Check migration status**
 
    ```bash
-   pnpm prisma migrate status
+   pnpm pnpm --filter admin db:migrate  # Check status
    ```
 
 3. **Backup database first**
@@ -705,7 +705,7 @@ This guide helps you diagnose and resolve common issues in the NaufalRF Portfoli
 
    ```typescript
    // Use select to limit fields
-   const projects = await prisma.project.findMany({
+   const projects = await db.select().from(projects).where({
      select: {
        id: true,
        title: true,
@@ -760,7 +760,7 @@ This guide helps you diagnose and resolve common issues in the NaufalRF Portfoli
 
 1. **Add indexes**
 
-   ```prisma
+   ```typescript
    @@index([field1, field2])
    ```
 
@@ -774,7 +774,7 @@ This guide helps you diagnose and resolve common issues in the NaufalRF Portfoli
 
    ```typescript
    // Use cursor-based pagination for large datasets
-   const projects = await prisma.project.findMany({
+   const projects = await db.select().from(projects).where({
      take: 10,
      cursor: { id: lastId },
    });

@@ -887,22 +887,22 @@ psql $DATABASE_URL
 
 ```bash
 # Check migration status
-pnpm --filter admin prisma migrate status
+pnpm --filter admin db:migrate  # Check migration status
 
 # View migration history
-pnpm --filter admin prisma migrate history
+pnpm --filter admin db:migrate  # View migration history
 
 # Reset database (CAUTION: Development only - deletes all data)
-pnpm --filter admin prisma migrate reset
+pnpm --filter admin db:push  # Reset and push schema
 
 # Apply pending migrations
-pnpm --filter admin prisma migrate deploy
+pnpm --filter admin db:migrate
 
-# Generate Prisma client
-pnpm --filter admin prisma generate
+# Generate Drizzle client
+pnpm --filter admin db:generate
 
 # Push schema without migrations (dev only)
-pnpm --filter admin prisma db push
+pnpm --filter admin db:push
 ```
 
 **Common Fixes:**
@@ -911,7 +911,7 @@ pnpm --filter admin prisma db push
 - Check for conflicting schema changes
 - Verify database user has CREATE/ALTER/DROP permissions
 - Review migration logs for specific SQL errors
-- Ensure Prisma schema matches database state
+- Ensure Drizzle schema matches database state
 - Check if migration was partially applied
 - Manually fix database state if needed, then mark migration as applied
 
@@ -945,7 +945,7 @@ AND pid <> pg_backend_pid();
 
 **Common Fixes:**
 
-- Reduce connection pool size in Prisma schema (`connection_limit` in DATABASE_URL)
+- Reduce connection pool size in postgres.js configuration (`connection_limit` in DATABASE_URL)
 - Use connection pooling (PgBouncer for Neon, RDS Proxy for AWS)
 - Increase max connections in PostgreSQL config
 - Check for connection leaks in application code
@@ -1631,7 +1631,7 @@ When troubleshooting:
 5. **Consult Documentation**
    - This deployment guide
    - Platform-specific docs (Heroku, AWS, etc.)
-   - Framework documentation (Next.js, Prisma)
+   - Framework documentation (Next.js, Drizzle ORM)
    - Community forums (Stack Overflow, GitHub Discussions)
 
 6. **Contact Support**
@@ -1697,7 +1697,7 @@ heroku logs --tail -a app-name
 
 ```bash
 # If migrations were run, you may need to rollback database
-heroku run -a app-name "cd apps/admin && pnpm prisma migrate resolve --rolled-back MIGRATION_NAME"
+heroku run -a app-name "cd apps/admin && pnpm --filter admin db:migrate resolve --rolled-back MIGRATION_NAME"
 
 # Or restore from backup
 heroku pg:backups:restore BACKUP_ID DATABASE_URL -a app-name
@@ -1886,15 +1886,15 @@ docker-compose start admin public links ngl
 
 ### Database Migration Rollback
 
-#### Prisma Migration Rollback
+#### Drizzle Migration Rollback
 
 ```bash
 # Mark migration as rolled back
-pnpm --filter admin prisma migrate resolve --rolled-back MIGRATION_NAME
+pnpm --filter admin db:migrate  # Resolve migration issues --rolled-back MIGRATION_NAME
 
 # Or restore database from backup
 # Then mark all migrations as applied
-pnpm --filter admin prisma migrate resolve --applied MIGRATION_NAME
+pnpm --filter admin db:migrate  # Resolve migration issues --applied MIGRATION_NAME
 ```
 
 #### Manual Database Rollback
@@ -1904,14 +1904,14 @@ pnpm --filter admin prisma migrate resolve --applied MIGRATION_NAME
 psql $DATABASE_URL
 
 # View migration history
-SELECT * FROM "_prisma_migrations" ORDER BY finished_at DESC LIMIT 10;
+SELECT * FROM "__drizzle_migrations" ORDER BY finished_at DESC LIMIT 10;
 
 # Manually revert changes (example)
 DROP TABLE IF EXISTS "NewTable";
 ALTER TABLE "ExistingTable" DROP COLUMN IF EXISTS "new_column";
 
 # Mark migration as rolled back
-UPDATE "_prisma_migrations"
+UPDATE "__drizzle_migrations"
 SET rolled_back_at = NOW()
 WHERE migration_name = 'MIGRATION_NAME';
 ```
@@ -2186,7 +2186,7 @@ sudo chmod +x /usr/local/bin/docker-compose
 # Check for security advisories
 # Subscribe to:
 # - Next.js security advisories
-# - Prisma security advisories
+# - Drizzle ORM security advisories
 # - Node.js security advisories
 
 # Monitor CVEs
@@ -2388,7 +2388,7 @@ For deployment issues or questions:
 ## Additional Resources
 
 - [Next.js Deployment Documentation](https://nextjs.org/docs/deployment)
-- [Prisma Deployment Guide](https://www.prisma.io/docs/guides/deployment)
+- [Drizzle ORM Deployment Guide](https://orm.drizzle.team/docs/guides/deployment)
 - [Docker Documentation](https://docs.docker.com/)
 - [Nginx Documentation](https://nginx.org/en/docs/)
 - [Let's Encrypt Documentation](https://letsencrypt.org/docs/)

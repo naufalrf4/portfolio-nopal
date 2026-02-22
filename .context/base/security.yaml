@@ -296,7 +296,7 @@ data_protection:
     required_secrets:
       database:
         - name: DATABASE_URL
-          purpose: Prisma connection to Neon
+          purpose: Drizzle ORM connection to Neon
           format: postgresql://user:pass@host/db
 
         - name: DIRECT_URL
@@ -387,9 +387,9 @@ data_protection:
       encryption: managed by provider (encrypted at rest)
       backups: encrypted by provider
 
-    vector_store:
-      provider: self-hosted Qdrant
-      encryption: none (Docker volume)
+    vector_embeddings:
+      storage: pgvector extension in PostgreSQL (Neon)
+      encryption: managed by Neon provider
       sensitivity: low (derived from public content)
 
     logs:
@@ -590,7 +590,7 @@ vulnerability_management:
       - no hardcoded secrets
       - input validation present
       - output encoding for XSS
-      - SQL injection prevention (Prisma handles)
+      - SQL injection prevention (Drizzle ORM handles)
       - authorization checks on all protected routes
       - rate limiting on write endpoints
 

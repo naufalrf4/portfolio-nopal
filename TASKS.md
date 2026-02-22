@@ -12,10 +12,9 @@
 
 ### Task 0.1: Monorepo Initialization
 
-- [x] Initialize Turborepo with pnpm workspace
+- [x] Initialize pnpm native workspaces monorepo
 - [x] Configure root `package.json` with workspace scripts
 - [x] Create `pnpm-workspace.yaml`
-- [x] Create `turbo.json` with pipeline configuration
 
 ### Task 0.2: Shared Config Package
 
@@ -43,7 +42,7 @@
 
 - [x] Create `docker-compose.yaml` for local services
 - [x] Configure PostgreSQL container
-- [x] Configure Qdrant container
+- [x] Configure Qdrant-free local development environment (pgvector used instead)
 - [x] Create `.env.example` templates
 
 ---
@@ -59,7 +58,7 @@
 
 ### Task 1.2: Database Setup
 
-- [x] Create Prisma schema in `apps/admin/prisma/schema.prisma`
+- [x] Create Drizzle ORM schema in `apps/admin/db/schema.ts`
 - [x] Define all models (User, Project, ProjectContext, BlogLink, etc.)
 - [x] Run initial migration
 - [x] Create seed script for initial data
@@ -109,8 +108,8 @@
 
 ### Task 2.1: Public App Scaffold
 
-- [ ] Create `apps/public` Next.js app
-- [ ] Configure Tailwind CSS with neuromorphic theme
+- [ ] Create `apps/public` Astro SSR app
+- [ ] Configure Tailwind CSS with neumorphism theme
 - [ ] Install shared UI components
 - [ ] Create main layout
 
@@ -150,9 +149,9 @@
 
 ### Task 2.7: UI Polish
 
-- [ ] Apply playful geometric design system
-- [ ] Add Framer Motion animations
-- [ ] Implement dark mode support
+- [ ] Apply neumorphism design system
+- [ ] Add animations (Framer Motion or CSS)
+- [ ] Light mode only (no dark mode in initial scope)
 - [ ] Audit and fix accessibility
 
 ---
@@ -175,14 +174,14 @@
 
 ### Task 3.3: NGL App
 
-- [ ] Create `apps/ngl` Next.js app
-- [ ] Create anonymous message form
+- [ ] Create `apps/ngl` SvelteKit app
+- [ ] Create anonymous message form (SvelteKit form actions)
 - [ ] Implement IP-based rate limiting
 - [ ] Create admin inbox view
 
 ### Task 3.4: Links Hub
 
-- [ ] Create `apps/links` Next.js app
+- [ ] Create `apps/links` Astro SSR app
 - [ ] Fetch profile links from API
 - [ ] Display links with icons
 - [ ] Admin CRUD for profile links
@@ -200,17 +199,18 @@
 
 ### Task 4.1: RAG Service Scaffold
 
-- [ ] Create `apps/rag-service` Node.js app
-- [ ] Setup Fastify server
+- [ ] Create `apps/rag-service` Python FastAPI app
+- [ ] Setup uvicorn server
 - [ ] Create health check endpoint
 - [ ] Create Docker configuration
+- [ ] Configure pyproject.toml with uv
 
 ### Task 4.2: Vector Store Integration
 
-- [ ] Configure Qdrant client
-- [ ] Create collection for embeddings
-- [ ] Implement embedding generation
-- [ ] Implement similarity search
+- [ ] Enable pgvector extension in PostgreSQL
+- [ ] Create vector similarity search queries
+- [ ] Implement embedding generation (OpenAI text-embedding-3-small, 1536 dims)
+- [ ] Implement cosine distance similarity search
 
 ### Task 4.3: Ingestion Pipeline
 
@@ -221,10 +221,10 @@
 
 ### Task 4.4: LLM Integration
 
-- [ ] Setup LangChain.js
+- [ ] Setup custom Python LLM router (no LangChain)
 - [ ] Implement provider clients (Gemini, Groq, OpenAI, DeepSeek)
 - [ ] Implement primary/fallback routing
-- [ ] Configure environment-based selection
+- [ ] Configure environment-based selection (PRIMARY_LLM, FALLBACK_LLM)
 
 ### Task 4.5: Chat Endpoint
 

@@ -1,6 +1,6 @@
 # =============================================================================
 # DIRECTORY STRUCTURE SPECIFICATION
-# naufalrf-portfolio Turborepo Monorepo
+# naufalrf-portfolio pnpm Workspaces Monorepo
 # =============================================================================
 #
 # This document defines the canonical directory structure, naming conventions,
@@ -31,10 +31,7 @@ root:
     configuration:
       - file: package.json
         purpose: Root package.json with workspace definitions
-        required: true
 
-      - file: turbo.json
-        purpose: Turborepo pipeline configuration
         required: true
 
       - file: pnpm-workspace.yaml
@@ -114,7 +111,7 @@ root:
       - directory: .context/
         purpose: AI assistant context and project documentation
         contents:
-          - architecture/
+          - base/
           - implementation/
           - decisions/
 
@@ -140,7 +137,7 @@ root:
     │   └── auth/                      # NextAuth configuration
     │
     ├── .context/                      # AI context files
-    │   ├── architecture/
+    │   ├── base/
     │   ├── implementation/
     │   └── decisions/
     │
@@ -149,8 +146,6 @@ root:
     ├── .husky/                        # Git hooks
     ├── scripts/                       # Build/deploy scripts
     │
-    ├── turbo.json                     # Turborepo config
-    ├── pnpm-workspace.yaml            # Workspace definition
     ├── package.json                   # Root package.json
     ├── tsconfig.json                  # Base TS config
     ├── docker-compose.yml             # Dev environment
@@ -399,51 +394,377 @@ nextjs_app:
           - env.d.ts
 
 # =============================================================================
+# ASTRO SSR APP ARCHITECTURE
+# =============================================================================
+
+astro_app:
+  description: |
+    Astro SSR applications combine file-based routing with component-based architecture.
+    .astro files are server-rendered by default (zero JS). React islands add interactivity
+    only where needed. Features follow the same modular pattern as Next.js apps.
+
+  # ---------------------------------------------------------------------------
+  # Pages Structure (File-Based Routing)
+  # ---------------------------------------------------------------------------
+  pages:
+    description: |
+      File-based routing in src/pages/. Each file becomes a route.
+      .astro files are server-rendered. API routes live in src/pages/api/.
+
+    structure:
+      - directory: src/pages/
+        purpose: File-based routes
+        files:
+          - pattern: "index.astro"
+            purpose: Homepage
+          - pattern: "about.astro"
+            purpose: About page
+          - pattern: "[slug].astro"
+            purpose: Dynamic route
+          - pattern: "api/[resource].ts"
+            purpose: API endpoint
+
+  # ---------------------------------------------------------------------------
+  # Layouts & Components
+  # ---------------------------------------------------------------------------
+  layouts:
+    description: |
+      Layouts wrap pages. Defined in src/layouts/.
+      Can include slots for flexible composition.
+
+    location: src/layouts/
+    examples:
+      - BaseLayout.astro
+      - BlogLayout.astro
+
+  components:
+    description: |
+      .astro components are server-rendered (no JS by default).
+      React/.tsx components are islands - wrap with client:* directives.
+
+    locations:
+      - src/components/        # Astro components
+      - src/features/*/components/  # Feature components
+
+    client_directives:
+      - client:load            # Hydrate immediately
+      - client:visible         # Hydrate when visible
+      - client:idle            # Hydrate when browser idle
+      - client:only            # Only client-side (no SSR)
+
+  # ---------------------------------------------------------------------------
+  # Middleware & Auth
+  # ---------------------------------------------------------------------------
+  middleware:
+    description: |
+      Middleware runs on every request. Defined in src/middleware.ts.
+      Used for auth checks, redirects, logging.
+
+    location: src/middleware.ts
+    use_cases:
+      - Lucia Auth session validation
+      - Protected route checks
+      - Request logging
+
+  # ---------------------------------------------------------------------------
+  # Shared Directories (Same as Next.js)
+  # ---------------------------------------------------------------------------
+  shared:
+    description: |
+      Same feature-based architecture as Next.js.
+      Features in src/features/, shared code in src/lib/, src/hooks/, etc.
+
+    directories:
+      - src/features/          # Feature modules
+      - src/components/        # Shared components
+      - src/lib/               # Utilities
+      - src/hooks/             # Shared hooks (for React islands)
+      - src/styles/            # Global styles
+      - src/types/             # Shared types
+
+# =============================================================================
+# SVELTEKIT APP ARCHITECTURE
+# =============================================================================
+
+sveltekit_app:
+  description: |
+    SvelteKit uses file-based routing with special files like +page.svelte,
+    +page.server.ts, +layout.svelte. Server and client code are clearly separated.
+    Features follow modular patterns with Svelte components.
+
+  # ---------------------------------------------------------------------------
+  # Routes Structure (File-Based)
+  # ---------------------------------------------------------------------------
+  routes:
+    description: |
+      File-based routing in src/routes/. Special files:
+      - +page.svelte: Page component
+      - +page.server.ts: Server-side load functions and form actions
+      - +layout.svelte: Layout component
+      - +layout.server.ts: Layout server logic
+      - +server.ts: API endpoint
+
+    structure:
+      - directory: src/routes/
+        purpose: File-based routes
+        files:
+          - pattern: "+page.svelte"
+            purpose: Page component
+          - pattern: "+page.server.ts"
+            purpose: Server load function + form actions
+          - pattern: "+layout.svelte"
+            purpose: Layout component
+          - pattern: "+layout.server.ts"
+            purpose: Layout server logic
+          - pattern: "+server.ts"
+            purpose: API endpoint
+          - pattern: "+error.svelte"
+            purpose: Error boundary
+
+  # ---------------------------------------------------------------------------
+  # Load Functions & Form Actions
+  # ---------------------------------------------------------------------------
+  server_logic:
+    description: |
+      Server-side logic in +page.server.ts and +layout.server.ts.
+      Load functions fetch data. Form actions handle POST requests.
+
+    load_function:
+      pattern: "export const load: PageServerLoad = async ({ params }) => { ... }"
+      purpose: Fetch data for page (runs on server)
+
+    form_actions:
+      pattern: "export const actions: Actions = { default: async ({ request }) => { ... } }"
+      purpose: Handle form submissions (progressive enhancement)
+
+  # ---------------------------------------------------------------------------
+  # Components & Stores
+  # ---------------------------------------------------------------------------
+  components:
+    description: |
+      Svelte components (.svelte files) in src/lib/components/.
+      Feature components in src/features/*/components/.
+
+    locations:
+      - src/lib/components/    # Shared Svelte components
+      - src/features/*/components/  # Feature components
+
+  stores:
+    description: |
+      Svelte stores for client-side state management.
+      Located in src/lib/stores/ or src/features/*/stores/.
+
+    location: src/lib/stores/
+    examples:
+      - writable stores
+      - derived stores
+      - custom stores
+
+  # ---------------------------------------------------------------------------
+  # Shared Directories
+  # ---------------------------------------------------------------------------
+  shared:
+    description: |
+      Feature-based architecture adapted for SvelteKit.
+
+    directories:
+      - src/routes/            # Routes (file-based)
+      - src/lib/               # Shared library code
+      - src/lib/components/    # Shared components
+      - src/lib/server/        # Server-only utilities
+      - src/lib/stores/        # Client stores
+      - src/features/          # Feature modules
+
+# =============================================================================
+# PYTHON FASTAPI SERVICE ARCHITECTURE
+# =============================================================================
+
+python_fastapi_service:
+  description: |
+    Python FastAPI service for RAG chatbot. Uses FastAPI framework with
+    async/await, Pydantic models, and modular router architecture.
+    Vector operations use pgvector extension in PostgreSQL.
+
+  # ---------------------------------------------------------------------------
+  # Project Structure
+  # ---------------------------------------------------------------------------
+  structure:
+    description: |
+      Standard Python package structure with src/ layout.
+      Uses pyproject.toml for dependencies (managed by uv).
+
+    root_files:
+      - pyproject.toml         # Python project metadata + dependencies
+      - .python-version        # Python version (3.12)
+      - README.md
+
+  # ---------------------------------------------------------------------------
+  # Application Entry & Config
+  # ---------------------------------------------------------------------------
+  app_entry:
+    location: src/main.py
+    description: FastAPI app initialization and lifespan management
+    pattern: |
+      from fastapi import FastAPI
+      from contextlib import asynccontextmanager
+
+      @asynccontextmanager
+      async def lifespan(app: FastAPI):
+          # startup logic
+          yield
+          # shutdown logic
+
+      app = FastAPI(lifespan=lifespan)
+
+  config:
+    location: src/config.py
+    description: Environment variables and settings (using pydantic-settings)
+    pattern: |
+      from pydantic_settings import BaseSettings
+
+      class Settings(BaseSettings):
+          openai_api_key: str
+          database_url: str
+
+  # ---------------------------------------------------------------------------
+  # Routers (API Endpoints)
+  # ---------------------------------------------------------------------------
+  routers:
+    description: |
+      API route handlers organized by domain.
+      Each router is a separate module in src/routers/.
+
+    location: src/routers/
+    pattern: |
+      from fastapi import APIRouter
+
+      router = APIRouter(prefix="/chat", tags=["chat"])
+
+      @router.post("/")
+      async def chat_endpoint(request: ChatRequest) -> ChatResponse:
+          ...
+
+    examples:
+      - chat.py                # Chat endpoint
+      - documents.py           # Document management
+      - health.py              # Health check
+
+  # ---------------------------------------------------------------------------
+  # Services (Business Logic)
+  # ---------------------------------------------------------------------------
+  services:
+    description: |
+      Business logic and orchestration.
+      Located in src/services/.
+
+    location: src/services/
+    examples:
+      - rag.py                 # RAG pipeline orchestration
+      - embeddings.py          # Embedding generation (OpenAI)
+      - llm.py                 # LLM interactions
+      - documents.py           # Document processing
+
+  # ---------------------------------------------------------------------------
+  # Database & Vector Store
+  # ---------------------------------------------------------------------------
+  database:
+    description: |
+      PostgreSQL with pgvector extension for vector storage.
+      Connection management in src/db/.
+
+    location: src/db/
+    files:
+      - vector.py              # pgvector operations
+      - client.py              # Database client (asyncpg)
+
+  # ---------------------------------------------------------------------------
+  # Models (Pydantic)
+  # ---------------------------------------------------------------------------
+  models:
+    description: |
+      Pydantic models for request/response validation.
+      Located in src/models/.
+
+    location: src/models/
+    examples:
+      - chat.py                # ChatRequest, ChatResponse
+      - document.py            # DocumentModel
+
+  # ---------------------------------------------------------------------------
+  # Shared Directories
+  # ---------------------------------------------------------------------------
+  shared:
+    directories:
+      - src/main.py            # FastAPI app entry
+      - src/config.py          # Settings
+      - src/routers/           # API route handlers
+      - src/services/          # Business logic
+      - src/models/            # Pydantic models
+      - src/db/                # Database operations
+      - src/utils/             # Utility functions
+      - tests/                 # pytest tests
+
+# =============================================================================
 # EXAMPLE: apps/public (Portfolio Site)
 # =============================================================================
 
 example_apps_public:
   description: |
     The public portfolio site showcasing projects, blog posts, and contact form.
-    Uses feature-based architecture with App Router.
+    Uses Astro SSR with file-based routing. Lucia Auth v3 for authentication.
+    React islands for interactivity only where needed.
 
   tree: |
     apps/public/
-    ├── app/                                    # Next.js App Router
-    │   ├── (public)/                           # Public routes group
-    │   │   ├── page.tsx                        # Homepage
-    │   │   ├── about/
-    │   │   │   └── page.tsx
-    │   │   ├── projects/
-    │   │   │   ├── page.tsx                    # Projects list
-    │   │   │   └── [slug]/
-    │   │   │       └── page.tsx                # Project detail
-    │   │   ├── blog/
-    │   │   │   ├── page.tsx                    # Blog list
-    │   │   │   └── [slug]/
-    │   │   │       └── page.tsx                # Blog post
-    │   │   └── contact/
-    │   │       └── page.tsx
-    │   │
-    │   ├── api/                                # API routes
-    │   │   ├── contact/
-    │   │   │   └── route.ts
-    │   │   ├── chat/
-    │   │   │   └── route.ts
-    │   │   └── revalidate/
-    │   │       └── route.ts
-    │   │
-    │   ├── layout.tsx                          # Root layout
-    │   ├── loading.tsx                         # Global loading
-    │   ├── error.tsx                           # Global error
-    │   ├── not-found.tsx                       # 404 page
-    │   └── globals.css                         # Global styles
-    │
     ├── src/
+    │   ├── pages/                              # File-based routes (Astro)
+    │   │   ├── index.astro                     # Homepage
+    │   │   ├── about.astro                     # About page
+    │   │   │
+    │   │   ├── projects/
+    │   │   │   ├── index.astro                 # Projects list
+    │   │   │   └── [slug].astro                # Project detail (dynamic)
+    │   │   │
+    │   │   ├── blog/
+    │   │   │   ├── index.astro                 # Blog list
+    │   │   │   └── [slug].astro                # Blog post (dynamic)
+    │   │   │
+    │   │   ├── contact.astro                   # Contact page
+    │   │   ├── guestbook.astro                 # Guestbook (auth required)
+    │   │   ├── login.astro                     # Login page (Lucia Auth)
+    │   │   │
+    │   │   └── api/                            # API endpoints
+    │   │       ├── auth/
+    │   │       │   ├── login.ts                # Login handler (Lucia)
+    │   │       │   ├── logout.ts               # Logout handler
+    │   │       │   └── google.ts               # Google OAuth callback
+    │   │       ├── contact.ts                  # Contact form submission
+    │   │       ├── guestbook.ts                # Guestbook CRUD
+    │   │       └── chat.ts                     # Chat widget proxy
+    │   │
+    │   ├── layouts/                            # Astro layouts
+    │   │   ├── BaseLayout.astro                # Base layout (header + footer)
+    │   │   ├── BlogLayout.astro                # Blog post layout
+    │   │   └── ProjectLayout.astro             # Project detail layout
+    │   │
+    │   ├── components/                         # Astro components (server-rendered)
+    │   │   ├── layout/
+    │   │   │   ├── Header.astro                # Site header
+    │   │   │   ├── Footer.astro                # Site footer
+    │   │   │   ├── Navigation.astro            # Nav menu
+    │   │   │   └── Container.astro             # Content container
+    │   │   │
+    │   │   ├── common/
+    │   │   │   ├── SEO.astro                   # SEO meta tags
+    │   │   │   ├── Card.astro                  # Card component
+    │   │   │   └── Badge.astro                 # Badge component
+    │   │   │
+    │   │   └── index.ts
+    │   │
     │   ├── features/                           # Feature modules
-    │   │   ├── hero/                           # Hero section feature
+    │   │   ├── hero/                           # Hero section
     │   │   │   ├── components/
-    │   │   │   │   ├── HeroSection.tsx
+    │   │   │   │   ├── HeroSection.tsx         # React island (client:load)
     │   │   │   │   ├── HeroTitle.tsx
     │   │   │   │   ├── HeroSubtitle.tsx
     │   │   │   │   ├── HeroCTA.tsx
@@ -451,15 +772,15 @@ example_apps_public:
     │   │   │   ├── hooks/
     │   │   │   │   ├── useTypewriter.ts
     │   │   │   │   └── index.ts
-    │   │   │   └── index.ts                    # Feature barrel
+    │   │   │   └── index.ts
     │   │   │
     │   │   ├── projects/                       # Projects feature
     │   │   │   ├── components/
-    │   │   │   │   ├── ProjectGrid.tsx
-    │   │   │   │   ├── ProjectCard.tsx
-    │   │   │   │   ├── ProjectDetail.tsx
-    │   │   │   │   ├── ProjectTechStack.tsx
-    │   │   │   │   ├── ProjectFilters.tsx
+    │   │   │   │   ├── ProjectGrid.tsx         # React island (client:visible)
+    │   │   │   │   ├── ProjectCard.tsx         # React island
+    │   │   │   │   ├── ProjectDetail.astro     # Server component
+    │   │   │   │   ├── ProjectTechStack.astro
+    │   │   │   │   ├── ProjectFilters.tsx      # React island (client:load)
     │   │   │   │   └── index.ts
     │   │   │   ├── hooks/
     │   │   │   │   ├── useProjects.ts
@@ -467,7 +788,7 @@ example_apps_public:
     │   │   │   │   ├── useProjectFilters.ts
     │   │   │   │   └── index.ts
     │   │   │   ├── services/
-    │   │   │   │   ├── projects.service.ts
+    │   │   │   │   ├── projects.service.ts     # Calls Admin API
     │   │   │   │   └── index.ts
     │   │   │   ├── types/
     │   │   │   │   ├── project.types.ts
@@ -479,15 +800,11 @@ example_apps_public:
     │   │   │
     │   │   ├── blog/                           # Blog feature
     │   │   │   ├── components/
-    │   │   │   │   ├── ArticleList.tsx
-    │   │   │   │   ├── ArticleCard.tsx
-    │   │   │   │   ├── ArticleContent.tsx
-    │   │   │   │   ├── ArticleMeta.tsx
-    │   │   │   │   ├── TableOfContents.tsx
-    │   │   │   │   └── index.ts
-    │   │   │   ├── hooks/
-    │   │   │   │   ├── useBlogPosts.ts
-    │   │   │   │   ├── useBlogPost.ts
+    │   │   │   │   ├── ArticleList.astro       # Server component
+    │   │   │   │   ├── ArticleCard.astro
+    │   │   │   │   ├── ArticleContent.astro
+    │   │   │   │   ├── ArticleMeta.astro
+    │   │   │   │   ├── TableOfContents.tsx     # React island
     │   │   │   │   └── index.ts
     │   │   │   ├── services/
     │   │   │   │   ├── blog.service.ts
@@ -499,9 +816,9 @@ example_apps_public:
     │   │   │
     │   │   ├── contact/                        # Contact feature
     │   │   │   ├── components/
-    │   │   │   │   ├── ContactForm.tsx
-    │   │   │   │   ├── ContactInfo.tsx
-    │   │   │   │   ├── SocialLinks.tsx
+    │   │   │   │   ├── ContactForm.tsx         # React island (client:load)
+    │   │   │   │   ├── ContactInfo.astro
+    │   │   │   │   ├── SocialLinks.astro
     │   │   │   │   └── index.ts
     │   │   │   ├── hooks/
     │   │   │   │   ├── useContactForm.ts
@@ -514,9 +831,23 @@ example_apps_public:
     │   │   │   │   └── index.ts
     │   │   │   └── index.ts
     │   │   │
+    │   │   ├── guestbook/                      # Guestbook feature
+    │   │   │   ├── components/
+    │   │   │   │   ├── GuestbookList.tsx       # React island
+    │   │   │   │   ├── GuestbookEntry.astro
+    │   │   │   │   ├── GuestbookForm.tsx       # React island
+    │   │   │   │   └── index.ts
+    │   │   │   ├── hooks/
+    │   │   │   │   ├── useGuestbook.ts
+    │   │   │   │   └── index.ts
+    │   │   │   ├── services/
+    │   │   │   │   ├── guestbook.service.ts
+    │   │   │   │   └── index.ts
+    │   │   │   └── index.ts
+    │   │   │
     │   │   ├── chat/                           # AI Chat feature
     │   │   │   ├── components/
-    │   │   │   │   ├── ChatWidget.tsx
+    │   │   │   │   ├── ChatWidget.tsx          # React island (client:idle)
     │   │   │   │   ├── ChatMessage.tsx
     │   │   │   │   ├── ChatInput.tsx
     │   │   │   │   ├── ChatToggle.tsx
@@ -526,7 +857,7 @@ example_apps_public:
     │   │   │   │   ├── useChatHistory.ts
     │   │   │   │   └── index.ts
     │   │   │   ├── services/
-    │   │   │   │   ├── chat.service.ts
+    │   │   │   │   ├── chat.service.ts         # Calls RAG service
     │   │   │   │   └── index.ts
     │   │   │   ├── stores/
     │   │   │   │   ├── chat.store.ts
@@ -536,42 +867,28 @@ example_apps_public:
     │   │   │   │   └── index.ts
     │   │   │   └── index.ts
     │   │   │
+    │   │   ├── auth/                           # Auth feature (Lucia)
+    │   │   │   ├── components/
+    │   │   │   │   ├── LoginForm.tsx           # React island
+    │   │   │   │   ├── GoogleLoginButton.tsx
+    │   │   │   │   └── index.ts
+    │   │   │   ├── lib/
+    │   │   │   │   ├── lucia.ts                # Lucia Auth config
+    │   │   │   │   └── google.ts               # Google OAuth (arctic)
+    │   │   │   ├── types/
+    │   │   │   │   └── index.ts
+    │   │   │   └── index.ts
+    │   │   │
     │   │   └── about/                          # About feature
     │   │       ├── components/
-    │   │       │   ├── AboutSection.tsx
-    │   │       │   ├── SkillsGrid.tsx
-    │   │       │   ├── ExperienceTimeline.tsx
+    │   │       │   ├── AboutSection.astro
+    │   │       │   ├── SkillsGrid.astro
+    │   │       │   ├── ExperienceTimeline.astro
     │   │       │   └── index.ts
     │   │       ├── types/
     │   │       │   ├── about.types.ts
     │   │       │   └── index.ts
     │   │       └── index.ts
-    │   │
-    │   ├── components/                         # Shared components
-    │   │   ├── ui/                             # Base UI components
-    │   │   │   ├── Button.tsx
-    │   │   │   ├── Card.tsx
-    │   │   │   ├── Input.tsx
-    │   │   │   ├── Badge.tsx
-    │   │   │   ├── Skeleton.tsx
-    │   │   │   └── index.ts
-    │   │   │
-    │   │   ├── layout/                         # Layout components
-    │   │   │   ├── Header.tsx
-    │   │   │   ├── Footer.tsx
-    │   │   │   ├── Navigation.tsx
-    │   │   │   ├── Container.tsx
-    │   │   │   ├── Section.tsx
-    │   │   │   └── index.ts
-    │   │   │
-    │   │   ├── common/                         # Common components
-    │   │   │   ├── SEOHead.tsx
-    │   │   │   ├── LoadingSpinner.tsx
-    │   │   │   ├── ErrorMessage.tsx
-    │   │   │   ├── AnimatedSection.tsx
-    │   │   │   └── index.ts
-    │   │   │
-    │   │   └── index.ts                        # Components barrel
     │   │
     │   ├── lib/                                # Utilities & config
     │   │   ├── utils/
@@ -585,39 +902,36 @@ example_apps_public:
     │   │   │   ├── config.ts                   # App config
     │   │   │   └── index.ts
     │   │   │
-    │   │   ├── api/
-    │   │   │   ├── client.ts                   # API client setup
-    │   │   │   └── index.ts
+    │   │   ├── sdk/
+    │   │   │   └── client.ts                   # Admin API + RAG API clients
     │   │   │
     │   │   └── index.ts
     │   │
-    │   ├── hooks/                              # Shared hooks
+    │   ├── hooks/                              # Shared hooks (for React islands)
     │   │   ├── useMediaQuery.ts
     │   │   ├── useScrollPosition.ts
     │   │   ├── useIntersectionObserver.ts
     │   │   └── index.ts
     │   │
-    │   ├── providers/                          # Context providers
-    │   │   ├── ThemeProvider.tsx
-    │   │   ├── QueryProvider.tsx
-    │   │   └── index.ts
-    │   │
-    │   ├── styles/                             # Styles
+    │   ├── styles/                             # Global styles
     │   │   ├── globals.css
     │   │   ├── variables.css
     │   │   ├── animations.css
     │   │   └── typography.css
     │   │
-    │   └── types/                              # Shared types
-    │       ├── global.d.ts
-    │       └── env.d.ts
+    │   ├── types/                              # Shared types
+    │   │   ├── global.d.ts
+    │   │   └── env.d.ts
+    │   │
+    │   ├── middleware.ts                       # Astro middleware (Lucia Auth)
+    │   └── env.d.ts                            # Astro env types
     │
     ├── public/                                 # Static assets
     │   ├── images/
     │   ├── fonts/
     │   └── favicon.ico
     │
-    ├── next.config.js
+    ├── astro.config.mjs                        # Astro config (SSR mode, Node adapter)
     ├── tailwind.config.ts
     ├── postcss.config.js
     ├── tsconfig.json
@@ -877,7 +1191,7 @@ example_apps_admin:
     │   │   │   ├── middleware.ts               # API middleware
     │   │   │   └── responses.ts                # Response helpers
     │   │   ├── db/
-    │   │   │   ├── prisma.ts                   # Prisma client
+    │   │   │   ├── client.ts                   # Drizzle client re-export
     │   │   │   └── queries/                    # Reusable queries
     │   │   └── validations/
     │   │       └── common.ts                   # Common Zod schemas
@@ -887,8 +1201,8 @@ example_apps_admin:
     │   ├── styles/
     │   └── types/
     │
-    ├── prisma/
-    │   ├── schema.prisma
+    ├── db/
+    │   ├── schema.ts
     │   ├── migrations/
     │   └── seed.ts
     │
@@ -1107,8 +1421,11 @@ packages:
   # ---------------------------------------------------------------------------
   auth:
     description: |
-      Shared NextAuth.js configuration and utilities.
-      Provides authentication setup for all Next.js apps that need auth.
+      Shared NextAuth.js v5 configuration and utilities.
+      Used ONLY by apps/admin (Next.js App Router).
+      
+      Note: apps/public uses Lucia Auth v3 separately with Google OAuth via arctic.
+      This package is NOT used by apps/public, apps/links, apps/ngl, or apps/rag-service.
 
     tree: |
       packages/auth/
@@ -1119,7 +1436,7 @@ packages:
       │   │   └── index.ts
       │   │
       │   ├── adapters/
-      │   │   ├── prisma.ts                     # Prisma adapter
+      │   │   ├── drizzle.ts                    # Drizzle adapter
       │   │   └── index.ts
       │   │
       │   ├── callbacks/
@@ -1157,44 +1474,49 @@ other_apps:
   # ---------------------------------------------------------------------------
   links:
     description: Link-in-bio style links hub (like Linktree)
+    architecture: Astro SSR (see astro_app pattern)
+    port: 3002
     key_features:
       - Public links page
       - Click tracking
       - Custom themes
+      - Read-only API consumer (Admin API)
 
     tree: |
       apps/links/
-      ├── app/
-      │   ├── page.tsx                          # Main links page
-      │   ├── [slug]/
-      │   │   └── page.tsx                      # Custom slug pages
-      │   ├── api/
-      │   │   └── click/
-      │   │       └── route.ts                  # Track clicks
-      │   ├── layout.tsx
-      │   └── globals.css
-      │
       ├── src/
-      │   ├── features/
-      │   │   └── links/
-      │   │       ├── components/
-      │   │       │   ├── LinksList.tsx
-      │   │       │   ├── LinkButton.tsx
-      │   │       │   ├── SocialLinks.tsx
-      │   │       │   └── index.ts
-      │   │       ├── hooks/
-      │   │       ├── services/
-      │   │       └── index.ts
+      │   ├── pages/
+      │   │   ├── index.astro                   # Main links page
+      │   │   ├── [slug].astro                  # Custom slug pages
+      │   │   └── api/
+      │   │       └── click.ts                  # Track clicks API endpoint
+      │   │
+      │   ├── layouts/
+      │   │   └── BaseLayout.astro              # Base HTML layout
       │   │
       │   ├── components/
-      │   │   ├── ui/
-      │   │   └── layout/
-      │   │       ├── ProfileHeader.tsx
-      │   │       └── index.ts
+      │   │   ├── LinksList.astro               # Server-rendered links
+      │   │   ├── LinkButton.astro              # Individual link button
+      │   │   ├── SocialLinks.astro             # Social media icons
+      │   │   ├── ProfileHeader.astro           # Profile section
+      │   │   └── ClickTracker.tsx              # React island for analytics
+      │   │
+      │   ├── features/
+      │   │   └── links/
+      │   │       ├── services/
+      │   │       │   └── links.service.ts      # Fetches from Admin API
+      │   │       └── types/
+      │   │           └── link.types.ts
       │   │
       │   └── lib/
+      │       ├── sdk.ts                        # Admin API client
+      │       └── config.ts
       │
-      ├── next.config.js
+      ├── public/
+      │   └── favicon.svg
+      │
+      ├── astro.config.mjs                      # Astro config (Node adapter)
+      ├── tsconfig.json
       └── package.json
 
   # ---------------------------------------------------------------------------
@@ -1202,46 +1524,44 @@ other_apps:
   # ---------------------------------------------------------------------------
   ngl:
     description: Anonymous feedback/questions app (like NGL)
+    architecture: SvelteKit (see sveltekit_app pattern)
+    port: 3003
     key_features:
       - Anonymous question submission
       - Question display
       - Spam filtering
+      - Write-only API consumer (Admin API)
 
     tree: |
       apps/ngl/
-      ├── app/
-      │   ├── page.tsx                          # Submit question
-      │   ├── inbox/
-      │   │   └── page.tsx                      # View questions (protected)
-      │   ├── api/
-      │   │   ├── questions/
-      │   │   │   └── route.ts
-      │   │   └── spam-check/
-      │   │       └── route.ts
-      │   ├── layout.tsx
-      │   └── globals.css
-      │
       ├── src/
-      │   ├── features/
-      │   │   ├── submit/
-      │   │   │   ├── components/
-      │   │   │   │   ├── QuestionForm.tsx
-      │   │   │   │   ├── SuccessMessage.tsx
-      │   │   │   │   └── index.ts
-      │   │   │   ├── hooks/
-      │   │   │   └── index.ts
-      │   │   │
-      │   │   └── inbox/
-      │   │       ├── components/
-      │   │       │   ├── QuestionsList.tsx
-      │   │       │   ├── QuestionCard.tsx
-      │   │       │   └── index.ts
-      │   │       └── index.ts
+      │   ├── routes/
+      │   │   ├── +page.svelte                  # Submit question form
+      │   │   ├── +page.server.ts               # Form action for submissions
+      │   │   ├── inbox/
+      │   │   │   ├── +page.svelte              # View questions (protected)
+      │   │   │   ├── +page.server.ts           # Load questions data
+      │   │   │   └── +layout.server.ts        # Auth guard
+      │   │   └── +layout.svelte                # Root layout
       │   │
-      │   ├── components/
-      │   └── lib/
+      │   ├── lib/
+      │   │   ├── server/                       # Server-only code
+      │   │   │   ├── api.ts                    # Admin API client
+      │   │   │   └── spam-check.ts             # Spam detection
+      │   │   └── components/
+      │   │       ├── QuestionForm.svelte       # Anonymous submission form
+      │   │       ├── QuestionsList.svelte      # Questions list
+      │   │       ├── QuestionCard.svelte       # Individual question card
+      │   │       └── SuccessMessage.svelte     # Post-submit feedback
+      │   │
+      │   └── app.html                      # HTML template
       │
-      ├── next.config.js
+      ├── static/
+      │   └── favicon.ico
+      │
+      ├── svelte.config.js                  # SvelteKit config (Node adapter)
+      ├── tsconfig.json
+      ├── vite.config.ts
       └── package.json
 
   # ---------------------------------------------------------------------------
@@ -1249,76 +1569,68 @@ other_apps:
   # ---------------------------------------------------------------------------
   rag_service:
     description: |
-      Node.js/Fastify service for RAG-based AI chatbot.
-      Handles document ingestion, vector storage, and query processing.
+      Python FastAPI service for RAG-based AI chatbot.
+      Handles document ingestion, vector storage (pgvector), and query processing.
+    architecture: Python FastAPI (see python_fastapi_service pattern)
+    port: 3004
 
     tree: |
       apps/rag-service/
       ├── src/
-      │   ├── server.ts                         # Fastify server entry
-      │   ├── app.ts                            # App configuration
+      │   ├── main.py                           # FastAPI app entry + lifespan
+      │   ├── config.py                         # Pydantic settings
       │   │
-      │   ├── routes/                           # API routes
-      │   │   ├── index.ts                      # Route registration
-      │   │   ├── health.route.ts               # Health check
-      │   │   ├── query.route.ts                # Query endpoint
-      │   │   ├── documents.route.ts            # Document management
-      │   │   └── conversations.route.ts        # Conversation history
+      │   ├── routers/                          # FastAPI routers
+      │   │   ├── __init__.py
+      │   │   ├── health.py                     # Health check
+      │   │   ├── query.py                      # Query endpoint
+      │   │   ├── documents.py                  # Document management
+      │   │   └── conversations.py              # Conversation history
       │   │
       │   ├── services/                         # Business logic
-      │   │   ├── rag.service.ts                # RAG orchestration
-      │   │   ├── embedding.service.ts          # Embedding generation
-      │   │   ├── vector-store.service.ts       # Vector DB operations
-      │   │   ├── llm.service.ts                # LLM interactions
-      │   │   ├── document.service.ts           # Document processing
-      │   │   └── index.ts
+      │   │   ├── __init__.py
+      │   │   ├── rag_service.py                # RAG orchestration
+      │   │   ├── embedding_service.py          # OpenAI embeddings
+      │   │   ├── vector_store_service.py       # pgvector operations
+      │   │   ├── llm_service.py                # LLM interactions
+      │   │   └── document_service.py           # Document processing
       │   │
       │   ├── processors/                       # Document processors
-      │   │   ├── markdown.processor.ts
-      │   │   ├── pdf.processor.ts
-      │   │   ├── text.processor.ts
-      │   │   └── index.ts
+      │   │   ├── __init__.py
+      │   │   ├── markdown_processor.py
+      │   │   ├── pdf_processor.py
+      │   │   └── text_processor.py
       │   │
       │   ├── db/                               # Database
-      │   │   ├── prisma.ts                     # Prisma client
-      │   │   ├── vector/                       # Vector DB (pgvector/pinecone)
-      │   │   │   ├── client.ts
-      │   │   │   └── queries.ts
-      │   │   └── index.ts
+      │   │   ├── __init__.py
+      │   │   └── vector.py                     # pgvector connection + queries
       │   │
       │   ├── lib/                              # Utilities
-      │   │   ├── chunker.ts                    # Text chunking
-      │   │   ├── prompts.ts                    # LLM prompts
-      │   │   ├── config.ts                     # Configuration
-      │   │   └── index.ts
+      │   │   ├── __init__.py
+      │   │   ├── chunker.py                    # Text chunking
+      │   │   └── prompts.py                    # LLM prompts
       │   │
-      │   ├── middleware/                       # Fastify middleware
-      │   │   ├── auth.ts                       # Authentication
-      │   │   ├── rateLimit.ts                  # Rate limiting
-      │   │   └── index.ts
+      │   ├── middleware/                       # FastAPI middleware
+      │   │   ├── __init__.py
+      │   │   ├── auth.py                       # Service token auth
+      │   │   └── rate_limit.py                 # Rate limiting
       │   │
-      │   ├── types/                            # TypeScript types
-      │   │   ├── query.types.ts
-      │   │   ├── document.types.ts
-      │   │   └── index.ts
-      │   │
-      │   └── plugins/                          # Fastify plugins
-      │       ├── cors.ts
-      │       ├── swagger.ts
-      │       └── index.ts
-      │
-      ├── prisma/
-      │   ├── schema.prisma
-      │   └── migrations/
+      │   └── models/                           # Pydantic models
+      │       ├── __init__.py
+      │       ├── query.py                      # Query request/response
+      │       └── document.py                   # Document models
       │
       ├── tests/
+      │   ├── __init__.py
       │   ├── unit/
       │   ├── integration/
       │   └── fixtures/
       │
       ├── Dockerfile
-      ├── tsconfig.json
-      └── package.json
+      ├── .python-version                   # Python 3.12
+      ├── pyproject.toml                    # uv project file
+      ├── uv.lock                           # uv lockfile
+      └── .env.example
 
 # =============================================================================
 # NAMING CONVENTIONS
@@ -1745,7 +2057,9 @@ guidelines:
         // app/api/v1/projects/route.ts
         import { NextRequest, NextResponse } from 'next/server'
         import { z } from 'zod'
-        import { prisma } from '@/lib/db'
+        import { db } from '@/lib/db'
+        import { projects } from '@/db/schema'
+        import { eq } from 'drizzle-orm'
         import { requireAuth } from '@repo/auth'
 
         // Validation schema
@@ -1757,7 +2071,7 @@ guidelines:
         // GET /api/v1/projects
         export async function GET(request: NextRequest) {
           try {
-            const projects = await prisma.project.findMany()
+            const result = await db.select().from(projects)
             return NextResponse.json({ data: projects })
           } catch (error) {
             return NextResponse.json(
@@ -1774,7 +2088,7 @@ guidelines:
             const body = await request.json()
             const data = createProjectSchema.parse(body)
 
-            const project = await prisma.project.create({ data })
+            const [project] = await db.insert(projects).values(data).returning()
             return NextResponse.json({ data: project }, { status: 201 })
           } catch (error) {
             // Handle validation/auth/db errors

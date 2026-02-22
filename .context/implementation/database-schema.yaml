@@ -1,8 +1,75 @@
 # =============================================================================
+# DATABASE CLIENT SETUP
+# =============================================================================
+
+database_client:
+  location: "apps/admin/db/index.ts"
+  
+  setup: |
+    // apps/admin/db/index.ts
+    import { drizzle } from 'drizzle-orm/postgres-js';
+    import postgres from 'postgres';
+    import * as schema from './schema';
+
+    // Create postgres.js client
+    const client = postgres(process.env.DATABASE_URL!, {
+      max: 10,
+      idle_timeout: 20,
+      connect_timeout: 10,
+    });
+
+    // Initialize Drizzle with schema
+    export const db = drizzle(client, { schema });
+    
+    // Export all schema tables and helpers
+    export * from './schema';
+  
+  usage: |
+    // In any file that needs database access
+    import { db, projects, eq } from '@/db';
+    
+    const allProjects = await db.select().from(projects);
+    const project = await db.select()
+      .from(projects)
+      .where(eq(projects.id, projectId))
+      .limit(1);
+
+# =============================================================================
+# MIGRATION COMMANDS REFERENCE
+# =============================================================================
+
+migration_commands:
+  generate:
+    command: "pnpm --filter admin db:generate"
+    description: "Generate migration files from schema changes"
+    when: "After modifying db/schema.ts"
+  
+  migrate:
+    command: "pnpm --filter admin db:migrate"
+    description: "Apply pending migrations to database"
+    when: "Deploy to staging/production"
+  
+  push:
+    command: "pnpm --filter admin db:push"
+    description: "Push schema directly without migrations (dev only)"
+    when: "Rapid prototyping in development"
+    warning: "Skips migration history - use only in development"
+  
+  studio:
+    command: "pnpm --filter admin db:studio"
+    description: "Open Drizzle Studio for database browsing"
+    port: 4983
+  
+  pull:
+    command: "pnpm --filter admin db:pull"
+    description: "Introspect database and generate schema"
+    when: "Reverse-engineer existing database"
+
+# =============================================================================
 # Portfolio Ecosystem Database Schema Specification
 # =============================================================================
-# Version: 1.0.0
-# Database: PostgreSQL (via Prisma ORM)
+# Version: 2.0.0
+# Database: PostgreSQL (via Drizzle ORM + postgres.js)
 # Last Updated: 2024
 # =============================================================================
 
@@ -10,7 +77,8 @@ metadata:
   name: "Portfolio Ecosystem Database"
   version: "1.0.0"
   database: "PostgreSQL"
-  orm: "Prisma"
+  orm: "Drizzle ORM"
+  driver: "postgres.js"
   description: |
     Comprehensive database schema for a personal portfolio ecosystem including
     projects, blog links, guestbook, anonymous messages, chat logs, and more.
@@ -217,268 +285,491 @@ json_structures:
       }
 
 # =============================================================================
-# PRISMA SCHEMA DEFINITION
+# DRIZZLE SCHEMA DEFINITION
 # =============================================================================
 
-prisma_schema: |
+drizzle_schema: |
   // ==========================================================================
-  // Prisma Schema for Portfolio Ecosystem
+  // Drizzle Schema for Portfolio Ecosystem
   // ==========================================================================
-  // Run: npx prisma generate
-  // Run: npx prisma migrate dev --name init
+  // Location: apps/admin/db/schema.ts
+  // Run: pnpm --filter admin db:generate
+  // Run: pnpm --filter admin db:migrate
   // ==========================================================================
 
-  generator client {
-    provider        = "prisma-client-js"
-    previewFeatures = ["fullTextSearch", "fullTextIndex"]
-  }
+  // --------------------------------------------------------------------------
+  // IMPORTS
+  // --------------------------------------------------------------------------
 
-  datasource db {
-    provider = "postgresql"
-    url      = env("DATABASE_URL")
-  }
+  import { pgTable, pgEnum, uuid, text, timestamp, boolean, integer, jsonb, varchar } from 'drizzle-orm/pg-core';
+  import { relations } from 'drizzle-orm';
+  import { vector } from 'pgvector/drizzle-orm';
 
   // --------------------------------------------------------------------------
   // ENUMS
   // --------------------------------------------------------------------------
 
-  enum UserRole {
-    ADMIN
-    USER
-  }
-
-  enum ProjectContextType {
-    CONTEXT
-    ROLE
-    DECISIONS
-    TRADEOFFS
-    RESULT
-    ARCHITECTURE
-    OPERATIONS
-    METRICS
-  }
+  export const userRoleEnum = pgEnum('user_role', ['user', 'admin']);
+  export const projectContextTypeEnum = pgEnum('project_context_type', [
+    'context',
+    'role',
+    'decisions',
+    'tradeoffs',
+    'result',
+    'architecture',
+    'operations',
+    'metrics',
+  ]);
+  export const bookingStatusEnum = pgEnum('booking_status', ['pending', 'confirmed', 'cancelled', 'completed']);
+  export const slotStatusEnum = pgEnum('slot_status', ['available', 'booked']);
 
   // --------------------------------------------------------------------------
-  // USER MODEL
+  // USER TABLE
   // --------------------------------------------------------------------------
 
-  /// User accounts for authentication and guestbook entries
-  model User {
-    id        String   @id @default(cuid())
-    email     String   @unique
-    name      String?
-    image     String?
-    role      UserRole @default(USER)
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  export const users = pgTable('users', {
+    id: uuid('id').primaryKey().defaultRandom(),
+    email: text('email').notNull().unique(),
+    name: text('name'),
+    image: text('image'),
+    role: userRoleEnum('role').default('user').notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  }, (table) => ({
+    emailIdx: index('users_email_idx').on(table.email),
+    roleIdx: index('users_role_idx').on(table.role),
+    createdAtIdx: index('users_created_at_idx').on(table.createdAt),
+  }));
 
-    // Relations
-    guestbookEntries GuestbookEntry[]
-
-    // Indexes
-    @@index([email])
-    @@index([role])
-    @@index([createdAt])
-    @@map("users")
-  }
-
-  // --------------------------------------------------------------------------
-  // PROJECT MODEL
-  // --------------------------------------------------------------------------
-
-  /// Portfolio projects with full details
-  model Project {
-    id          String   @id @default(cuid())
-    title       String
-    slug        String   @unique
-    summary     String   @db.Text
-    description String   @db.Text
-    category    String
-    techStack   String[] // Array of technology names
-    liveUrl     String?
-    repoUrl     String?
-    featured    Boolean  @default(false)
-    visible     Boolean  @default(true)
-    order       Int      @default(0)
-    createdAt   DateTime @default(now())
-    updatedAt   DateTime @updatedAt
-
-    // Relations
-    contexts ProjectContext[]
-
-    // Indexes
-    @@index([slug])
-    @@index([category])
-    @@index([featured])
-    @@index([visible])
-    @@index([order])
-    @@index([createdAt])
-    @@index([visible, featured, order])
-    @@map("projects")
-  }
+  export const usersRelations = relations(users, ({ many }) => ({
+    accounts: many(accounts),
+    sessions: many(sessions),
+    guestbookEntries: many(guestbookEntries),
+  }));
 
   // --------------------------------------------------------------------------
-  // PROJECT CONTEXT MODEL
+  // NEXTAUTH TABLES (Account, Session, VerificationToken)
   // --------------------------------------------------------------------------
 
-  /// Detailed context sections for each project
-  model ProjectContext {
-    id        String             @id @default(cuid())
-    projectId String
-    type      ProjectContextType
-    title     String
-    content   String             @db.Text // Markdown content
-    order     Int                @default(0)
-    createdAt DateTime           @default(now())
-    updatedAt DateTime           @updatedAt
+  export const accounts = pgTable('accounts', {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+    type: text('type').notNull(),
+    provider: text('provider').notNull(),
+    providerAccountId: text('provider_account_id').notNull(),
+    refresh_token: text('refresh_token'),
+    access_token: text('access_token'),
+    expires_at: integer('expires_at'),
+    token_type: text('token_type'),
+    scope: text('scope'),
+    id_token: text('id_token'),
+    session_state: text('session_state'),
+  }, (table) => ({
+    providerProviderAccountIdKey: unique('accounts_provider_provider_account_id_key').on(table.provider, table.providerAccountId),
+  }));
 
-    // Relations
-    project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  export const accountsRelations = relations(accounts, ({ one }) => ({
+    user: one(users, { fields: [accounts.userId], references: [users.id] }),
+  }));
 
-    // Indexes
-    @@index([projectId])
-    @@index([type])
-    @@index([order])
-    @@index([projectId, type])
-    @@index([projectId, order])
-    @@map("project_contexts")
-  }
+  export const sessions = pgTable('sessions', {
+    id: uuid('id').primaryKey().defaultRandom(),
+    sessionToken: text('session_token').notNull().unique(),
+    userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+    expires: timestamp('expires').notNull(),
+  });
 
-  // --------------------------------------------------------------------------
-  // BLOG LINK MODEL
-  // --------------------------------------------------------------------------
+  export const sessionsRelations = relations(sessions, ({ one }) => ({
+    user: one(users, { fields: [sessions.userId], references: [users.id] }),
+  }));
 
-  /// External blog posts and articles
-  model BlogLink {
-    id          String    @id @default(cuid())
-    url         String    @unique
-    title       String
-    description String?   @db.Text
-    imageUrl    String?
-    source      String    // e.g., "medium", "dev.to", "hashnode"
-    publishedAt DateTime?
-    visible     Boolean   @default(true)
-    order       Int       @default(0)
-    createdAt   DateTime  @default(now())
-    updatedAt   DateTime  @updatedAt
-
-    // Indexes
-    @@index([url])
-    @@index([source])
-    @@index([visible])
-    @@index([order])
-    @@index([publishedAt])
-    @@index([visible, order])
-    @@map("blog_links")
-  }
+  export const verificationTokens = pgTable('verification_tokens', {
+    identifier: text('identifier').notNull(),
+    token: text('token').notNull().unique(),
+    expires: timestamp('expires').notNull(),
+  }, (table) => ({
+    identifierTokenKey: unique('verification_tokens_identifier_token_key').on(table.identifier, table.token),
+  }));
 
   // --------------------------------------------------------------------------
-  // GUESTBOOK ENTRY MODEL
+  // PROJECT TABLE
   // --------------------------------------------------------------------------
 
-  /// Guestbook messages from authenticated users
-  model GuestbookEntry {
-    id        String   @id @default(cuid())
-    userId    String
-    message   String   @db.Text
-    reactions Json     @default("{}") // JSON structure for reactions
-    visible   Boolean  @default(true)
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  export const projects = pgTable('projects', {
+    id: uuid('id').primaryKey().defaultRandom(),
+    title: text('title').notNull(),
+    slug: text('slug').notNull().unique(),
+    summary: text('summary').notNull(),
+    description: text('description').notNull(),
+    category: text('category').notNull(),
+    techStack: text('tech_stack').array().notNull().default([]),
+    tags: text('tags').array().notNull().default([]),
+    liveUrl: text('live_url'),
+    repoUrl: text('repo_url'),
+    imageUrl: text('image_url'),
+    featured: boolean('featured').default(false).notNull(),
+    visible: boolean('visible').default(true).notNull(),
+    order: integer('order').default(0).notNull(),
+    startDate: timestamp('start_date'),
+    endDate: timestamp('end_date'),
+    projectDate: text('project_date'),
+    content: text('content'),
+    thumbnailId: uuid('thumbnail_id'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  }, (table) => ({
+    slugIdx: index('projects_slug_idx').on(table.slug),
+    categoryIdx: index('projects_category_idx').on(table.category),
+    featuredIdx: index('projects_featured_idx').on(table.featured),
+    visibleIdx: index('projects_visible_idx').on(table.visible),
+    orderIdx: index('projects_order_idx').on(table.order),
+    createdAtIdx: index('projects_created_at_idx').on(table.createdAt),
+    visibleFeaturedOrderIdx: index('projects_visible_featured_order_idx').on(table.visible, table.featured, table.order),
+  }));
 
-    // Relations
-    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-    // Indexes
-    @@index([userId])
-    @@index([visible])
-    @@index([createdAt])
-    @@index([visible, createdAt])
-    @@map("guestbook_entries")
-  }
-
-  // --------------------------------------------------------------------------
-  // ANONYMOUS MESSAGE MODEL
-  // --------------------------------------------------------------------------
-
-  /// Anonymous messages from visitors (contact form alternative)
-  model AnonymousMessage {
-    id        String   @id @default(cuid())
-    content   String   @db.Text
-    ipHash    String   // Hashed IP for rate limiting, not identification
-    read      Boolean  @default(false)
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-
-    // Indexes
-    @@index([ipHash])
-    @@index([read])
-    @@index([createdAt])
-    @@index([read, createdAt])
-    @@map("anonymous_messages")
-  }
+  export const projectsRelations = relations(projects, ({ many }) => ({
+    contexts: many(projectContexts),
+    images: many(projectImages),
+  }));
 
   // --------------------------------------------------------------------------
-  // CHAT LOG MODEL
+  // PROJECT CONTEXT TABLE
   // --------------------------------------------------------------------------
 
-  /// AI chat conversation logs
-  model ChatLog {
-    id        String   @id @default(cuid())
-    sessionId String   @unique
-    messages  Json     @default("[]") // Array of chat messages
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  export const projectContexts = pgTable('project_contexts', {
+    id: uuid('id').primaryKey().defaultRandom(),
+    projectId: uuid('project_id').notNull().references(() => projects.id, { onDelete: 'cascade' }),
+    type: projectContextTypeEnum('type').notNull(),
+    title: text('title').notNull(),
+    content: text('content').notNull(),
+    order: integer('order').default(0).notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  }, (table) => ({
+    projectIdIdx: index('project_contexts_project_id_idx').on(table.projectId),
+    typeIdx: index('project_contexts_type_idx').on(table.type),
+    orderIdx: index('project_contexts_order_idx').on(table.order),
+    projectIdTypeIdx: index('project_contexts_project_id_type_idx').on(table.projectId, table.type),
+    projectIdOrderIdx: index('project_contexts_project_id_order_idx').on(table.projectId, table.order),
+  }));
 
-    // Indexes
-    @@index([sessionId])
-    @@index([createdAt])
-    @@index([updatedAt])
-    @@map("chat_logs")
-  }
-
-  // --------------------------------------------------------------------------
-  // PROFILE LINK MODEL
-  // --------------------------------------------------------------------------
-
-  /// Social and professional profile links
-  model ProfileLink {
-    id        String   @id @default(cuid())
-    label     String   // Display name (e.g., "GitHub", "LinkedIn")
-    url       String
-    icon      String?  // Icon identifier or URL
-    visible   Boolean  @default(true)
-    order     Int      @default(0)
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-
-    // Indexes
-    @@index([visible])
-    @@index([order])
-    @@index([visible, order])
-    @@map("profile_links")
-  }
+  export const projectContextsRelations = relations(projectContexts, ({ one }) => ({
+    project: one(projects, { fields: [projectContexts.projectId], references: [projects.id] }),
+  }));
 
   // --------------------------------------------------------------------------
-  // KNOWLEDGE DOC MODEL
+  // PROJECT IMAGE TABLE
   // --------------------------------------------------------------------------
 
-  /// Documents for RAG/knowledge base for AI assistant
-  model KnowledgeDoc {
-    id        String   @id @default(cuid())
-    filename  String   @unique
-    content   String   @db.Text // Full document content
-    indexed   Boolean  @default(false) // Whether it's been indexed for vector search
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  export const projectImages = pgTable('project_images', {
+    id: uuid('id').primaryKey().defaultRandom(),
+    projectId: uuid('project_id').notNull().references(() => projects.id, { onDelete: 'cascade' }),
+    url: text('url').notNull(),
+    key: text('key').notNull(),
+    order: integer('order').default(0).notNull(),
+    caption: text('caption'),
+    alt: text('alt'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  }, (table) => ({
+    projectIdIdx: index('project_images_project_id_idx').on(table.projectId),
+    orderIdx: index('project_images_order_idx').on(table.order),
+  }));
 
-    // Indexes
-    @@index([filename])
-    @@index([indexed])
-    @@index([createdAt])
-    @@index([indexed, updatedAt])
-    @@map("knowledge_docs")
-  }
+  export const projectImagesRelations = relations(projectImages, ({ one }) => ({
+    project: one(projects, { fields: [projectImages.projectId], references: [projects.id] }),
+  }));
+
+  // --------------------------------------------------------------------------
+  // BLOG LINK TABLE
+  // --------------------------------------------------------------------------
+
+  export const blogLinks = pgTable('blog_links', {
+    id: uuid('id').primaryKey().defaultRandom(),
+    url: text('url').notNull(),
+    title: text('title').notNull(),
+    description: text('description'),
+    imageUrl: text('image_url'),
+    source: text('source').notNull(),
+    category: text('category'),
+    tags: text('tags').array().notNull().default([]),
+    publishedAt: timestamp('published_at').notNull(),
+    visible: boolean('visible').default(true).notNull(),
+    order: integer('order').default(0).notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  }, (table) => ({
+    sourceIdx: index('blog_links_source_idx').on(table.source),
+    visibleIdx: index('blog_links_visible_idx').on(table.visible),
+    orderIdx: index('blog_links_order_idx').on(table.order),
+    publishedAtIdx: index('blog_links_published_at_idx').on(table.publishedAt),
+    visibleOrderIdx: index('blog_links_visible_order_idx').on(table.visible, table.order),
+  }));
+
+  // --------------------------------------------------------------------------
+  // GUESTBOOK ENTRY TABLE
+  // --------------------------------------------------------------------------
+
+  export const guestbookEntries = pgTable('guestbook_entries', {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+    message: text('message').notNull(),
+    reactions: jsonb('reactions').default([]).notNull(),
+    visible: boolean('visible').default(true).notNull(),
+    ipAddress: text('ip_address'),
+    countryCode: text('country_code'),
+    country: text('country'),
+    city: text('city'),
+    region: text('region'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  }, (table) => ({
+    userIdIdx: index('guestbook_entries_user_id_idx').on(table.userId),
+    visibleIdx: index('guestbook_entries_visible_idx').on(table.visible),
+    createdAtIdx: index('guestbook_entries_created_at_idx').on(table.createdAt),
+    visibleCreatedAtIdx: index('guestbook_entries_visible_created_at_idx').on(table.visible, table.createdAt),
+    countryCodeIdx: index('guestbook_entries_country_code_idx').on(table.countryCode),
+  }));
+
+  export const guestbookEntriesRelations = relations(guestbookEntries, ({ one }) => ({
+    user: one(users, { fields: [guestbookEntries.userId], references: [users.id] }),
+  }));
+
+  // --------------------------------------------------------------------------
+  // ANALYTICS EVENT TABLE
+  // --------------------------------------------------------------------------
+
+  export const analyticsEvents = pgTable('analytics_events', {
+    id: uuid('id').primaryKey().defaultRandom(),
+    page: varchar('page', { length: 100 }).notNull(),
+    entityType: varchar('entity_type', { length: 50 }).notNull(),
+    entityId: text('entity_id'),
+    eventType: varchar('event_type', { length: 20 }).notNull(),
+    data: jsonb('data'),
+    userSession: text('user_session'),
+    ipAddress: varchar('ip_address', { length: 45 }),
+    countryCode: varchar('country_code', { length: 2 }),
+    city: varchar('city', { length: 100 }),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  }, (table) => ({
+    pageIdx: index('analytics_events_page_idx').on(table.page),
+    eventTypeIdx: index('analytics_events_event_type_idx').on(table.eventType),
+    entityTypeEntityIdIdx: index('analytics_events_entity_type_entity_id_idx').on(table.entityType, table.entityId),
+    createdAtIdx: index('analytics_events_created_at_idx').on(table.createdAt),
+  }));
+
+  // --------------------------------------------------------------------------
+  // ANONYMOUS MESSAGE TABLE
+  // --------------------------------------------------------------------------
+
+  export const anonymousMessages = pgTable('anonymous_messages', {
+    id: uuid('id').primaryKey().defaultRandom(),
+    content: text('content').notNull(),
+    ipHash: text('ip_hash').notNull(),
+    read: boolean('read').default(false).notNull(),
+    ipAddress: text('ip_address'),
+    countryCode: text('country_code'),
+    country: text('country'),
+    city: text('city'),
+    region: text('region'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  }, (table) => ({
+    readIdx: index('anonymous_messages_read_idx').on(table.read),
+    createdAtIdx: index('anonymous_messages_created_at_idx').on(table.createdAt),
+    readCreatedAtIdx: index('anonymous_messages_read_created_at_idx').on(table.read, table.createdAt),
+    countryCodeIdx: index('anonymous_messages_country_code_idx').on(table.countryCode),
+    cityIdx: index('anonymous_messages_city_idx').on(table.city),
+  }));
+
+  // --------------------------------------------------------------------------
+  // CHAT LOG TABLE
+  // --------------------------------------------------------------------------
+
+  export const chatLogs = pgTable('chat_logs', {
+    id: uuid('id').primaryKey().defaultRandom(),
+    sessionId: text('session_id').notNull().unique(),
+    messages: jsonb('messages').default([]).notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  }, (table) => ({
+    sessionIdIdx: index('chat_logs_session_id_idx').on(table.sessionId),
+    createdAtIdx: index('chat_logs_created_at_idx').on(table.createdAt),
+  }));
+
+  // --------------------------------------------------------------------------
+  // PROFILE LINK TABLE
+  // --------------------------------------------------------------------------
+
+  export const profileLinks = pgTable('profile_links', {
+    id: uuid('id').primaryKey().defaultRandom(),
+    label: text('label').notNull(),
+    url: text('url').notNull(),
+    icon: text('icon'),
+    visible: boolean('visible').default(true).notNull(),
+    order: integer('order').default(0).notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  }, (table) => ({
+    visibleIdx: index('profile_links_visible_idx').on(table.visible),
+    orderIdx: index('profile_links_order_idx').on(table.order),
+    visibleOrderIdx: index('profile_links_visible_order_idx').on(table.visible, table.order),
+  }));
+
+  // --------------------------------------------------------------------------
+  // KNOWLEDGE DOC TABLE
+  // --------------------------------------------------------------------------
+
+  export const knowledgeDocs = pgTable('knowledge_docs', {
+    id: uuid('id').primaryKey().defaultRandom(),
+    filename: text('filename').notNull().unique(),
+    content: text('content').notNull(),
+    indexed: boolean('indexed').default(false).notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  }, (table) => ({
+    filenameIdx: index('knowledge_docs_filename_idx').on(table.filename),
+    indexedIdx: index('knowledge_docs_indexed_idx').on(table.indexed),
+    createdAtIdx: index('knowledge_docs_created_at_idx').on(table.createdAt),
+    indexedUpdatedAtIdx: index('knowledge_docs_indexed_updated_at_idx').on(table.indexed, table.updatedAt),
+  }));
+
+  // --------------------------------------------------------------------------
+  // CONTACT FORM TABLE
+  // --------------------------------------------------------------------------
+
+  export const contactForms = pgTable('contact_forms', {
+    id: uuid('id').primaryKey().defaultRandom(),
+    name: text('name').notNull(),
+    email: text('email').notNull(),
+    subject: text('subject'),
+    message: text('message').notNull(),
+    ipHash: text('ip_hash').notNull(),
+    ipAddress: text('ip_address'),
+    countryCode: text('country_code'),
+    country: text('country'),
+    city: text('city'),
+    region: text('region'),
+    read: boolean('read').default(false).notNull(),
+    replied: boolean('replied').default(false).notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  }, (table) => ({
+    readIdx: index('contact_forms_read_idx').on(table.read),
+    createdAtIdx: index('contact_forms_created_at_idx').on(table.createdAt),
+    countryCodeIdx: index('contact_forms_country_code_idx').on(table.countryCode),
+  }));
+
+  export const contactSettings = pgTable('contact_settings', {
+    id: uuid('id').primaryKey().defaultRandom(),
+    notificationEmail: text('notification_email'),
+    blockedKeywords: text('blocked_keywords').array().notNull().default([]),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  });
+
+  // --------------------------------------------------------------------------
+  // BOOKING TABLES
+  // --------------------------------------------------------------------------
+
+  export const bookingSlots = pgTable('booking_slots', {
+    id: uuid('id').primaryKey().defaultRandom(),
+    date: timestamp('date', { mode: 'date' }).notNull(),
+    time: text('time').notNull(),
+    duration: integer('duration').default(60).notNull(),
+    status: slotStatusEnum('status').default('available').notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  }, (table) => ({
+    dateTimeKey: unique('booking_slots_date_time_key').on(table.date, table.time),
+    dateStatusIdx: index('booking_slots_date_status_idx').on(table.date, table.status),
+  }));
+
+  export const bookings = pgTable('bookings', {
+    id: uuid('id').primaryKey().defaultRandom(),
+    name: text('name').notNull(),
+    email: text('email').notNull(),
+    phone: text('phone'),
+    notes: text('notes'),
+    status: bookingStatusEnum('status').default('pending').notNull(),
+    slotId: uuid('slot_id').unique().references(() => bookingSlots.id),
+    ipHash: text('ip_hash').notNull(),
+    ipAddress: text('ip_address'),
+    countryCode: text('country_code'),
+    country: text('country'),
+    city: text('city'),
+    region: text('region'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  }, (table) => ({
+    statusIdx: index('bookings_status_idx').on(table.status),
+    createdAtIdx: index('bookings_created_at_idx').on(table.createdAt),
+    countryCodeIdx: index('bookings_country_code_idx').on(table.countryCode),
+  }));
+
+  export const bookingSettings = pgTable('booking_settings', {
+    id: uuid('id').primaryKey().defaultRandom(),
+    notificationEmail: text('notification_email'),
+    reminderEnabled: boolean('reminder_enabled').default(true).notNull(),
+    reminderDay: integer('reminder_day').default(6).notNull(),
+    reminderTime: text('reminder_time').default('09:00').notNull(),
+    timezone: text('timezone').default('Asia/Jakarta').notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  });
+
+  export const bookingAvailability = pgTable('booking_availability', {
+    id: uuid('id').primaryKey().defaultRandom(),
+    dayOfWeek: integer('day_of_week').notNull(),
+    startTime: text('start_time').notNull(),
+    endTime: text('end_time').notNull(),
+    enabled: boolean('enabled').default(true).notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  }, (table) => ({
+    dayOfWeekStartTimeEndTimeKey: unique('booking_availability_day_of_week_start_time_end_time_key').on(table.dayOfWeek, table.startTime, table.endTime),
+    dayOfWeekIdx: index('booking_availability_day_of_week_idx').on(table.dayOfWeek),
+    enabledIdx: index('booking_availability_enabled_idx').on(table.enabled),
+  }));
+
+  // --------------------------------------------------------------------------
+  // ABOUT ME & ACHIEVEMENT TABLES
+  // --------------------------------------------------------------------------
+
+  export const aboutMe = pgTable('about_me', {
+    id: uuid('id').primaryKey().defaultRandom(),
+    fullName: text('full_name').notNull(),
+    tagline: text('tagline').notNull(),
+    roles: text('roles').array().notNull().default([]),
+    bio: text('bio').notNull(),
+    email: text('email').notNull(),
+    phone: text('phone'),
+    location: text('location'),
+    avatarUrl: text('avatar_url'),
+    resumeUrl: text('resume_url'),
+    availabilityStatus: text('availability_status'),
+    skills: text('skills').array().notNull().default([]),
+    experience: jsonb('experience'),
+    socialLinks: jsonb('social_links'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  });
+
+  export const achievements = pgTable('achievements', {
+    id: uuid('id').primaryKey().defaultRandom(),
+    name: text('name').notNull(),
+    location: text('location').notNull(),
+    monthYear: text('month_year').notNull(),
+    photos: text('photos').array().notNull().default([]),
+    description: text('description').notNull(),
+    externalUrl: text('external_url'),
+    order: integer('order').default(0).notNull(),
+    visible: boolean('visible').default(true).notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  }, (table) => ({
+    orderIdx: index('achievements_order_idx').on(table.order),
+    visibleIdx: index('achievements_visible_idx').on(table.visible),
+  }));
 
 # =============================================================================
 # INDEX STRATEGY
@@ -577,59 +868,71 @@ indexes:
 # =============================================================================
 
 migration:
-  approach: "Incremental migrations with Prisma Migrate"
+  approach: "Incremental migrations with drizzle-kit"
   
   initial_setup:
     steps:
       - step: 1
-        action: "Initialize Prisma"
-        command: "npx prisma init"
-        
-      - step: 2
         action: "Configure DATABASE_URL in .env"
         example: |
-          DATABASE_URL="postgresql://user:password@localhost:5432/portfolio?schema=public"
+          DATABASE_URL="postgresql://user:password@localhost:5432/portfolio"
+          DIRECT_URL="postgresql://user:password@localhost:5432/portfolio"
+          
+      - step: 2
+        action: "Create drizzle config"
+        file: "apps/admin/drizzle.config.ts"
+        example: |
+          import { defineConfig } from 'drizzle-kit';
+          export default defineConfig({
+            schema: './db/schema.ts',
+            out: './db/migrations',
+            dialect: 'postgresql',
+            dbCredentials: {
+              url: process.env.DIRECT_URL!,
+            },
+          });
           
       - step: 3
-        action: "Create initial migration"
-        command: "npx prisma migrate dev --name init"
+        action: "Generate migration files"
+        command: "pnpm --filter admin db:generate"
         
       - step: 4
-        action: "Generate Prisma Client"
-        command: "npx prisma generate"
+        action: "Apply migrations to database"
+        command: "pnpm --filter admin db:migrate"
 
   versioning:
-    naming_convention: "YYYYMMDDHHMMSS_descriptive_name"
+    naming_convention: "NNNN_descriptive_name.sql (auto-numbered by drizzle-kit)"
     examples:
-      - "20240115120000_init"
-      - "20240120093000_add_project_contexts"
-      - "20240125140000_add_reactions_to_guestbook"
+      - "0000_init.sql"
+      - "0001_add_project_contexts.sql"
+      - "0002_add_reactions_to_guestbook.sql"
 
   production_workflow:
     steps:
       - step: 1
         description: "Create migration in development"
-        command: "npx prisma migrate dev --name descriptive_name"
+        command: "pnpm --filter admin db:generate"
         
       - step: 2
         description: "Review generated SQL"
-        location: "prisma/migrations/[timestamp]_name/migration.sql"
+        location: "apps/admin/db/migrations/NNNN_name.sql"
         
       - step: 3
         description: "Test migration on staging"
-        command: "npx prisma migrate deploy"
+        command: "pnpm --filter admin db:migrate"
         
       - step: 4
         description: "Deploy to production"
-        command: "npx prisma migrate deploy"
+        command: "pnpm --filter admin db:migrate"
 
   rollback_strategy:
     description: |
-      Prisma doesn't support automatic rollbacks. For production:
+      Drizzle doesn't support automatic rollbacks. For production:
       1. Always backup database before migrations
-      2. Create reverse migration scripts manually
+      2. Create reverse migration SQL scripts manually
       3. Test migrations thoroughly on staging
       4. Use database snapshots for critical migrations
+      5. Apply reverse migrations with: psql $DATABASE_URL < reverse_migration.sql
 
   zero_downtime_considerations:
     - "Add new columns as nullable first"
@@ -642,23 +945,23 @@ migration:
 # =============================================================================
 
 seeding:
-  file_location: "prisma/seed.ts"
+  file_location: "apps/admin/db/seed.ts"
   
   command:
-    development: "npx prisma db seed"
+    development: "pnpm --filter admin db:seed"
     configuration: |
-      // In package.json
+      // In apps/admin/package.json
       {
-        "prisma": {
-          "seed": "tsx prisma/seed.ts"
+        "scripts": {
+          "db:seed": "tsx db/seed.ts"
         }
       }
 
   seed_script: |
-    // prisma/seed.ts
-    import { PrismaClient, UserRole, ProjectContextType } from '@prisma/client';
-
-    const prisma = new PrismaClient();
+    // apps/admin/db/seed.ts
+    import { db } from './index';
+    import * as schema from './schema';
+    import { eq } from 'drizzle-orm';
 
     async function main() {
       console.log('Starting database seed...');
@@ -666,17 +969,16 @@ seeding:
       // ---------------------------------------------------------------------------
       // Seed Admin User
       // ---------------------------------------------------------------------------
-      const adminUser = await prisma.user.upsert({
-        where: { email: 'admin@example.com' },
-        update: {},
-        create: {
+      const [adminUser] = await db.insert(schema.users)
+        .values({
           email: 'admin@example.com',
           name: 'Admin User',
-          role: UserRole.ADMIN,
+          role: 'admin',
           image: 'https://avatars.githubusercontent.com/u/1234567',
-        },
-      });
-      console.log('Created admin user:', adminUser.id);
+        })
+        .onConflictDoNothing({ target: schema.users.email })
+        .returning();
+      console.log('Created admin user:', adminUser?.id);
 
       // ---------------------------------------------------------------------------
       // Seed Profile Links
@@ -688,94 +990,94 @@ seeding:
         { label: 'Email', url: 'mailto:hello@example.com', icon: 'mail', order: 4 },
       ];
 
-      for (const link of profileLinks) {
-        await prisma.profileLink.upsert({
-          where: { id: link.label.toLowerCase() },
-          update: link,
-          create: { ...link, id: link.label.toLowerCase() },
-        });
-      }
+      await db.insert(schema.profileLinks)
+        .values(profileLinks)
+        .onConflictDoNothing();
       console.log('Created profile links');
 
       // ---------------------------------------------------------------------------
       // Seed Sample Project
       // ---------------------------------------------------------------------------
-      const sampleProject = await prisma.project.upsert({
-        where: { slug: 'sample-project' },
-        update: {},
-        create: {
+      const [sampleProject] = await db.insert(schema.projects)
+        .values({
           title: 'Sample Portfolio Project',
           slug: 'sample-project',
           summary: 'A comprehensive example project showcasing full-stack development skills.',
           description: `
-    # Sample Project
+# Sample Project
 
-    This is a detailed description of the sample project with **markdown** support.
+This is a detailed description of the sample project with **markdown** support.
 
-    ## Features
-    - Feature 1
-    - Feature 2
-    - Feature 3
+## Features
+- Feature 1
+- Feature 2
+- Feature 3
 
-    ## Tech Stack
-    Built with modern technologies for optimal performance.
+## Tech Stack
+Built with modern technologies for optimal performance.
           `.trim(),
           category: 'Web Application',
-          techStack: ['Next.js', 'TypeScript', 'Prisma', 'PostgreSQL', 'Tailwind CSS'],
+          techStack: ['Next.js', 'TypeScript', 'Drizzle ORM', 'PostgreSQL', 'Tailwind CSS'],
           liveUrl: 'https://example.com',
           repoUrl: 'https://github.com/username/sample-project',
           featured: true,
           visible: true,
           order: 1,
-        },
-      });
-      console.log('Created sample project:', sampleProject.id);
+        })
+        .onConflictDoUpdate({ 
+          target: schema.projects.slug,
+          set: { updatedAt: new Date() },
+        })
+        .returning();
+      console.log('Created sample project:', sampleProject?.id);
 
       // ---------------------------------------------------------------------------
       // Seed Project Contexts
       // ---------------------------------------------------------------------------
-      const projectContexts = [
-        {
-          type: ProjectContextType.CONTEXT,
-          title: 'Project Background',
-          content: 'The context and background for this project...',
-          order: 1,
-        },
-        {
-          type: ProjectContextType.ROLE,
-          title: 'My Role',
-          content: 'As the lead developer, I was responsible for...',
-          order: 2,
-        },
-        {
-          type: ProjectContextType.DECISIONS,
-          title: 'Key Decisions',
-          content: 'Major technical decisions included...',
-          order: 3,
-        },
-        {
-          type: ProjectContextType.ARCHITECTURE,
-          title: 'System Architecture',
-          content: 'The system follows a microservices architecture...',
-          order: 4,
-        },
-        {
-          type: ProjectContextType.RESULT,
-          title: 'Results & Impact',
-          content: 'The project achieved significant improvements...',
-          order: 5,
-        },
-      ];
-
-      for (const ctx of projectContexts) {
-        await prisma.projectContext.create({
-          data: {
-            ...ctx,
+      if (sampleProject) {
+        const projectContexts = [
+          {
             projectId: sampleProject.id,
+            type: 'context' as const,
+            title: 'Project Background',
+            content: 'The context and background for this project...',
+            order: 1,
           },
-        });
+          {
+            projectId: sampleProject.id,
+            type: 'role' as const,
+            title: 'My Role',
+            content: 'As the lead developer, I was responsible for...',
+            order: 2,
+          },
+          {
+            projectId: sampleProject.id,
+            type: 'decisions' as const,
+            title: 'Key Decisions',
+            content: 'Major technical decisions included...',
+            order: 3,
+          },
+          {
+            projectId: sampleProject.id,
+            type: 'architecture' as const,
+            title: 'System Architecture',
+            content: 'The system follows a microservices architecture...',
+            order: 4,
+          },
+          {
+            projectId: sampleProject.id,
+            type: 'result' as const,
+            title: 'Results & Impact',
+            content: 'The project achieved significant improvements...',
+            order: 5,
+          },
+        ];
+
+        await db.insert(schema.projectContexts)
+          .values(projectContexts)
+          .onConflictDoNothing();
+        console.log('Created project contexts');
       }
-      console.log('Created project contexts');
 
       // ---------------------------------------------------------------------------
       // Seed Sample Blog Links
@@ -799,13 +1101,9 @@ seeding:
         },
       ];
 
-      for (const blog of blogLinks) {
-        await prisma.blogLink.upsert({
-          where: { url: blog.url },
-          update: blog,
-          create: blog,
-        });
-      }
+      await db.insert(schema.blogLinks)
+        .values(blogLinks)
+        .onConflictDoNothing();
       console.log('Created blog links');
 
       // ---------------------------------------------------------------------------
@@ -815,42 +1113,41 @@ seeding:
         {
           filename: 'about-me.md',
           content: `
-    # About Me
+# About Me
 
-    I am a full-stack developer with expertise in modern web technologies.
+I am a full-stack developer with expertise in modern web technologies.
 
-    ## Skills
-    - Frontend: React, Next.js, TypeScript
-    - Backend: Node.js, Python, Go
-    - Database: PostgreSQL, MongoDB, Redis
-    - DevOps: Docker, Kubernetes, AWS
+## Skills
+- Frontend: React, Next.js, TypeScript
+- Backend: Node.js, Python, Go
+- Database: PostgreSQL, MongoDB, Redis
+- DevOps: Docker, Kubernetes, AWS
           `.trim(),
           indexed: false,
         },
         {
           filename: 'experience.md',
           content: `
-    # Professional Experience
+# Professional Experience
 
-    ## Senior Software Engineer - Tech Company (2022-Present)
-    - Led development of microservices architecture
-    - Improved system performance by 40%
+## Senior Software Engineer - Tech Company (2022-Present)
+- Led development of microservices architecture
+- Improved system performance by 40%
 
-    ## Software Engineer - Startup (2020-2022)
-    - Built MVP from scratch
-    - Scaled to 100k+ users
+## Software Engineer - Startup (2020-2022)
+- Built MVP from scratch
+- Scaled to 100k+ users
           `.trim(),
           indexed: false,
         },
       ];
 
-      for (const doc of knowledgeDocs) {
-        await prisma.knowledgeDoc.upsert({
-          where: { filename: doc.filename },
-          update: doc,
-          create: doc,
+      await db.insert(schema.knowledgeDocs)
+        .values(knowledgeDocs)
+        .onConflictDoUpdate({
+          target: schema.knowledgeDocs.filename,
+          set: { updatedAt: new Date() },
         });
-      }
       console.log('Created knowledge documents');
 
       console.log('Database seeding completed!');
@@ -860,9 +1157,6 @@ seeding:
       .catch((e) => {
         console.error('Seeding error:', e);
         process.exit(1);
-      })
-      .finally(async () => {
-        await prisma.$disconnect();
       });
 
   environment_specific_seeds:
@@ -887,244 +1181,316 @@ seeding:
 query_patterns:
   description: |
     Common query patterns optimized for performance with proper indexing.
-    All examples use Prisma Client syntax.
+    All examples use Drizzle ORM syntax with postgres.js driver.
 
   user_queries:
     find_by_email:
       description: "Authenticate user by email"
       query: |
-        const user = await prisma.user.findUnique({
-          where: { email: 'user@example.com' },
-          include: {
-            guestbookEntries: {
-              where: { visible: true },
-              orderBy: { createdAt: 'desc' },
-              take: 5,
-            },
-          },
-        });
+        import { db } from '@/db';
+        import { users, guestbookEntries, eq, desc } from '@/db/schema';
+
+        const user = await db.select()
+          .from(users)
+          .where(eq(users.email, 'user@example.com'))
+          .limit(1);
+        
+        // With guestbook entries (separate query for relational data)
+        const entries = await db.select()
+          .from(guestbookEntries)
+          .where(
+            and(
+              eq(guestbookEntries.userId, user[0].id),
+              eq(guestbookEntries.visible, true)
+            )
+          )
+          .orderBy(desc(guestbookEntries.createdAt))
+          .limit(5);
 
     list_admin_users:
       description: "Get all admin users"
       query: |
-        const admins = await prisma.user.findMany({
-          where: { role: 'ADMIN' },
-          orderBy: { createdAt: 'asc' },
-        });
+        import { db } from '@/db';
+        import { users, eq, asc } from '@/db/schema';
+
+        const admins = await db.select()
+          .from(users)
+          .where(eq(users.role, 'admin'))
+          .orderBy(asc(users.createdAt));
 
   project_queries:
     get_featured_projects:
       description: "Homepage featured projects"
       query: |
-        const featuredProjects = await prisma.project.findMany({
-          where: {
-            visible: true,
-            featured: true,
-          },
-          orderBy: { order: 'asc' },
-          include: {
-            contexts: {
-              where: { type: 'RESULT' },
-              take: 1,
-            },
-          },
-        });
+        import { db } from '@/db';
+        import { projects, projectContexts, eq, and, asc } from '@/db/schema';
+
+        const featuredProjects = await db.select()
+          .from(projects)
+          .where(
+            and(
+              eq(projects.visible, true),
+              eq(projects.featured, true)
+            )
+          )
+          .orderBy(asc(projects.order));
+        
+        // Get result contexts for each project
+        const projectIds = featuredProjects.map(p => p.id);
+        const resultContexts = await db.select()
+          .from(projectContexts)
+          .where(
+            and(
+              inArray(projectContexts.projectId, projectIds),
+              eq(projectContexts.type, 'result')
+            )
+          )
+          .limit(1);
 
     get_project_by_slug:
       description: "Full project page with all contexts"
       query: |
-        const project = await prisma.project.findUnique({
-          where: { slug: 'project-slug' },
-          include: {
-            contexts: {
-              orderBy: { order: 'asc' },
-            },
-          },
-        });
+        import { db } from '@/db';
+        import { projects, projectContexts, eq, asc } from '@/db/schema';
+
+        const [project] = await db.select()
+          .from(projects)
+          .where(eq(projects.slug, 'project-slug'))
+          .limit(1);
+        
+        if (project) {
+          const contexts = await db.select()
+            .from(projectContexts)
+            .where(eq(projectContexts.projectId, project.id))
+            .orderBy(asc(projectContexts.order));
+        }
 
     list_projects_by_category:
       description: "Filter projects by category"
       query: |
-        const projects = await prisma.project.findMany({
-          where: {
-            visible: true,
-            category: 'Web Application',
-          },
-          orderBy: [
-            { featured: 'desc' },
-            { order: 'asc' },
-          ],
-        });
+        import { db } from '@/db';
+        import { projects, eq, and, desc, asc } from '@/db/schema';
+
+        const results = await db.select()
+          .from(projects)
+          .where(
+            and(
+              eq(projects.visible, true),
+              eq(projects.category, 'Web Application')
+            )
+          )
+          .orderBy(desc(projects.featured), asc(projects.order));
 
     search_projects:
       description: "Full-text search on projects"
       query: |
-        const results = await prisma.project.findMany({
-          where: {
-            visible: true,
-            OR: [
-              { title: { contains: searchTerm, mode: 'insensitive' } },
-              { summary: { contains: searchTerm, mode: 'insensitive' } },
-              { description: { contains: searchTerm, mode: 'insensitive' } },
-              { techStack: { hasSome: [searchTerm] } },
-            ],
-          },
-          orderBy: { order: 'asc' },
-        });
+        import { db } from '@/db';
+        import { projects, eq, or, ilike, arrayContains, asc } from '@/db/schema';
+
+        const searchTerm = 'react';
+        const results = await db.select()
+          .from(projects)
+          .where(
+            and(
+              eq(projects.visible, true),
+              or(
+                ilike(projects.title, `%${searchTerm}%`),
+                ilike(projects.summary, `%${searchTerm}%`),
+                ilike(projects.description, `%${searchTerm}%`),
+                arrayContains(projects.techStack, [searchTerm])
+              )
+            )
+          )
+          .orderBy(asc(projects.order));
 
   blog_queries:
     get_visible_posts:
       description: "List all visible blog links"
       query: |
-        const blogLinks = await prisma.blogLink.findMany({
-          where: { visible: true },
-          orderBy: [
-            { order: 'asc' },
-            { publishedAt: 'desc' },
-          ],
-        });
+        import { db } from '@/db';
+        import { blogLinks, eq, asc, desc } from '@/db/schema';
+
+        const posts = await db.select()
+          .from(blogLinks)
+          .where(eq(blogLinks.visible, true))
+          .orderBy(asc(blogLinks.order), desc(blogLinks.publishedAt));
 
     get_posts_by_source:
       description: "Filter blog links by platform"
       query: |
-        const mediumPosts = await prisma.blogLink.findMany({
-          where: {
-            visible: true,
-            source: 'medium',
-          },
-          orderBy: { publishedAt: 'desc' },
-        });
+        import { db } from '@/db';
+        import { blogLinks, eq, and, desc } from '@/db/schema';
+
+        const mediumPosts = await db.select()
+          .from(blogLinks)
+          .where(
+            and(
+              eq(blogLinks.visible, true),
+              eq(blogLinks.source, 'medium')
+            )
+          )
+          .orderBy(desc(blogLinks.publishedAt));
 
   guestbook_queries:
     get_recent_entries:
       description: "Paginated guestbook entries"
       query: |
-        const entries = await prisma.guestbookEntry.findMany({
-          where: { visible: true },
-          include: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-                image: true,
-              },
-            },
+        import { db } from '@/db';
+        import { guestbookEntries, users, eq, desc } from '@/db/schema';
+
+        const page = 0;
+        const entries = await db.select({
+          id: guestbookEntries.id,
+          message: guestbookEntries.message,
+          reactions: guestbookEntries.reactions,
+          createdAt: guestbookEntries.createdAt,
+          user: {
+            id: users.id,
+            name: users.name,
+            image: users.image,
           },
-          orderBy: { createdAt: 'desc' },
-          take: 20,
-          skip: page * 20,
-        });
+        })
+        .from(guestbookEntries)
+        .leftJoin(users, eq(guestbookEntries.userId, users.id))
+        .where(eq(guestbookEntries.visible, true))
+        .orderBy(desc(guestbookEntries.createdAt))
+        .limit(20)
+        .offset(page * 20);
 
     add_reaction:
       description: "Add reaction to guestbook entry"
       query: |
-        // Using raw query for JSON manipulation
-        const updated = await prisma.$executeRaw`
-          UPDATE guestbook_entries
-          SET reactions = jsonb_set(
-            COALESCE(reactions, '{}'),
-            '{reactions}',
-            (
-              COALESCE(reactions->'reactions', '[]')::jsonb || 
-              ${JSON.stringify({ emoji, userId })}::jsonb
-            )
-          )
-          WHERE id = ${entryId}
-        `;
+        import { db } from '@/db';
+        import { guestbookEntries, eq } from '@/db/schema';
+        import { sql } from 'drizzle-orm';
+
+        // Using raw SQL for JSON manipulation
+        const updated = await db.execute(
+          sql`UPDATE guestbook_entries
+              SET reactions = jsonb_set(
+                COALESCE(reactions, '[]'::jsonb),
+                '{reactions}',
+                (COALESCE(reactions->'reactions', '[]'::jsonb) || ${JSON.stringify({ emoji, userId })}::jsonb)
+              )
+              WHERE id = ${entryId}`
+        );
 
   anonymous_message_queries:
     get_unread_messages:
       description: "Admin inbox - unread messages"
       query: |
-        const unreadMessages = await prisma.anonymousMessage.findMany({
-          where: { read: false },
-          orderBy: { createdAt: 'desc' },
-        });
+        import { db } from '@/db';
+        import { anonymousMessages, eq, desc } from '@/db/schema';
+
+        const unreadMessages = await db.select()
+          .from(anonymousMessages)
+          .where(eq(anonymousMessages.read, false))
+          .orderBy(desc(anonymousMessages.createdAt));
 
     mark_as_read:
       description: "Mark message as read"
       query: |
-        const message = await prisma.anonymousMessage.update({
-          where: { id: messageId },
-          data: { read: true },
-        });
+        import { db } from '@/db';
+        import { anonymousMessages, eq } from '@/db/schema';
+
+        const [message] = await db.update(anonymousMessages)
+          .set({ read: true })
+          .where(eq(anonymousMessages.id, messageId))
+          .returning();
 
     rate_limit_check:
       description: "Check rate limit by IP hash"
       query: |
-        const recentMessages = await prisma.anonymousMessage.count({
-          where: {
-            ipHash: hashedIp,
-            createdAt: {
-              gte: new Date(Date.now() - 60 * 60 * 1000), // Last hour
-            },
-          },
-        });
+        import { db } from '@/db';
+        import { anonymousMessages, eq, gte, count } from '@/db/schema';
+        import { sql } from 'drizzle-orm';
+
+        const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+        const [result] = await db.select({ count: count() })
+          .from(anonymousMessages)
+          .where(
+            and(
+              eq(anonymousMessages.ipHash, hashedIp),
+              gte(anonymousMessages.createdAt, oneHourAgo)
+            )
+          );
 
   chat_queries:
     get_or_create_session:
       description: "Get existing or create new chat session"
       query: |
-        const chatLog = await prisma.chatLog.upsert({
-          where: { sessionId },
-          create: {
-            sessionId,
-            messages: [],
-          },
-          update: {},
-        });
+        import { db } from '@/db';
+        import { chatLogs, eq } from '@/db/schema';
+
+        let [chatLog] = await db.select()
+          .from(chatLogs)
+          .where(eq(chatLogs.sessionId, sessionId))
+          .limit(1);
+
+        if (!chatLog) {
+          [chatLog] = await db.insert(chatLogs)
+            .values({ sessionId, messages: [] })
+            .returning();
+        }
 
     append_message:
       description: "Add message to chat log"
       query: |
-        const updated = await prisma.chatLog.update({
-          where: { sessionId },
-          data: {
-            messages: {
-              push: newMessage,
-            },
-          },
-        });
+        import { db } from '@/db';
+        import { chatLogs, eq } from '@/db/schema';
+        import { sql } from 'drizzle-orm';
+
+        // Using raw SQL for JSON array append
+        const [updated] = await db.execute(
+          sql`UPDATE chat_logs
+              SET messages = messages || ${JSON.stringify(newMessage)}::jsonb,
+                  updated_at = NOW()
+              WHERE session_id = ${sessionId}
+              RETURNING *`
+        );
 
     cleanup_old_sessions:
       description: "Remove sessions older than 30 days"
       query: |
-        const deleted = await prisma.chatLog.deleteMany({
-          where: {
-            updatedAt: {
-              lt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
-            },
-          },
-        });
+        import { db } from '@/db';
+        import { chatLogs, lt } from '@/db/schema';
+
+        const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+        const deleted = await db.delete(chatLogs)
+          .where(lt(chatLogs.updatedAt, thirtyDaysAgo));
 
   knowledge_queries:
     get_unindexed_docs:
       description: "Find documents needing indexing"
       query: |
-        const unindexedDocs = await prisma.knowledgeDoc.findMany({
-          where: { indexed: false },
-          orderBy: { createdAt: 'asc' },
-        });
+        import { db } from '@/db';
+        import { knowledgeDocs, eq, asc } from '@/db/schema';
+
+        const unindexedDocs = await db.select()
+          .from(knowledgeDocs)
+          .where(eq(knowledgeDocs.indexed, false))
+          .orderBy(asc(knowledgeDocs.createdAt));
 
     mark_as_indexed:
       description: "Update document indexed status"
       query: |
-        const doc = await prisma.knowledgeDoc.update({
-          where: { id: docId },
-          data: { indexed: true },
-        });
+        import { db } from '@/db';
+        import { knowledgeDocs, eq } from '@/db/schema';
+
+        const [doc] = await db.update(knowledgeDocs)
+          .set({ indexed: true })
+          .where(eq(knowledgeDocs.id, docId))
+          .returning();
 
     search_knowledge:
       description: "Search knowledge base content"
       query: |
-        const results = await prisma.knowledgeDoc.findMany({
-          where: {
-            content: {
-              contains: searchTerm,
-              mode: 'insensitive',
-            },
-          },
-        });
+        import { db } from '@/db';
+        import { knowledgeDocs, ilike } from '@/db/schema';
+
+        const results = await db.select()
+          .from(knowledgeDocs)
+          .where(ilike(knowledgeDocs.content, `%${searchTerm}%`));
 
 # =============================================================================
 # PERFORMANCE CONSIDERATIONS
@@ -1134,25 +1500,31 @@ performance:
   connection_pooling:
     description: "Configure connection pool for production"
     config: |
-      // In production, configure pool settings
-      const prisma = new PrismaClient({
-        datasources: {
-          db: {
-            url: process.env.DATABASE_URL,
-          },
-        },
-        log: process.env.NODE_ENV === 'development' 
-          ? ['query', 'error', 'warn'] 
-          : ['error'],
+      // apps/admin/db/index.ts
+      import { drizzle } from 'drizzle-orm/postgres-js';
+      import postgres from 'postgres';
+      import * as schema from './schema';
+
+      const client = postgres(process.env.DATABASE_URL!, {
+        max: 10, // Connection pool size
+        idle_timeout: 20,
+        connect_timeout: 10,
+      });
+
+      export const db = drizzle(client, { 
+        schema,
+        logger: process.env.NODE_ENV === 'development',
       });
 
   query_optimization:
     tips:
-      - "Use `select` to fetch only needed fields"
-      - "Use `include` sparingly; prefer separate queries for complex relations"
-      - "Implement cursor-based pagination for large datasets"
-      - "Use raw queries for complex aggregations"
+      - "Use `.select()` with specific columns to fetch only needed fields"
+      - "Avoid N+1 queries; use joins or batch queries for relations"
+      - "Implement offset/limit pagination for large datasets (or cursor-based for better performance)"
+      - "Use raw SQL queries (`db.execute(sql`...`)`) for complex aggregations"
       - "Cache frequently accessed, rarely changed data (profile links, etc.)"
+      - "Use prepared statements for repeated queries"
+      - "Index foreign keys and frequently queried columns"
 
   caching_strategy:
     static_content:
@@ -1176,8 +1548,8 @@ backup:
     - name: "pg_dump"
       usage: "pg_dump -Fc portfolio > backup_$(date +%Y%m%d).dump"
       
-    - name: "Prisma"
-      usage: "For data export, use Prisma Client to export to JSON"
+    - name: "Drizzle ORM"
+      usage: "For data export, use Drizzle to query and export to JSON"
 
   retention:
     daily: "7 days"
@@ -1193,7 +1565,7 @@ security:
     - "Hash IP addresses before storing (AnonymousMessage.ipHash)"
     - "Never store raw passwords; use OAuth providers"
     - "Sanitize all user inputs before database insertion"
-    - "Use parameterized queries (Prisma handles this)"
+    - "Use parameterized queries (Drizzle handles this automatically)"
 
   access_control:
     - "Implement row-level security where needed"

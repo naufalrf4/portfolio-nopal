@@ -29,7 +29,7 @@ phases:
     duration_estimate: 1-2 weeks
     
     objectives:
-      - Set up Turborepo monorepo with pnpm workspaces
+      - Set up pnpm native workspaces monorepo
       - Configure shared TypeScript, ESLint, and Prettier
       - Create shared packages structure
       - Set up Docker development environment
@@ -40,7 +40,6 @@ phases:
         name: Monorepo Initialization
         deliverables:
           - pnpm workspace configuration
-          - Turborepo pipeline setup
           - Root package.json with workspace scripts
         acceptance: pnpm install and pnpm build work from root
 
@@ -66,7 +65,6 @@ phases:
         deliverables:
           - docker-compose.yaml for local services
           - Local PostgreSQL container
-          - Local Qdrant container
           - .env.example templates
         acceptance: docker compose up starts all services
 
@@ -81,10 +79,8 @@ phases:
 
     dependencies: none
     risks:
-      - Turborepo configuration complexity
       - pnpm workspace resolution issues
     mitigations:
-      - Follow official Turborepo examples
       - Test package linking early
 
 
@@ -98,8 +94,8 @@ phases:
     
     objectives:
       - Set up Next.js Admin app with App Router
-      - Configure Prisma with Neon PostgreSQL
-      - Implement Google OAuth with NextAuth
+      - Configure Drizzle ORM with Neon PostgreSQL
+      - Implement Google OAuth with NextAuth v5
       - Build core data models and migrations
       - Create admin CRUD API endpoints
       - Build basic admin dashboard UI
@@ -117,13 +113,14 @@ phases:
       - id: M1.2
         name: Database Setup
         deliverables:
-          - Prisma schema with core models
+          - Drizzle ORM schema with core models (apps/admin/db/schema.ts)
           - User, Project, ProjectContext models
           - BlogLink, GuestbookEntry models
           - AnonymousMessage, ChatLog models
           - ProfileLink, KnowledgeDoc models
-          - Initial migration
-        acceptance: prisma migrate dev succeeds
+          - ContactForm, BookingSlot, Booking models
+          - Initial migration (drizzle-kit generate + migrate)
+        acceptance: pnpm --filter admin db:migrate succeeds
 
       - id: M1.3
         name: Authentication
@@ -205,8 +202,8 @@ phases:
       - id: M2.1
         name: Public App Scaffold
         deliverables:
-          - apps/public Next.js app
-          - Tailwind CSS with playful geometric theme
+          - apps/public Astro SSR app
+          - Tailwind CSS with neumorphism theme
           - packages/ui shared components
           - Layout with navigation
         acceptance: App runs at localhost:3000
@@ -261,9 +258,9 @@ phases:
       - id: M2.7
         name: UI Polish
         deliverables:
-          - Playful geometric design system
-          - Animations with Framer Motion
-          - Dark mode support
+          - Neumorphism design system
+          - Animations (Framer Motion or CSS)
+          - Responsive design (light mode only)
           - Accessibility review
         acceptance: Lighthouse score > 90
 
@@ -314,8 +311,8 @@ phases:
       - id: M3.3
         name: NGL App
         deliverables:
-          - apps/ngl Next.js app
-          - Anonymous message form
+          - apps/ngl SvelteKit app
+          - Anonymous message form (SvelteKit form actions)
           - Rate limiting (IP-based)
           - Success confirmation
           - Admin inbox in dashboard
@@ -324,7 +321,7 @@ phases:
       - id: M3.4
         name: Links Hub
         deliverables:
-          - apps/links Next.js app
+          - apps/links Astro SSR app
           - Profile links display
           - Admin CRUD for profile links
           - Minimal, fast design
@@ -355,12 +352,12 @@ phases:
   # ---------------------------------------------------------------------------
   - name: RAG Chatbot
     id: phase-4
-    description: Build the conversational RAG service with LLM routing and vector search.
+    description: Build the conversational RAG service using Python FastAPI with pgvector and LLM routing.
     duration_estimate: 3-4 weeks
     
     objectives:
-      - Set up Node.js RAG service with Fastify
-      - Implement vector storage with Qdrant
+      - Set up Python FastAPI RAG service
+      - Implement vector storage with pgvector (PostgreSQL extension)
       - Build ingestion pipeline
       - Implement LLM routing with fallback
       - Add session memory with pruning
@@ -370,38 +367,39 @@ phases:
       - id: M4.1
         name: RAG Service Scaffold
         deliverables:
-          - apps/rag-service Node.js app
-          - Fastify server setup
+          - apps/rag-service Python FastAPI app (src/main.py)
+          - uvicorn server setup
           - Health check endpoint
           - Docker configuration
+          - pyproject.toml with uv dependency management
         acceptance: Service runs and responds to health checks
 
       - id: M4.2
         name: Vector Store Integration
         deliverables:
-          - Qdrant client setup
-          - Collection creation
-          - Embedding generation (OpenAI)
-          - Similarity search implementation
-        acceptance: Can store and retrieve embeddings
+          - pgvector extension enabled on PostgreSQL
+          - asyncpg / psycopg client for vector queries
+          - Embedding generation (OpenAI text-embedding-3-small, 1536 dims)
+          - Similarity search implementation (cosine distance)
+        acceptance: Can store and retrieve embeddings via pgvector
 
       - id: M4.3
         name: Ingestion Pipeline
         deliverables:
           - Content fetch from Admin API
           - Document chunking
-          - Embedding generation
-          - Qdrant indexing
+          - Embedding generation (OpenAI text-embedding-3-small)
+          - pgvector indexing
           - Internal trigger endpoint
         acceptance: Admin can trigger ingestion
 
       - id: M4.4
         name: LLM Integration
         deliverables:
-          - LangChain.js setup
+          - Custom Python LLM router (no LangChain dependency)
           - Provider clients (Gemini, Groq, OpenAI, DeepSeek)
           - Primary/fallback routing
-          - Environment-based selection
+          - Environment-based selection (PRIMARY_LLM, FALLBACK_LLM)
         acceptance: Fallback works when primary fails
 
       - id: M4.5

@@ -65,7 +65,7 @@ The RAG Chatbot Service provides:
 
 ### 5. Unified Monorepo Architecture
 
-The entire ecosystem lives in a single Turborepo with shared packages:
+The entire ecosystem lives in a single pnpm native workspaces monorepo with shared packages:
 
 | Package | Purpose |
 |---------|---------|
@@ -80,8 +80,7 @@ The entire ecosystem lives in a single Turborepo with shared packages:
 Self-hosted Docker deployment with:
 
 - **Traefik**: Reverse proxy with TLS termination via Let's Encrypt.
-- **Qdrant**: Vector store for RAG embeddings (internal-only exposure).
-- **Neon PostgreSQL**: Managed database with connection pooling.
+- **Neon PostgreSQL**: Managed database with connection pooling (postgres.js driver, Drizzle ORM). pgvector extension provides vector storage for RAG embeddings — no separate vector service required.
 - **Environment Isolation**: Secrets managed via environment variables, never exposed to frontend bundles.
 
 ---
@@ -141,7 +140,7 @@ The following are explicitly excluded from the system design:
          └────────────────────┼────────────────┴──────────────┘              │
                               │                                              │
                     ┌─────────▼─────────┐                          ┌─────────▼─────────┐
-                    │   PostgreSQL      │                          │      Qdrant       │
+                    │   PostgreSQL      │                          │   PostgreSQL (Neon) + pgvector │
                     │   (Neon)          │                          │  (Vector Store)   │
                     │                   │                          │                   │
                     │ [ADMIN ONLY]      │                          │ [RAG ONLY]        │
@@ -151,5 +150,5 @@ The following are explicitly excluded from the system design:
 **Data Flow Rules:**
 1. Only Admin app has `DATABASE_URL` credentials.
 2. Public, Links, NGL apps call Admin API for all data.
-3. RAG Service calls Admin API for content and logs; uses Qdrant for vectors.
+3. RAG Service calls Admin API for content and logs; uses pgvector (PostgreSQL) for vector similarity search.
 4. All external traffic terminates TLS at Traefik.

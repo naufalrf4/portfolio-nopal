@@ -17,11 +17,11 @@ development:
   setup:
     prerequisites:
       - name: Node.js
-        version: ">=20.0.0"
+        version: ">=22.0.0"
         check_command: node --version
 
       - name: pnpm
-        version: ">=8.0.0"
+        version: ">=9.0.0"
         check_command: pnpm --version
 
       - name: Docker
@@ -45,10 +45,9 @@ development:
           notes: Fill in required environment variables
 
         - name: Start infrastructure services
-          command: docker compose up -d postgres qdrant
+          command: docker compose up -d postgres
           services:
             - postgres (local development only)
-            - qdrant
 
         - name: Run database migrations
           command: pnpm --filter admin db:migrate
@@ -85,7 +84,6 @@ development:
           - PRIMARY_LLM
           - FALLBACK_LLM
           - ADMIN_SERVICE_TOKEN
-          - QDRANT_URL
 
   # ---------------------------------------------------------------------------
   # Development Commands
@@ -128,16 +126,16 @@ development:
 
     database:
       - command: pnpm --filter admin db:migrate
-        description: Run Prisma migrations
+        description: Run Drizzle migrations
 
       - command: pnpm --filter admin db:push
-        description: Push schema changes (dev only)
+        description: Push schema changes (dev only, not for production)
 
       - command: pnpm --filter admin db:studio
-        description: Open Prisma Studio
+        description: Open Drizzle Studio
 
       - command: pnpm --filter admin db:generate
-        description: Generate Prisma client
+        description: Generate Drizzle migration files
 
       - command: pnpm --filter admin db:seed
         description: Seed database with initial data
@@ -347,7 +345,6 @@ deployment:
 
     caching:
       - pnpm store
-      - turbo cache
       - docker layers
       - next.js cache
 
@@ -378,7 +375,7 @@ deployment:
         dockerfile: apps/rag-service/Dockerfile
 
     dockerfile_pattern:
-      base: node:20-alpine
+      base: node:22-alpine
       stages:
         - deps: install dependencies
         - builder: build application
@@ -405,7 +402,7 @@ deployment:
         command: docker compose pull
 
       - name: Apply database migrations
-        command: docker compose exec admin npx prisma migrate deploy
+        command: docker compose exec admin pnpm --filter admin db:migrate
         notes: Run before starting new containers
 
       - name: Rolling update
