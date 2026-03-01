@@ -132,3 +132,21 @@ The system now provides clear error messages for various authentication scenario
 - All error messages are user-friendly and actionable
 - The implementation maintains backward compatibility with existing functionality
 - Google OAuth flow is properly configured with email verification and user sync
+
+## Task: T6: links-astro: Layout + Design System
+
+- **Status**: Completed
+- **Date**: 2026-03-01
+- **Completed By**: Sisyphus-Junior
+
+### Subtasks Completed
+
+- [x] apps/links-astro/src/layouts/BaseLayout.astro
+- [x] apps/links-astro/src/styles/globals.css
+- [x] bun run build in apps/links-astro exits 0
+
+### Notes
+
+- Implemented minimal OKLCH reset and neumorphic utilities in globals.css
+- BaseLayout handles Google Fonts linking and metadata
+- Verified build passes with updated layout

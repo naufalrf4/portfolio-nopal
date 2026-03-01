@@ -1,0 +1,85 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+:root {
+  /* Base surface - cool grey */
+  --neu-bg: oklch(0.92 0.008 240);
+  --neu-surface: oklch(0.92 0.008 240);
+
+  /* Text colors */
+  --neu-fg: oklch(0.35 0.015 240);
+  --neu-fg-muted: oklch(0.52 0.012 240);
+  --neu-fg-subtle: oklch(0.72 0.01 240);
+
+  /* Accent colors */
+  --neu-accent: oklch(0.58 0.2 280);
+  --neu-accent-light: oklch(0.68 0.18 280);
+  --neu-accent-secondary: oklch(0.68 0.1 190);
+
+  /* Shadow colors - RGBA for smooth blending */
+  --neu-shadow-light: rgba(255, 255, 255, 0.5);
+  --neu-shadow-dark: rgb(163, 177, 198, 0.6);
+  --neu-shadow-light-strong: rgba(255, 255, 255, 0.6);
+  --neu-shadow-dark-strong: rgb(163, 177, 198, 0.7);
+
+  /* Border radius */
+  --radius-container: 32px;
+  --radius-base: 16px;
+  --radius-inner: 12px;
+}
+
+body {
+  background-color: var(--neu-bg);
+  color: var(--neu-fg);
+  font-family: 'DM Sans', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+
+/* Neumorphic Utilities */
+.neu-extruded {
+  box-shadow:
+    9px 9px 16px var(--neu-shadow-dark),
+    -9px -9px 16px var(--neu-shadow-light);
+}
+
+.neu-extruded-hover {
+  box-shadow:
+    12px 12px 20px var(--neu-shadow-dark-strong),
+    -12px -12px 20px var(--neu-shadow-light-strong);
+}
+
+.neu-extruded-sm {
+  box-shadow:
+    5px 5px 10px var(--neu-shadow-dark),
+    -5px -5px 10px var(--neu-shadow-light);
+}
+
+.neu-inset {
+  box-shadow:
+    inset 6px 6px 10px var(--neu-shadow-dark),
+    inset -6px -6px 10px var(--neu-shadow-light);
+}
+
+.neu-inset-deep {
+  box-shadow:
+    inset 10px 10px 20px var(--neu-shadow-dark),
+    inset -10px -10px 20px var(--neu-shadow-light);
+}
+
+.neu-flat {
+  box-shadow: none;
+}
