@@ -1,0 +1,25 @@
+---
+import PageLayout from '@/layouts/PageLayout.astro';
+import { BlogsContent } from '@/components/blogs';
+import { SectionHeader } from '@/components/shared';
+import { getBlogs } from '@/lib/api';
+
+const { blogs } = await getBlogs();
+
+const title = "Blog & Articles";
+const description = "Read my thoughts on software engineering, web development, and technology. Links to articles on Medium, Dev.to, and more.";
+
+---
+
+<PageLayout title={title} description={description}>
+  <div class="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto">
+      <SectionHeader
+        title="Articles & Blog Posts"
+        subtitle="Thoughts, tutorials, and insights on web development, software engineering, and technology published on various platforms."
+      />
+      
+      <BlogsContent initialBlogs={blogs} client:load />
+    </div>
+  </div>
+</PageLayout>

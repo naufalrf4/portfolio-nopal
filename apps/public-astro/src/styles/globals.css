@@ -1,0 +1,211 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Base surface - cool grey */
+    --background: oklch(0.92 0.008 240);
+    --surface: oklch(0.92 0.008 240);
+
+    /* Text colors */
+    --foreground: oklch(0.35 0.015 240);
+    --foreground-muted: oklch(0.52 0.012 240);
+    --foreground-subtle: oklch(0.72 0.01 240);
+
+    /* Accent colors */
+    --accent: oklch(0.58 0.2 280);
+    --accent-light: oklch(0.68 0.18 280);
+    --accent-secondary: oklch(0.68 0.1 190);
+
+    /* Semantic */
+    --success: oklch(0.68 0.1 190);
+    --warning: oklch(0.75 0.15 70);
+    --error: oklch(0.62 0.22 25);
+
+    /* Shadow colors - use rgba directly in shadows */
+    --shadow-light: rgba(255, 255, 255, 0.5);
+    --shadow-light-strong: rgba(255, 255, 255, 0.6);
+    --shadow-dark: rgb(163, 177, 198, 0.6);
+    --shadow-dark-strong: rgb(163, 177, 198, 0.7);
+
+    /* Border radius */
+    --radius-container: 32px;
+    --radius-base: 16px;
+    --radius-inner: 12px;
+
+    /* Neumorphic Shadows (Variables for reuse if needed outside utility classes) */
+    --neu-extruded: 9px 9px 16px var(--shadow-dark), -9px -9px 16px var(--shadow-light);
+    --neu-extruded-hover:
+      12px 12px 20px var(--shadow-dark-strong), -12px -12px 20px var(--shadow-light-strong);
+    --neu-extruded-sm: 5px 5px 10px var(--shadow-dark), -5px -5px 10px var(--shadow-light);
+    --neu-inset: inset 6px 6px 10px var(--shadow-dark), inset -6px -6px 10px var(--shadow-light);
+    --neu-inset-deep:
+      inset 10px 10px 20px var(--shadow-dark-strong),
+      inset -10px -10px 20px var(--shadow-light-strong);
+    --neu-inset-sm: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light);
+  }
+
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: 'DM Sans', 'sans-serif';
+    -webkit-font-smoothing: antialiased;
+    font-smooth: antialiased;
+    min-height: 100vh;
+  }
+
+  body::selection {
+    background-color: var(--accent);
+    color: white;
+  }
+}
+
+@layer utilities {
+  .neu-extruded {
+    box-shadow: var(--neu-extruded);
+  }
+  .neu-extruded-hover {
+    box-shadow: var(--neu-extruded-hover);
+  }
+  .neu-extruded-sm {
+    box-shadow: var(--neu-extruded-sm);
+  }
+  .neu-inset {
+    box-shadow: var(--neu-inset);
+  }
+  .neu-inset-deep {
+    box-shadow: var(--neu-inset-deep);
+  }
+  .neu-inset-sm {
+    box-shadow: var(--neu-inset-sm);
+  }
+  .neu-flat {
+    box-shadow: none;
+  }
+
+  /* Animations */
+  .animate-in {
+    animation: animate-in 0.3s ease-out forwards;
+  }
+  .animate-out {
+    animation: animate-out 0.2s ease-in forwards;
+  }
+  .fade-in {
+    animation: fade-in 0.2s ease-out forwards;
+  }
+  .fade-out {
+    animation: fade-out 0.2s ease-in forwards;
+  }
+  .slide-in-from-bottom-4 {
+    animation: slide-in-from-bottom-4 0.3s ease-out forwards;
+  }
+  .slide-in-from-bottom-2 {
+    animation: slide-in-from-bottom-2 0.2s ease-out forwards;
+  }
+  .slide-in-from-top-2 {
+    animation: slide-in-from-top-2 0.2s ease-out forwards;
+  }
+  .zoom-in-95 {
+    animation: zoom-in-95 0.2s ease-out forwards;
+  }
+  .zoom-out-95 {
+    animation: zoom-out-95 0.2s ease-in forwards;
+  }
+
+  /* Safe area padding for mobile bottom nav */
+  .safe-area-pb {
+    padding-bottom: env(safe-area-inset-bottom, 20px);
+  }
+}
+
+@keyframes animate-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes animate-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+@keyframes slide-in-from-bottom-4 {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes slide-in-from-bottom-2 {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes slide-in-from-top-2 {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes zoom-in-95 {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes zoom-out-95 {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}

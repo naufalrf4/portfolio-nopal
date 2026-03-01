@@ -1,0 +1,21 @@
+$ astro build
+22:30:39 [@astrojs/node] Enabling sessions with filesystem storage
+22:30:39 [content] Syncing content
+22:30:39 [content] Synced content
+22:30:39 [types] Generated 32ms
+22:30:39 [build] output: "server"
+22:30:39 [build] mode: "server"
+22:30:39 [build] directory: /home/naufalrf/Documents/Projects/Personal/naufalrf-portfolio/apps/links-astro/dist/
+22:30:39 [build] adapter: @astrojs/node
+22:30:39 [build] Collecting build info...
+22:30:39 [build] ✓ Completed in 76ms.
+22:30:39 [build] Building server entrypoints...
+22:30:41 [vite] ✓ built in 1.17s
+22:30:41 [build] ✓ Completed in 1.20s.
+
+ prerendering static routes 
+22:30:41 ✓ Completed in 7ms.
+
+22:30:41 [build] Rearranging server assets...
+22:30:41 [build] Server built in 1.29s
+22:30:41 [build] Complete!

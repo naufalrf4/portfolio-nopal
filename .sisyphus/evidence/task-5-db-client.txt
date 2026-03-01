@@ -1,0 +1,5 @@
+PASS: File exists
+PASS: Exports db
+PASS: Imports postgres
+PASS: Imports schema
+PASS: Connection config present

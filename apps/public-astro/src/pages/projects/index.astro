@@ -1,0 +1,37 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import { ProjectsGrid } from '../../components/projects/ProjectsGrid';
+import { getProjects } from '../../lib/api';
+import { FolderKanban } from 'lucide-react';
+
+// Fetch all projects for client-side filtering
+const { projects } = await getProjects();
+
+const title = "Projects";
+const description = "Explore my portfolio of web applications, mobile apps, and backend systems built with modern technologies like React, Next.js, and Node.js.";
+
+---
+
+<PageLayout
+  title={title}
+  description={description}
+  canonicalUrl="https://naufalrf.tech/projects"
+>
+  <div class="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto">
+      <header class="mb-12 text-center">
+        <div class="flex flex-col items-center gap-6 mb-6">
+          <div class="w-16 h-16 md:w-20 md:h-20 rounded-2xl neu-extruded flex items-center justify-center bg-[#E0E5EC] shadow-[9px_9px_16px_rgba(163,177,198,0.6),-9px_-9px_16px_rgba(255,255,255,0.5)]">
+            <FolderKanban className="w-8 h-8 md:w-10 md:h-10 text-[#3B82F6]" />
+          </div>
+          <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-[#3D4852]">{title}</h1>
+        </div>
+        <p class="text-lg md:text-xl text-[#6B7280] max-w-3xl mx-auto leading-relaxed">
+          A collection of projects showcasing my expertise in web development, mobile applications, backend systems, and DevOps practices. Each project represents real-world problem-solving and technical innovation.
+        </p>
+      </header>
+
+      <ProjectsGrid client:load projects={projects} />
+    </div>
+  </div>
+</PageLayout>

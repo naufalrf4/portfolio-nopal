@@ -1,0 +1,9 @@
+=== Evidence: Task 6 - Auth decoupled from apps/ ===
+
+--- Check 1: No relative imports (../) ---
+PASS: No relative imports
+
+--- Check 2: No apps/admin coupling ---
+PASS: No admin app coupling
+
+=== ALL CHECKS PASSED ===

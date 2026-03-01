@@ -1,0 +1,22 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import { AboutContent } from '../components/about/AboutContent';
+import { getAbout } from '../lib/api';
+
+const about = await getAbout();
+
+const title = "About";
+const description = "Learn about Naufal RF - a passionate software engineer with expertise in full-stack development, cloud architecture, and creating scalable web applications. Currently available for opportunities.";
+
+---
+
+<PageLayout
+  title={title}
+  description={description}
+  canonicalUrl="/about"
+  ogType="profile"
+>
+  <div class="container mx-auto px-4 py-8 md:py-12">
+    <AboutContent client:load about={about} achievements={[]} />
+  </div>
+</PageLayout>

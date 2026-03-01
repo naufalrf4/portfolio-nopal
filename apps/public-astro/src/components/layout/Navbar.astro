@@ -1,0 +1,148 @@
+---
+import { NAV_ITEMS, OTHER_LINKS } from '../../lib/constants';
+import { ChevronDown, ExternalLink } from 'lucide-react';
+
+const currentPath = Astro.url.pathname;
+
+// Helper to check active state
+const isActive = (href: string) => {
+  if (href === '/') return currentPath === '/';
+  return currentPath.startsWith(href);
+};
+---
+
+<header class="sticky top-0 z-50 px-4 pt-4">
+  <nav class="mx-auto max-w-7xl rounded-2xl bg-[#E0E5EC]/80 backdrop-blur-md shadow-[9px_9px_16px_rgb(163,177,198,0.6),-9px_-9px_16px_rgba(255,255,255,0.5)] px-4 md:px-8">
+    <div class="flex h-16 items-center justify-between">
+      <a
+        href="/"
+        class="text-xl font-bold text-[#3B82F6] hover:text-[#2563EB] transition-colors font-display"
+      >
+        Nau.
+      </a>
+
+      <div class="hidden md:flex items-center gap-1">
+        {NAV_ITEMS.map((link) => (
+          <a
+            href={link.href}
+            class:list={[
+              'px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200',
+              isActive(link.href)
+                ? 'text-[#3B82F6] shadow-[inset_4px_4px_8px_rgba(163,177,198,0.6),inset_-4px_-4px_8px_rgba(255,255,255,0.5)]'
+                : 'text-[#3D4852] hover:text-[#3B82F6] hover:shadow-[4px_4px_8px_rgba(163,177,198,0.6),-4px_-4px_8px_rgba(255,255,255,0.5)]'
+            ]}
+          >
+            {link.label}
+          </a>
+        ))}
+
+        <div class="relative group" id="other-dropdown-container">
+          <button
+            id="other-dropdown-trigger"
+            class:list={[
+              'flex items-center gap-1 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200',
+              'text-[#3D4852] hover:text-[#3B82F6] hover:shadow-[4px_4px_8px_rgba(163,177,198,0.6),-4px_-4px_8px_rgba(255,255,255,0.5)]'
+            ]}
+            aria-expanded="false"
+          >
+            Other
+            <ChevronDown
+              size={16}
+              className="transition-transform duration-200 group-data-[state=open]:rotate-180"
+            />
+          </button>
+
+          <div 
+            id="other-dropdown-menu"
+            class="hidden absolute top-full right-0 mt-2 w-56 py-2 rounded-xl bg-[#E0E5EC] shadow-[9px_9px_16px_rgba(163,177,198,0.6),-9px_-9px_16px_rgba(255,255,255,0.5)] animate-in slide-in-from-top-2 fade-in duration-200"
+          >
+            {OTHER_LINKS.map((link) => {
+              const Icon = link.icon;
+              const isExternal = link.external;
+              const active = isActive(link.href);
+
+              return (
+                <a
+                  href={link.href}
+                  target={isExternal ? "_blank" : undefined}
+                  rel={isExternal ? "noopener noreferrer" : undefined}
+                  class:list={[
+                    'group/item flex items-center gap-3 px-4 py-3 mx-2 rounded-lg text-sm transition-all duration-200',
+                    active && !isExternal
+                      ? 'text-[#3B82F6] shadow-[inset_2px_2px_4px_rgba(163,177,198,0.4),inset_-2px_-2px_4px_rgba(255,255,255,0.4)]'
+                      : 'text-[#3D4852] hover:text-[#3B82F6] hover:shadow-[inset_2px_2px_4px_rgba(163,177,198,0.4),inset_-2px_-2px_4px_rgba(255,255,255,0.4)]'
+                  ]}
+                >
+                  <Icon
+                    size={18}
+                    className="transition-transform duration-200 group-hover/item:scale-110"
+                  />
+                  <span class="flex-1">{link.label}</span>
+                  {isExternal && (
+                    <ExternalLink
+                      size={14}
+                      className="text-[#6B7280] transition-opacity duration-200 group-hover/item:opacity-100 opacity-60"
+                    />
+                  )}
+                </a>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<script>
+  const container = document.getElementById('other-dropdown-container');
+  const trigger = document.getElementById('other-dropdown-trigger');
+  const menu = document.getElementById('other-dropdown-menu');
+  let isOpen = false;
+  let hoverTimeout: number | null = null;
+
+  function setOpen(state: boolean) {
+    isOpen = state;
+    if (state) {
+      menu?.classList.remove('hidden');
+      trigger?.setAttribute('aria-expanded', 'true');
+      trigger?.classList.add('text-[#3B82F6]', 'shadow-[inset_4px_4px_8px_rgba(163,177,198,0.6),inset_-4px_-4px_8px_rgba(255,255,255,0.5)]');
+      trigger?.classList.remove('shadow-none');
+    } else {
+      menu?.classList.add('hidden');
+      trigger?.setAttribute('aria-expanded', 'false');
+      trigger?.classList.remove('text-[#3B82F6]', 'shadow-[inset_4px_4px_8px_rgba(163,177,198,0.6),inset_-4px_-4px_8px_rgba(255,255,255,0.5)]');
+    }
+  }
+
+  // Hover logic
+  container?.addEventListener('mouseenter', () => {
+    if (hoverTimeout) clearTimeout(hoverTimeout);
+    hoverTimeout = window.setTimeout(() => setOpen(true), 100);
+  });
+
+  container?.addEventListener('mouseleave', () => {
+    if (hoverTimeout) clearTimeout(hoverTimeout);
+    hoverTimeout = window.setTimeout(() => setOpen(false), 150);
+  });
+
+  // Click logic
+  trigger?.addEventListener('click', (e) => {
+    e.stopPropagation(); // Prevent closing immediately
+    setOpen(!isOpen);
+  });
+
+  // Close on outside click
+  document.addEventListener('click', (e) => {
+    if (container && !container.contains(e.target as Node)) {
+      setOpen(false);
+    }
+  });
+
+  // Close on Escape
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      setOpen(false);
+    }
+  });
+</script>

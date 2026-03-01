@@ -1,0 +1,43 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import { ProjectDetail } from '../../components/project-detail/ProjectDetail';
+import { getProjectBySlug } from '../../lib/api';
+
+const { slug } = Astro.params;
+
+if (!slug) {
+  return Astro.redirect('/404');
+}
+
+const project = await getProjectBySlug(slug);
+
+if (!project) {
+  return Astro.redirect('/404');
+}
+const articleSchema = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": project.title,
+  "description": project.summary,
+  "image": project.imageUrl,
+  "datePublished": project.createdAt,
+  "author": {
+    "@type": "Person",
+    "name": "Naufal Rizqullah Fauzan"
+  }
+};
+
+---
+
+<PageLayout
+  title={project.title}
+  description={project.summary}
+  ogImage={project.imageUrl || undefined}
+  ogType="article"
+
+>
+  <ProjectDetail project={project} client:load />
+  <script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
+</PageLayout>
+
+

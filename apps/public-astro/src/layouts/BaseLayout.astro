@@ -1,0 +1,93 @@
+---
+import '../styles/globals.css';
+
+interface Props {
+  title: string;
+  description: string;
+  ogImage?: string;
+  canonicalUrl?: string;
+  ogType?: 'website' | 'article' | 'profile';
+}
+
+const { 
+  title, 
+  description, 
+  ogImage = '/og-image.png', 
+  canonicalUrl,
+  ogType = 'website'
+} = Astro.props;
+
+const currentPath = Astro.url.pathname;
+const siteUrl = import.meta.env.SITE_URL || 'https://naufalrf.tech';
+const canonical = canonicalUrl || new URL(currentPath, siteUrl).href;
+
+const personSchema = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Naufal Rizqullah Fauzan",
+  "jobTitle": "Full-Stack Engineer",
+  "url": "https://naufalrf.tech",
+  "sameAs": [
+    "https://github.com/naufalrf",
+    "https://linkedin.com/in/naufalrf",
+    "https://twitter.com/naufalrf"
+  ]
+};
+
+const websiteSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "NaufalRF Portfolio",
+  "url": "https://naufalrf.tech",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": "https://naufalrf.tech/search?q={search_term_string}",
+    "query-input": "required name=search_term_string"
+  }
+};
+
+---
+
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    
+    <!-- SEO -->
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    
+    <!-- Open Graph -->
+    <meta property="og:type" content={ogType} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={new URL(ogImage, siteUrl).href} />
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@naufalrf" />
+    <meta name="twitter:creator" content="@naufalrf" />
+    <meta name="twitter:url" content={canonical} />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={new URL(ogImage, siteUrl).href} />
+
+    <!-- JSON-LD -->
+    <script type="application/ld+json" set:html={JSON.stringify(personSchema)} />
+    <script type="application/ld+json" set:html={JSON.stringify(websiteSchema)} />
+
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  </head>
+<body class="bg-background text-foreground min-h-screen selection:bg-accent selection:text-white">
+    <slot />
+  </body>
+</html>

@@ -1,0 +1,8 @@
+=== TypeScript Check for Migrated Files ===
+✓ No TypeScript errors in target files
+
+=== Prisma Import Check ===
+✓ No Prisma db imports found
+
+=== Prisma Generated Types Check ===
+✓ No Prisma generated type imports found

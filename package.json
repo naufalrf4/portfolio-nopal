@@ -8,7 +8,13 @@
   "packageManager": "pnpm@9.15.0",
   "scripts": {
     "build": "pnpm -r --filter=!rag-service run build",
+    "build:links-astro": "pnpm --filter links-astro run build",
+    "build:ngl-svelte": "pnpm --filter ngl-svelte run build",
+    "build:public-astro": "pnpm --filter public-astro run build",
     "dev": "pnpm -r --parallel --filter=!rag-service run dev",
+    "dev:public-astro": "pnpm --filter public-astro run dev",
+    "dev:links-astro": "pnpm --filter links-astro run dev",
+    "dev:ngl-svelte": "pnpm --filter ngl-svelte run dev",
     "start": "pnpm -r --parallel --filter=!rag-service run start",
     "typecheck": "pnpm -r --filter=!rag-service run typecheck",
     "test": "pnpm -r run test",

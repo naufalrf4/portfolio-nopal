@@ -1,0 +1,3 @@
+drizzle.config.ts exists: PASS
+schema path correct: PASS
+dialect correct: PASS

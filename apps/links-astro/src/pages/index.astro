@@ -1,11 +1,41 @@
 ---
-import Welcome from '../components/Welcome.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import ProfileHeader from '../components/ProfileHeader.astro';
+import LinkButtons from '../components/LinkButtons.astro';
+import SocialIcons from '../components/SocialIcons.astro';
+import { getProfileLinks } from '../lib/api';
+import type { ProfileLink } from '../types';
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+const profile = {
+  name: 'Naufal Rizqullah Fauzan',
+  tagline: 'Full-Stack Engineer',
+  bio: 'Building scalable web applications. Open to collaboration and opportunities.',
+};
+
+let links: ProfileLink[] = [];
+
+try {
+  links = await getProfileLinks();
+} catch (error) {
+  console.error('Failed to load profile links', error);
+  links = [];
+}
 ---
 
-<BaseLayout title="NaufalRF Links">
-	<Welcome />
+<BaseLayout
+  title="NaufalRF | Links"
+  description="Links and social profiles for Naufal Rizqullah Fauzan, Full-Stack Engineer"
+  canonicalUrl="https://links.naufalrf.tech"
+>
+  <main class="min-h-screen bg-background flex items-center justify-center px-4 py-16">
+    <section class="w-full max-w-3xl rounded-[34px] bg-surface shadow-neu-extruded px-6 py-10 sm:px-10 sm:py-12 flex flex-col gap-10">
+      <ProfileHeader name={profile.name} tagline={profile.tagline} bio={profile.bio} />
+      <div class="flex justify-center">
+        <SocialIcons links={links} />
+      </div>
+      <div class="w-full">
+        <LinkButtons links={links} />
+      </div>
+    </section>
+  </main>
 </BaseLayout>

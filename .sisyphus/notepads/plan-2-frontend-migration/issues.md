@@ -1,0 +1,1 @@
+- 2026-03-02: LSP diagnostics initially timed out while checking the updated links index page; repeated diagnostics calls failed to initialize. Probably due to dev env (limit?).

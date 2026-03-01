@@ -1,0 +1,30 @@
+22:25:36 [@astrojs/node] Enabling sessions with filesystem storage
+22:25:37 [content] Syncing content
+22:25:37 [content] Synced content
+22:25:37 [types] Generated 36ms
+22:25:37 [build] output: "server"
+22:25:37 [build] mode: "server"
+22:25:37 [build] directory: /home/naufalrf/Documents/Projects/Personal/naufalrf-portfolio/apps/public-astro/dist/
+22:25:37 [build] adapter: @astrojs/node
+22:25:37 [build] Collecting build info...
+22:25:37 [build] ✓ Completed in 77ms.
+22:25:37 [build] Building server entrypoints...
+22:25:38 [vite] ✓ built in 1.09s
+22:25:38 [build] ✓ Completed in 1.12s.
+
+ building client (vite) 
+22:25:38 [vite] transforming...
+22:25:39 [vite] ✓ 21 modules transformed.
+22:25:39 [vite] rendering chunks...
+22:25:39 [vite] computing gzip size...
+22:25:39 [vite] dist/client/_astro/client.T9fhd2RU.js  194.63 kB │ gzip: 60.99 kB
+22:25:39 [vite] ✓ built in 953ms
+
+ prerendering static routes 
+22:25:39 ✓ Completed in 23ms.
+
+22:25:39 [build] Rearranging server assets...
+22:25:39 [@astrojs/sitemap] `sitemap-index.xml` created at `dist/client`
+22:25:39 [build] Server built in 2.20s
+22:25:39 [build] Complete!
+Exit code: 0

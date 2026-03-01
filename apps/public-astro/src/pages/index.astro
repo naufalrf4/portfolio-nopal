@@ -1,0 +1,25 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import { HeroSection } from '../components/home/HeroSection';
+import { FeaturedProjects } from '../components/home/FeaturedProjects';
+import { LatestArticles } from '../components/home/LatestArticles';
+import { TechnicalExpertise } from '../components/home/TechnicalExpertise';
+import { getAbout, getProjects, getBlogs } from '../lib/api';
+
+const [about, projectsData, blogsData] = await Promise.all([
+  getAbout(),
+  getProjects({ featured: true, limit: 3 }),
+  getBlogs(3),
+]);
+
+const title = "Naufal Rizqullah Fauzan | Full-Stack Engineer";
+const description = "Portfolio of Naufal Rizqullah Fauzan - Full-Stack Engineer specializing in scalable web applications, automation systems, and solution architecture.";
+
+---
+
+<PageLayout title={title} description={description}>
+  <HeroSection client:load about={about} />
+  <TechnicalExpertise client:visible />
+  <FeaturedProjects client:load projects={projectsData.projects} />
+  <LatestArticles client:visible blogs={blogsData.blogs} />
+</PageLayout>

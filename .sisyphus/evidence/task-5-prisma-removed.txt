@@ -1,0 +1,2 @@
+PASS: prisma.ts deleted
+PASS: Only expected files remain

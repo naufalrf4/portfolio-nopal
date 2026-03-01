@@ -1,0 +1,89 @@
+prisma/seed.ts(3,26): error TS2307: Cannot find module '@prisma/adapter-pg' or its corresponding type declarations.
+src/app/api/v1/admin/achievements/route.ts(26,39): error TS2345: Argument of type 'string[] | null' is not assignable to parameter of type 'string[]'.
+  Type 'null' is not assignable to type 'string[]'.
+src/app/api/v1/admin/achievements/route.ts(49,37): error TS2345: Argument of type 'string[] | null' is not assignable to parameter of type 'string[]'.
+  Type 'null' is not assignable to type 'string[]'.
+src/app/api/v1/admin/bookings/[id]/status/route.ts(3,24): error TS2307: Cannot find module '@/lib/db/prisma' or its corresponding type declarations.
+src/app/api/v1/admin/chat-logs/[id]/route.ts(2,10): error TS2305: Module '"@naufalrf/auth"' has no exported member 'auth'.
+src/app/api/v1/admin/knowledge/[id]/ingest/route.ts(2,10): error TS2305: Module '"@naufalrf/auth"' has no exported member 'auth'.
+src/app/api/v1/admin/knowledge/[id]/route.ts(2,10): error TS2305: Module '"@naufalrf/auth"' has no exported member 'auth'.
+src/app/api/v1/admin/messages/route.ts(7,24): error TS2307: Cannot find module '@/lib/db/prisma' or its corresponding type declarations.
+src/app/api/v1/admin/messages/stats/locations/route.ts(4,24): error TS2307: Cannot find module '@/lib/db/prisma' or its corresponding type declarations.
+src/app/api/v1/admin/messages/stats/locations/route.ts(25,8): error TS7006: Parameter 'acc' implicitly has an 'any' type.
+src/app/api/v1/admin/messages/stats/locations/route.ts(25,13): error TS7006: Parameter 'message' implicitly has an 'any' type.
+src/app/api/v1/admin/projects/[id]/content/route.ts(2,10): error TS2305: Module '"@naufalrf/auth"' has no exported member 'auth'.
+src/app/api/v1/admin/projects/[id]/content/route.ts(3,24): error TS2307: Cannot find module '@/lib/db/prisma' or its corresponding type declarations.
+src/app/api/v1/admin/projects/[id]/images/[imageId]/route.ts(2,10): error TS2305: Module '"@naufalrf/auth"' has no exported member 'auth'.
+src/app/api/v1/admin/projects/[id]/images/[imageId]/route.ts(3,24): error TS2307: Cannot find module '@/lib/db/prisma' or its corresponding type declarations.
+src/app/api/v1/admin/projects/[id]/images/reorder/route.ts(2,10): error TS2305: Module '"@naufalrf/auth"' has no exported member 'auth'.
+src/app/api/v1/admin/projects/[id]/images/reorder/route.ts(3,24): error TS2307: Cannot find module '@/lib/db/prisma' or its corresponding type declarations.
+src/app/api/v1/admin/projects/[id]/images/route.ts(2,10): error TS2305: Module '"@naufalrf/auth"' has no exported member 'auth'.
+src/app/api/v1/admin/projects/[id]/images/route.ts(3,24): error TS2307: Cannot find module '@/lib/db/prisma' or its corresponding type declarations.
+src/app/api/v1/admin/projects/[id]/route.ts(64,49): error TS2345: Argument of type '{ id: string; createdAt: string; updatedAt: string; visible: boolean; order: number; content: string | null; title: string; slug: string; summary: string; description: string; category: string; ... 10 more ...; projectContexts: { ...; }[]; } | undefined' is not assignable to parameter of type 'SignableRecord'.
+  Type 'undefined' is not assignable to type 'SignableRecord'.
+src/app/api/v1/admin/projects/fix-content/route.ts(3,24): error TS2307: Cannot find module '@/lib/db/prisma' or its corresponding type declarations.
+src/app/api/v1/admin/projects/route.ts(68,47): error TS2345: Argument of type '{ id: string; createdAt: string; updatedAt: string; visible: boolean; order: number; content: string | null; title: string; slug: string; summary: string; description: string; category: string; ... 10 more ...; projectContexts: { ...; }[]; } | undefined' is not assignable to parameter of type 'SignableRecord'.
+  Type 'undefined' is not assignable to type 'SignableRecord'.
+src/app/api/v1/admin/projects/route.ts(75,18): error TS18048: 'project' is possibly 'undefined'.
+src/app/api/v1/admin/stats/route.ts(1,24): error TS2307: Cannot find module '@/lib/db/prisma' or its corresponding type declarations.
+src/app/api/v1/admin/upload/route.ts(3,10): error TS2305: Module '"@naufalrf/auth"' has no exported member 'auth'.
+src/app/api/v1/public/about/route.ts(1,24): error TS2307: Cannot find module '@/lib/db/prisma' or its corresponding type declarations.
+src/app/api/v1/public/achievements/route.ts(2,24): error TS2307: Cannot find module '@/lib/db/prisma' or its corresponding type declarations.
+src/app/api/v1/public/achievements/route.ts(40,31): error TS7006: Parameter 'achievement' implicitly has an 'any' type.
+src/app/api/v1/public/auth/sync/route.ts(2,24): error TS2307: Cannot find module '@/lib/db/prisma' or its corresponding type declarations.
+src/app/api/v1/public/blogs/route.ts(3,24): error TS2307: Cannot find module '@/lib/db/prisma' or its corresponding type declarations.
+src/app/api/v1/public/bookings/available/route.ts(3,24): error TS2307: Cannot find module '@/lib/db/prisma' or its corresponding type declarations.
+src/app/api/v1/public/bookings/available/route.ts(53,41): error TS7006: Parameter 'slot' implicitly has an 'any' type.
+src/app/api/v1/public/bookings/route.ts(3,24): error TS2307: Cannot find module '@/lib/db/prisma' or its corresponding type declarations.
+src/app/api/v1/public/bookings/route.ts(88,54): error TS7006: Parameter 'tx' implicitly has an 'any' type.
+src/app/api/v1/public/contact/route.ts(3,24): error TS2307: Cannot find module '@/lib/db/prisma' or its corresponding type declarations.
+src/app/api/v1/public/guestbook/route.ts(2,24): error TS2307: Cannot find module '@/lib/db/prisma' or its corresponding type declarations.
+src/app/api/v1/public/messages/route.ts(3,24): error TS2307: Cannot find module '@/lib/db/prisma' or its corresponding type declarations.
+src/app/api/v1/public/projects/[slug]/route.ts(2,24): error TS2307: Cannot find module '@/lib/db/prisma' or its corresponding type declarations.
+src/app/api/v1/public/projects/route.ts(2,24): error TS2307: Cannot find module '@/lib/db/prisma' or its corresponding type declarations.
+src/lib/api/handlers/analytics.service.ts(2,24): error TS2307: Cannot find module '@/lib/db/prisma' or its corresponding type declarations.
+src/lib/api/handlers/analytics.service.ts(42,8): error TS7006: Parameter 'acc' implicitly has an 'any' type.
+src/lib/api/handlers/analytics.service.ts(42,13): error TS7006: Parameter 'event' implicitly has an 'any' type.
+src/lib/api/handlers/analytics.service.ts(72,8): error TS7006: Parameter 'acc' implicitly has an 'any' type.
+src/lib/api/handlers/analytics.service.ts(72,13): error TS7006: Parameter 'event' implicitly has an 'any' type.
+src/lib/api/handlers/analytics.service.ts(88,48): error TS18046: 'b' is of type 'unknown'.
+src/lib/api/handlers/analytics.service.ts(88,58): error TS18046: 'a' is of type 'unknown'.
+src/lib/api/handlers/analytics.service.ts(107,8): error TS7006: Parameter 'acc' implicitly has an 'any' type.
+src/lib/api/handlers/analytics.service.ts(107,13): error TS7006: Parameter 'event' implicitly has an 'any' type.
+src/lib/api/handlers/analytics.service.ts(118,48): error TS18046: 'b' is of type 'unknown'.
+src/lib/api/handlers/analytics.service.ts(118,58): error TS18046: 'a' is of type 'unknown'.
+src/lib/api/handlers/analytics.service.ts(134,8): error TS7006: Parameter 'acc' implicitly has an 'any' type.
+src/lib/api/handlers/analytics.service.ts(134,13): error TS7006: Parameter 'event' implicitly has an 'any' type.
+src/lib/api/handlers/analytics.service.ts(144,23): error TS18046: 'b.views' is of type 'unknown'.
+src/lib/api/handlers/analytics.service.ts(144,33): error TS18046: 'a.views' is of type 'unknown'.
+src/lib/api/handlers/analytics.service.ts(193,35): error TS7006: Parameter 'item' implicitly has an 'any' type.
+src/lib/api/handlers/anonymous-messages.service.ts(1,24): error TS2307: Cannot find module '@/lib/db/prisma' or its corresponding type declarations.
+src/lib/api/handlers/booking-availability.service.ts(2,24): error TS2307: Cannot find module '@/lib/db/prisma' or its corresponding type declarations.
+src/lib/api/handlers/booking-availability.service.ts(46,8): error TS7006: Parameter 'acc' implicitly has an 'any' type.
+src/lib/api/handlers/booking-availability.service.ts(46,13): error TS7006: Parameter 'item' implicitly has an 'any' type.
+src/lib/api/handlers/booking-settings.service.ts(1,24): error TS2307: Cannot find module '@/lib/db/prisma' or its corresponding type declarations.
+src/lib/api/handlers/booking-slots.service.ts(2,24): error TS2307: Cannot find module '@/lib/db/prisma' or its corresponding type declarations.
+src/lib/api/handlers/booking-slots.service.ts(39,41): error TS7006: Parameter 'slot' implicitly has an 'any' type.
+src/lib/api/handlers/booking-slots.service.ts(57,8): error TS7006: Parameter 'acc' implicitly has an 'any' type.
+src/lib/api/handlers/booking-slots.service.ts(57,13): error TS7006: Parameter 'slot' implicitly has an 'any' type.
+src/lib/api/handlers/bookings.service.ts(1,24): error TS2307: Cannot find module '@/lib/db/prisma' or its corresponding type declarations.
+src/lib/api/handlers/bookings.service.ts(43,47): error TS7006: Parameter 'booking' implicitly has an 'any' type.
+src/lib/api/handlers/bookings.service.ts(163,23): error TS7006: Parameter 'booking' implicitly has an 'any' type.
+src/lib/api/handlers/chat-logs.service.ts(1,24): error TS2307: Cannot find module '@/lib/db/prisma' or its corresponding type declarations.
+src/lib/api/handlers/chat-logs.service.ts(19,37): error TS7006: Parameter 'log' implicitly has an 'any' type.
+src/lib/api/handlers/contacts.service.ts(2,24): error TS2307: Cannot find module '@/lib/db/prisma' or its corresponding type declarations.
+src/lib/api/handlers/content-export.service.ts(1,24): error TS2307: Cannot find module '@/lib/db/prisma' or its corresponding type declarations.
+src/lib/api/handlers/content-export.service.ts(54,26): error TS7006: Parameter 'project' implicitly has an 'any' type.
+src/lib/api/handlers/content-export.service.ts(60,39): error TS7006: Parameter 'ctx' implicitly has an 'any' type.
+src/lib/api/middleware/auth.ts(2,10): error TS2305: Module '"@naufalrf/auth"' has no exported member 'auth'.
+src/lib/auth.ts(20,8): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(value: { id: string | SQL<unknown> | Placeholder<string, any>; updatedAt: string | SQL<unknown> | Placeholder<string, any>; email: string | SQL<unknown> | Placeholder<...>; name?: string | ... 3 more ... | undefined; createdAt?: string | ... 2 more ... | undefined; image?: string | ... 3 more ... | undefined; role?: "ADMIN" | ... 3 more ... | undefined; }): PgInsertBase<...>', gave the following error.
+    Argument of type '{ email: string; name: string | null | undefined; image: string | null | undefined; role: "ADMIN"; }' is not assignable to parameter of type '{ id: string | SQL<unknown> | Placeholder<string, any>; updatedAt: string | SQL<unknown> | Placeholder<string, any>; email: string | SQL<unknown> | Placeholder<string, any>; name?: string | ... 3 more ... | undefined; createdAt?: string | ... 2 more ... | undefined; image?: string | ... 3 more ... | undefined; role?...'.
+      Type '{ email: string; name: string | null | undefined; image: string | null | undefined; role: "ADMIN"; }' is missing the following properties from type '{ id: string | SQL<unknown> | Placeholder<string, any>; updatedAt: string | SQL<unknown> | Placeholder<string, any>; email: string | SQL<unknown> | Placeholder<string, any>; name?: string | ... 3 more ... | undefined; createdAt?: string | ... 2 more ... | undefined; image?: string | ... 3 more ... | undefined; role?...': id, updatedAt
+  Overload 2 of 2, '(values: { id: string | SQL<unknown> | Placeholder<string, any>; updatedAt: string | SQL<unknown> | Placeholder<string, any>; email: string | SQL<unknown> | Placeholder<...>; name?: string | ... 3 more ... | undefined; createdAt?: string | ... 2 more ... | undefined; image?: string | ... 3 more ... | undefined; role?: "ADMIN" | ... 3 more ... | undefined; }[]): PgInsertBase<...>', gave the following error.
+    Object literal may only specify known properties, and 'email' does not exist in type '{ id: string | SQL<unknown> | Placeholder<string, any>; updatedAt: string | SQL<unknown> | Placeholder<string, any>; email: string | SQL<unknown> | Placeholder<string, any>; name?: string | ... 3 more ... | undefined; createdAt?: string | ... 2 more ... | undefined; image?: string | ... 3 more ... | undefined; role?...'.
+src/scripts/migrate-image-urls.ts(1,24): error TS2307: Cannot find module '@/lib/db/prisma' or its corresponding type declarations.
+src/scripts/migrate-to-keys.ts(1,24): error TS2307: Cannot find module '@/lib/db/prisma' or its corresponding type declarations.
+undefined
+/home/naufalrf/Documents/Projects/Personal/naufalrf-portfolio/apps/admin:
+ ERR_PNPM_RECURSIVE_EXEC_FIRST_FAIL  Command failed with exit code 2: tsc --noEmit

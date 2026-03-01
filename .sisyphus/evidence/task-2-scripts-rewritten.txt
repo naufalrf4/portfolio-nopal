@@ -1,0 +1,4 @@
+grep -c "turbo run" package.json
+0
+grep -c "pnpm -r" package.json
+6

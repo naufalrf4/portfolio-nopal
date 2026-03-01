@@ -1,0 +1,50 @@
+=== Method Signatures for Migrated Services ===
+
+--- about.service.ts ---
+export class AboutService {
+  async get() {
+  async update(data: UpdateAboutInput) {
+  private async createDefault() {
+export const aboutService = new AboutService();
+
+--- achievements.service.ts ---
+export class AchievementsService {
+  async getAll(query?: { visible?: boolean }) {
+  async getById(id: string) {
+  async create(data: any) {
+  async update(id: string, data: any) {
+  async delete(id: string) {
+  async reorder(achievementIds: string[]) {
+    await db.transaction(async (tx) => {
+  async toggleVisibility(id: string) {
+export const achievementsService = new AchievementsService();
+
+--- profile-links.service.ts ---
+export class ProfileLinksService {
+  async getAll(query?: { visible?: boolean }) {
+  async getById(id: string) {
+  async create(data: any) {
+  async update(id: string, data: any) {
+  async delete(id: string) {
+  async reorder(linkIds: string[]) {
+    await db.transaction(async (tx) => {
+export const profileLinksService = new ProfileLinksService();
+
+--- blog-links.service.ts ---
+export type BlogLinkCreateInput = CreateBlogLinkInput;
+export class BlogLinksService {
+  async getAll(query?: { source?: string; visible?: boolean }) {
+  async getById(id: string) {
+  async create(data: BlogLinkCreateInput) {
+  async update(id: string, data: any) {
+  async delete(id: string) {
+  async reorder(blogIds: string[]) {
+    await db.transaction(async (tx) => {
+  async toggleVisibility(id: string) {
+export const blogLinksService = new BlogLinksService();
+
+--- contact-settings.service.ts ---
+export class ContactSettingsService {
+  async get() {
+  async update(data: UpdateContactSettingsInput) {
+export const contactSettingsService = new ContactSettingsService();

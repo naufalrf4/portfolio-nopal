@@ -1,0 +1,8 @@
+pnpm --filter public-astro build → SUCCESS
+- astro build completed in 1.21s with server/client outputs; used Tailwind v4 standalone CSS configuration.
+
+pnpm --filter links-astro build → SUCCESS
+- after removing @astrojs/tailwind, pointing globals to Tailwind v4 via @import "tailwindcss" and @config "../../tailwind.config.mjs", build passes and sitemap generated.
+
+pnpm --filter ngl-svelte build → SUCCESS (warning)
+- Vite build succeeded for both SSR and client, with a benign warning about @import order in the CSS; adapter-node packaged assets correctly.

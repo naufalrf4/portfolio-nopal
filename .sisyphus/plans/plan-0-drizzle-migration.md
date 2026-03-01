@@ -337,8 +337,8 @@ Max Concurrent: 4 (Waves 1, 3, 4)
     - `@id @default(cuid())` → `text('id').primaryKey().$defaultFn(() => createId())`
     - `@updatedAt` → `timestamp('updated_at').$onUpdate(() => new Date())`
     - `DateTime @default(now())` → `timestamp('created_at').defaultNow().notNull()`
-    - `String[]` → `text('column').array()` with `.default(sql\`'{}'\`)` for `@default([])`
-    - `Json` → `jsonb('column')` 
+    - `String[]` → `text('column').array()` with `.default(sql\`'{}'\`)`for`@default([])`
+    - `Json` → `jsonb('column')`
     - `Int @default(0)` → `integer('column').default(0).notNull()`
     - `Boolean @default(false)` → `boolean('column').default(false).notNull()`
     - `@db.VarChar(N)` → `varchar('column', { length: N })`
@@ -523,13 +523,14 @@ Max Concurrent: 4 (Waves 1, 3, 4)
   - Files: `apps/admin/src/lib/db/relations.ts`
   - Pre-commit: lsp_diagnostics on relations.ts
 
-- [ ] 4. Create drizzle.config.ts + Update db:* Scripts
+- [ ] 4. Create drizzle.config.ts + Update db:\* Scripts
 
   **What to do**:
   - Create `apps/admin/drizzle.config.ts`:
+
     ```typescript
     import { defineConfig } from 'drizzle-kit';
-    
+
     export default defineConfig({
       schema: './src/lib/db/schema.ts',
       out: './drizzle',
@@ -539,6 +540,7 @@ Max Concurrent: 4 (Waves 1, 3, 4)
       },
     });
     ```
+
   - Update `apps/admin/package.json` scripts:
     - `"db:generate": "drizzle-kit generate"` (was `prisma migrate dev`)
     - `"db:migrate": "drizzle-kit migrate"` (was `prisma migrate deploy`)
@@ -567,7 +569,7 @@ Max Concurrent: 4 (Waves 1, 3, 4)
   **References**:
 
   **Pattern References**:
-  - `apps/admin/package.json` — Current db:* scripts to replace
+  - `apps/admin/package.json` — Current db:\* scripts to replace
   - `apps/admin/prisma/` — Current Prisma output dir (migrations go to `drizzle/` instead)
 
   **External References**:
@@ -618,20 +620,22 @@ Max Concurrent: 4 (Waves 1, 3, 4)
 
   **What to do**:
   - Create `apps/admin/src/lib/db/index.ts` with Drizzle client:
+
     ```typescript
     import { drizzle } from 'drizzle-orm/postgres-js';
     import postgres from 'postgres';
     import * as schema from './schema';
     import * as relations from './relations';
-    
+
     const client = postgres(process.env.DATABASE_URL!, {
       max: 10,
       idle_timeout: 20,
       connect_timeout: 10,
     });
-    
+
     export const db = drizzle(client, { schema: { ...schema, ...relations } });
     ```
+
   - Export `db` as the single database client
   - Configure postgres.js for Neon serverless (connection limits, timeouts)
   - Delete `apps/admin/src/lib/db/prisma.ts` (the old Prisma client)
@@ -726,24 +730,28 @@ Max Concurrent: 4 (Waves 1, 3, 4)
     - Export `createAuth(db, callbacks)` function instead of pre-initialized auth
   - Update `packages/auth/src/index.ts` — adjust exports
   - Create `apps/admin/src/lib/auth.ts` — initialize auth with Drizzle db:
+
     ```typescript
     import { createAuthConfig } from '@naufalrf/auth';
     import { db } from '@/lib/db';
     import { eq } from 'drizzle-orm';
     import { users } from '@/lib/db/schema';
-    
+
     const authCallbacks = {
       async getUserByEmail(email: string) {
         return db.query.users.findFirst({ where: eq(users.email, email) });
       },
       async upsertUser({ email, name, image }) {
-        await db.insert(users).values({ email, name, image, role: 'ADMIN' })
+        await db
+          .insert(users)
+          .values({ email, name, image, role: 'ADMIN' })
           .onConflictDoUpdate({ target: users.email, set: { name, image, role: 'ADMIN' } });
       },
     };
-    
+
     export const { auth, signIn, signOut, handlers } = createAuthConfig(db, authCallbacks);
     ```
+
   - Update ALL admin files that import from `packages/auth` to import from the new `@/lib/auth.ts` if they need `auth`, `signIn`, `signOut`
   - Verify `@auth/drizzle-adapter` table name expectations match our schema (it expects `user`, `account`, `session`, `verificationToken` tables — check if our `@@map` names match)
 
@@ -829,7 +837,7 @@ Max Concurrent: 4 (Waves 1, 3, 4)
   - Files: `packages/auth/src/config.ts`, `packages/auth/src/auth.ts`, `packages/auth/src/index.ts`, `packages/auth/package.json`, `apps/admin/src/lib/auth.ts`
   - Pre-commit: `pnpm --filter admin typecheck`
 
-- [ ] 7. Push Schema to DB + Verify Table/Enum Counts
+- [x] 7. Push Schema to DB + Verify Table/Enum Counts
 
   **What to do**:
   - Run `pnpm --filter admin db:push` to push Drizzle schema to the database
@@ -902,7 +910,7 @@ Max Concurrent: 4 (Waves 1, 3, 4)
   - Files: Any migration files generated in `apps/admin/drizzle/`
   - Pre-commit: `pnpm --filter admin db:push` succeeds
 
-- [ ] 8. Migrate Simple Services to Drizzle
+- [x] 8. Migrate Simple Services to Drizzle
 
   **What to do**:
   - Migrate 5 service files from Prisma to Drizzle query syntax:
@@ -1008,7 +1016,7 @@ Max Concurrent: 4 (Waves 1, 3, 4)
   - Files: `apps/admin/src/lib/api/handlers/{about,achievements,profile-links,blog-links,contact-settings}.service.ts`
   - Pre-commit: `pnpm --filter admin exec tsc --noEmit` passes for these files
 
-- [ ] 9. Migrate Moderate Services (Projects, Contexts, Guestbook, Knowledge) to Drizzle
+- [x] 9. Migrate Moderate Services (Projects, Contexts, Guestbook, Knowledge) to Drizzle
 
   **What to do**:
   - Migrate 4 service files with moderate complexity:

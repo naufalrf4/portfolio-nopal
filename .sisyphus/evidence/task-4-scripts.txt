@@ -1,0 +1,15 @@
+{
+  "dev": "next dev -p 3001",
+  "build": "next build",
+  "start": "next start -p 3001",
+  "lint": "next lint",
+  "typecheck": "tsc --noEmit",
+  "clean": "rm -rf .next .turbo node_modules",
+  "db:generate": "drizzle-kit generate",
+  "db:migrate": "drizzle-kit migrate",
+  "db:reset": "drizzle-kit migrate reset",
+  "db:push": "drizzle-kit push",
+  "db:studio": "drizzle-kit studio",
+  "db:pull": "drizzle-kit introspect",
+  "db:seed": "tsx prisma/seed.ts"
+}

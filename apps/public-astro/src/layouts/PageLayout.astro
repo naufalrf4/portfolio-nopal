@@ -1,0 +1,40 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import Navbar from '../components/layout/Navbar.astro';
+import Footer from '../components/layout/Footer.astro';
+import FloatingBlobs from '../components/layout/FloatingBlobs.astro';
+import { MobileBottomNav } from '../components/layout/MobileBottomNav';
+
+interface Props {
+  title: string;
+  description: string;
+  ogImage?: string;
+  canonicalUrl?: string;
+  ogType?: 'website' | 'article' | 'profile';
+}
+
+const { title, description, ogImage, canonicalUrl, ogType } = Astro.props;
+const currentPath = Astro.url.pathname;
+
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  ogImage={ogImage}
+  canonicalUrl={canonicalUrl}
+  ogType={ogType}
+>
+
+  <FloatingBlobs />
+  
+  <Navbar />
+  
+  <main class="relative z-10 min-h-screen flex flex-col">
+    <slot />
+  </main>
+  
+  <Footer className="relative z-10" />
+  
+  <MobileBottomNav client:load currentPath={currentPath} />
+</BaseLayout>
