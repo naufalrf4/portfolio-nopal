@@ -2068,7 +2068,7 @@ Max Concurrent: 9 (Wave 4)
   - Files: removed `apps/public/`, `apps/links/`, `apps/ngl/`; updated `pnpm-workspace.yaml`
   - Pre-commit: `pnpm build`
 
-- [ ] T25. **Delete ALL `packages/*` Workspace Packages + Clean Dead Dependencies** — `quick` | Wave 6 | Depends on: T24 | Blocks: F1–F4
+- [x] T25. **Delete ALL `packages/*` Workspace Packages + Clean Dead Dependencies** — `quick` | Wave 6 | Depends on: T24 | Blocks: F1–F4
 
   **What to do**:
   1. Remove ALL `@naufalrf/*` entries from `apps/admin/package.json` (dead deps: `@naufalrf/auth`, `@naufalrf/config`, `@naufalrf/sdk`, `@naufalrf/types`, `@naufalrf/ui`)
