@@ -1992,7 +1992,7 @@ Max Concurrent: 9 (Wave 4)
 
 ---
 
-- [ ] T24. **Cleanup: Delete Deprecated Next.js Apps** — `quick` | Wave 6 | Depends on: T23 | Blocks: T25
+- [x] T24. **Cleanup: Delete Deprecated Next.js Apps** — `quick` | Wave 6 | Depends on: T23 | Blocks: T25
 
   **What to do**:
   1. **Pre-deletion verification** — run ALL of the following and confirm all pass:

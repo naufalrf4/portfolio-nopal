@@ -1,7 +1,0 @@
-# Build directories
-.next/
-.turbo/
-node_modules/
-
-# Generated files
-*.d.ts

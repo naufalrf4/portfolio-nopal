@@ -1,0 +1,4 @@
+pnpm install: SUCCESS
+pnpm --filter public-astro build: SUCCESS
+pnpm --filter links-astro build: SUCCESS
+pnpm --filter ngl-svelte build: SUCCESS

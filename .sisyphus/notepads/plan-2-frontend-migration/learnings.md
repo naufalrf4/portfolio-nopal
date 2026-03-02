@@ -298,3 +298,9 @@ links-astro api.ts + ProfileLink type created.
 - Root package.json updated with per-app convenience scripts for public-astro, links-astro, ngl-svelte
 - pnpm-workspace.yaml confirmed uses apps/\* wildcard (unchanged)
 - All 3 new app builds verified passing
+
+## [2026-03-02] Task: T24
+
+- Deleted apps/public, apps/links, apps/ngl (old Next.js apps)
+- All 3 new apps (public-astro, links-astro, ngl-svelte) still build successfully after deletion
+- pnpm-workspace.yaml uses apps/\* wildcard so no changes needed there

@@ -1,0 +1,8 @@
+admin
+links
+links-astro
+ngl
+ngl-svelte
+public
+public-astro
+rag-service
