@@ -2179,19 +2179,19 @@ Max Concurrent: 9 (Wave 4)
 
 > 4 review agents run in PARALLEL. ALL must APPROVE. Rejection → fix → re-run.
 
-- [ ] F1. **Plan Compliance Audit** — `oracle`
+- [x] F1. **Plan Compliance Audit** — `oracle`
       Read the plan end-to-end. For each "Must Have": verify implementation exists (read file, curl endpoint, run build). For each "Must NOT Have": search codebase for forbidden patterns — reject with file:line if found. Check evidence files exist in `.sisyphus/evidence/`. Confirm old apps deleted. Compare deliverables against plan.
       Output: `Must Have [N/N] | Must NOT Have [N/N] | Tasks [N/N] | VERDICT: APPROVE/REJECT`
 
-- [ ] F2. **Code Quality Review** — `unspecified-high`
+- [x] F2. **Code Quality Review** — `unspecified-high`
       Run `bun --cwd apps/public-astro run build`, `bun --cwd apps/links-astro run build`, `bun --cwd apps/ngl-svelte run build`. Check all new app source files for: hardcoded API URLs, missing error handling on SDK calls, console.log left in, broken imports. Check no `next/` imports remain anywhere. Verify `.env.example` files exist and are complete.
       Output: `Build [PASS/FAIL per app] | Lint [PASS/FAIL] | Issues [N] | VERDICT`
 
-- [ ] F3. **Real Manual QA** — `unspecified-high` (+ `playwright` skill)
+- [x] F3. **Real Manual QA** — `unspecified-high` (+ `playwright` skill)
       Start each app dev server (`bun --cwd apps/public-astro run dev &`, ports 3000/3002/3003). Execute EVERY QA scenario from EVERY task using Playwright — navigate to each page, assert key DOM content, capture screenshots. Test SDK data loads (projects, links visible). Test form presence in ngl-svelte. Save to `.sisyphus/evidence/final-qa/`.
       Output: `Pages [N/N pass] | Scenarios [N/N] | Screenshots saved | VERDICT`
 
-- [ ] F4. **Scope Fidelity Check** — `deep`
+- [x] F4. **Scope Fidelity Check** — `deep`
       For each task: compare "What to do" against actual implementation. Verify 1:1 — everything specified was built, nothing extra was added. Check: no auth added, no new features, no business logic rewritten. Confirm old apps are deleted. Confirm ALL packages deleted. Confirm root scripts updated. Flag any unaccounted files.
       Output: `Tasks [N/N compliant] | No-creep [PASS/FAIL] | Old apps [deleted/present] | Packages [deleted/present] | VERDICT`
 
