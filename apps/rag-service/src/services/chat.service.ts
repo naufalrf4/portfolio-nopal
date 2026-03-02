@@ -5,7 +5,7 @@ import { sessionService } from './session.service';
 import { adminApiService } from './admin-api.service';
 import { buildSystemPrompt, formatContextFromChunks } from '../utils/prompt-builder';
 import { logger } from '../utils/logger';
-import type { ChatRequest, ChatResponse, ChatMessage } from '@naufalrf/types';
+import type { ChatRequest, ChatResponse, ChatMessage } from '../types';
 
 class ChatService {
   async chat(request: ChatRequest): Promise<ChatResponse> {

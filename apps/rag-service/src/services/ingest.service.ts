@@ -2,7 +2,7 @@ import { retrieverService } from './retriever.service';
 import { adminApiService } from './admin-api.service';
 import { chunkText } from '../utils/chunker';
 import { logger } from '../utils/logger';
-import type { IngestRequest, IngestResponse, ContentExport } from '@naufalrf/types';
+import type { IngestRequest, IngestResponse, ContentExport } from '../types';
 
 class IngestService {
   async ingest(request: IngestRequest): Promise<IngestResponse> {

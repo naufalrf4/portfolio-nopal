@@ -304,3 +304,16 @@ links-astro api.ts + ProfileLink type created.
 - Deleted apps/public, apps/links, apps/ngl (old Next.js apps)
 - All 3 new apps (public-astro, links-astro, ngl-svelte) still build successfully after deletion
 - pnpm-workspace.yaml uses apps/\* wildcard so no changes needed there
+
+## [2026-03-02] Task: T25 - Delete packages/
+
+- Deleted all 6 packages: analytics, auth, config, sdk, types, ui
+- Inlined auth code directly into apps/admin/src/lib/auth.ts (createAuthConfig, AuthDbCallbacks, isAdminEmail)
+- Inlined analytics trackPageView/isGAReady into GoogleAnalytics.tsx
+- Inlined NextAuth module augmentation into admin/src/types.d.ts (from packages/auth/src/types.ts)
+- Created apps/rag-service/src/types/index.ts with RAG types (LLMProvider, ChatMessage, ChatRequest, ChatResponse, ContentExport, KnowledgeDoc, RetrievedChunk, IngestRequest, IngestResponse + supporting types Experience, ProjectContextType)
+- Removed @naufalrf/\* from admin/package.json (5 entries) and rag-service/package.json (2 entries)
+- Added next-auth@5.0.0-beta.30 and @auth/drizzle-adapter@^1.11.1 directly to admin/package.json (were transitive deps through @naufalrf/auth)
+- Removed packages/\* from pnpm-workspace.yaml
+- pnpm install, pnpm build, and pnpm --filter rag-service typecheck all pass
+- Key finding: admin didn't have next-auth or @auth/drizzle-adapter as direct deps — they came transitively through @naufalrf/auth package. Had to add them when inlining.

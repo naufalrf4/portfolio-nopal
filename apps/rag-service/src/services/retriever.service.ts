@@ -2,7 +2,7 @@ import { QdrantClient } from '@qdrant/js-client-rest';
 import { env } from '../config/env';
 import { embeddingService } from './embedding.service';
 import { logger } from '../utils/logger';
-import type { RetrievedChunk } from '@naufalrf/types';
+import type { RetrievedChunk } from '../types';
 
 interface UpsertChunk {
   id: string;

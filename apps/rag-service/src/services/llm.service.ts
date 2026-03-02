@@ -4,7 +4,7 @@ import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { createGroq } from '@ai-sdk/groq';
 import { env } from '../config/env';
 import { logger } from '../utils/logger';
-import type { LLMProvider } from '@naufalrf/types';
+import type { LLMProvider } from '../types';
 
 interface ChatMessage {
   role: 'system' | 'user' | 'assistant';

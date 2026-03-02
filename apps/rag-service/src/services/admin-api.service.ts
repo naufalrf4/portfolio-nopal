@@ -1,6 +1,6 @@
 import { env } from '../config/env';
 import { logger } from '../utils/logger';
-import type { KnowledgeDoc, ChatMessage, ContentExport } from '@naufalrf/types';
+import type { KnowledgeDoc, ChatMessage, ContentExport } from '../types';
 
 interface FetchOptions {
   method?: string;

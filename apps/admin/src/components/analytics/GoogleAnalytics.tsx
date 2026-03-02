@@ -3,10 +3,27 @@
 import { Suspense, useEffect } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import Script from 'next/script';
-import { trackPageView, isGAReady } from '@naufalrf/analytics';
 
 interface GoogleAnalyticsProps {
   measurementId: string;
+}
+
+function isGAReady(): boolean {
+  return (
+    typeof window !== 'undefined' &&
+    !!(window as { gtag?: unknown }).gtag &&
+    !!process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID
+  );
+}
+
+function trackPageView(pageData?: {
+  page_path?: string;
+  page_location?: string;
+  page_title?: string;
+}): void {
+  if (!isGAReady()) return;
+  const gtag = (window as { gtag: (...args: unknown[]) => void }).gtag;
+  gtag('config', process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID!, pageData ?? {});
 }
 
 function AnalyticsPageView() {
@@ -27,7 +44,6 @@ function AnalyticsPageView() {
 }
 
 export function GoogleAnalytics({ measurementId }: GoogleAnalyticsProps) {
-  // SSR-safe check: only validate prop, not window
   if (!measurementId) {
     return null;
   }
