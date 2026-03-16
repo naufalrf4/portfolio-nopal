@@ -11,6 +11,7 @@ import { DraggableRoles } from './DraggableRoles';
 export function BioTab() {
   const { data, updateAbout, saving } = useAbout();
 
+  const [shortBio, setShortBio] = useState('');
   const [bio, setBio] = useState('');
   const [roles, setRoles] = useState<string[]>([]);
   const [roleInput, setRoleInput] = useState('');
@@ -23,9 +24,13 @@ export function BioTab() {
       let parsedBio = data.bio || '';
       if (typeof parsedBio === 'string' && parsedBio.trim().startsWith('{')) {
         try {
-          parsedBio = JSON.parse(parsedBio);
-        } catch {}
+          const decodedBio = JSON.parse(parsedBio);
+          parsedBio = typeof decodedBio === 'string' ? decodedBio : parsedBio;
+        } catch {
+          parsedBio = data.bio || '';
+        }
       }
+      setShortBio(data.shortBio || '');
       setBio(parsedBio);
       setRoles(data.roles || []);
       setHasUnsavedChangesBio(false);
@@ -43,6 +48,7 @@ export function BioTab() {
       await updateAbout({
         fullName: data.fullName,
         email: data.email,
+        shortBio,
         bio: bioString,
         roles: data.roles || [],
         tagline: data.tagline ?? undefined,
@@ -65,6 +71,11 @@ export function BioTab() {
     setHasUnsavedChangesBio(true);
   };
 
+  const handleShortBioChange = (newShortBio: string) => {
+    setShortBio(newShortBio);
+    setHasUnsavedChangesBio(true);
+  };
+
   const handleSaveBio = () => {
     saveBio(bio);
   };
@@ -83,6 +94,7 @@ export function BioTab() {
       email: data.email,
       roles,
       tagline: data.tagline ?? undefined,
+      shortBio: data.shortBio ?? undefined,
       bio: bioString,
       phone: data.phone ?? undefined,
       location: data.location ?? undefined,
@@ -144,14 +156,24 @@ export function BioTab() {
             </div>
           </div>
           <Textarea
+            value={shortBio}
+            onChange={(e) => handleShortBioChange(e.target.value)}
+            placeholder="Write the short homepage and links intro here..."
+            rows={4}
+            className="resize-y mb-4"
+          />
+          <p className="text-xs text-[#6B7280] mb-4">
+            This short version is used on the homepage hero and links app.
+          </p>
+          <Textarea
             value={bio}
             onChange={(e) => handleBioChange(e.target.value)}
-            placeholder="Write your bio here..."
+            placeholder="Write your detailed about-page bio here..."
             rows={12}
             className="resize-y"
           />
           <p className="text-xs text-[#6B7280] mt-3">
-            Click &quot;Save Bio&quot; button to save your changes.
+            Save both the short and detailed versions together from this tab.
           </p>
         </CardContent>
       </Card>

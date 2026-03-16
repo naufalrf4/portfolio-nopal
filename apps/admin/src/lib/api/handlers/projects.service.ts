@@ -1,7 +1,7 @@
 import { createId } from '@paralleldrive/cuid2';
 import { db } from '@/lib/db';
 import { eq, and, or, ilike, asc, count } from 'drizzle-orm';
-import { projects, projectContexts, projectImages } from '@/lib/db/schema';
+import { projects, projectImages } from '@/lib/db/schema';
 import type {
   CreateProjectInput,
   UpdateProjectInput,
@@ -35,11 +35,6 @@ export class ProjectsService {
         offset,
         limit,
         orderBy: [asc(projects.order)],
-        with: {
-          projectContexts: {
-            orderBy: [asc(projectContexts.order)],
-          },
-        },
       }),
       db.select({ total: count() }).from(projects).where(whereClause),
     ]);
@@ -57,11 +52,6 @@ export class ProjectsService {
   async getById(id: string) {
     return db.query.projects.findFirst({
       where: eq(projects.id, id),
-      with: {
-        projectContexts: {
-          orderBy: [asc(projectContexts.order)],
-        },
-      },
     });
   }
 
@@ -69,9 +59,6 @@ export class ProjectsService {
     return db.query.projects.findFirst({
       where: eq(projects.slug, slug),
       with: {
-        projectContexts: {
-          orderBy: [asc(projectContexts.order)],
-        },
         projectImages: {
           orderBy: [asc(projectImages.order)],
         },
@@ -101,9 +88,6 @@ export class ProjectsService {
 
     return db.query.projects.findFirst({
       where: eq(projects.id, created.id),
-      with: {
-        projectContexts: true,
-      },
     });
   }
 
@@ -129,9 +113,6 @@ export class ProjectsService {
 
     return db.query.projects.findFirst({
       where: eq(projects.id, id),
-      with: {
-        projectContexts: true,
-      },
     });
   }
 

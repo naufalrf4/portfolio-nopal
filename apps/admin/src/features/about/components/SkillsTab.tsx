@@ -53,6 +53,7 @@ export function SkillsTab() {
       skills,
       roles: data.roles || [],
       tagline: data.tagline ?? undefined,
+      shortBio: data.shortBio ?? undefined,
       bio: bioString,
       phone: data.phone ?? undefined,
       location: data.location ?? undefined,

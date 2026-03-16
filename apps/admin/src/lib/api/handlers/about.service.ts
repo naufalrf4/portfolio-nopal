@@ -4,6 +4,60 @@ import { eq } from 'drizzle-orm';
 import type { UpdateAboutInput } from '@/lib/validations/about.schema';
 import { createId } from '@paralleldrive/cuid2';
 
+type AboutInsert = typeof aboutMe.$inferInsert;
+
+function sanitizeAssetValue(value?: string | null): string | null {
+  if (!value) {
+    return null;
+  }
+
+  const trimmedValue = value.trim();
+  if (!trimmedValue) {
+    return null;
+  }
+
+  if (/^https?:\/\//i.test(trimmedValue)) {
+    try {
+      const parsedUrl = new URL(trimmedValue);
+      const hasSignedQuery =
+        parsedUrl.searchParams.has('X-Amz-Algorithm') ||
+        parsedUrl.searchParams.has('X-Amz-Signature') ||
+        parsedUrl.searchParams.has('x-id');
+
+      if (!hasSignedQuery) {
+        return trimmedValue;
+      }
+
+      const bucketName = process.env.R2_BUCKET_NAME;
+      const rawPath = decodeURIComponent(parsedUrl.pathname.replace(/^\/+/, ''));
+
+      if (bucketName && rawPath.startsWith(`${bucketName}/`)) {
+        return rawPath.slice(bucketName.length + 1);
+      }
+
+      return rawPath || null;
+    } catch {
+      return trimmedValue;
+    }
+  }
+
+  return trimmedValue;
+}
+
+function normalizeExperienceItems(
+  experience: UpdateAboutInput['experience']
+): AboutInsert['experience'] {
+  if (!experience) {
+    return null;
+  }
+
+  return experience.map((item) => ({
+    ...item,
+    logoUrl: sanitizeAssetValue(item.logoUrl) ?? '',
+    skills: item.skills?.map((skill) => skill.trim()).filter(Boolean) ?? [],
+  }));
+}
+
 export class AboutService {
   async get() {
     const result = await db.select().from(aboutMe).limit(1);
@@ -19,44 +73,55 @@ export class AboutService {
   async update(data: UpdateAboutInput) {
     const result = await db.select().from(aboutMe).limit(1);
     const existing = result[0];
-
-    const updateData: any = {
-      fullName: data.fullName,
-      roles: data.roles,
-      bio: data.bio,
-      email: data.email,
-      skills: data.skills,
-    };
-
-    if (data.tagline !== undefined) updateData.tagline = data.tagline;
-    if (data.phone !== undefined) updateData.phone = data.phone;
-    if (data.location !== undefined) updateData.location = data.location;
-    if (data.avatarUrl !== undefined) updateData.avatarUrl = data.avatarUrl;
-    if (data.resumeUrl !== undefined) updateData.resumeUrl = data.resumeUrl;
-    if (data.experience !== undefined) updateData.experience = data.experience;
-    if (data.socialLinks !== undefined) updateData.socialLinks = data.socialLinks;
+    const normalizedData = this.normalizePayload(data, existing?.id);
 
     if (!existing) {
-      const [created] = await db
-        .insert(aboutMe)
-        .values({
-          id: createId(),
-          updatedAt: new Date().toISOString(),
-          ...updateData,
-        } as any)
-        .returning();
+      const [created] = await db.insert(aboutMe).values(normalizedData).returning();
       return created;
     }
 
     const [updated] = await db
       .update(aboutMe)
       .set({
-        ...updateData,
-        updatedAt: new Date().toISOString(),
-      } as any)
+        fullName: normalizedData.fullName,
+        tagline: normalizedData.tagline,
+        roles: normalizedData.roles,
+        shortBio: normalizedData.shortBio,
+        bio: normalizedData.bio,
+        email: normalizedData.email,
+        phone: normalizedData.phone,
+        location: normalizedData.location,
+        avatarUrl: normalizedData.avatarUrl,
+        resumeUrl: normalizedData.resumeUrl,
+        skills: normalizedData.skills,
+        experience: normalizedData.experience,
+        socialLinks: normalizedData.socialLinks,
+        updatedAt: normalizedData.updatedAt,
+      })
       .where(eq(aboutMe.id, existing.id))
       .returning();
+
     return updated;
+  }
+
+  private normalizePayload(data: UpdateAboutInput, id = createId()): AboutInsert {
+    return {
+      id,
+      updatedAt: new Date().toISOString(),
+      fullName: data.fullName,
+      tagline: data.tagline ?? '',
+      roles: data.roles,
+      shortBio: data.shortBio ?? null,
+      bio: data.bio ?? '',
+      email: data.email,
+      phone: data.phone ?? null,
+      location: data.location ?? null,
+      avatarUrl: sanitizeAssetValue(data.avatarUrl),
+      resumeUrl: sanitizeAssetValue(data.resumeUrl),
+      skills: data.skills,
+      experience: normalizeExperienceItems(data.experience),
+      socialLinks: data.socialLinks ?? null,
+    };
   }
 
   private async createDefault() {
@@ -68,11 +133,13 @@ export class AboutService {
         fullName: 'Full Name',
         tagline: 'Your Tagline',
         email: 'email@example.com',
+        shortBio: '',
         bio: '',
         roles: [],
         skills: [],
-      } as any)
+      })
       .returning();
+
     return created;
   }
 }

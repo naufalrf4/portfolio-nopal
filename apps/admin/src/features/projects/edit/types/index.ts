@@ -4,6 +4,7 @@ export interface ProjectEdit {
   slug: string;
   content: string | null;
   summary: string | null;
+  description: string | null;
   category: string;
   techStack: string[];
   liveUrl: string | null;

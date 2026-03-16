@@ -13,11 +13,58 @@ import { ExperienceCard } from './ExperienceCard';
 import { ExperienceModal } from './ExperienceModal';
 import type { ExperienceItem, ExperienceType } from '../types/about.types';
 
+type ExperienceSubTab = 'education' | 'work' | 'certification' | 'organizational';
+
+const tabToType: Record<ExperienceSubTab, ExperienceType> = {
+  education: 'Education',
+  work: 'Work',
+  certification: 'Certification',
+  organizational: 'Organizational',
+};
+
+const tabConfig: Array<{
+  value: ExperienceSubTab;
+  label: string;
+  mobileLabel: string;
+  addLabel: string;
+  emptyLabel: string;
+}> = [
+  {
+    value: 'education',
+    label: 'Education',
+    mobileLabel: 'Edu',
+    addLabel: 'Add Education',
+    emptyLabel: 'No education added yet. Click the button above to add your first entry.',
+  },
+  {
+    value: 'work',
+    label: 'Work',
+    mobileLabel: 'Work',
+    addLabel: 'Add Work Experience',
+    emptyLabel: 'No work experience added yet. Click the button above to add your first entry.',
+  },
+  {
+    value: 'certification',
+    label: 'Certifications',
+    mobileLabel: 'Cert',
+    addLabel: 'Add Certification',
+    emptyLabel: 'No certifications added yet. Click the button above to add your first entry.',
+  },
+  {
+    value: 'organizational',
+    label: 'Organizational',
+    mobileLabel: 'Org',
+    addLabel: 'Add Organizational',
+    emptyLabel:
+      'No organizational experience added yet. Click the button above to add your first entry.',
+  },
+];
+
 export function ExperienceTab() {
   const { data, updateAbout, saving } = useAbout();
 
   const [experience, setExperience] = useState<ExperienceItem[]>([]);
-  const [experienceSubTab, setExperienceSubTab] = useState('education');
+  const [experienceSubTab, setExperienceSubTab] = useState<ExperienceSubTab>('education');
   const [isExperienceModalOpen, setIsExperienceModalOpen] = useState(false);
   const [editingExperience, setEditingExperience] = useState<
     (ExperienceItem & { index?: number }) | null
@@ -41,6 +88,7 @@ export function ExperienceTab() {
       endDate: null,
       description: '',
       logoUrl: '',
+      skills: [],
     });
     setIsExperienceModalOpen(true);
   };
@@ -67,8 +115,9 @@ export function ExperienceTab() {
   };
 
   const handleDeleteExperience = async (index: number) => {
-    const updatedExperience = experience.filter((_, i) => i !== index);
-    setExperience(updatedExperience);
+    setExperience((currentExperience) =>
+      currentExperience.filter((_, currentIndex) => currentIndex !== index)
+    );
     setHasUnsavedChanges(true);
   };
 
@@ -87,6 +136,7 @@ export function ExperienceTab() {
       experience,
       roles: data.roles || [],
       tagline: data.tagline ?? undefined,
+      shortBio: data.shortBio ?? undefined,
       bio: bioString,
       phone: data.phone ?? undefined,
       location: data.location ?? undefined,
@@ -101,6 +151,52 @@ export function ExperienceTab() {
     }
   };
 
+  const renderTabContent = (tabValue: ExperienceSubTab) => {
+    const config = tabConfig.find((tab) => tab.value === tabValue);
+    const type = tabToType[tabValue];
+    const items = experience
+      .map((item, index) => ({ item, index }))
+      .filter(({ item }) => item.type === type);
+
+    if (!config) {
+      return null;
+    }
+
+    return (
+      <div className="space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <Label>
+            {config.label} ({filterExperienceByType(experience, type).length})
+          </Label>
+          <Button
+            variant="primary"
+            onClick={() => handleAddExperience(type)}
+            size="sm"
+            className="hidden md:flex"
+          >
+            <Plus className="h-4 w-4" />
+            {config.addLabel}
+          </Button>
+        </div>
+
+        {items.length === 0 ? (
+          <p className="py-8 text-center text-sm text-[#6B7280]">{config.emptyLabel}</p>
+        ) : (
+          <div className="space-y-3">
+            {items.map(({ item, index }) => (
+              <ExperienceCard
+                key={`${item.type}-${item.title}-${index}`}
+                experience={item}
+                onEdit={() => handleEditExperience(item, index)}
+                onDelete={() => handleDeleteExperience(index)}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <>
       <Card>
@@ -109,173 +205,53 @@ export function ExperienceTab() {
             <div>
               <h3 className="text-lg font-semibold text-[#3D4852]">Experience</h3>
               <p className="text-sm text-[#6B7280]">
-                Add and manage your education, work, and organizational experience. Click &quot;Save
-                Changes&quot; to save.
+                Add and manage your education, work, certifications, and organizational background.
+                Click &quot;Save Changes&quot; to save.
               </p>
             </div>
             <div className="flex items-center gap-3">
-              {hasUnsavedChanges && !saving && (
+              {hasUnsavedChanges && !saving ? (
                 <span className="text-sm text-amber-600">Unsaved changes</span>
-              )}
+              ) : null}
               <Button
                 onClick={handleSaveChanges}
                 disabled={!hasUnsavedChanges || saving}
                 size="sm"
-                className="bg-[#3B82F6] hover:bg-[#2563EB] text-white disabled:bg-gray-300 disabled:text-gray-500"
+                className="bg-[#3B82F6] text-white hover:bg-[#2563EB] disabled:bg-gray-300 disabled:text-gray-500"
               >
-                {saving && <Loader2 className="h-4 w-4 animate-spin" />}
+                {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
                 {saving ? 'Saving...' : 'Save Changes'}
               </Button>
             </div>
           </div>
-          <Tabs value={experienceSubTab} onValueChange={setExperienceSubTab}>
-            <TabsList className="mb-4 grid grid-cols-3 h-auto">
-              <TabsTrigger value="education" className="text-xs sm:text-sm">
-                <span className="hidden sm:inline">Education</span>
-                <span className="sm:hidden">Edu</span>
-                <span className="ml-1">
-                  ({filterExperienceByType(experience, 'Education').length})
-                </span>
-              </TabsTrigger>
-              <TabsTrigger value="work" className="text-xs sm:text-sm">
-                Work ({filterExperienceByType(experience, 'Work').length})
-              </TabsTrigger>
-              <TabsTrigger value="organizational" className="text-xs sm:text-sm">
-                <span className="hidden sm:inline">Organizational</span>
-                <span className="sm:hidden">Org</span>
-                <span className="ml-1">
-                  ({filterExperienceByType(experience, 'Organizational').length})
-                </span>
-              </TabsTrigger>
+
+          <Tabs
+            value={experienceSubTab}
+            onValueChange={(value) => setExperienceSubTab(value as ExperienceSubTab)}
+          >
+            <TabsList className="mb-4 grid h-auto grid-cols-4">
+              {tabConfig.map((tab) => (
+                <TabsTrigger key={tab.value} value={tab.value} className="text-xs sm:text-sm">
+                  <span className="hidden sm:inline">{tab.label}</span>
+                  <span className="sm:hidden">{tab.mobileLabel}</span>
+                  <span className="ml-1">
+                    ({filterExperienceByType(experience, tabToType[tab.value]).length})
+                  </span>
+                </TabsTrigger>
+              ))}
             </TabsList>
 
-            <TabsContent value="education">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between flex-wrap gap-2">
-                  <Label>
-                    Education ({filterExperienceByType(experience, 'Education').length})
-                  </Label>
-                  <Button
-                    variant="primary"
-                    onClick={() => handleAddExperience('Education')}
-                    size="sm"
-                    className="hidden md:flex"
-                  >
-                    <Plus className="h-4 w-4" />
-                    Add Education
-                  </Button>
-                </div>
-
-                {filterExperienceByType(experience, 'Education').length === 0 ? (
-                  <p className="text-sm text-[#6B7280] text-center py-8">
-                    No education added yet. Click the button above to add your first entry.
-                  </p>
-                ) : (
-                  <div className="space-y-3">
-                    {experience
-                      .map((item, index) => ({ item, index }))
-                      .filter(({ item }) => item.type === 'Education')
-                      .map(({ item, index }) => (
-                        <ExperienceCard
-                          key={index}
-                          experience={item}
-                          onEdit={() => handleEditExperience(item, index)}
-                          onDelete={() => handleDeleteExperience(index)}
-                        />
-                      ))}
-                  </div>
-                )}
-              </div>
-            </TabsContent>
-
-            <TabsContent value="work">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between flex-wrap gap-2">
-                  <Label>
-                    Work Experience ({filterExperienceByType(experience, 'Work').length})
-                  </Label>
-                  <Button
-                    variant="primary"
-                    onClick={() => handleAddExperience('Work')}
-                    size="sm"
-                    className="hidden md:flex"
-                  >
-                    <Plus className="h-4 w-4" />
-                    Add Work Experience
-                  </Button>
-                </div>
-
-                {filterExperienceByType(experience, 'Work').length === 0 ? (
-                  <p className="text-sm text-[#6B7280] text-center py-8">
-                    No work experience added yet. Click the button above to add your first entry.
-                  </p>
-                ) : (
-                  <div className="space-y-3">
-                    {experience
-                      .map((item, index) => ({ item, index }))
-                      .filter(({ item }) => item.type === 'Work')
-                      .map(({ item, index }) => (
-                        <ExperienceCard
-                          key={index}
-                          experience={item}
-                          onEdit={() => handleEditExperience(item, index)}
-                          onDelete={() => handleDeleteExperience(index)}
-                        />
-                      ))}
-                  </div>
-                )}
-              </div>
-            </TabsContent>
-
-            <TabsContent value="organizational">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between flex-wrap gap-2">
-                  <Label>
-                    Organizational ({filterExperienceByType(experience, 'Organizational').length})
-                  </Label>
-                  <Button
-                    variant="primary"
-                    onClick={() => handleAddExperience('Organizational')}
-                    size="sm"
-                    className="hidden md:flex"
-                  >
-                    <Plus className="h-4 w-4" />
-                    Add Organizational
-                  </Button>
-                </div>
-
-                {filterExperienceByType(experience, 'Organizational').length === 0 ? (
-                  <p className="text-sm text-[#6B7280] text-center py-8">
-                    No organizational experience added yet. Click the button above to add your first
-                    entry.
-                  </p>
-                ) : (
-                  <div className="space-y-3">
-                    {experience
-                      .map((item, index) => ({ item, index }))
-                      .filter(({ item }) => item.type === 'Organizational')
-                      .map(({ item, index }) => (
-                        <ExperienceCard
-                          key={index}
-                          experience={item}
-                          onEdit={() => handleEditExperience(item, index)}
-                          onDelete={() => handleDeleteExperience(index)}
-                        />
-                      ))}
-                  </div>
-                )}
-              </div>
-            </TabsContent>
+            {tabConfig.map((tab) => (
+              <TabsContent key={tab.value} value={tab.value}>
+                {renderTabContent(tab.value)}
+              </TabsContent>
+            ))}
           </Tabs>
         </CardContent>
       </Card>
 
       <FloatingActionButton
-        onClick={() => {
-          if (experienceSubTab === 'education') handleAddExperience('Education');
-          else if (experienceSubTab === 'work') handleAddExperience('Work');
-          else handleAddExperience('Organizational');
-        }}
+        onClick={() => handleAddExperience(tabToType[experienceSubTab])}
         label="Add Experience"
       />
 

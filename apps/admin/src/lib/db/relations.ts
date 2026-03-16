@@ -4,7 +4,6 @@ import {
   accounts,
   sessions,
   projects,
-  projectContexts,
   projectImages,
   guestbookEntries,
   bookingSlots,
@@ -39,15 +38,7 @@ export const guestbookEntriesRelations = relations(guestbookEntries, ({ one }) =
 }));
 
 export const projectsRelations = relations(projects, ({ many }) => ({
-  projectContexts: many(projectContexts),
   projectImages: many(projectImages),
-}));
-
-export const projectContextsRelations = relations(projectContexts, ({ one }) => ({
-  project: one(projects, {
-    fields: [projectContexts.projectId],
-    references: [projects.id],
-  }),
 }));
 
 export const projectImagesRelations = relations(projectImages, ({ one }) => ({

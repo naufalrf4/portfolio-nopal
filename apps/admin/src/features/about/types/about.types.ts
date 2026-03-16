@@ -1,4 +1,4 @@
-export type ExperienceType = 'Education' | 'Work' | 'Organizational';
+export type ExperienceType = 'Education' | 'Work' | 'Organizational' | 'Certification';
 
 export interface ExperienceItem {
   type: ExperienceType;
@@ -9,6 +9,7 @@ export interface ExperienceItem {
   endDate?: string | null;
   description?: string;
   logoUrl?: string;
+  skills?: string[];
 }
 
 export interface SocialLinks {
@@ -25,6 +26,7 @@ export interface AboutMeData {
   fullName: string;
   tagline: string | null;
   roles: string[];
+  shortBio: string | null;
   bio: string | null;
   email: string;
   phone: string | null;
@@ -44,6 +46,7 @@ export interface UpdateAboutInput {
   skills: string[];
   roles: string[];
   tagline?: string | null;
+  shortBio?: string | null;
   bio?: string;
   phone?: string | null;
   location?: string | null;

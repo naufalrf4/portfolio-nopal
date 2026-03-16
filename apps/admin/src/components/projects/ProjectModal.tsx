@@ -19,6 +19,7 @@ interface ProjectModalProps {
     title: string;
     slug: string;
     summary: string | null;
+    description: string | null;
     category: string;
     techStack: string[];
     liveUrl: string | null;
@@ -33,6 +34,7 @@ interface FormData {
   title: string;
   slug: string;
   summary: string;
+  description: string;
   category: string;
   techStack: string;
   liveUrl: string;
@@ -46,6 +48,7 @@ const initialFormData: FormData = {
   title: '',
   slug: '',
   summary: '',
+  description: '',
   category: '',
   techStack: '',
   liveUrl: '',
@@ -66,6 +69,7 @@ export function ProjectModal({ isOpen, onClose, onSuccess, project }: ProjectMod
         title: project.title,
         slug: project.slug,
         summary: project.summary || '',
+        description: project.description || '',
         category: project.category,
         techStack: project.techStack.join(', '),
         liveUrl: project.liveUrl || '',
@@ -120,6 +124,7 @@ export function ProjectModal({ isOpen, onClose, onSuccess, project }: ProjectMod
           .filter(Boolean),
         liveUrl: formData.liveUrl || undefined,
         repoUrl: formData.repoUrl || undefined,
+        description: formData.description || undefined,
       };
 
       const url = project ? `/api/v1/admin/projects/${project.id}` : '/api/v1/admin/projects';
@@ -228,6 +233,18 @@ export function ProjectModal({ isOpen, onClose, onSuccess, project }: ProjectMod
             placeholder="A brief description of your project..."
             rows={3}
             required
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="description">Description</Label>
+          <Textarea
+            id="description"
+            name="description"
+            value={formData.description}
+            onChange={handleInputChange}
+            placeholder="Short standfirst before the long-form content..."
+            rows={4}
           />
         </div>
 

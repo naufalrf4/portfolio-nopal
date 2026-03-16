@@ -16,9 +16,6 @@ export async function GET(req: NextRequest, context: RouteContext) {
     const project = await db.query.projects.findFirst({
       where: eq(projects.slug, slug),
       with: {
-        projectContexts: {
-          orderBy: (ctx, { asc }) => [asc(ctx.order)],
-        },
         projectImages: {
           orderBy: (img, { asc }) => [asc(img.order)],
         },
@@ -30,8 +27,20 @@ export async function GET(req: NextRequest, context: RouteContext) {
     }
 
     const projectData = {
-      ...project,
-      contexts: project.projectContexts,
+      id: project.id,
+      title: project.title,
+      slug: project.slug,
+      summary: project.summary,
+      description: project.description,
+      content: project.content,
+      category: project.category,
+      techStack: project.techStack,
+      liveUrl: project.liveUrl,
+      repoUrl: project.repoUrl,
+      imageUrl: project.imageUrl,
+      featured: project.featured,
+      createdAt: project.createdAt,
+      projectDate: project.projectDate,
       images: project.projectImages,
     };
 

@@ -1,5 +1,6 @@
 import {
   pgTable,
+  pgSchema,
   varchar,
   timestamp,
   text,
@@ -12,6 +13,8 @@ import {
   foreignKey,
   date,
   pgEnum,
+  customType,
+  uuid,
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 
@@ -21,18 +24,23 @@ export const bookingStatus = pgEnum('BookingStatus', [
   'CANCELLED',
   'COMPLETED',
 ]);
-export const projectContextType = pgEnum('ProjectContextType', [
-  'CONTEXT',
-  'ROLE',
-  'DECISIONS',
-  'TRADEOFFS',
-  'RESULT',
-  'ARCHITECTURE',
-  'OPERATIONS',
-  'METRICS',
-]);
 export const slotStatus = pgEnum('SlotStatus', ['AVAILABLE', 'BOOKED', 'BLOCKED']);
 export const userRole = pgEnum('UserRole', ['ADMIN', 'USER']);
+
+const rag = pgSchema('rag');
+
+const vector = customType<{
+  data: number[];
+  driverData: string;
+  config: { dimensions: number };
+}>({
+  dataType(config) {
+    return `vector(${config?.dimensions ?? 768})`;
+  },
+  toDriver(value) {
+    return `[${value.join(',')}]`;
+  },
+});
 
 export const prismaMigrations = pgTable('_prisma_migrations', {
   id: varchar({ length: 36 }).primaryKey().notNull(),
@@ -121,40 +129,6 @@ export const knowledgeDocs = pgTable(
       table.indexed.asc().nullsLast().op('bool_ops')
     ),
     unique('knowledge_docs_filename_unique').on(table.filename),
-  ]
-);
-
-export const projectContexts = pgTable(
-  'project_contexts',
-  {
-    id: text().primaryKey().notNull(),
-    projectId: text().notNull(),
-    type: projectContextType().notNull(),
-    title: text().notNull(),
-    content: text().notNull(),
-    order: integer().default(0).notNull(),
-    createdAt: timestamp({ precision: 3, mode: 'string' })
-      .default(sql`CURRENT_TIMESTAMP`)
-      .notNull(),
-    updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
-  },
-  (table) => [
-    index('project_contexts_order_idx').using(
-      'btree',
-      table.order.asc().nullsLast().op('int4_ops')
-    ),
-    index('project_contexts_projectId_idx').using(
-      'btree',
-      table.projectId.asc().nullsLast().op('text_ops')
-    ),
-    index('project_contexts_type_idx').using('btree', table.type.asc().nullsLast().op('enum_ops')),
-    foreignKey({
-      columns: [table.projectId],
-      foreignColumns: [projects.id],
-      name: 'project_contexts_projectId_fkey',
-    })
-      .onUpdate('cascade')
-      .onDelete('cascade'),
   ]
 );
 
@@ -304,6 +278,128 @@ export const sessions = pgTable(
     })
       .onUpdate('cascade')
       .onDelete('cascade'),
+  ]
+);
+
+export const ragDocuments = rag.table(
+  'documents',
+  {
+    id: uuid().primaryKey().notNull(),
+    sourceType: varchar('source_type', { length: 32 }).notNull(),
+    sourceRef: varchar('source_ref', { length: 255 }).notNull(),
+    title: varchar({ length: 255 }).notNull(),
+    visibility: varchar({ length: 32 }).default('private').notNull(),
+    sensitivity: varchar({ length: 32 }).default('normal').notNull(),
+    storageKey: varchar('storage_key', { length: 512 }),
+    mimeType: varchar('mime_type', { length: 128 }),
+    status: varchar({ length: 32 }).default('pending').notNull(),
+    tags: jsonb()
+      .default(sql`'[]'::jsonb`)
+      .notNull(),
+    metadata: jsonb()
+      .default(sql`'{}'::jsonb`)
+      .notNull(),
+    contentHash: varchar('content_hash', { length: 64 }),
+    contentExcerpt: text('content_excerpt'),
+    lastIngestedAt: timestamp('last_ingested_at', { withTimezone: true, mode: 'string' }),
+    createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'string' })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+  },
+  (table) => [
+    unique('uq_rag_documents_source').on(table.sourceType, table.sourceRef),
+    index('ix_rag_documents_source_ref').using(
+      'btree',
+      table.sourceRef.asc().nullsLast().op('text_ops')
+    ),
+    index('ix_rag_documents_visibility').using(
+      'btree',
+      table.visibility.asc().nullsLast().op('text_ops')
+    ),
+    index('ix_rag_documents_status').using('btree', table.status.asc().nullsLast().op('text_ops')),
+  ]
+);
+
+export const ragChunks = rag.table(
+  'chunks',
+  {
+    id: uuid().primaryKey().notNull(),
+    documentId: uuid('document_id').notNull(),
+    chunkIndex: integer('chunk_index').notNull(),
+    sourceType: varchar('source_type', { length: 32 }).notNull(),
+    sourceRef: varchar('source_ref', { length: 255 }).notNull(),
+    visibility: varchar({ length: 32 }).default('private').notNull(),
+    content: text().notNull(),
+    contextualContent: text('contextual_content').notNull(),
+    tokenCount: integer('token_count').notNull(),
+    checksum: varchar({ length: 64 }).notNull(),
+    metadata: jsonb()
+      .default(sql`'{}'::jsonb`)
+      .notNull(),
+    embedding: vector('embedding', { dimensions: 768 }).notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+  },
+  (table) => [
+    unique('uq_rag_chunks_document_index').on(table.documentId, table.chunkIndex),
+    index('ix_rag_chunks_document_id').using(
+      'btree',
+      table.documentId.asc().nullsLast().op('uuid_ops')
+    ),
+    index('ix_rag_chunks_source_ref').using(
+      'btree',
+      table.sourceRef.asc().nullsLast().op('text_ops')
+    ),
+    index('ix_rag_chunks_visibility').using(
+      'btree',
+      table.visibility.asc().nullsLast().op('text_ops')
+    ),
+    foreignKey({
+      columns: [table.documentId],
+      foreignColumns: [ragDocuments.id],
+      name: 'rag_chunks_document_id_fkey',
+    }).onDelete('cascade'),
+  ]
+);
+
+export const ragIngestionRuns = rag.table(
+  'ingestion_runs',
+  {
+    id: uuid().primaryKey().notNull(),
+    documentId: uuid('document_id'),
+    triggerType: varchar('trigger_type', { length: 32 }).notNull(),
+    requestPayload: jsonb('request_payload')
+      .default(sql`'{}'::jsonb`)
+      .notNull(),
+    status: varchar({ length: 32 }).default('pending').notNull(),
+    chunksWritten: integer('chunks_written').default(0).notNull(),
+    errorMessage: text('error_message'),
+    startedAt: timestamp('started_at', { withTimezone: true, mode: 'string' })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+    completedAt: timestamp('completed_at', { withTimezone: true, mode: 'string' }),
+    createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+  },
+  (table) => [
+    index('ix_rag_ingestion_runs_document_id').using(
+      'btree',
+      table.documentId.asc().nullsLast().op('uuid_ops')
+    ),
+    index('ix_rag_ingestion_runs_status').using(
+      'btree',
+      table.status.asc().nullsLast().op('text_ops')
+    ),
+    foreignKey({
+      columns: [table.documentId],
+      foreignColumns: [ragDocuments.id],
+      name: 'rag_ingestion_runs_document_id_fkey',
+    }).onDelete('set null'),
   ]
 );
 
@@ -634,6 +730,7 @@ export const aboutMe = pgTable('AboutMe', {
   fullName: text().notNull(),
   tagline: text().notNull(),
   roles: text().array(),
+  shortBio: text(),
   bio: text().notNull(),
   email: text().notNull(),
   phone: text(),

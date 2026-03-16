@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { ProjectDetailPageContent } from './components/ProjectDetailPageContent';
+import { redirect } from 'next/navigation';
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -10,12 +10,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return {
     title: `Project Details - ${id}`,
-    description: 'View and manage project details, contexts, and related information',
+    description: 'Redirecting to the simplified project editor',
   };
 }
 
 export default async function ProjectDetailPage({ params }: PageProps) {
   const { id } = await params;
-
-  return <ProjectDetailPageContent projectId={id} />;
+  redirect(`/projects/${id}/edit`);
 }

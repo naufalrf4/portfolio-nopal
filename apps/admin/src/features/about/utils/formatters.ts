@@ -16,11 +16,13 @@ export function formatMonthDate(date: Date | null): string {
 
 export function getTitleLabel(type: string): string {
   if (type === 'Education') return 'Degree';
+  if (type === 'Certification') return 'Certification';
   return 'Position';
 }
 
 export function getOrganizationLabel(type: string): string {
   if (type === 'Education') return 'Institution';
+  if (type === 'Certification') return 'Issuer';
   return 'Company/Organization';
 }
 

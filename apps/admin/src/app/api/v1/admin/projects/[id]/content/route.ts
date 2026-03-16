@@ -19,12 +19,11 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       return NextResponse.json({ error: 'Content or summary is required' }, { status: 400 });
     }
 
-    const contentToSave =
-      content !== undefined
-        ? typeof content === 'string'
-          ? content
-          : JSON.stringify(content)
-        : undefined;
+    if (content !== undefined && typeof content !== 'string') {
+      return NextResponse.json({ error: 'Content must be markdown text' }, { status: 400 });
+    }
+
+    const contentToSave = content;
 
     const now = new Date().toISOString();
     const [project] = await db

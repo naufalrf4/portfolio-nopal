@@ -40,6 +40,18 @@ export function ExperienceCard({ experience, onEdit, onDelete }: ExperienceCardP
             {experience.description && (
               <p className="text-sm text-[#3D4852] mt-2 line-clamp-2">{experience.description}</p>
             )}
+            {experience.skills && experience.skills.length > 0 ? (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {experience.skills.map((skill) => (
+                  <span
+                    key={skill}
+                    className="rounded-lg bg-[#E0E5EC] px-2.5 py-1 text-xs text-[#3D4852] shadow-[2px_2px_4px_rgba(163,177,198,0.5),-2px_-2px_4px_rgba(255,255,255,0.35)]"
+                  >
+                    {skill}
+                  </span>
+                ))}
+              </div>
+            ) : null}
           </div>
         </div>
         <div className="flex gap-2 shrink-0">

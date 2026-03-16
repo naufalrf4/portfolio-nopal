@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import { NextRequest } from 'next/server';
 import { withAdminAuth } from '@/lib/api/middleware/auth';
 import { aboutService } from '@/lib/api/handlers/about.service';
@@ -8,7 +9,7 @@ import { handleApiError } from '@/lib/api/utils/error-handler';
 import { signAssetUrls } from '@/lib/utils/sign-urls';
 
 async function handleGet() {
-  const requestId = crypto.randomUUID();
+  const requestId = randomUUID();
 
   try {
     logger.info('Fetching about data', { requestId, operation: 'about.get' });
@@ -16,6 +17,9 @@ async function handleGet() {
 
     const signedAbout = await signAssetUrls(aboutMe, {
       fields: ['avatarUrl', 'resumeUrl'],
+      nested: {
+        experience: ['logoUrl'],
+      },
     });
 
     logger.info('About data fetched successfully', { requestId, operation: 'about.get' });
@@ -30,7 +34,7 @@ async function handleGet() {
 }
 
 async function handlePut(req: NextRequest) {
-  const requestId = crypto.randomUUID();
+  const requestId = randomUUID();
 
   try {
     const body = await req.json();
@@ -45,6 +49,9 @@ async function handlePut(req: NextRequest) {
 
     const signedAbout = await signAssetUrls(aboutMe, {
       fields: ['avatarUrl', 'resumeUrl'],
+      nested: {
+        experience: ['logoUrl'],
+      },
     });
 
     logger.info('About data updated successfully', { requestId, operation: 'about.update' });

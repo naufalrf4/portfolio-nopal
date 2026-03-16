@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { Plus, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -47,20 +48,54 @@ export function ExperienceModal({
   const [description, setDescription] = useState('');
   const [logoUrl, setLogoUrl] = useState('');
   const [isCurrentPosition, setIsCurrentPosition] = useState(false);
+  const [skills, setSkills] = useState<string[]>([]);
+  const [skillInput, setSkillInput] = useState('');
 
   useEffect(() => {
-    if (editingExperience) {
-      setType(editingExperience.type);
-      setTitle(editingExperience.title);
-      setOrganization(editingExperience.organization);
-      setLocation(editingExperience.location || '');
-      setStartDate(editingExperience.startDate);
-      setEndDate(editingExperience.endDate || null);
-      setDescription(editingExperience.description || '');
-      setLogoUrl(editingExperience.logoUrl || '');
-      setIsCurrentPosition(!editingExperience.endDate);
+    if (!editingExperience) {
+      return;
     }
+
+    setType(editingExperience.type);
+    setTitle(editingExperience.title);
+    setOrganization(editingExperience.organization);
+    setLocation(editingExperience.location || '');
+    setStartDate(editingExperience.startDate);
+    setEndDate(editingExperience.endDate || null);
+    setDescription(editingExperience.description || '');
+    setLogoUrl(editingExperience.logoUrl || '');
+    setIsCurrentPosition(!editingExperience.endDate);
+    setSkills(editingExperience.skills || []);
+    setSkillInput('');
   }, [editingExperience]);
+
+  const titlePlaceholderByType: Record<ExperienceType, string> = {
+    Education: 'Bachelor of Computer Science',
+    Work: 'Senior Software Engineer',
+    Organizational: 'Community Lead',
+    Certification: 'AWS Academy Cloud Architecting',
+  };
+
+  const organizationPlaceholderByType: Record<ExperienceType, string> = {
+    Education: 'University Name',
+    Work: 'Company Name',
+    Organizational: 'Organization Name',
+    Certification: 'Issuing Organization',
+  };
+
+  const addSkill = () => {
+    const trimmedSkill = skillInput.trim();
+    if (!trimmedSkill || skills.includes(trimmedSkill)) {
+      return;
+    }
+
+    setSkills((currentSkills) => [...currentSkills, trimmedSkill]);
+    setSkillInput('');
+  };
+
+  const removeSkill = (skillToRemove: string) => {
+    setSkills((currentSkills) => currentSkills.filter((skill) => skill !== skillToRemove));
+  };
 
   const handleSave = () => {
     if (!title || !organization || !startDate) {
@@ -85,6 +120,7 @@ export function ExperienceModal({
       endDate: isCurrentPosition ? null : endDate,
       description: description || '',
       logoUrl: logoUrl || '',
+      skills: skills.length > 0 ? skills : undefined,
     };
 
     onSave(newItem);
@@ -120,6 +156,7 @@ export function ExperienceModal({
               <SelectItem value="Education">Education</SelectItem>
               <SelectItem value="Work">Work</SelectItem>
               <SelectItem value="Organizational">Organizational</SelectItem>
+              <SelectItem value="Certification">Certification</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -132,9 +169,7 @@ export function ExperienceModal({
             id="exp-title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder={
-              type === 'Education' ? 'Bachelor of Computer Science' : 'Senior Software Engineer'
-            }
+            placeholder={titlePlaceholderByType[type]}
           />
         </div>
 
@@ -146,7 +181,7 @@ export function ExperienceModal({
             id="exp-organization"
             value={organization}
             onChange={(e) => setOrganization(e.target.value)}
-            placeholder={type === 'Education' ? 'University Name' : 'Company Name'}
+            placeholder={organizationPlaceholderByType[type]}
           />
         </div>
 
@@ -167,11 +202,11 @@ export function ExperienceModal({
             label="Organization Logo"
             folder="about"
             accept="image/jpeg,image/png,image/webp,image/svg+xml"
-            helperText="Upload company or institution logo (recommended: 200x200px)"
+            helperText="Upload company, institution, community, or issuer logo (recommended: 200x200px)"
           />
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="exp-start">
               Start Date <span className="text-red-500">*</span>
@@ -196,7 +231,7 @@ export function ExperienceModal({
           </div>
         </div>
 
-        <div className="flex items-center gap-3 p-3 rounded-xl bg-blue-50 border border-blue-200">
+        <div className="flex items-center gap-3 rounded-xl border border-blue-200 bg-blue-50 p-3">
           <Checkbox
             id="current-position"
             checked={isCurrentPosition}
@@ -210,9 +245,9 @@ export function ExperienceModal({
           />
           <label
             htmlFor="current-position"
-            className="text-sm font-medium text-blue-700 cursor-pointer"
+            className="cursor-pointer text-sm font-medium text-blue-700"
           >
-            I currently work/study here
+            This entry is current or ongoing
           </label>
         </div>
 
@@ -222,9 +257,51 @@ export function ExperienceModal({
             id="exp-desc"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="Describe your role and achievements..."
+            placeholder="Describe your role, focus, results, or what this certification covered..."
             rows={4}
           />
+        </div>
+
+        <div className="space-y-3">
+          <Label htmlFor="exp-skill-input">Skills / Topics</Label>
+          <div className="flex gap-2">
+            <Input
+              id="exp-skill-input"
+              value={skillInput}
+              onChange={(e) => setSkillInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  addSkill();
+                }
+              }}
+              placeholder="Add tools, skills, or certification topics"
+            />
+            <Button type="button" onClick={addSkill} disabled={!skillInput.trim()}>
+              <Plus className="h-4 w-4" />
+            </Button>
+          </div>
+
+          {skills.length > 0 ? (
+            <div className="flex flex-wrap gap-2">
+              {skills.map((skill) => (
+                <div
+                  key={skill}
+                  className="inline-flex items-center gap-2 rounded-xl bg-[#E0E5EC] px-3 py-1.5 text-sm text-[#3D4852] shadow-[3px_3px_6px_rgba(163,177,198,0.6),-3px_-3px_6px_rgba(255,255,255,0.5)]"
+                >
+                  {skill}
+                  <button
+                    type="button"
+                    onClick={() => removeSkill(skill)}
+                    className="text-[#6B7280] transition-colors hover:text-red-500"
+                    aria-label={`Remove ${skill}`}
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          ) : null}
         </div>
       </div>
     </ResponsiveModal>

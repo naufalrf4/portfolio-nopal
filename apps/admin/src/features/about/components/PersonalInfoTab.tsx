@@ -77,6 +77,7 @@ export function PersonalInfoTab() {
       fullName,
       tagline: tagline || undefined,
       roles: data.roles || [],
+      shortBio: data.shortBio ?? undefined,
       email,
       phone: phone || undefined,
       location: location || undefined,

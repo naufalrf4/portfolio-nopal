@@ -3,6 +3,7 @@ export interface Project {
   title: string;
   slug: string;
   summary: string;
+  description: string | null;
   category: string;
   techStack: string[];
   liveUrl: string | null;

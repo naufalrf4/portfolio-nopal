@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 const experienceItemSchema = z.object({
-  type: z.enum(['Education', 'Work', 'Organizational']),
+  type: z.enum(['Education', 'Work', 'Organizational', 'Certification']),
   title: z.string().min(1).max(200),
   organization: z.string().min(1).max(200),
   location: z.string().optional().or(z.literal('')),
@@ -9,6 +9,7 @@ const experienceItemSchema = z.object({
   endDate: z.string().optional().or(z.literal('')).nullable(),
   description: z.string().optional().or(z.literal('')),
   logoUrl: z.string().url().optional().or(z.literal('')),
+  skills: z.array(z.string().min(1).max(100)).max(20).optional(),
 });
 
 const socialLinksSchema = z.object({
@@ -24,6 +25,7 @@ export const updateAboutSchema = z.object({
   fullName: z.string().min(2).max(100),
   tagline: z.string().max(200).optional().or(z.literal('')).nullable(),
   roles: z.array(z.string()).max(10),
+  shortBio: z.string().optional().or(z.literal('')).nullable(),
   bio: z.string().optional().or(z.literal('')),
   email: z.string().email(),
   phone: z.string().optional().or(z.literal('')).nullable(),
