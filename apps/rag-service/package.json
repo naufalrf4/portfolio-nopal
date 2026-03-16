@@ -2,33 +2,17 @@
   "name": "rag-service",
   "version": "0.0.1",
   "private": true,
-  "main": "dist/index.js",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
-    "build": "tsc",
-    "start": "node dist/index.js",
-    "lint": "eslint src --ext .ts",
-    "typecheck": "tsc --noEmit",
-    "clean": "rm -rf dist node_modules"
-  },
-  "dependencies": {
-    "@ai-sdk/google": "^3.0.7",
-    "@ai-sdk/groq": "^3.0.5",
-    "@ai-sdk/openai": "^3.0.9",
-    "@fastify/cors": "^11.2.0",
-    "@fastify/rate-limit": "^10.3.0",
-    "@qdrant/js-client-rest": "^1.16.2",
-    "ai": "^6.0.27",
-    "dotenv": "^17.2.3",
-    "fastify": "^5.0.0",
-    "pino": "^10.1.1",
-    "pino-pretty": "^13.1.3",
-    "uuid": "^13.0.0",
-    "zod": "^4.3.5"
-  },
-  "devDependencies": {
-    "@types/node": "^25.0.7",
-    "tsx": "^4.21.0",
-    "typescript": "latest"
+    "dev": "bun run dev:fastapi",
+    "build": "bun run build:fastapi",
+    "start": "cd fastapi && uv run uvicorn app.main:app --host 0.0.0.0 --port 3005",
+    "dev:fastapi": "cd fastapi && uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 3005",
+    "build:fastapi": "cd fastapi && uv run python -m compileall app alembic",
+    "check:fastapi": "cd fastapi && uv run python -c \"from app.main import app; print(app.title)\"",
+    "sync:fastapi": "cd fastapi && uv sync",
+    "migrate:fastapi": "python -c \"print('RAG schema migrations are managed by apps/admin Drizzle.')\"",
+    "compare": "node scripts/compare-rag-services.mjs",
+    "typecheck": "bun run check:fastapi",
+    "clean": "rm -rf fastapi/.venv fastapi/.pytest_cache fastapi/.ruff_cache node_modules"
   }
 }
