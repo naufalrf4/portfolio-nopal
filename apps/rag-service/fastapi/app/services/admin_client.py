@@ -7,6 +7,7 @@ from app.schemas.admin import (
     ChatLogMessage,
     ChatLogRecord,
     ContentExport,
+    FreelanceIntentContext,
     KnowledgeDocument,
 )
 from app.services.errors import RagServiceError
@@ -67,6 +68,10 @@ class AdminApiClient:
         payload = await self._request("GET", "/api/v1/internal/content")
         return ContentExport.model_validate(payload)
 
+    async def get_freelance_intent_context(self) -> FreelanceIntentContext:
+        payload = await self._request("GET", "/api/v1/internal/intent-context/freelance-profile")
+        return FreelanceIntentContext.model_validate(payload)
+
     async def get_knowledge_doc_by_id(self, document_id: str) -> KnowledgeDocument:
         payload = await self._request("GET", f"/api/v1/internal/knowledge/{document_id}")
         return KnowledgeDocument.model_validate(payload)
@@ -84,12 +89,15 @@ class AdminApiClient:
             return []
         return ChatLogRecord.model_validate(payload).messages
 
-    async def save_chat_log(self, session_id: str, messages: list[dict[str, str]]) -> None:
+    async def save_chat_log(
+        self, session_id: str, messages: list[dict[str, object]], mode: str = "replace"
+    ) -> None:
         await self._request(
             "POST",
             "/api/v1/internal/chat-logs",
             json={
                 "sessionId": session_id,
                 "messages": messages,
+                "mode": mode,
             },
         )

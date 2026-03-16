@@ -7,6 +7,7 @@ from google.genai import types as genai_types
 
 from app.config import settings
 from app.services.errors import RagServiceError
+from app.services.prompt_builder import normalize_intent, normalize_language
 
 
 @dataclass(slots=True)
@@ -20,6 +21,8 @@ class GeneratedText:
 class QueryPlan:
     workflow: str
     intent: str
+    query_language: str
+    answer_language: str
     needs_portfolio_context: bool
     tool_name: str | None
     tool_arguments: dict[str, object]
@@ -114,7 +117,15 @@ class LlmService:
 
         return QueryPlan(
             workflow=workflow,
-            intent=str(payload.get("intent", fallback.get("intent", "portfolio_question"))),
+            intent=normalize_intent(
+                str(payload.get("intent", fallback.get("intent", "general_portfolio")))
+            ),
+            query_language=normalize_language(
+                str(payload.get("queryLanguage", fallback.get("queryLanguage", "en")))
+            ),
+            answer_language=normalize_language(
+                str(payload.get("answerLanguage", fallback.get("answerLanguage", "en")))
+            ),
             needs_portfolio_context=bool(payload.get("needsPortfolioContext", True)),
             tool_name=tool_name,
             tool_arguments=tool_arguments,
@@ -155,7 +166,9 @@ class LlmService:
     def _build_fallback_query_plan(self, fallback: dict[str, object]) -> QueryPlan:
         return QueryPlan(
             workflow=str(fallback.get("workflow", "rag")),
-            intent=str(fallback.get("intent", "portfolio_question")),
+            intent=normalize_intent(str(fallback.get("intent", "general_portfolio"))),
+            query_language=normalize_language(str(fallback.get("queryLanguage", "en"))),
+            answer_language=normalize_language(str(fallback.get("answerLanguage", "en"))),
             needs_portfolio_context=bool(fallback.get("needsPortfolioContext", True)),
             tool_name=(str(fallback.get("toolName", "")).strip() or None),
             tool_arguments=self._as_object_dict(fallback.get("toolArguments")),

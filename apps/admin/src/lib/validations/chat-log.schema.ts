@@ -18,6 +18,7 @@ export const chatMessageSchema = z.object({
 export const createChatLogSchema = z.object({
   sessionId: z.string().min(1),
   messages: z.array(chatMessageSchema),
+  mode: z.enum(['replace', 'append']).default('replace'),
 });
 
 export const chatLogQuerySchema = z.object({

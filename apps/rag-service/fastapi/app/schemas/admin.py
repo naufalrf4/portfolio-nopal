@@ -7,6 +7,37 @@ class AboutContent(BaseModel):
     bio: str = ""
     skills: list[str] = Field(default_factory=list)
     experience: list["ExperienceItem"] = Field(default_factory=list)
+    freelance_profile: "FreelanceProfile | None" = Field(default=None, alias="freelanceProfile")
+
+
+class FreelanceFeaturePrice(BaseModel):
+    feature: str
+    price: float | None = None
+    notes: str = ""
+    related_project_slugs: list[str] = Field(default_factory=list, alias="relatedProjectSlugs")
+
+    model_config = {"populate_by_name": True}
+
+
+class FreelanceProjectReference(BaseModel):
+    slug: str
+    title: str
+    notes: str = ""
+
+
+class FreelanceProfile(BaseModel):
+    hourly_rate: float | None = Field(default=None, alias="hourlyRate")
+    currency: str = "IDR"
+    completed_projects: int | None = Field(default=None, alias="completedProjects")
+    pricing_notes: str = Field(default="", alias="pricingNotes")
+    feature_pricing: list[FreelanceFeaturePrice] = Field(
+        default_factory=list, alias="featurePricing"
+    )
+    project_references: list[FreelanceProjectReference] = Field(
+        default_factory=list, alias="projectReferences"
+    )
+
+    model_config = {"populate_by_name": True}
 
 
 class ExperienceItem(BaseModel):
@@ -32,6 +63,7 @@ class ProjectContent(BaseModel):
     slug: str
     summary: str = ""
     description: str = ""
+    content: str = ""
     tech_stack: list[str] = Field(default_factory=list, alias="techStack")
     contexts: list[ProjectContext] = Field(default_factory=list)
 
@@ -53,11 +85,25 @@ class ContentExport(BaseModel):
     model_config = {"populate_by_name": True}
 
 
+class FreelanceIntentContext(BaseModel):
+    freelance_profile: FreelanceProfile | None = Field(default=None, alias="freelanceProfile")
+
+    model_config = {"populate_by_name": True}
+
+
+class ChatLogMessageMetadata(BaseModel):
+    model: str | None = None
+    provider: str | None = None
+    tokens: int | None = None
+    duration: int | None = None
+
+
 class ChatLogMessage(BaseModel):
     id: str | None = None
     role: str
     content: str
     timestamp: datetime | str
+    metadata: ChatLogMessageMetadata | None = None
 
 
 class ChatLogRecord(BaseModel):

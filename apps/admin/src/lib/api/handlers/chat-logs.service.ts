@@ -1,8 +1,15 @@
 import { db } from '@/lib/db';
-import { eq, desc, lt, count } from 'drizzle-orm';
+import { eq, desc, lt, count, sql } from 'drizzle-orm';
 import { chatLogs } from '@/lib/db/schema';
 import { createId } from '@paralleldrive/cuid2';
 import type { CreateChatLogInput, ChatLogQueryInput } from '@/lib/validations/chat-log.schema';
+
+type ChatLogMessage = CreateChatLogInput['messages'][number];
+type ChatLogRow = {
+  id: string;
+  messages: ChatLogMessage[];
+  createdAt: string;
+};
 
 export class ChatLogsService {
   async getAll(query: ChatLogQueryInput) {
@@ -49,6 +56,10 @@ export class ChatLogsService {
   }
 
   async upsert(data: CreateChatLogInput) {
+    if (data.mode === 'append') {
+      return this.appendMessages(data.sessionId, data.messages);
+    }
+
     const now = new Date().toISOString();
     const [result] = await db
       .insert(chatLogs)
@@ -68,6 +79,77 @@ export class ChatLogsService {
       })
       .returning();
     return result;
+  }
+
+  private async appendMessages(sessionId: string, messages: ChatLogMessage[]) {
+    const now = new Date().toISOString();
+    return db.transaction(async (tx) => {
+      const existingRows = await tx.execute<ChatLogRow>(sql`
+        SELECT "id", "messages", "createdAt"
+        FROM "chat_logs"
+        WHERE "sessionId" = ${sessionId}
+        FOR UPDATE
+      `);
+      const existing = existingRows[0] ?? null;
+
+      if (!existing) {
+        const [created] = await tx
+          .insert(chatLogs)
+          .values({
+            id: createId(),
+            sessionId,
+            messages,
+            createdAt: now,
+            updatedAt: now,
+          })
+          .returning();
+        return created;
+      }
+
+      const mergedMessages = this.mergeMessages(existing.messages, messages);
+      const [updated] = await tx
+        .update(chatLogs)
+        .set({
+          messages: mergedMessages,
+          updatedAt: now,
+        })
+        .where(eq(chatLogs.id, existing.id))
+        .returning();
+      return updated;
+    });
+  }
+
+  private mergeMessages(existing: unknown, incoming: ChatLogMessage[]) {
+    const existingMessages = this.normalizeMessages(existing);
+    const seenIds = new Set(existingMessages.map((message) => message.id));
+    const merged = [...existingMessages];
+
+    for (const message of incoming) {
+      if (seenIds.has(message.id)) {
+        continue;
+      }
+      merged.push(message);
+      seenIds.add(message.id);
+    }
+
+    return merged;
+  }
+
+  private normalizeMessages(value: unknown): ChatLogMessage[] {
+    if (Array.isArray(value)) {
+      return value as ChatLogMessage[];
+    }
+
+    if (typeof value !== 'string') {
+      return [];
+    }
+
+    try {
+      const parsed = JSON.parse(value);
+      return Array.isArray(parsed) ? (parsed as ChatLogMessage[]) : [];
+    } catch {
+      return [];
+    }
   }
 
   async delete(id: string) {

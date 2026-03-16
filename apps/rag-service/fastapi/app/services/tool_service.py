@@ -1,9 +1,7 @@
 from dataclasses import dataclass
 from typing import Any
 
-DEFAULT_REFERENCE_PRICES: dict[str, float] = {
-    "drizzle authentication system": 1_000_000.0,
-}
+from app.services.prompt_builder import normalize_language
 
 
 @dataclass(slots=True)
@@ -62,23 +60,119 @@ def _as_reference_prices(value: Any) -> dict[str, float]:
     return prices
 
 
+def _as_freelance_profile(value: Any) -> dict[str, Any]:
+    if not isinstance(value, dict):
+        return {}
+
+    feature_pricing: list[dict[str, Any]] = []
+    for item in value.get("featurePricing", []):
+        if not isinstance(item, dict):
+            continue
+        feature = _as_string(item.get("feature"))
+        if not feature:
+            continue
+        feature_pricing.append(
+            {
+                "feature": feature,
+                "price": _as_float(item.get("price"), -1),
+                "notes": _as_string(item.get("notes")),
+                "relatedProjectSlugs": _as_string_list(item.get("relatedProjectSlugs")),
+            }
+        )
+
+    project_references: list[dict[str, str]] = []
+    for item in value.get("projectReferences", []):
+        if not isinstance(item, dict):
+            continue
+        slug = _as_string(item.get("slug"))
+        title = _as_string(item.get("title"))
+        if not slug or not title:
+            continue
+        project_references.append(
+            {
+                "slug": slug,
+                "title": title,
+                "notes": _as_string(item.get("notes")),
+            }
+        )
+
+    return {
+        "hourlyRate": _as_float(value.get("hourlyRate"), -1),
+        "currency": _as_string(value.get("currency")) or "IDR",
+        "completedProjects": int(_as_float(value.get("completedProjects"), -1)),
+        "pricingNotes": _as_string(value.get("pricingNotes")),
+        "featurePricing": feature_pricing,
+        "projectReferences": project_references,
+    }
+
+
+def _reference_catalog_from_profile(profile: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    catalog: dict[str, dict[str, Any]] = {}
+    for item in profile.get("featurePricing", []):
+        if not isinstance(item, dict):
+            continue
+        feature = _normalize_key(str(item.get("feature", "")))
+        price = _as_float(item.get("price"), -1)
+        if not feature or price < 0:
+            continue
+        catalog[feature] = {
+            "price": price,
+            "notes": _as_string(item.get("notes")),
+            "relatedProjectSlugs": _as_string_list(item.get("relatedProjectSlugs")),
+        }
+    return catalog
+
+
+def _project_reference_lookup(profile: dict[str, Any]) -> dict[str, dict[str, str]]:
+    lookup: dict[str, dict[str, str]] = {}
+    for item in profile.get("projectReferences", []):
+        if not isinstance(item, dict):
+            continue
+        slug = _as_string(item.get("slug"))
+        title = _as_string(item.get("title"))
+        if not slug or not title:
+            continue
+        lookup[slug] = {
+            "slug": slug,
+            "title": title,
+            "notes": _as_string(item.get("notes")),
+        }
+    return lookup
+
+
 class ToolService:
     def execute(
-        self, tool_name: str, arguments: dict[str, object], question: str
+        self,
+        tool_name: str,
+        arguments: dict[str, object],
+        question: str,
+        answer_language: str = "en",
     ) -> ToolExecutionResult:
         if tool_name == "feature_pricing_quote":
-            return self._execute_feature_pricing_quote(arguments, question)
+            return self._execute_feature_pricing_quote(arguments, question, answer_language)
         return ToolExecutionResult(
             tool_name=tool_name,
-            text="I recognized a tool workflow, but the requested tool is not available yet.",
-            context="No deterministic tool result was available.",
+            text=(
+                "Saya mengenali workflow tool, tetapi tool yang diminta belum tersedia."
+                if normalize_language(answer_language) == "id"
+                else "I recognized a tool workflow, but the requested tool is not available yet."
+            ),
+            context=(
+                "Belum ada hasil tool deterministik yang tersedia."
+                if normalize_language(answer_language) == "id"
+                else "No deterministic tool result was available."
+            ),
             metadata={"status": "unavailable"},
         )
 
     def _execute_feature_pricing_quote(
-        self, arguments: dict[str, object], question: str
+        self, arguments: dict[str, object], question: str, answer_language: str
     ) -> ToolExecutionResult:
-        currency = _as_string(arguments.get("currency")) or "IDR"
+        is_indonesian = normalize_language(answer_language) == "id"
+        profile = _as_freelance_profile(arguments.get("freelanceProfile"))
+        profile_catalog = _reference_catalog_from_profile(profile)
+        project_lookup = _project_reference_lookup(profile)
+        currency = _as_string(arguments.get("currency")) or str(profile.get("currency") or "IDR")
         project_name = _as_string(arguments.get("projectName"))
         requirements_summary = _as_string(arguments.get("requirementsSummary"))
         modules_input = arguments.get("modules")
@@ -94,12 +188,25 @@ class ToolService:
                     modules.append({"name": module_name or "General", "features": features})
 
         if not modules:
+            example_features = list(profile_catalog.keys())[:2]
+            example_line = (
+                (
+                    f" Contoh referensi yang sudah dikenali: {', '.join(example_features)}."
+                    if is_indonesian
+                    else f" Reference examples already recognized: {', '.join(example_features)}."
+                )
+                if example_features
+                else ""
+            )
             guidance = (
-                "I can prepare a freelance quote breakdown, but I still need the "
+                "Saya bisa menyiapkan rincian penawaran freelance, tetapi saya masih butuh "
+                "daftar modul dan fitur. Kirim requirement sebagai modul dengan "
+                "item fitur, lalu saya akan cocokkan dengan harga referensi Anda. "
+                if is_indonesian
+                else "I can prepare a freelance quote breakdown, but I still need the "
                 "module and feature list. Share the requirements as modules with "
                 "feature items, then I can match them against your reference prices. "
-                "Example reference already recognized: Drizzle authentication system = Rp1.000.000."
-            )
+            ) + example_line
             return ToolExecutionResult(
                 tool_name="feature_pricing_quote",
                 text=guidance,
@@ -108,15 +215,17 @@ class ToolService:
                     "status": "needs_input",
                     "mode": "feature_breakdown",
                     "question": question,
+                    "loadedFromIntentProfile": bool(profile_catalog),
                 },
             )
 
-        references = dict(DEFAULT_REFERENCE_PRICES)
+        references = {key: details["price"] for key, details in profile_catalog.items()}
         references.update(_as_reference_prices(arguments.get("referencePrices")))
 
         line_items: list[dict[str, object]] = []
         missing_features: list[str] = []
         matched_total = 0.0
+        used_project_references: list[dict[str, str]] = []
 
         for module in modules:
             module_name = str(module.get("name") or "General")
@@ -132,46 +241,116 @@ class ToolService:
                 if price is None:
                     missing_features.append(feature.strip())
                     continue
+
+                related_projects = []
+                for slug in profile_catalog.get(normalized_feature, {}).get(
+                    "relatedProjectSlugs", []
+                ):
+                    project_reference = project_lookup.get(slug)
+                    if project_reference and project_reference not in used_project_references:
+                        used_project_references.append(project_reference)
+                    if project_reference:
+                        related_projects.append(project_reference)
+
                 matched_total += price
                 line_items.append(
                     {
                         "module": module_name,
                         "feature": feature.strip(),
                         "price": price,
+                        "notes": profile_catalog.get(normalized_feature, {}).get("notes", ""),
+                        "relatedProjects": related_projects,
                     }
                 )
 
         text_lines = [
-            f"Freelance feature quote breakdown ({currency.upper()}):",
+            (
+                f"Rincian penawaran fitur freelance ({currency.upper()}):"
+                if is_indonesian
+                else f"Freelance feature quote breakdown ({currency.upper()}):"
+            ),
         ]
 
         if project_name:
-            text_lines.append(f"- Project: {project_name}")
+            text_lines.append(f"- {'Proyek' if is_indonesian else 'Project'}: {project_name}")
         if requirements_summary:
-            text_lines.append(f"- Requirement summary: {requirements_summary}")
+            requirements_label = "Ringkasan kebutuhan" if is_indonesian else "Requirement summary"
+            text_lines.append(f"- {requirements_label}: {requirements_summary}")
+        if profile.get("hourlyRate", -1) >= 0:
+            hourly_rate = _format_currency(float(profile["hourlyRate"]), currency)
+            hourly_rate_label = (
+                "Rate per jam referensi" if is_indonesian else "Reference hourly rate"
+            )
+            text_lines.append(f"- {hourly_rate_label}: {hourly_rate}")
+        if profile.get("completedProjects", -1) >= 0:
+            completed_projects_label = (
+                "Proyek freelance selesai di profil"
+                if is_indonesian
+                else "Completed freelance projects in profile"
+            )
+            text_lines.append(f"- {completed_projects_label}: {int(profile['completedProjects'])}")
 
         if line_items:
-            text_lines.append("- Matched reference items:")
+            text_lines.append(
+                "- Item referensi yang cocok:" if is_indonesian else "- Matched reference items:"
+            )
             for item in line_items:
                 line_total = _format_currency(_as_float(item["price"], 0), currency)
-                text_lines.append(f"  - {item['module']}: {item['feature']} = {line_total}")
-            text_lines.append(
-                f"- Current quoted subtotal: {_format_currency(matched_total, currency)}"
+                related_projects = item.get("relatedProjects", [])
+                related_suffix = ""
+                if isinstance(related_projects, list) and related_projects:
+                    related_titles = [
+                        str(project.get("title"))
+                        for project in related_projects
+                        if isinstance(project, dict) and project.get("title")
+                    ]
+                    if related_titles:
+                        related_suffix = (
+                            f" (proyek terkait: {', '.join(related_titles)})"
+                            if is_indonesian
+                            else f" (related projects: {', '.join(related_titles)})"
+                        )
+                text_lines.append(
+                    f"  - {item['module']}: {item['feature']} = {line_total}{related_suffix}"
+                )
+            subtotal_label = (
+                "Subtotal penawaran saat ini" if is_indonesian else "Current quoted subtotal"
             )
+            text_lines.append(f"- {subtotal_label}: {_format_currency(matched_total, currency)}")
         else:
-            text_lines.append("- No module features matched the current reference catalog yet.")
+            text_lines.append(
+                "- Belum ada fitur modul yang cocok dengan katalog referensi saat ini."
+                if is_indonesian
+                else "- No module features matched the current reference catalog yet."
+            )
 
         if missing_features:
-            text_lines.append("- Missing reference prices for:")
+            text_lines.append(
+                "- Harga referensi yang masih belum ada untuk:"
+                if is_indonesian
+                else "- Missing reference prices for:"
+            )
             for feature in missing_features:
                 text_lines.append(f"  - {feature}")
             text_lines.append(
-                "- Add reference prices for the missing features, then rerun the "
+                "- Tambahkan harga referensi untuk fitur yang masih kosong, lalu "
+                "jalankan ulang rincian ini untuk mendapatkan penawaran final."
+                if is_indonesian
+                else "- Add reference prices for the missing features, then rerun the "
                 "breakdown to get a final quote."
             )
 
+        pricing_notes = _as_string(profile.get("pricingNotes"))
+        if pricing_notes:
+            text_lines.append(
+                f"- {'Catatan pricing' if is_indonesian else 'Pricing notes'}: {pricing_notes}"
+            )
+
         text_lines.append(
-            "- Pricing model: module/feature-based quoting using your freelance "
+            "- Model pricing: penawaran berbasis modul/fitur menggunakan katalog "
+            "referensi freelance Anda, bukan estimasi rate generik."
+            if is_indonesian
+            else "- Pricing model: module/feature-based quoting using your freelance "
             "reference catalog instead of generic rate estimation."
         )
 
@@ -196,5 +375,13 @@ class ToolService:
                 "matchedSubtotal": matched_total,
                 "missingFeatures": missing_features,
                 "referenceCatalogSize": len(references),
+                "loadedFromIntentProfile": bool(profile_catalog),
+                "hourlyRate": None
+                if profile.get("hourlyRate", -1) < 0
+                else profile.get("hourlyRate"),
+                "completedProjects": None
+                if profile.get("completedProjects", -1) < 0
+                else profile.get("completedProjects"),
+                "projectReferencesUsed": used_project_references,
             },
         )

@@ -12,6 +12,7 @@ from app.services.llm_service import LlmService
 from app.services.prompt_builder import (
     build_chunk_context_prompt,
     build_document_summary_prompt,
+    build_source_metadata,
     source_label,
 )
 from app.services.repository import ChunkWritePayload, RagRepository
@@ -153,10 +154,13 @@ class IngestService:
             f"# {project.title}",
             f"## Summary\n{project.summary.strip()}" if project.summary else "",
             f"## Description\n{project.description.strip()}" if project.description else "",
-            f"## Technologies\n" + ", ".join(project.tech_stack) if project.tech_stack else "",
+            "## Technologies\n" + ", ".join(project.tech_stack) if project.tech_stack else "",
+            self._format_project_content(project.content),
         ]
-        for context in project.contexts:
-            sections.append(f"## {context.title}\n{context.content.strip()}")
+
+        if not project.content.strip():
+            for context in project.contexts:
+                sections.append(f"## {context.title}\n{context.content.strip()}")
 
         return await self._ingest_text_document(
             run_id=run_id,
@@ -171,6 +175,15 @@ class IngestService:
             tags=["project"],
             extra_metadata={"origin": "project-export"},
         )
+
+    @staticmethod
+    def _format_project_content(content: str) -> str:
+        normalized = content.strip()
+        if not normalized:
+            return ""
+        if normalized.startswith("#"):
+            return normalized
+        return f"## Project Details\n{normalized}"
 
     async def _ingest_about(self, export: ContentExport, run_id) -> IngestedSource:
         about = export.about_me
@@ -244,7 +257,7 @@ class IngestService:
             mime_type=mime_type,
             tags=tags,
             metadata={
-                "source_label": source,
+                **build_source_metadata(source_type, source_ref, title),
                 "run_id": str(run_id),
                 "document_summary": document_summary,
                 **extra_metadata,
@@ -267,10 +280,7 @@ class IngestService:
                     checksum=checksum,
                     embedding=embedding,
                     metadata={
-                        "source_label": source,
-                        "title": title,
-                        "source_type": source_type,
-                        "source_ref": source_ref,
+                        **build_source_metadata(source_type, source_ref, title),
                         "document_summary": document_summary,
                         **extra_metadata,
                     },
