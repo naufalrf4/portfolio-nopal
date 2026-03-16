@@ -1,11 +1,12 @@
 import { fail, type Actions } from '@sveltejs/kit';
-import { submitMessage } from '$lib/api';
+import { submitMessageWithContext } from '$lib/api';
 
 export const actions: Actions = {
 	default: async ({ request }) => {
 		const formData = await request.formData();
 		const content = formData.get('content');
 		const turnstileToken = formData.get('turnstileToken');
+		const timezone = formData.get('timezone');
 
 		if (!content || typeof content !== 'string') {
 			return fail(422, { error: 'Message is required' });
@@ -25,13 +26,19 @@ export const actions: Actions = {
 			return fail(422, { error: 'CAPTCHA verification is required' });
 		}
 
-		const result = await submitMessage({
-			content: trimmedContent,
-			turnstileToken
-		});
+		const result = await submitMessageWithContext(
+			{
+				content: trimmedContent,
+				turnstileToken,
+				timezone: typeof timezone === 'string' ? timezone.trim() || undefined : undefined
+			},
+			request.headers
+		);
 
 		if (!result.success) {
-			return fail(422, { error: result.error?.message || 'Failed to send message' });
+			return fail(result.status ?? 422, {
+				error: result.error?.message || 'Failed to send message'
+			});
 		}
 
 		return { success: true };

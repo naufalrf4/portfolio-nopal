@@ -1,20 +1,105 @@
-import { ADMIN_API_URL, SERVICE_TOKEN } from '$env/static/private';
+import { ADMIN_API_URL } from '$env/static/private';
 import type { MessagePayload, MessageResponse } from '../types';
 
-export async function submitMessage(payload: MessagePayload): Promise<MessageResponse> {
-	const response = await fetch(`${ADMIN_API_URL}/api/v1/public/messages`, {
-		method: 'POST',
-		headers: {
+interface MessageResult extends MessageResponse {
+	status?: number;
+}
+
+const API_TIMEOUT_MS = 5000;
+const FORWARDED_HEADER_NAMES = [
+	'x-forwarded-for',
+	'x-real-ip',
+	'x-vercel-forwarded-for',
+	'cf-connecting-ip',
+	'user-agent',
+	'accept-language',
+	'referer'
+] as const;
+
+function createAbortSignal(timeoutMs: number): { signal: AbortSignal; cleanup: () => void } {
+	const controller = new AbortController();
+	const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+	return {
+		signal: controller.signal,
+		cleanup: () => clearTimeout(timeoutId)
+	};
+}
+
+function isAbortError(error: unknown): boolean {
+	return error instanceof Error && (error.name === 'AbortError' || error.name === 'TimeoutError');
+}
+
+export async function submitMessage(payload: MessagePayload): Promise<MessageResult> {
+	return submitMessageWithContext(payload, new Headers());
+}
+
+export async function submitMessageWithContext(
+	payload: MessagePayload,
+	requestHeaders: Headers
+): Promise<MessageResult> {
+	const { signal, cleanup } = createAbortSignal(API_TIMEOUT_MS);
+
+	try {
+		const headers = new Headers({
 			'Content-Type': 'application/json',
-			'X-Service-Token': SERVICE_TOKEN
-		},
-		body: JSON.stringify(payload)
-	});
+			'x-portfolio-source-app': 'ngl-svelte',
+			'x-portfolio-source-path': '/'
+		});
 
-	if (!response.ok) {
-		const data: MessageResponse = await response.json();
-		return data;
+		for (const headerName of FORWARDED_HEADER_NAMES) {
+			const headerValue = requestHeaders.get(headerName);
+			if (headerValue) {
+				headers.set(headerName, headerValue);
+			}
+		}
+
+		if (payload.timezone?.trim()) {
+			headers.set('x-portfolio-timezone', payload.timezone.trim().slice(0, 100));
+		}
+
+		const response = await fetch(`${ADMIN_API_URL}/api/v1/public/messages`, {
+			method: 'POST',
+			headers,
+			body: JSON.stringify(payload),
+			signal
+		});
+
+		const data = (await response.json().catch(() => null)) as MessageResponse | null;
+
+		if (!response.ok) {
+			return {
+				success: false,
+				error: data?.error ?? { message: 'Failed to send message' },
+				status: response.status
+			};
+		}
+
+		return {
+			...(data ?? { success: true }),
+			status: response.status
+		};
+	} catch (error) {
+		if (isAbortError(error)) {
+			return {
+				success: false,
+				error: {
+					message: 'Message service timed out. Please try again.',
+					code: 'UPSTREAM_TIMEOUT'
+				},
+				status: 504
+			};
+		}
+
+		return {
+			success: false,
+			error: {
+				message: 'Message service is temporarily unavailable. Please try again later.',
+				code: 'UPSTREAM_UNAVAILABLE'
+			},
+			status: 503
+		};
+	} finally {
+		cleanup();
 	}
-
-	return await response.json();
 }

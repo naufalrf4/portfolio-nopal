@@ -1,122 +1,364 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { env } from '$env/dynamic/public';
 	import type { ActionData } from './$types';
+	import { onMount } from 'svelte';
 	import { fade, scale } from 'svelte/transition';
 
+	interface TurnstileApi {
+		render(
+			container: HTMLElement,
+			options: {
+				sitekey: string;
+				theme?: 'light' | 'dark';
+				callback: (token: string) => void;
+				'expired-callback'?: () => void;
+				'error-callback'?: () => void;
+			}
+		): string;
+		reset(widgetId?: string): void;
+	}
+
+	interface WindowWithGtag extends Window {
+		gtag?: (command: string, eventName: string, params?: Record<string, string>) => void;
+	}
+
 	let { form }: { form: ActionData } = $props();
+	const PUBLIC_TURNSTILE_SITE_KEY = env.PUBLIC_TURNSTILE_SITE_KEY ?? '';
+
+	const hasTrackedSuccess = { value: false };
+
+	const hasTurnstileConfig = Boolean(PUBLIC_TURNSTILE_SITE_KEY);
 
 	let message = $state('');
 	let isSubmitting = $state(false);
+	let timezone = $state('');
+	let turnstileToken = $state('');
+	let turnstileWidgetId = $state<string | null>(null);
+	let turnstileContainer = $state<HTMLDivElement | null>(null);
 
 	let remaining = $derived(500 - message.length);
 	let isOverLimit = $derived(remaining < 0);
 	let isEmpty = $derived(message.trim().length === 0);
-	let canSubmit = $derived(!isEmpty && !isOverLimit && !isSubmitting);
+	let shouldShowTurnstile = $derived(hasTurnstileConfig && message.trim().length > 0);
+	let canSubmit = $derived(
+		hasTurnstileConfig && !isEmpty && !isOverLimit && !isSubmitting && Boolean(turnstileToken)
+	);
 
-	// Reset message when success
+	function getTurnstile(): TurnstileApi | undefined {
+		return (window as Window & { turnstile?: TurnstileApi }).turnstile;
+	}
+
+	function resetTurnstile() {
+		turnstileToken = '';
+
+		const turnstile = getTurnstile();
+
+		if (turnstileWidgetId && turnstile) {
+			turnstile.reset(turnstileWidgetId);
+		}
+	}
+
+	function mountTurnstile() {
+		const turnstile = getTurnstile();
+
+		if (!shouldShowTurnstile || !turnstileContainer || !turnstile || turnstileWidgetId) {
+			return;
+		}
+
+		turnstileWidgetId = turnstile.render(turnstileContainer, {
+			sitekey: PUBLIC_TURNSTILE_SITE_KEY,
+			theme: 'light',
+			callback: (token: string) => {
+				turnstileToken = token;
+			},
+			'expired-callback': () => {
+				turnstileToken = '';
+			},
+			'error-callback': () => {
+				turnstileToken = '';
+			}
+		});
+	}
+
+	function trackSubmission() {
+		const windowWithGtag = window as WindowWithGtag;
+
+		windowWithGtag.gtag?.('event', 'ngl_submission', {
+			event_category: 'engagement',
+			event_label: 'anonymous_message'
+		});
+	}
+
 	$effect(() => {
 		if (form?.success) {
 			message = '';
 			isSubmitting = false;
+			resetTurnstile();
+
+			if (!hasTrackedSuccess.value) {
+				trackSubmission();
+				hasTrackedSuccess.value = true;
+			}
+		} else {
+			hasTrackedSuccess.value = false;
 		}
+	});
+
+	$effect(() => {
+		if (shouldShowTurnstile) {
+			mountTurnstile();
+			return;
+		}
+
+		turnstileToken = '';
+		turnstileWidgetId = null;
+	});
+
+	onMount(() => {
+		timezone = Intl.DateTimeFormat().resolvedOptions().timeZone ?? '';
+
+		if (!hasTurnstileConfig) {
+			return;
+		}
+
+		if (getTurnstile()) {
+			mountTurnstile();
+			return;
+		}
+
+		const intervalId = window.setInterval(() => {
+			if (getTurnstile()) {
+				window.clearInterval(intervalId);
+				mountTurnstile();
+			}
+		}, 100);
+
+		return () => window.clearInterval(intervalId);
 	});
 </script>
 
 <svelte:head>
-	<title>NGL | Anonymous Messages</title>
+	{#if hasTurnstileConfig}
+		<script
+			src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
+			async
+			defer
+		></script>
+	{/if}
 </svelte:head>
 
-<div class="min-h-[80vh] flex items-center justify-center p-4">
-	<div class="neu-card w-full max-w-md p-8 relative overflow-hidden transition-all duration-300">
-		
-		{#if form?.success}
-			<div in:scale class="flex flex-col items-center py-8 text-center">
-				<div class="w-16 h-16 rounded-full bg-emerald-500/10 flex items-center justify-center mb-4 text-emerald-500">
-					<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-				</div>
-				<h2 class="text-xl font-bold mb-2">Message Sent!</h2>
-				<p class="text-gray-400 text-sm mb-6">
-					Your anonymous message has been delivered.
-				</p>
-				<a
-					href="/"
-					class="neu-button px-6 py-3 text-sm inline-block"
-					data-sveltekit-reload
-				>
-					Send Another Message
-				</a>
-			</div>
-		{:else}
-			<div class="mb-6 text-center">
-				<h1 class="text-2xl font-bold mb-2 bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
-					Send me a message
-				</h1>
-				<p class="text-gray-400 text-sm">
-					100% anonymous & private
-				</p>
-			</div>
+<div class="relative min-h-screen overflow-hidden px-4 py-10 md:px-6 md:py-14">
+	<div class="pointer-events-none absolute inset-0 overflow-hidden">
+		<div
+			class="absolute left-[-4rem] top-8 h-44 w-44 rounded-full bg-[radial-gradient(circle,rgba(59,130,246,0.18),transparent_70%)] blur-3xl"
+		></div>
+		<div
+			class="absolute right-[-4rem] top-1/4 h-56 w-56 rounded-full bg-[radial-gradient(circle,rgba(96,165,250,0.16),transparent_72%)] blur-3xl"
+		></div>
+		<div
+			class="absolute bottom-[-5rem] left-1/2 h-64 w-64 -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(147,197,253,0.14),transparent_70%)] blur-3xl"
+		></div>
+	</div>
 
-			<form
-				method="POST"
-				use:enhance={() => {
-					isSubmitting = true;
-					return async ({ update }) => {
-						await update();
-						isSubmitting = false;
-					};
-				}}
-				class="ngl-form space-y-4"
-			>
-				<div class="relative">
-					<textarea
-						name="content"
-						bind:value={message}
-						placeholder="Type your message here..."
-						rows="5"
-						maxlength="550"
-						disabled={isSubmitting}
-						class="neu-input ngl-textarea resize-none min-h-[150px] pr-4 pb-8 w-full disabled:opacity-50"
-					></textarea>
-
-					<div class="absolute bottom-3 right-3 flex items-center gap-2 pointer-events-none">
-						<span
-							class="text-xs font-medium transition-colors {remaining < 50 ? (remaining < 0 ? 'text-red-500' : 'text-amber-500') : 'text-gray-500'}"
+	<div
+		class="relative mx-auto flex min-h-[calc(100vh-5rem)] w-full max-w-2xl items-center justify-center"
+	>
+		<div
+			class="neu-card ngl-panel animate-scale-in relative w-full max-w-xl overflow-hidden rounded-[34px] border border-white/55 bg-[linear-gradient(150deg,rgba(236,242,248,0.96),rgba(222,230,240,0.94))] p-8 shadow-[14px_14px_28px_rgba(163,177,198,0.32),-14px_-14px_28px_rgba(255,255,255,0.58)] md:p-10"
+		>
+			{#if form?.success}
+				<div in:scale class="flex flex-col items-center py-8 text-center">
+					<div
+						class="ngl-success-badge mb-4 flex h-16 w-16 items-center justify-center rounded-full"
+					>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							width="32"
+							height="32"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline
+								points="22 4 12 14.01 9 11.01"
+							/></svg
 						>
-							{remaining}
-						</span>
 					</div>
+					<h2 class="ngl-title mb-2 text-2xl font-bold">Message Sent!</h2>
+					<p class="ngl-muted mb-6 max-w-sm text-sm">Your anonymous message has been delivered.</p>
+					<a href="/" class="neu-button px-6 py-3 text-sm inline-flex" data-sveltekit-reload>
+						Send Another Message
+					</a>
+				</div>
+			{:else}
+				<div class="mb-8 text-center opacity-0 animate-fade-in-up">
+					<div
+						class="mx-auto mb-4 flex h-18 w-18 items-center justify-center rounded-full bg-[linear-gradient(145deg,rgba(236,242,248,0.98),rgba(222,230,240,0.94))] shadow-[inset_6px_6px_12px_rgba(163,177,198,0.25),inset_-6px_-6px_12px_rgba(255,255,255,0.7)]"
+					>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							width="30"
+							height="30"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							class="text-[var(--neu-accent)]"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path></svg
+						>
+					</div>
+					<p
+						class="mb-3 text-xs font-semibold uppercase tracking-[0.32em] text-[var(--neu-accent)]"
+					>
+						Anonymous message
+					</p>
+					<h1 class="ngl-title text-2xl font-bold md:text-3xl">Send me a message</h1>
+					<p class="ngl-muted mx-auto mt-4 max-w-md text-sm leading-7 md:text-base">
+						Share feedback, thoughts, or questions anonymously.
+					</p>
 				</div>
 
-				<!-- Hidden input for Turnstile token - this will cause a 422 error on submission which is expected behavior without the widget -->
-				<input type="hidden" name="turnstileToken" value="" />
+				<form
+					method="POST"
+					use:enhance={() => {
+						isSubmitting = true;
+						return async ({ update }) => {
+							await update();
+							isSubmitting = false;
+							resetTurnstile();
+						};
+					}}
+					class="ngl-form space-y-5 opacity-0 animate-fade-in-up stagger-1"
+				>
+					<div class="relative">
+						<textarea
+							name="content"
+							bind:value={message}
+							placeholder="Type your message here..."
+							rows="6"
+							maxlength="550"
+							disabled={isSubmitting}
+							class="neu-input min-h-[220px] w-full resize-none rounded-[26px] border border-white/45 bg-[linear-gradient(150deg,rgba(238,243,249,0.98),rgba(223,232,241,0.94))] px-5 pb-9 pt-5 text-base disabled:opacity-50"
+						></textarea>
 
-				{#if form?.error}
-					<div transition:fade class="p-4 rounded-xl bg-red-500/10 border border-red-500/20 flex items-start gap-3">
-						<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-red-500 shrink-0 mt-0.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-						<div class="flex-1">
-							<p class="text-sm font-medium text-red-500">Failed to send</p>
-							<p class="text-xs text-red-400/80 mt-1">{form.error}</p>
+						<div class="pointer-events-none absolute bottom-3 right-3 flex items-center gap-2">
+							<span
+								class="text-xs font-medium transition-colors {remaining < 50
+									? remaining < 0
+										? 'text-red-500'
+										: 'text-amber-500'
+									: 'ngl-subtle'}"
+							>
+								{remaining}
+							</span>
 						</div>
 					</div>
-				{/if}
 
-				<button
-					type="submit"
-					disabled={!canSubmit}
-					class="neu-button neu-button-primary ngl-submit w-full justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed py-3 flex items-center"
-				>
-					{#if isSubmitting}
-						<svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-							<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-							<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-						</svg>
-						<span>Sending...</span>
-					{:else}
-						<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-						<span>Send Message</span>
+					<div class="space-y-3">
+						{#if hasTurnstileConfig && shouldShowTurnstile}
+							<div
+								class="ngl-turnstile-shell rounded-[24px] border border-white/45 bg-[linear-gradient(145deg,rgba(235,241,248,0.95),rgba(223,231,241,0.93))] p-4"
+							>
+								<div bind:this={turnstileContainer} class="flex justify-center"></div>
+							</div>
+						{:else if hasTurnstileConfig}
+							<div class="h-0" aria-hidden="true"></div>
+						{:else}
+							<div class="ngl-notice-card rounded-[22px] p-4 text-sm ngl-muted">
+								CAPTCHA is not configured right now, so anonymous message delivery is temporarily
+								unavailable.
+							</div>
 					{/if}
-				</button>
-			</form>
-		{/if}
+					<input type="hidden" name="turnstileToken" value={turnstileToken} />
+					<input type="hidden" name="timezone" value={timezone} />
+				</div>
+
+					{#if form?.error}
+						<div transition:fade class="ngl-error-card flex items-start gap-3 rounded-[22px] p-4">
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								width="20"
+								height="20"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								class="mt-0.5 shrink-0 text-red-500"
+								><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line
+									x1="12"
+									y1="16"
+									x2="12.01"
+									y2="16"
+								/></svg
+							>
+							<div class="flex-1">
+								<p class="text-sm font-medium text-red-600">Message not sent</p>
+								<p class="mt-1 text-xs text-red-500/80">{form.error}</p>
+							</div>
+						</div>
+					{/if}
+
+					<button
+						type="submit"
+						disabled={!canSubmit}
+						class="neu-button neu-button-primary flex w-full items-center justify-center gap-2 py-3 disabled:cursor-not-allowed disabled:opacity-50"
+					>
+						{#if isSubmitting}
+							<svg
+								class="h-5 w-5 animate-spin"
+								xmlns="http://www.w3.org/2000/svg"
+								fill="none"
+								viewBox="0 0 24 24"
+							>
+								<circle
+									class="opacity-25"
+									cx="12"
+									cy="12"
+									r="10"
+									stroke="currentColor"
+									stroke-width="4"
+								></circle>
+								<path
+									class="opacity-75"
+									fill="currentColor"
+									d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+								></path>
+							</svg>
+							<span>Sending...</span>
+						{:else}
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								width="20"
+								height="20"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								><line x1="22" y1="2" x2="11" y2="13" /><polygon
+									points="22 2 15 22 11 13 2 9 22 2"
+								/></svg
+							>
+							<span>Send message</span>
+						{/if}
+					</button>
+				</form>
+
+				<div
+					class="mt-8 border-t border-[#d8e1ed] pt-6 text-center opacity-0 animate-fade-in-up stagger-2"
+				>
+					<p class="text-xs text-[#A0AEC0]">
+						Your message is completely anonymous. I will not know who sent it.
+					</p>
+				</div>
+			{/if}
+		</div>
 	</div>
 </div>

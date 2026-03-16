@@ -1,6 +1,7 @@
 export interface MessagePayload {
 	content: string;
 	turnstileToken: string;
+	timezone?: string;
 }
 
 export interface MessageResponse {
