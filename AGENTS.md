@@ -72,3 +72,4 @@ Authoritative AI control contract for this repository.
 - Public, Links, and NGL are standalone apps, but they are not allowed to bypass Admin for database access.
 - Legacy phase2 is the visual baseline until the user explicitly replaces it.
 - Root now has local orchestration scripts: `bun run dev:all` starts all apps, and `bun run reset:seed` resets Admin + RAG data, seeds Admin from `data/`, then triggers proper Admin -> RAG ingest.
+- Root hook/tooling is Bun-aligned; remove stale pnpm lockfiles and pnpm-only root docs when updating repo shell docs.

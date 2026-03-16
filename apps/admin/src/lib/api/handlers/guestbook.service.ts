@@ -1,4 +1,9 @@
 import { createId } from '@paralleldrive/cuid2';
+
+type GuestbookEntryUpdate = Partial<
+  Pick<typeof guestbookEntries.$inferInsert, 'message' | 'visible' | 'reactions' | 'updatedAt'>
+>;
+type GuestbookReaction = { userId: string; emoji: string };
 import { db } from '@/lib/db';
 import { eq, and, desc } from 'drizzle-orm';
 import { guestbookEntries } from '@/lib/db/schema';
@@ -92,10 +97,11 @@ export class GuestbookService {
     });
   }
 
-  async update(id: string, data: any) {
+  async update(id: string, data: Omit<GuestbookEntryUpdate, 'updatedAt'>) {
+    const updateData: GuestbookEntryUpdate = { ...data, updatedAt: new Date().toISOString() };
     const [updated] = await db
       .update(guestbookEntries)
-      .set({ ...data, updatedAt: new Date().toISOString() } as any)
+      .set(updateData)
       .where(eq(guestbookEntries.id, id))
       .returning();
 
@@ -157,10 +163,14 @@ export class GuestbookService {
     });
   }
 
-  async updateReactions(id: string, reactions: object) {
+  async updateReactions(id: string, reactions: GuestbookReaction[]) {
+    const updateData: GuestbookEntryUpdate = {
+      reactions,
+      updatedAt: new Date().toISOString(),
+    };
     const [updated] = await db
       .update(guestbookEntries)
-      .set({ reactions: reactions as any, updatedAt: new Date().toISOString() })
+      .set(updateData)
       .where(eq(guestbookEntries.id, id))
       .returning();
 
@@ -191,7 +201,7 @@ export class GuestbookService {
     if (!entry) {
       throw new Error('Guestbook entry not found');
     }
-    const reactions = (entry.reactions as Array<{ userId: string; emoji: string }>) || [];
+    const reactions = (entry.reactions as GuestbookReaction[] | null) || [];
     const existingIndex = reactions.findIndex((r) => r.userId === userId && r.emoji === emoji);
     if (existingIndex !== -1) {
       reactions.splice(existingIndex, 1);
@@ -199,9 +209,13 @@ export class GuestbookService {
       reactions.push({ userId, emoji });
     }
 
+    const updateData: GuestbookEntryUpdate = {
+      reactions,
+      updatedAt: new Date().toISOString(),
+    };
     await db
       .update(guestbookEntries)
-      .set({ reactions: reactions as any, updatedAt: new Date().toISOString() })
+      .set(updateData)
       .where(eq(guestbookEntries.id, id))
       .returning();
 

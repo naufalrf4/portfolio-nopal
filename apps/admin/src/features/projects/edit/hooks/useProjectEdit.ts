@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { useDebounce } from 'use-debounce';
@@ -202,17 +202,7 @@ export function useProjectEdit(id: string) {
   const [saving, setSaving] = useState(false);
   const [debouncedContent] = useDebounce(content, 1000);
 
-  useEffect(() => {
-    fetchProject();
-  }, [id]);
-
-  useEffect(() => {
-    if (project && debouncedContent !== (project.content || '')) {
-      saveContent(debouncedContent);
-    }
-  }, [debouncedContent]);
-
-  const fetchProject = async () => {
+  const fetchProject = useCallback(async () => {
     try {
       const response = await fetch(`/api/v1/admin/projects/${id}`);
       const data = await response.json();
@@ -232,38 +222,51 @@ export function useProjectEdit(id: string) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id, router]);
 
-  const saveContent = async (newContent: string) => {
-    if (!project) return;
+  const saveContent = useCallback(
+    async (newContent: string) => {
+      if (!project) return;
 
-    setSaving(true);
-    try {
-      const response = await fetch(`/api/v1/admin/projects/${project.id}/content`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content: newContent }),
-      });
+      setSaving(true);
+      try {
+        const response = await fetch(`/api/v1/admin/projects/${project.id}/content`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ content: newContent }),
+        });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error?.message || 'Failed to save content');
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error?.message || 'Failed to save content');
+        }
+
+        const data = await response.json();
+
+        if (!data.success) {
+          throw new Error(data.error?.message || 'Failed to save content');
+        }
+
+        setProject({ ...project, content: newContent });
+        toast.success('Content saved');
+      } catch (error) {
+        toast.error(getErrorMessage(error, 'Failed to save content'));
+      } finally {
+        setSaving(false);
       }
+    },
+    [project]
+  );
 
-      const data = await response.json();
+  useEffect(() => {
+    void fetchProject();
+  }, [fetchProject]);
 
-      if (!data.success) {
-        throw new Error(data.error?.message || 'Failed to save content');
-      }
-
-      setProject({ ...project, content: newContent });
-      toast.success('Content saved');
-    } catch (error) {
-      toast.error(getErrorMessage(error, 'Failed to save content'));
-    } finally {
-      setSaving(false);
+  useEffect(() => {
+    if (project && debouncedContent !== (project.content || '')) {
+      void saveContent(debouncedContent);
     }
-  };
+  }, [debouncedContent, project, saveContent]);
 
   return {
     project,

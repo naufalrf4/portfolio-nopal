@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import type { JSONContent } from '@tiptap/core';
 import { EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Image from '@tiptap/extension-image';
@@ -34,8 +35,8 @@ import {
 } from '@/components/ui/dialog';
 
 interface RichTextEditorProps {
-  content: any;
-  onChange: (content: any) => void;
+  content: JSONContent | null;
+  onChange: (content: JSONContent) => void;
   placeholder?: string;
   editable?: boolean;
 }

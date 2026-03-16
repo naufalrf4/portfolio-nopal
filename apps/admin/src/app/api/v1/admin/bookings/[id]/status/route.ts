@@ -21,6 +21,8 @@ type RouteContext = {
   params: Promise<{ id: string }>;
 };
 
+type BookingStatusUpdate = Partial<Pick<typeof bookings.$inferInsert, 'status' | 'updatedAt'>>;
+
 export async function PUT(request: NextRequest, context: RouteContext) {
   return withAdminAuth(async () => {
     try {
@@ -42,9 +44,10 @@ export async function PUT(request: NextRequest, context: RouteContext) {
       }
 
       const now = new Date().toISOString();
+      const updateData: BookingStatusUpdate = { status: parsed.data.status, updatedAt: now };
       const [updated] = await db
         .update(bookings)
-        .set({ status: parsed.data.status, updatedAt: now } as any)
+        .set(updateData)
         .where(eq(bookings.id, id))
         .returning();
 

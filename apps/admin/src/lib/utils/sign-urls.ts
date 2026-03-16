@@ -1,6 +1,6 @@
 import { storageService } from '@/lib/services/storage';
 
-type SignableRecord = Record<string, any>;
+type SignableRecord = object;
 
 interface SignConfig {
   fields?: string[];
@@ -26,12 +26,12 @@ export async function signAssetUrls<T extends SignableRecord>(
 ): Promise<T> {
   if (!record) return record;
 
-  const signedRecord = { ...record } as any;
+  const signedRecord = { ...record } as Record<string, unknown>;
 
   if (config.fields) {
     const promises = config.fields.map(async (field) => {
       const value = signedRecord[field];
-      if (value && isS3Key(value)) {
+      if (typeof value === 'string' && isS3Key(value)) {
         signedRecord[field] = await storageService.signGetUrl(value, expiresInSeconds);
       }
     });
@@ -46,10 +46,10 @@ export async function signAssetUrls<T extends SignableRecord>(
           array.map(async (item) => {
             if (!item || typeof item !== 'object') return item;
 
-            const signedItem = { ...item } as any;
+            const signedItem: Record<string, unknown> = { ...(item as Record<string, unknown>) };
             const itemPromises = fields.map(async (field) => {
               const value = signedItem[field];
-              if (value && isS3Key(value)) {
+              if (typeof value === 'string' && isS3Key(value)) {
                 signedItem[field] = await storageService.signGetUrl(value, expiresInSeconds);
               }
             });

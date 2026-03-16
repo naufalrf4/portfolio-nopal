@@ -5,11 +5,10 @@ import type { CreateBlogLinkInput } from '@/lib/validations/blog-link.schema';
 import { createId } from '@paralleldrive/cuid2';
 
 export type BlogLinkCreateInput = CreateBlogLinkInput;
+type BlogLinkUpdateInput = Partial<BlogLinkCreateInput>;
 
 export class BlogLinksService {
   async getAll(query?: { source?: string; visible?: boolean }) {
-    let queryBuilder = db.select().from(blogLink);
-
     const conditions = [];
     if (query?.source) {
       conditions.push(eq(blogLink.source, query.source));
@@ -19,10 +18,14 @@ export class BlogLinksService {
     }
 
     if (conditions.length > 0) {
-      queryBuilder = queryBuilder.where(and(...conditions)) as any;
+      return db
+        .select()
+        .from(blogLink)
+        .where(and(...conditions))
+        .orderBy(asc(blogLink.order));
     }
 
-    return queryBuilder.orderBy(asc(blogLink.order));
+    return db.select().from(blogLink).orderBy(asc(blogLink.order));
   }
 
   async getById(id: string) {
@@ -56,7 +59,7 @@ export class BlogLinksService {
     return created;
   }
 
-  async update(id: string, data: any) {
+  async update(id: string, data: BlogLinkUpdateInput) {
     const [updated] = await db
       .update(blogLink)
       .set({

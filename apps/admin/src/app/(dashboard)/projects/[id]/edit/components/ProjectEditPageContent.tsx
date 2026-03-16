@@ -1,6 +1,6 @@
 'use client';
 
-import { use, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Loader2, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -22,8 +22,10 @@ export function ProjectEditPageContent({ projectId }: ProjectEditPageContentProp
   const { images, fetchImages, handleImageUpload } = useProjectImages(projectId);
 
   useEffect(() => {
-    if (project) fetchImages();
-  }, [project?.id]);
+    if (project?.id) {
+      void fetchImages();
+    }
+  }, [fetchImages, project?.id]);
 
   if (loading)
     return (

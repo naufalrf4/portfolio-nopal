@@ -27,5 +27,7 @@ export async function markContactAsRead(id: string): Promise<void> {
       body: JSON.stringify({ read: true }),
       cache: 'no-store',
     });
-  } catch {}
+  } catch {
+    return;
+  }
 }

@@ -3,15 +3,21 @@ import { profileLinks } from '@/lib/db/schema';
 import { eq, asc } from 'drizzle-orm';
 import { createId } from '@paralleldrive/cuid2';
 
+type ProfileLinkInsert = typeof profileLinks.$inferInsert;
+type ProfileLinkCreateInput = Omit<ProfileLinkInsert, 'id' | 'updatedAt'>;
+type ProfileLinkUpdateInput = Partial<ProfileLinkCreateInput>;
+
 export class ProfileLinksService {
   async getAll(query?: { visible?: boolean }) {
-    let queryBuilder = db.select().from(profileLinks);
-
     if (query?.visible !== undefined) {
-      queryBuilder = queryBuilder.where(eq(profileLinks.visible, query.visible)) as any;
+      return db
+        .select()
+        .from(profileLinks)
+        .where(eq(profileLinks.visible, query.visible))
+        .orderBy(asc(profileLinks.order));
     }
 
-    return queryBuilder.orderBy(asc(profileLinks.order));
+    return db.select().from(profileLinks).orderBy(asc(profileLinks.order));
   }
 
   async getById(id: string) {
@@ -19,7 +25,7 @@ export class ProfileLinksService {
     return result[0] || null;
   }
 
-  async create(data: any) {
+  async create(data: ProfileLinkCreateInput) {
     const [created] = await db
       .insert(profileLinks)
       .values({
@@ -31,7 +37,7 @@ export class ProfileLinksService {
     return created;
   }
 
-  async update(id: string, data: any) {
+  async update(id: string, data: ProfileLinkUpdateInput) {
     const [updated] = await db
       .update(profileLinks)
       .set({

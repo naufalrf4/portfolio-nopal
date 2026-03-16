@@ -7,7 +7,11 @@ interface EmptyStateProps {
   onCreateClick: () => void;
 }
 
-export function EmptyState({ hasSearchQuery, searchQuery, onCreateClick }: EmptyStateProps) {
+export function EmptyState({
+  hasSearchQuery,
+  searchQuery: _searchQuery,
+  onCreateClick,
+}: EmptyStateProps) {
   return (
     <div
       className="flex flex-col items-center justify-center py-16 rounded-[32px] bg-[#E0E5EC]"

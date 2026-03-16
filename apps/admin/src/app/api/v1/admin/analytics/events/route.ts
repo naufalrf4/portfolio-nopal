@@ -1,6 +1,6 @@
 import { withAdminAuth } from '@/lib/api/middleware/auth';
 import { analyticsService } from '@/lib/api/handlers/analytics.service';
-import { successResponse, serverErrorResponse, validationErrorResponse } from '@/lib/api/responses';
+import { successResponse, serverErrorResponse } from '@/lib/api/responses';
 import { createAnalyticsEventSchema } from '@/lib/validations/analytics.schema';
 
 async function handlePost(req: Request) {

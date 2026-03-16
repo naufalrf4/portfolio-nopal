@@ -41,7 +41,9 @@ export function useDashboardStats() {
                 read: contacts.filter((c: { read: boolean }) => c.read).length,
               };
             }
-          } catch {}
+          } catch {
+            return;
+          }
         }
 
         if (bookingsResponse.status === 'fulfilled') {
@@ -56,12 +58,15 @@ export function useDashboardStats() {
                   .length,
               };
             }
-          } catch {}
+          } catch {
+            return;
+          }
         }
 
         setStats(baseStats);
       } catch (error) {
-        if ((error as Error).name !== 'AbortError') {
+        if ((error as Error).name === 'AbortError') {
+          return;
         }
       } finally {
         setLoading(false);

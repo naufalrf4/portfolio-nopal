@@ -5,7 +5,6 @@ import { toast } from 'sonner';
 import { getErrorMessage } from '@/lib/utils/api';
 import type {
   BookingSlot,
-  BookingAvailability,
   BookingSettings,
   CreateSlotInput,
   UpdateSlotInput,

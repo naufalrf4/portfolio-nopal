@@ -32,6 +32,13 @@ export type AvailabilityQueryInput = {
   enabled?: boolean;
 };
 
+type BookingAvailabilityUpdate = Partial<
+  Pick<
+    typeof bookingAvailability.$inferInsert,
+    'dayOfWeek' | 'startTime' | 'endTime' | 'enabled' | 'updatedAt'
+  >
+>;
+
 export class BookingAvailabilityService {
   async getAll(query: AvailabilityQueryInput) {
     const conditions = [];
@@ -106,9 +113,10 @@ export class BookingAvailabilityService {
     }
 
     const now = new Date().toISOString();
+    const updateData: BookingAvailabilityUpdate = { ...data, updatedAt: now };
     const [updated] = await db
       .update(bookingAvailability)
-      .set({ ...data, updatedAt: now } as any)
+      .set(updateData)
       .where(eq(bookingAvailability.id, id))
       .returning();
     return updated;

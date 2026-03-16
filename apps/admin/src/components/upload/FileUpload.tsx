@@ -145,70 +145,73 @@ export function FileUpload({
     };
   }, []);
 
-  const uploadFile = async (file: File) => {
-    if (file.size > maxSize) {
-      toast.error(`File size exceeds maximum limit of ${formatFileSize(maxSize)}`);
-      setErrorMessage(`File too large. Maximum size is ${formatFileSize(maxSize)}`);
-      setUploadState('error');
-      return;
-    }
-
-    setLastFile(file);
-    setUploadState('uploading');
-    setUploadProgress(0);
-    setErrorMessage(null);
-
-    abortControllerRef.current = new AbortController();
-
-    const completeProgress = simulateProgress(() => {});
-
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('folder', folder);
-
-      const response = await fetch('/api/v1/admin/upload', {
-        method: 'POST',
-        body: formData,
-        signal: abortControllerRef.current.signal,
-      });
-
-      const data = await response.json();
-
-      if (!data.success) {
-        throw new Error(data.error || 'Upload failed');
-      }
-
-      completeProgress();
-      setUploadProgress(100);
-      setUploadState('success');
-
-      const uploadedUrl = data.data.url;
-      onChange(uploadedUrl);
-      setPreviewUrl(uploadedUrl);
-      setImageLoadError(false);
-      toast.success('File uploaded successfully');
-
-      setTimeout(() => {
-        setUploadState('idle');
-        setUploadProgress(0);
-      }, 1500);
-    } catch (error) {
-      completeProgress();
-
-      if ((error as Error).name === 'AbortError') {
-        setUploadState('idle');
-        setUploadProgress(0);
+  const uploadFile = useCallback(
+    async (file: File) => {
+      if (file.size > maxSize) {
+        toast.error(`File size exceeds maximum limit of ${formatFileSize(maxSize)}`);
+        setErrorMessage(`File too large. Maximum size is ${formatFileSize(maxSize)}`);
+        setUploadState('error');
         return;
       }
 
-      const message = getErrorMessage(error, 'Upload failed');
-      setErrorMessage(message);
-      setUploadState('error');
-      setUploadProgress(100);
-      toast.error(message);
-    }
-  };
+      setLastFile(file);
+      setUploadState('uploading');
+      setUploadProgress(0);
+      setErrorMessage(null);
+
+      abortControllerRef.current = new AbortController();
+
+      const completeProgress = simulateProgress(() => {});
+
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('folder', folder);
+
+        const response = await fetch('/api/v1/admin/upload', {
+          method: 'POST',
+          body: formData,
+          signal: abortControllerRef.current.signal,
+        });
+
+        const data = await response.json();
+
+        if (!data.success) {
+          throw new Error(data.error || 'Upload failed');
+        }
+
+        completeProgress();
+        setUploadProgress(100);
+        setUploadState('success');
+
+        const uploadedUrl = data.data.url;
+        onChange(uploadedUrl);
+        setPreviewUrl(uploadedUrl);
+        setImageLoadError(false);
+        toast.success('File uploaded successfully');
+
+        setTimeout(() => {
+          setUploadState('idle');
+          setUploadProgress(0);
+        }, 1500);
+      } catch (error) {
+        completeProgress();
+
+        if ((error as Error).name === 'AbortError') {
+          setUploadState('idle');
+          setUploadProgress(0);
+          return;
+        }
+
+        const message = getErrorMessage(error, 'Upload failed');
+        setErrorMessage(message);
+        setUploadState('error');
+        setUploadProgress(100);
+        toast.error(message);
+      }
+    },
+    [folder, maxSize, onChange, simulateProgress]
+  );
 
   const handleRetry = () => {
     if (lastFile) {
@@ -222,7 +225,7 @@ export function FileUpload({
         uploadFile(acceptedFiles[0]);
       }
     },
-    [folder, maxSize, onChange]
+    [uploadFile]
   );
 
   const { getRootProps, getInputProps, isDragActive, isDragAccept, isDragReject } = useDropzone({

@@ -10,7 +10,7 @@ interface PageHeaderProps {
   actions?: import('react').ReactNode;
   stats?: { label: string; value: string | number; variant?: 'default' | 'success' | 'warning' }[];
   className?: string;
-  icon?: React.ReactElement;
+  icon?: React.ReactElement<{ className?: string; strokeWidth?: number }>;
 }
 
 const NEU_SHADOW_INSET =
@@ -31,7 +31,7 @@ function PageHeader({ title, description, actions, stats, className, icon }: Pag
           <div className="flex items-center gap-2 md:gap-3">
             {icon && (
               <div className="flex-shrink-0 text-[#3D4852]">
-                {React.cloneElement(icon as React.ReactElement<any>, {
+                {React.cloneElement(icon, {
                   className: 'h-5 w-5 md:h-7 md:w-7',
                   strokeWidth: 2,
                 })}

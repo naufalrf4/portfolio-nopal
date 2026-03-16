@@ -32,7 +32,6 @@ export function BookingsTab({ onPendingCountChange }: BookingsTabProps) {
   const [filter, setFilter] = useState<FilterType>('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [total, setTotal] = useState(0);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deletingBooking, setDeletingBooking] = useState<Booking | null>(null);
   const [deleting, setDeleting] = useState(false);
@@ -62,14 +61,12 @@ export function BookingsTab({ onPendingCountChange }: BookingsTabProps) {
 
       if (data.success && data.data?.bookings) {
         setBookings(data.data.bookings);
-        setTotal(data.data.pagination.total);
         setTotalPages(data.data.pagination.totalPages);
 
         const pending = data.data.bookings.filter((b: Booking) => b.status === 'PENDING').length;
         onPendingCountChange(pending);
       } else {
         setBookings([]);
-        setTotal(0);
         setTotalPages(1);
         onPendingCountChange(0);
       }

@@ -3,6 +3,11 @@ import { Eye, EyeOff, Star, Pencil, Trash2, Wrench, ExternalLink, Github, Hash }
 import { getCategoryIcon } from '../utils/projects.utils';
 import type { ProjectCardProps } from '../types/projects.types';
 
+type ProjectWithImages = ProjectCardProps['project'] & {
+  imageUrl?: string | null;
+  images?: Array<{ url: string }>;
+};
+
 export function ProjectCard({
   project,
   index,
@@ -11,11 +16,12 @@ export function ProjectCard({
   onToggleVisibility,
   onToggleFeatured,
 }: ProjectCardProps) {
+  const projectWithImages = project as ProjectWithImages;
   const CategoryIcon = getCategoryIcon(project.category);
   const imageUrl =
-    (project as any).imageUrl ||
-    ((project as any).images && (project as any).images.length > 0
-      ? (project as any).images[0].url
+    projectWithImages.imageUrl ||
+    (projectWithImages.images && projectWithImages.images.length > 0
+      ? projectWithImages.images[0].url
       : null);
 
   return (

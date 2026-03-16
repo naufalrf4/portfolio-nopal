@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Calendar, ArrowLeft, Mail, Phone, Clock, Globe, FileText, User } from 'lucide-react';
 import { PageWrapper } from '@/components/layout/PageWrapper';
@@ -40,11 +40,7 @@ export function BookingDetailClient({ id }: BookingDetailClientProps) {
   const [selectedStatus, setSelectedStatus] = useState<Booking['status']>('PENDING');
   const [statusNotes, setStatusNotes] = useState('');
 
-  useEffect(() => {
-    fetchBooking();
-  }, [id]);
-
-  async function fetchBooking() {
+  const fetchBooking = useCallback(async () => {
     try {
       setLoading(true);
       const response = await fetch(`/api/v1/admin/bookings/${id}`);
@@ -65,7 +61,11 @@ export function BookingDetailClient({ id }: BookingDetailClientProps) {
     } finally {
       setLoading(false);
     }
-  }
+  }, [id, router]);
+
+  useEffect(() => {
+    void fetchBooking();
+  }, [fetchBooking]);
 
   async function handleDelete() {
     if (!booking) return;
@@ -114,7 +114,7 @@ export function BookingDetailClient({ id }: BookingDetailClientProps) {
       if (data.success) {
         toast.success('Status updated successfully');
         setIsStatusModalOpen(false);
-        fetchBooking();
+        await fetchBooking();
       } else {
         const errorMsg =
           typeof data.error === 'string'

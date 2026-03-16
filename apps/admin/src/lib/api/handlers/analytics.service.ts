@@ -11,6 +11,7 @@ import { createId } from '@paralleldrive/cuid2';
 import type { CreateAnalyticsEventInput } from '@/lib/validations/analytics.schema';
 
 type AnalyticsRange = '7d' | '30d' | '90d';
+type AnalyticsEventInsert = typeof analyticsEvents.$inferInsert;
 
 type SubmissionRecord = {
   id: string;
@@ -84,22 +85,20 @@ function startCase(value: string): string {
 export class AnalyticsService {
   async trackEvent(event: CreateAnalyticsEventInput) {
     const now = new Date().toISOString();
-    const [created] = await db
-      .insert(analyticsEvents)
-      .values({
-        id: createId(),
-        page: event.page,
-        eventType: event.eventType,
-        entityType: event.entityType,
-        entityId: event.entityId,
-        data: event.data,
-        userSession: event.userSession,
-        ipAddress: event.ipAddress,
-        countryCode: event.countryCode,
-        city: event.city,
-        createdAt: now,
-      } as any)
-      .returning();
+    const eventData: AnalyticsEventInsert = {
+      id: createId(),
+      page: event.page,
+      eventType: event.eventType,
+      entityType: event.entityType,
+      entityId: event.entityId,
+      data: event.data,
+      userSession: event.userSession,
+      ipAddress: event.ipAddress,
+      countryCode: event.countryCode,
+      city: event.city,
+      createdAt: now,
+    };
+    const [created] = await db.insert(analyticsEvents).values(eventData).returning();
     return created;
   }
 

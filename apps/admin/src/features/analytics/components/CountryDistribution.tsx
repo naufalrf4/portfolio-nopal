@@ -42,8 +42,6 @@ export function CountryDistribution({ data, loading }: CountryDistributionProps)
   }
 
   const countriesData = data || [];
-  const totalVisitors = countriesData.reduce((sum, c) => sum + c.count, 0);
-
   return (
     <Card
       className={cn(

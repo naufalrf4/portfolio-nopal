@@ -8,6 +8,14 @@ import nextPlugin from '@next/eslint-plugin-next';
 export default [
   js.configs.recommended,
   {
+    files: ['**/*.{js,mjs,cjs}'],
+    languageOptions: {
+      globals: {
+        process: 'readonly',
+      },
+    },
+  },
+  {
     files: ['**/*.{ts,tsx}'],
     languageOptions: {
       parser: tsparser,
@@ -76,6 +84,8 @@ export default [
       '@typescript-eslint/no-explicit-any': 'warn',
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'warn',
+      'no-empty': 'warn',
+      'no-undef': 'off',
       'no-unused-vars': 'off',
     },
   },

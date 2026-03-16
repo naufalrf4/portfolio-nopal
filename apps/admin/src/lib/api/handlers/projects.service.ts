@@ -8,6 +8,9 @@ import type {
   ProjectQueryInput,
 } from '@/lib/validations/project.schema';
 
+type ProjectInsert = typeof projects.$inferInsert;
+type ProjectUpdate = Partial<ProjectInsert>;
+
 export class ProjectsService {
   async getAll(query: ProjectQueryInput) {
     const { page, limit, category, featured, visible, search } = query;
@@ -69,22 +72,20 @@ export class ProjectsService {
   async create(data: CreateProjectInput) {
     const { description, liveUrl, repoUrl, startDate, endDate, projectDate, tags, ...rest } = data;
     const now = new Date().toISOString();
-    const [created] = await db
-      .insert(projects)
-      .values({
-        id: createId(),
-        ...rest,
-        description: description || '',
-        liveUrl: liveUrl || null,
-        repoUrl: repoUrl || null,
-        tags: tags || [],
-        startDate: startDate ? new Date(startDate).toISOString() : null,
-        endDate: endDate ? new Date(endDate).toISOString() : null,
-        projectDate: projectDate || null,
-        createdAt: now,
-        updatedAt: now,
-      } as any)
-      .returning();
+    const projectData: ProjectInsert = {
+      id: createId(),
+      ...rest,
+      description: description || '',
+      liveUrl: liveUrl || null,
+      repoUrl: repoUrl || null,
+      tags: tags || [],
+      startDate: startDate ? new Date(startDate).toISOString() : null,
+      endDate: endDate ? new Date(endDate).toISOString() : null,
+      projectDate: projectDate || null,
+      createdAt: now,
+      updatedAt: now,
+    };
+    const [created] = await db.insert(projects).values(projectData).returning();
 
     return db.query.projects.findFirst({
       where: eq(projects.id, created.id),
@@ -93,7 +94,7 @@ export class ProjectsService {
 
   async update(id: string, data: UpdateProjectInput) {
     const { startDate, endDate, ...rest } = data;
-    const updateData: Record<string, unknown> = { ...rest, updatedAt: new Date().toISOString() };
+    const updateData: ProjectUpdate = { ...rest, updatedAt: new Date().toISOString() };
     if (startDate !== undefined) {
       updateData.startDate = startDate ? new Date(startDate).toISOString() : null;
     }
@@ -103,7 +104,7 @@ export class ProjectsService {
 
     const [updated] = await db
       .update(projects)
-      .set(updateData as any)
+      .set(updateData)
       .where(eq(projects.id, id))
       .returning();
 

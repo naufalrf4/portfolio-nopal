@@ -5,6 +5,9 @@ import { successResponse, serverErrorResponse, validationErrorResponse } from '@
 import { z } from 'zod';
 import { createId } from '@paralleldrive/cuid2';
 
+type UserInsert = typeof users.$inferInsert;
+type UserConflictUpdate = Partial<Pick<typeof users.$inferInsert, 'name' | 'image' | 'updatedAt'>>;
+
 const syncUserSchema = z.object({
   email: z.string().email('Invalid email'),
   name: z.string().optional(),
@@ -23,24 +26,30 @@ export async function POST(request: NextRequest) {
     const { email, name, image } = parsed.data;
 
     const now = new Date().toISOString();
+    const userData: UserInsert = {
+      id: createId(),
+      email,
+      name,
+      image,
+      role: 'USER',
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    const conflictUpdate: UserConflictUpdate = { updatedAt: now };
+    if (name) {
+      conflictUpdate.name = name;
+    }
+    if (image) {
+      conflictUpdate.image = image;
+    }
+
     const [user] = await db
       .insert(users)
-      .values({
-        id: createId(),
-        email,
-        name,
-        image,
-        role: 'USER',
-        createdAt: now,
-        updatedAt: now,
-      } as any)
+      .values(userData)
       .onConflictDoUpdate({
         target: users.email,
-        set: {
-          ...(name && { name }),
-          ...(image && { image }),
-          updatedAt: now,
-        } as any,
+        set: conflictUpdate,
       })
       .returning({
         id: users.id,

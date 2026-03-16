@@ -210,7 +210,9 @@ export class BookingSlotsService {
       throw new Error('Cannot block a slot that is already booked');
     }
 
-    const updateData: Record<string, unknown> = {};
+    const updateData: Partial<
+      Pick<typeof bookingSlots.$inferInsert, 'time' | 'status' | 'updatedAt'>
+    > = {};
 
     if (data.time !== undefined) {
       const [existingAtTime] = await db
@@ -234,7 +236,7 @@ export class BookingSlotsService {
 
     const [slot] = await db
       .update(bookingSlots)
-      .set(updateData as any)
+      .set(updateData)
       .where(eq(bookingSlots.id, id))
       .returning();
 

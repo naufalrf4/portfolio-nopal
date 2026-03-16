@@ -12,6 +12,18 @@ const DEFAULT_SETTINGS = {
   timezone: 'Asia/Jakarta',
 } as const;
 
+type BookingSettingsUpdate = Partial<
+  Pick<
+    typeof bookingSettings.$inferInsert,
+    | 'notificationEmail'
+    | 'reminderEnabled'
+    | 'reminderDay'
+    | 'reminderTime'
+    | 'timezone'
+    | 'updatedAt'
+  >
+>;
+
 export class BookingSettingsService {
   async get() {
     const result = await db.select().from(bookingSettings).limit(1);
@@ -31,12 +43,14 @@ export class BookingSettingsService {
       return this.create(data);
     }
 
+    const updateData: BookingSettingsUpdate = {
+      ...data,
+      updatedAt: new Date().toISOString(),
+    };
+
     const [updated] = await db
       .update(bookingSettings)
-      .set({
-        ...data,
-        updatedAt: new Date().toISOString(),
-      } as any)
+      .set(updateData)
       .where(eq(bookingSettings.id, existing[0].id))
       .returning();
     return updated;

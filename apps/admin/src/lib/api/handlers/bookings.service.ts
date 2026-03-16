@@ -168,13 +168,16 @@ export const bookingsService = {
 
   async updateStatus(id: string, data: UpdateBookingStatusInput) {
     const now = new Date().toISOString();
+    const updateData: Partial<
+      Pick<typeof bookings.$inferInsert, 'status' | 'notes' | 'updatedAt'>
+    > = {
+      status: data.status,
+      notes: data.notes,
+      updatedAt: now,
+    };
     const [updated] = await db
       .update(bookings)
-      .set({
-        status: data.status,
-        notes: data.notes,
-        updatedAt: now,
-      } as any)
+      .set(updateData)
       .where(eq(bookings.id, id))
       .returning();
 

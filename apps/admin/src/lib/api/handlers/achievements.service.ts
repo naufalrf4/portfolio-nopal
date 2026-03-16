@@ -3,15 +3,21 @@ import { achievements } from '@/lib/db/schema';
 import { eq, asc } from 'drizzle-orm';
 import { createId } from '@paralleldrive/cuid2';
 
+type AchievementInsert = typeof achievements.$inferInsert;
+type AchievementCreateInput = Omit<AchievementInsert, 'id' | 'updatedAt'>;
+type AchievementUpdateInput = Partial<AchievementCreateInput>;
+
 export class AchievementsService {
   async getAll(query?: { visible?: boolean }) {
-    let queryBuilder = db.select().from(achievements);
-
     if (query?.visible !== undefined) {
-      queryBuilder = queryBuilder.where(eq(achievements.visible, query.visible)) as any;
+      return db
+        .select()
+        .from(achievements)
+        .where(eq(achievements.visible, query.visible))
+        .orderBy(asc(achievements.order));
     }
 
-    return queryBuilder.orderBy(asc(achievements.order));
+    return db.select().from(achievements).orderBy(asc(achievements.order));
   }
 
   async getById(id: string) {
@@ -19,7 +25,7 @@ export class AchievementsService {
     return result[0] || null;
   }
 
-  async create(data: any) {
+  async create(data: AchievementCreateInput) {
     const [created] = await db
       .insert(achievements)
       .values({
@@ -31,7 +37,7 @@ export class AchievementsService {
     return created;
   }
 
-  async update(id: string, data: any) {
+  async update(id: string, data: AchievementUpdateInput) {
     const [updated] = await db
       .update(achievements)
       .set({

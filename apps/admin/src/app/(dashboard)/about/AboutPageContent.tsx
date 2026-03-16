@@ -1,6 +1,6 @@
 'use client';
 
-import { Loader2, User, Award } from 'lucide-react';
+import { Loader2, User } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { PageWrapper } from '@/components/layout/PageWrapper';

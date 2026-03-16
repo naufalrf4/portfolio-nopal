@@ -1,6 +1,6 @@
 'use client';
 
-import { Eye, EyeOff, Trash2, MailOpen, CheckCircle2, Circle, Mail } from 'lucide-react';
+import { Eye, EyeOff, Trash2, MailOpen, CheckCircle2, Circle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';

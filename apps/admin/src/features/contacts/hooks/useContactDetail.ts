@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import type { ContactForm } from '../types/contacts.types';
 
 interface UseContactDetailOptions {
@@ -22,7 +22,30 @@ export function useContactDetail({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
-  async function fetchContact() {
+  const markAsReadInternal = useCallback(async (): Promise<boolean> => {
+    try {
+      const response = await fetch(`/api/v1/admin/contacts/${contactId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ read: true }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setContact((currentContact) =>
+          currentContact ? { ...currentContact, read: true } : currentContact
+        );
+        return true;
+      }
+
+      return false;
+    } catch {
+      return false;
+    }
+  }, [contactId]);
+
+  const fetchContact = useCallback(async () => {
     setLoading(true);
     setError(null);
 
@@ -49,36 +72,15 @@ export function useContactDetail({
     } finally {
       setLoading(false);
     }
-  }
-
-  async function markAsReadInternal(): Promise<boolean> {
-    try {
-      const response = await fetch(`/api/v1/admin/contacts/${contactId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ read: true }),
-      });
-
-      const data = await response.json();
-
-      if (data.success && contact) {
-        setContact({ ...contact, read: true });
-        return true;
-      }
-
-      return false;
-    } catch {
-      return false;
-    }
-  }
+  }, [autoMarkRead, contactId, markAsReadInternal]);
 
   async function markAsRead(): Promise<boolean> {
     return markAsReadInternal();
   }
 
   useEffect(() => {
-    fetchContact();
-  }, [contactId]);
+    void fetchContact();
+  }, [fetchContact]);
 
   return {
     contact,
