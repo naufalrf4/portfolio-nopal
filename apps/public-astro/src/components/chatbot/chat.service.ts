@@ -67,6 +67,8 @@ export async function sendChatMessage({
         sessionId: data.data.sessionId,
         message: data.data.message,
         sources: data.data.sources || [],
+        citations: data.data.citations || [],
+        suggestedActions: data.data.suggestedActions || [],
         metadata: data.data.metadata,
       };
     } finally {

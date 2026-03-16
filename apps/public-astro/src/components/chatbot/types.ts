@@ -4,6 +4,34 @@ export interface Message {
   content: string;
   timestamp: Date;
   sources?: string[];
+  citations?: Citation[];
+  suggestedActions?: SuggestedAction[];
+  metadata?: ChatMetadata;
+}
+
+export interface Citation {
+  source: string;
+  title?: string;
+  route?: string;
+  routeLabel?: string;
+  sourceType?: string;
+  sourceRef?: string;
+  section?: string;
+}
+
+export interface SuggestedAction {
+  type: string;
+  target: string;
+  label: string;
+}
+
+export interface ChatMetadata {
+  workflow: string;
+  intent: string;
+  queryLanguage: string;
+  answerLanguage: string;
+  retrievalConfidence: number;
+  abstained: boolean;
 }
 
 export interface ChatRequest {
@@ -15,7 +43,9 @@ export interface ChatResponse {
   sessionId: string;
   message: string;
   sources: string[];
-  metadata?: Record<string, unknown>;
+  citations?: Citation[];
+  suggestedActions?: SuggestedAction[];
+  metadata?: ChatMetadata;
 }
 
 export interface ChatState {

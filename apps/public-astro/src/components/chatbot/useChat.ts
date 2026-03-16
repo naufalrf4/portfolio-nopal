@@ -83,6 +83,9 @@ export function useChat(ragServiceUrl: string): UseChat {
           content: '',
           timestamp: new Date(),
           sources: response.sources,
+          citations: response.citations,
+          suggestedActions: response.suggestedActions,
+          metadata: response.metadata,
         };
 
         setMessages((prev) => [...prev, assistantMessage]);

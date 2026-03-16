@@ -24,7 +24,7 @@ const API_BASE = import.meta.env.ADMIN_API_URL || 'http://localhost:3001';
 const API_TIMEOUT_MS = 5000;
 
 const FALLBACK_ABOUT: AboutData = {
-  fullName: 'Naufal Rizqullah Fauzan',
+  fullName: 'Naufal Rizqullah Firdaus',
   tagline: null,
   roles: [],
   shortBio: null,
