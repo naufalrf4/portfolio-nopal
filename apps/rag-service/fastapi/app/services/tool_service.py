@@ -66,8 +66,8 @@ class ToolService:
     def execute(
         self, tool_name: str, arguments: dict[str, object], question: str
     ) -> ToolExecutionResult:
-        if tool_name == "freelance_calculator":
-            return self._execute_freelance_calculator(arguments, question)
+        if tool_name == "feature_pricing_quote":
+            return self._execute_feature_pricing_quote(arguments, question)
         return ToolExecutionResult(
             tool_name=tool_name,
             text="I recognized a tool workflow, but the requested tool is not available yet.",
@@ -75,7 +75,7 @@ class ToolService:
             metadata={"status": "unavailable"},
         )
 
-    def _execute_freelance_calculator(
+    def _execute_feature_pricing_quote(
         self, arguments: dict[str, object], question: str
     ) -> ToolExecutionResult:
         currency = _as_string(arguments.get("currency")) or "IDR"
@@ -101,7 +101,7 @@ class ToolService:
                 "Example reference already recognized: Drizzle authentication system = Rp1.000.000."
             )
             return ToolExecutionResult(
-                tool_name="freelance_calculator",
+                tool_name="feature_pricing_quote",
                 text=guidance,
                 context=guidance,
                 metadata={
@@ -172,17 +172,17 @@ class ToolService:
 
         text_lines.append(
             "- Pricing model: module/feature-based quoting using your freelance "
-            "reference catalog, not hourly/day-rate estimation."
+            "reference catalog instead of generic rate estimation."
         )
 
         context = (
-            f"Tool result from freelance_calculator. Module-feature pricing mode. "
+            f"Tool result from feature_pricing_quote. Module-feature pricing mode. "
             f"Matched subtotal: {_format_currency(matched_total, currency)}. "
             f"Matched items: {len(line_items)}. Missing references: {len(missing_features)}."
         )
 
         return ToolExecutionResult(
-            tool_name="freelance_calculator",
+            tool_name="feature_pricing_quote",
             text="\n".join(text_lines),
             context=context,
             metadata={

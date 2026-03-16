@@ -51,9 +51,10 @@ export function AnalyticsDashboard({ timeRange = '30d' }: AnalyticsDashboardProp
         <OverviewCards
           loading={loading}
           stats={{
-            totalViews: data?.overview.totalSubmissions || 0,
-            uniqueVisitors: data?.overview.totalClicks || 0,
-            activeNow: data?.overview.uniqueCountries || 0,
+            totalInteractions:
+              (data?.overview.totalSubmissions || 0) + (data?.overview.totalClicks || 0),
+            trackedClicks: data?.overview.totalClicks || 0,
+            countriesReached: data?.overview.uniqueCountries || 0,
           }}
         />
 

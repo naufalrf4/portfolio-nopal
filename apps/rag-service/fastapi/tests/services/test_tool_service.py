@@ -1,21 +1,23 @@
+from typing import cast
+
 from app.services.tool_service import ToolService
 
 
-def test_freelance_calculator_returns_guidance_without_target() -> None:
+def test_feature_pricing_quote_returns_guidance_without_modules() -> None:
     service = ToolService()
 
-    result = service.execute("freelance_calculator", {}, "help me price freelance work")
+    result = service.execute("feature_pricing_quote", {}, "help me price freelance work")
 
     assert result.metadata["status"] == "needs_input"
     assert result.metadata["mode"] == "feature_breakdown"
     assert "module and feature list" in result.text.lower()
 
 
-def test_freelance_calculator_computes_feature_quote_breakdown() -> None:
+def test_feature_pricing_quote_computes_feature_quote_breakdown() -> None:
     service = ToolService()
 
     result = service.execute(
-        "freelance_calculator",
+        "feature_pricing_quote",
         {
             "projectName": "Auth revamp",
             "requirementsSummary": "Need login and session setup",
@@ -32,15 +34,16 @@ def test_freelance_calculator_computes_feature_quote_breakdown() -> None:
     assert result.metadata["status"] == "completed"
     assert result.metadata["matchedSubtotal"] == 1000000.0
     assert result.metadata["missingFeatures"] == []
-    assert result.metadata["lineItems"][0]["price"] == 1000000.0
+    line_items = cast(list[dict[str, object]], result.metadata["lineItems"])
+    assert line_items[0]["price"] == 1000000.0
     assert "drizzle authentication system" in result.text.lower()
 
 
-def test_freelance_calculator_flags_missing_reference_prices() -> None:
+def test_feature_pricing_quote_flags_missing_reference_prices() -> None:
     service = ToolService()
 
     result = service.execute(
-        "freelance_calculator",
+        "feature_pricing_quote",
         {
             "modules": [
                 {

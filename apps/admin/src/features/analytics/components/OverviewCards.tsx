@@ -1,21 +1,21 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import { Card } from '@/components/ui/card';
 import { Eye, Users, Activity } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface StatCardProps {
-  icon: React.ReactNode;
+  icon: ReactNode;
   title: string;
   value: number | string;
   change?: {
     value: number;
     isPositive: boolean;
   };
-  delay?: number;
 }
 
-export function OverviewCard({ icon, title, value, change, delay = 0 }: StatCardProps) {
+export function OverviewCard({ icon, title, value, change }: StatCardProps) {
   return (
     <Card
       className={cn(
@@ -60,9 +60,9 @@ export function OverviewCard({ icon, title, value, change, delay = 0 }: StatCard
 
 interface OverviewCardsProps {
   stats?: {
-    totalViews: number;
-    uniqueVisitors: number;
-    activeNow: number;
+    totalInteractions: number;
+    trackedClicks: number;
+    countriesReached: number;
   };
   loading?: boolean;
 }
@@ -90,29 +90,27 @@ export function OverviewCards({ stats, loading }: OverviewCardsProps) {
   }
 
   const data = stats || {
-    totalViews: 0,
-    uniqueVisitors: 0,
-    activeNow: 0,
+    totalInteractions: 0,
+    trackedClicks: 0,
+    countriesReached: 0,
   };
 
   return (
     <div className="grid gap-4 grid-cols-1 sm:grid-cols-3">
       <OverviewCard
         icon={<Eye className="w-6 h-6 text-blue-500" />}
-        title="Total Views"
-        value={data.totalViews.toLocaleString()}
-        change={{ value: 12, isPositive: true }}
+        title="Total Interactions"
+        value={data.totalInteractions.toLocaleString()}
       />
       <OverviewCard
         icon={<Users className="w-6 h-6 text-purple-500" />}
-        title="Unique Visitors"
-        value={data.uniqueVisitors.toLocaleString()}
-        change={{ value: 8, isPositive: true }}
+        title="Tracked Clicks"
+        value={data.trackedClicks.toLocaleString()}
       />
       <OverviewCard
         icon={<Activity className="w-6 h-6 text-emerald-500" />}
-        title="Active Now"
-        value={data.activeNow}
+        title="Countries Reached"
+        value={data.countriesReached}
       />
     </div>
   );

@@ -59,7 +59,7 @@ def build_query_analysis_prompt(question: str, history: str) -> str:
         '"workflow":"rag|tool|hybrid",'
         '"intent":"string",'
         '"needsPortfolioContext":true,'
-        '"toolName":"freelance_calculator|",'
+        '"toolName":"feature_pricing_quote|",'
         '"toolArguments":{"projectName":"","requirementsSummary":"",'
         '"modules":[{"name":"Authentication","features":["drizzle authentication system"]}],'
         '"referencePrices":{"drizzle authentication system":1000000},"currency":"IDR"},'
@@ -74,8 +74,8 @@ def build_query_analysis_prompt(question: str, history: str) -> str:
         "portfolio context or experience\n"
         "- Use workflow 'rag' for portfolio knowledge questions\n"
         "- toolName must be empty when workflow is 'rag'\n"
-        "- toolArguments for freelance_calculator should describe module/feature "
-        "breakdowns, reference prices, and currency instead of hourly/day-rate math\n"
+        "- toolArguments for feature_pricing_quote should describe module/feature "
+        "breakdowns, reference prices, and currency for reference-based quoting\n"
         "- Only include referencePrices that are explicitly provided by the user or "
         "clearly established in prior context\n"
         "- retrievalQueries must contain 1 to 3 distinct concise search queries\n"
@@ -130,7 +130,7 @@ def fallback_query_plan(question: str) -> dict[str, object]:
         workflow = (
             "hybrid" if any(keyword in normalized for keyword in portfolio_keywords) else "tool"
         )
-        tool_name = "freelance_calculator"
+        tool_name = "feature_pricing_quote"
         if workflow == "tool":
             portfolio_areas = ["general"]
             suggested_actions = []
