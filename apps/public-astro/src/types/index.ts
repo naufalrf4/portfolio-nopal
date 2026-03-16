@@ -1,10 +1,3 @@
-export interface ProjectContext {
-  id: string;
-  title: string;
-  content: string;
-  type: string;
-}
-
 export interface ProjectImage {
   id: string;
   url: string;
@@ -19,6 +12,7 @@ export interface Project {
   slug: string;
   summary: string;
   description?: string;
+  content?: string | null;
   category: string;
   techStack: string[];
   liveUrl: string | null;
@@ -28,7 +22,6 @@ export interface Project {
   createdAt: string;
   projectDate?: string | null;
   images: ProjectImage[];
-  contexts?: ProjectContext[];
 }
 
 export interface ProjectsResponse {
@@ -66,9 +59,13 @@ export interface Skill {
 export interface Experience {
   type: string;
   title: string;
-  company: string;
-  period: string;
+  organization: string;
+  location: string | null;
+  startDate: string;
+  endDate: string | null;
   description: string;
+  logoUrl: string | null;
+  skills: string[];
 }
 
 export interface SocialLink {
@@ -80,6 +77,7 @@ export interface AboutData {
   fullName: string;
   tagline: string | null;
   roles: string[];
+  shortBio: string | null;
   bio: string;
   email: string;
   location: string | null;
@@ -89,6 +87,25 @@ export interface AboutData {
   skills: Skill[];
   experience: Experience[];
   socialLinks: SocialLink[];
+}
+
+export interface Achievement {
+  id: string;
+  name: string;
+  location: string;
+  monthYear: string;
+  photos: string[];
+  description: string;
+  externalUrl: string | null;
+  order: number;
+  createdAt: string;
+}
+
+export interface AchievementsResponse {
+  achievements: Achievement[];
+  meta: {
+    total: number;
+  };
 }
 
 export interface GuestbookUser {
@@ -105,4 +122,33 @@ export interface GuestbookEntry {
 
 export interface GuestbookResponse {
   entries: GuestbookEntry[];
+}
+
+export interface ContactSubmissionInput {
+  name: string;
+  email: string;
+  subject?: string;
+  message: string;
+  turnstileToken?: string;
+  timezone?: string;
+}
+
+export interface BookingSlot {
+  id: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  duration: number;
+}
+
+export type BookingAvailability = Record<string, BookingSlot[]>;
+
+export interface BookingSubmissionInput {
+  slotId: string;
+  name: string;
+  email: string;
+  phone?: string;
+  notes?: string;
+  turnstileToken?: string;
+  timezone?: string;
 }
