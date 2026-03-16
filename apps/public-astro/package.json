@@ -3,9 +3,9 @@
   "type": "module",
   "version": "0.0.1",
   "scripts": {
-    "dev": "astro dev",
+    "dev": "astro dev --host 0.0.0.0 --port 3000",
     "build": "astro build",
-    "preview": "astro preview",
+    "preview": "astro preview --host 0.0.0.0 --port 3000",
     "astro": "astro"
   },
   "dependencies": {
@@ -19,6 +19,8 @@
     "lucide-react": "^0.575.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1",
     "tailwind-merge": "^3.5.0"
   },
   "devDependencies": {

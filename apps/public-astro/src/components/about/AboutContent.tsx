@@ -31,6 +31,7 @@ const socialIcons: Record<string, ComponentType<{ size?: number; className?: str
 };
 
 export const AboutContent: FC<AboutContentProps> = ({ about, achievements }) => {
+  const fullName = about.fullName?.trim() || 'NaufalRF';
   const socialLinksList = about.socialLinks || [];
 
   return (
@@ -45,23 +46,21 @@ export const AboutContent: FC<AboutContentProps> = ({ about, achievements }) => 
                   {about.avatarUrl ? (
                     <img
                       src={about.avatarUrl}
-                      alt={about.fullName}
+                      alt={fullName}
                       className="w-full h-full object-cover"
                       loading="eager"
                     />
                   ) : (
                     <div className="w-full h-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
                       <span className="text-4xl md:text-5xl text-white font-bold">
-                        {about.fullName.charAt(0)}
+                        {fullName.charAt(0)}
                       </span>
                     </div>
                   )}
                 </div>
               </div>
 
-              <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
-                {about.fullName}
-              </h1>
+              <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">{fullName}</h1>
               {about.tagline && (
                 <p className="text-primary font-medium text-lg mb-4">{about.tagline}</p>
               )}
@@ -130,7 +129,9 @@ export const AboutContent: FC<AboutContentProps> = ({ about, achievements }) => 
 
         <div className="lg:col-span-7">
           <div className="lg:sticky lg:top-24">
-            <h2 className="text-xl font-bold text-foreground mb-6">Experience & Background</h2>
+            <h2 className="text-xl font-bold text-foreground mb-6">
+              Experience, Education & Certifications
+            </h2>
             {about.experience && about.experience.length > 0 ? (
               <ExperienceTabs experience={about.experience} />
             ) : (

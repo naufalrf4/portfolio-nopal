@@ -1,13 +1,51 @@
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
+const JAKARTA_TIME_ZONE = 'Asia/Jakarta';
+const JAKARTA_DATE_FORMATTER = new Intl.DateTimeFormat('en-US', {
+  timeZone: JAKARTA_TIME_ZONE,
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+  second: '2-digit',
+  hour12: false,
+});
+
+function getValidDate(date: string | Date): Date {
+  return typeof date === 'string' ? new Date(date) : date;
+}
+
+function toJakartaDate(date: string | Date): Date {
+  const source = getValidDate(date);
+  const parts = JAKARTA_DATE_FORMATTER.formatToParts(source);
+  const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+
+  return new Date(
+    Date.UTC(
+      Number(values.year),
+      Number(values.month) - 1,
+      Number(values.day),
+      Number(values.hour),
+      Number(values.minute),
+      Number(values.second)
+    )
+  );
+}
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
 export function formatDate(date: string | Date): string {
-  const d = typeof date === 'string' ? new Date(date) : date;
-  return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+  const d = getValidDate(date);
+  return d.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    timeZone: JAKARTA_TIME_ZONE,
+  });
 }
 
 const SECOND = 1000;
@@ -18,9 +56,10 @@ const WEEK = 7 * DAY;
 const MONTH = 30 * DAY;
 const YEAR = 365 * DAY;
 
-export function formatDistanceToNow(date: Date): string {
-  const now = new Date();
-  const diff = now.getTime() - date.getTime();
+export function formatDistanceToNow(date: string | Date): string {
+  const now = toJakartaDate(new Date());
+  const targetDate = toJakartaDate(date);
+  const diff = Math.max(0, now.getTime() - targetDate.getTime());
 
   if (diff < MINUTE) {
     return 'just now';

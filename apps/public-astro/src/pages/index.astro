@@ -2,24 +2,80 @@
 import PageLayout from '../layouts/PageLayout.astro';
 import { HeroSection } from '../components/home/HeroSection';
 import { FeaturedProjects } from '../components/home/FeaturedProjects';
+import { Guestbook } from '../components/home/Guestbook';
 import { LatestArticles } from '../components/home/LatestArticles';
 import { TechnicalExpertise } from '../components/home/TechnicalExpertise';
-import { getAbout, getProjects, getBlogs } from '../lib/api';
+import { getAbout, getProjects, getBlogs, getGuestbookEntries } from '../lib/api';
 
-const [about, projectsData, blogsData] = await Promise.all([
+const [about, projectsData, blogsData, guestbookData] = await Promise.all([
   getAbout(),
   getProjects({ featured: true, limit: 3 }),
   getBlogs(3),
+  getGuestbookEntries(),
 ]);
 
-const title = "Naufal Rizqullah Fauzan | Full-Stack Engineer";
-const description = "Portfolio of Naufal Rizqullah Fauzan - Full-Stack Engineer specializing in scalable web applications, automation systems, and solution architecture.";
+const title = 'NaufalRF Portfolio';
+const description =
+  'Hi, I am Naufal Rizqullah Firdaus, a final year Computer Engineering student and software engineer who builds user friendly web applications, automation systems, AI powered workflows, and IoT integrated solutions. Based in Indonesia and open to remote and global roles.';
 
+const websiteStructuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'NaufalRF Portfolio',
+  url: 'https://naufalrf.tech',
+  description:
+    'The personal portfolio of Naufal Rizqullah Firdaus featuring full stack development, automation engineering, IoT integration, and real world digital solutions designed for scalability and usability.',
+  author: {
+    '@type': 'Person',
+    name: 'Naufal Rizqullah Firdaus',
+    alternateName: 'NaufalRF',
+  },
+};
+
+const personStructuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: 'Naufal Rizqullah Firdaus',
+  alternateName: 'NaufalRF',
+  url: 'https://naufalrf.tech',
+  jobTitle: [
+    'Software Engineer',
+    'Full Stack Developer',
+    'Automation Engineer',
+    'IoT Integration Engineer',
+    'Solution Engineer',
+    'Solution Architect (Junior Level)',
+  ],
+  description:
+    'Software engineer focused on full stack development, automation, IoT integration, and solution oriented engineering.',
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: 'Depok',
+    addressRegion: 'West Java',
+    addressCountry: 'ID',
+  },
+  worksFor: {
+    '@type': 'Organization',
+    name: 'Open to opportunities',
+  },
+  sameAs: ['https://github.com/naufalrf4', 'https://linkedin.com/in/naufalrf'],
+};
 ---
 
 <PageLayout title={title} description={description}>
+  <Fragment slot="head">
+    <meta
+      name="keywords"
+      content="NaufalRF Portfolio, Full-Stack Engineer, Software Engineer, Automation Engineer, IoT Integration, Solution Engineer"
+    />
+    <meta name="author" content="Naufal Rizqullah Firdaus" />
+    <script type="application/ld+json" set:html={JSON.stringify(websiteStructuredData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(personStructuredData)} />
+  </Fragment>
+
   <HeroSection client:load about={about} />
   <TechnicalExpertise client:visible />
   <FeaturedProjects client:load projects={projectsData.projects} />
   <LatestArticles client:visible blogs={blogsData.blogs} />
+  <Guestbook client:load initialEntries={guestbookData.entries} />
 </PageLayout>

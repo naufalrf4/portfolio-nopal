@@ -1,32 +1,34 @@
 ---
+import { Sparkles } from 'lucide-react';
+import { PageHero } from '@/components/shared';
 import PageLayout from '../layouts/PageLayout.astro';
-import { ChatWidget } from '../components/chatbot/ChatWidget';
+import { ChatWindow } from '../components/chatbot/ChatWindow';
 
-const ragServiceUrl = import.meta.env.PUBLIC_RAG_SERVICE_URL || 'http://localhost:3004';
+const ragServiceUrl = import.meta.env.PUBLIC_RAG_SERVICE_URL || 'http://localhost:3005';
 
 const title = "AI Assistant";
 const description = "Chat with my AI assistant to explore my projects, technical skills, and software engineering experience in a conversational way.";
-
 ---
 
 <PageLayout title={title} description={description}>
-  <div class="flex flex-col items-center justify-center min-h-[60vh] px-4 text-center">
-    <div class="max-w-2xl mx-auto space-y-6">
-      <h1 class="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-blue-400 pb-2">
-        AI Assistant
-      </h1>
-      
-      <p class="text-lg text-slate-600 leading-relaxed">
-        I've built a custom RAG (Retrieval-Augmented Generation) chatbot that can answer questions about my portfolio, projects, and technical experience.
-      </p>
-      
-      <div class="p-6 bg-white/50 backdrop-blur-sm rounded-2xl border border-white/20 shadow-lg">
-        <p class="text-slate-500">
-          Click the <span class="inline-flex items-center justify-center w-8 h-8 bg-blue-500 text-white rounded-full mx-1 shadow-sm"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></span> icon in the bottom right corner to start chatting.
-        </p>
+  <section class="px-4 py-12 md:px-6 md:py-16">
+    <div class="mx-auto max-w-7xl">
+      <PageHero
+        icon={Sparkles}
+        title="AI Assistant"
+        description="Ask about my projects, engineering decisions, tools, and experience through the same portfolio RAG assistant, now in a dedicated full-page workspace."
+        className="homepage-reveal"
+      />
+
+      <div class="homepage-reveal relative overflow-hidden rounded-[38px] bg-[linear-gradient(160deg,rgba(228,236,246,0.98),rgba(216,228,241,0.98))] p-4 shadow-[16px_16px_36px_rgba(163,177,198,0.34),-16px_-16px_36px_rgba(255,255,255,0.42)] md:p-6" style="animation-delay:0.22s">
+        <div class="pointer-events-none absolute inset-x-10 top-0 h-24 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.16),transparent_68%)]" />
+        <ChatWindow
+          client:load
+          ragServiceUrl={ragServiceUrl}
+          isFullPage={true}
+          className="mx-auto h-[72vh] min-h-[620px] max-w-[1100px]"
+        />
       </div>
     </div>
-  </div>
-  
-  <ChatWidget client:load ragServiceUrl={ragServiceUrl} />
+  </section>
 </PageLayout>

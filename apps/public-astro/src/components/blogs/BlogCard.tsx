@@ -9,20 +9,24 @@ interface BlogCardProps {
 }
 
 export function BlogCard({ blog }: BlogCardProps) {
+  const title = blog.title?.trim() || 'Untitled Article';
+  const source = blog.source?.trim() || 'Unknown';
+  const url = blog.url?.trim() || '#';
+
   return (
-    <a href={blog.url} target="_blank" rel="noopener noreferrer" className="block h-full">
+    <a href={url} target="_blank" rel="noopener noreferrer" className="block h-full">
       <NeuCard hover className="h-full group">
         <div className="relative aspect-video rounded-xl overflow-hidden mb-4 shadow-[inset_4px_4px_8px_rgba(163,177,198,0.6),inset_-4px_-4px_8px_rgba(255,255,255,0.5)]">
           {blog.imageUrl ? (
             <img
               src={blog.imageUrl}
-              alt={blog.title}
+              alt={title}
               className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
               loading="lazy"
             />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-[#3B82F6] to-[#06B6D4] flex items-center justify-center">
-              <span className="text-4xl text-white font-bold">{blog.title.charAt(0)}</span>
+              <span className="text-4xl text-white font-bold">{title.charAt(0)}</span>
             </div>
           )}
         </div>
@@ -34,7 +38,7 @@ export function BlogCard({ blog }: BlogCardProps) {
             </NeuBadge>
           )}
           <NeuBadge variant="default" size="sm">
-            {blog.source}
+            {source}
           </NeuBadge>
           <div className="flex items-center text-sm text-[#6B7280]">
             <Calendar className="w-4 h-4 mr-1" />
@@ -43,7 +47,7 @@ export function BlogCard({ blog }: BlogCardProps) {
         </div>
 
         <h3 className="text-xl font-bold text-[#3D4852] group-hover:text-[#3B82F6] transition-colors mb-2 line-clamp-2">
-          {blog.title}
+          {title}
         </h3>
 
         {blog.description && <p className="text-[#6B7280] line-clamp-2 mb-4">{blog.description}</p>}

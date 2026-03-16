@@ -5,7 +5,7 @@ import type { BlogLink } from '@/types';
 import { FileX } from 'lucide-react';
 
 interface BlogsGridProps {
-  blogs: BlogLink[];
+  blogs?: BlogLink[];
 }
 
 function EmptyState() {

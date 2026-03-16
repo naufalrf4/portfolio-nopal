@@ -9,12 +9,21 @@ if (!slug) {
   return Astro.redirect('/404');
 }
 
-const project = await getProjectBySlug(slug);
+let project = null;
+let projectUnavailable = false;
 
-if (!project) {
+try {
+  project = await getProjectBySlug(slug);
+} catch {
+  projectUnavailable = true;
+}
+
+if (!projectUnavailable && !project) {
   return Astro.redirect('/404');
 }
-const articleSchema = {
+
+const articleSchema = project
+  ? {
   "@context": "https://schema.org",
   "@type": "Article",
   "headline": project.title,
@@ -25,19 +34,39 @@ const articleSchema = {
     "@type": "Person",
     "name": "Naufal Rizqullah Fauzan"
   }
-};
+}
+  : null;
 
 ---
 
 <PageLayout
-  title={project.title}
-  description={project.summary}
-  ogImage={project.imageUrl || undefined}
-  ogType="article"
+  title={project ? project.title : 'Project Temporarily Unavailable'}
+  description={project ? project.summary : 'This project detail is temporarily unavailable while the portfolio reconnects to the Admin API.'}
+  ogImage={project?.imageUrl || undefined}
+  ogType={project ? 'article' : 'website'}
 
 >
-  <ProjectDetail project={project} client:load />
-  <script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
+  {project ? (
+    <>
+      <ProjectDetail project={project} client:load />
+      <script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
+    </>
+  ) : (
+    <section class="py-24 px-4">
+      <div class="mx-auto max-w-3xl rounded-[32px] bg-surface p-10 text-center neu-extruded">
+        <p class="mb-3 text-xs font-semibold uppercase tracking-[0.24em] text-subtle">Temporary issue</p>
+        <h1 class="mb-4 font-display text-3xl font-bold text-foreground">Project detail is temporarily unavailable</h1>
+        <p class="mx-auto max-w-xl text-base leading-relaxed text-muted-foreground">
+          The project index is still available, but this detail page could not refresh from the Admin API right now.
+          Please try again shortly.
+        </p>
+        <div class="mt-8">
+          <a href="/projects" class="inline-flex items-center justify-center rounded-[16px] bg-surface px-6 py-3 text-sm font-medium text-foreground neu-extruded-hover">
+            Back to projects
+          </a>
+        </div>
+      </div>
+    </section>
+  )}
 </PageLayout>
-
 

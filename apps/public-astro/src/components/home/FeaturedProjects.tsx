@@ -5,20 +5,21 @@ import { NeuBadge } from '@/components/shared/NeuBadge';
 import { NeuButton } from '@/components/shared/NeuButton';
 import { ArrowRight } from 'lucide-react';
 import type { Project } from '@/types';
+import { motion } from 'framer-motion';
 
 interface FeaturedProjectsProps {
-  projects: Project[];
+  projects?: Project[];
 }
 
 export function FeaturedProjects({ projects }: FeaturedProjectsProps) {
-  const featuredProjects = projects.filter((p) => p.featured).slice(0, 6);
+  const featuredProjects = (projects ?? []).filter((p) => p.featured).slice(0, 6);
 
   if (featuredProjects.length === 0) {
     return null;
   }
 
   return (
-    <Section className="animate-fade-in">
+    <Section className="homepage-reveal-soft">
       <SectionHeader
         title="Featured Projects"
         subtitle="A selection of projects that showcase my skills and passion for building"
@@ -30,20 +31,23 @@ export function FeaturedProjects({ projects }: FeaturedProjectsProps) {
           const thumbnailAlt = project.images?.[0]?.alt || project.title;
 
           return (
-            <a
+            <motion.a
               key={project.id}
               href={`/projects/${project.slug}`}
-              className="min-w-[280px] w-[280px] flex-shrink-0 snap-start md:min-w-0 md:w-auto md:flex-shrink stagger-item"
-              style={{ animationDelay: `${index * 0.1}s` }}
+              className="min-w-[280px] w-[280px] flex-shrink-0 snap-start md:min-w-0 md:w-auto md:flex-shrink"
+              initial={{ opacity: 0, y: 30, scale: 0.985 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ duration: 0.72, delay: 0.12 + index * 0.1, ease: [0.22, 1, 0.36, 1] }}
             >
-              <NeuCard hover className="h-full group p-4">
+              <NeuCard hover className="h-full group p-4 homepage-card-hover">
                 <div className="relative aspect-[16/10] rounded-lg overflow-hidden mb-3 shadow-[inset_3px_3px_6px_rgba(163,177,198,0.6),inset_-3px_-3px_6px_rgba(255,255,255,0.5)]">
                   {thumbnailUrl ? (
                     <img
                       src={thumbnailUrl}
                       alt={thumbnailAlt}
                       loading="lazy"
-                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.07]"
                     />
                   ) : (
                     <div className="w-full h-full bg-gradient-to-br from-[#3B82F6] to-[#8B5CF6] flex items-center justify-center">
@@ -55,7 +59,7 @@ export function FeaturedProjects({ projects }: FeaturedProjectsProps) {
                 </div>
 
                 <div className="flex items-start justify-between gap-2 mb-2">
-                  <h3 className="text-lg font-bold text-[#3D4852] group-hover:text-[#3B82F6] transition-colors line-clamp-1">
+                  <h3 className="text-lg font-bold text-[#3D4852] group-hover:text-[#3B82F6] transition-all duration-300 line-clamp-1 group-hover:translate-x-0.5">
                     {project.title}
                   </h3>
                   <NeuBadge variant="accent" size="sm">
@@ -76,19 +80,25 @@ export function FeaturedProjects({ projects }: FeaturedProjectsProps) {
                   )}
                 </div>
               </NeuCard>
-            </a>
+            </motion.a>
           );
         })}
       </div>
 
-      <div className="mt-10 text-center">
+      <motion.div
+        className="mt-10 text-center homepage-reveal-soft"
+        initial={{ opacity: 0, y: 24 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.7 }}
+        transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+      >
         <a href="/projects">
-          <NeuButton variant="primary" size="md" className="min-w-[200px]">
+          <NeuButton variant="primary" size="md" className="min-w-[200px] group">
             View All Projects
-            <ArrowRight className="ml-2 w-4 h-4" />
+            <ArrowRight className="ml-2 w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
           </NeuButton>
         </a>
-      </div>
+      </motion.div>
     </Section>
   );
 }

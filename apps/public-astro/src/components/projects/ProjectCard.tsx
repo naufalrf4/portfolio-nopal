@@ -7,6 +7,8 @@ interface ProjectCardProps {
 }
 
 export function ProjectCard({ project }: ProjectCardProps) {
+  const title = project.title?.trim() || 'Untitled Project';
+  const techStack = project.techStack ?? [];
   // Use imageUrl first, fallback to first image from images array, then fallback to gradient
   const thumbnailUrl = project.imageUrl || project.images?.[0]?.url;
 
@@ -17,20 +19,20 @@ export function ProjectCard({ project }: ProjectCardProps) {
           {thumbnailUrl ? (
             <img
               src={thumbnailUrl}
-              alt={project.images?.[0]?.alt || project.title}
+              alt={project.images?.[0]?.alt || title}
               className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105"
               loading="lazy"
             />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-[#3B82F6] to-[#8B5CF6] flex items-center justify-center">
-              <span className="text-4xl text-white font-bold">{project.title.charAt(0)}</span>
+              <span className="text-4xl text-white font-bold">{title.charAt(0)}</span>
             </div>
           )}
         </div>
 
         <div className="flex items-start justify-between gap-4 mb-3">
           <h3 className="text-xl font-bold text-[#3D4852] group-hover:text-[#3B82F6] transition-colors">
-            {project.title}
+            {title}
           </h3>
           <NeuBadge variant="accent" size="sm">
             {project.category}
@@ -40,14 +42,12 @@ export function ProjectCard({ project }: ProjectCardProps) {
         <p className="text-[#6B7280] mb-4 line-clamp-2">{project.summary}</p>
 
         <div className="flex flex-wrap gap-2">
-          {project.techStack.slice(0, 4).map((tech, index) => (
+          {techStack.slice(0, 4).map((tech, index) => (
             <NeuBadge key={index} size="sm">
               {tech}
             </NeuBadge>
           ))}
-          {project.techStack.length > 4 && (
-            <NeuBadge size="sm">+{project.techStack.length - 4}</NeuBadge>
-          )}
+          {techStack.length > 4 && <NeuBadge size="sm">+{techStack.length - 4}</NeuBadge>}
         </div>
       </NeuCard>
     </a>

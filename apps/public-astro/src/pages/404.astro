@@ -1,0 +1,27 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+---
+
+<PageLayout
+  title="Page Not Found"
+  description="The page you are looking for does not exist or may have moved."
+  canonicalUrl="/404"
+>
+  <section class="min-h-screen px-4 py-16 md:px-6">
+    <div class="mx-auto max-w-3xl rounded-[32px] bg-surface p-10 text-center neu-extruded">
+      <p class="mb-3 text-xs font-semibold uppercase tracking-[0.24em] text-subtle">404</p>
+      <h1 class="mb-4 font-display text-4xl font-bold text-foreground">Page not found</h1>
+      <p class="mx-auto max-w-xl text-base leading-relaxed text-muted-foreground">
+        The page you requested is not available right now. Use the links below to get back to the main public site.
+      </p>
+      <div class="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
+        <a href="/" class="inline-flex items-center justify-center rounded-[16px] bg-surface px-6 py-3 text-sm font-medium text-foreground neu-extruded-hover">
+          Go home
+        </a>
+        <a href="/projects" class="inline-flex items-center justify-center rounded-[16px] bg-surface px-6 py-3 text-sm font-medium text-foreground neu-extruded-hover">
+          Browse projects
+        </a>
+      </div>
+    </div>
+  </section>
+</PageLayout>

@@ -26,9 +26,9 @@ export function ChatWindow({
   return (
     <div
       className={cn(
-        'flex flex-col bg-[#F0F4F8] rounded-2xl overflow-hidden backdrop-blur-sm',
-        'shadow-[12px_12px_24px_rgba(163,177,198,0.5),-12px_-12px_24px_rgba(255,255,255,0.5)]',
-        'border border-white/20',
+        'flex flex-col overflow-hidden rounded-[30px] bg-[linear-gradient(180deg,rgba(234,240,247,0.98),rgba(222,232,243,0.98))] backdrop-blur-sm',
+        'shadow-[16px_16px_32px_rgba(163,177,198,0.34),-16px_-16px_32px_rgba(255,255,255,0.42)]',
+        'border border-[#F7FAFC]/60',
         isFullPage ? 'h-full' : 'h-[500px]',
         className
       )}
@@ -42,7 +42,7 @@ export function ChatWindow({
       />
 
       {error && (
-        <div className="px-4 py-2 bg-red-50/90 backdrop-blur-sm border-t border-red-200">
+        <div className="border-t border-red-200 bg-red-50/90 px-4 py-2 backdrop-blur-sm">
           <div className="flex items-center gap-2 text-red-600 text-sm">
             <AlertCircle size={16} />
             <span>{error}</span>

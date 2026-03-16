@@ -1,6 +1,5 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+@config '../../tailwind.config.mjs';
 
 @layer base {
   :root {
@@ -14,8 +13,8 @@
     --foreground-subtle: oklch(0.72 0.01 240);
 
     /* Accent colors */
-    --accent: oklch(0.58 0.2 280);
-    --accent-light: oklch(0.68 0.18 280);
+    --accent: #3b82f6;
+    --accent-light: #60a5fa;
     --accent-secondary: oklch(0.68 0.1 190);
 
     /* Semantic */
@@ -116,6 +115,75 @@
   .zoom-out-95 {
     animation: zoom-out-95 0.2s ease-in forwards;
   }
+  .animate-fade-in-up {
+    animation: fade-in-up 0.5s ease-out forwards;
+  }
+  .stagger-item {
+    opacity: 0;
+    animation: stagger-in 0.55s ease-out forwards;
+  }
+  .animate-wave {
+    animation: wave 2.2s ease-in-out infinite;
+    transform-origin: 70% 70%;
+  }
+
+  .homepage-reveal {
+    opacity: 0;
+    animation: homepage-reveal 0.82s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    will-change: opacity, transform;
+  }
+
+  .homepage-reveal-soft {
+    opacity: 0;
+    animation: homepage-reveal-soft 0.92s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    will-change: opacity, transform;
+  }
+
+  .homepage-reveal-pop {
+    opacity: 0;
+    animation: homepage-reveal-pop 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    will-change: opacity, transform;
+  }
+
+  .homepage-stagger {
+    opacity: 0;
+    animation: homepage-stagger 0.88s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    will-change: opacity, transform;
+  }
+
+  .homepage-card-hover {
+    transition:
+      transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+      border-color 0.35s ease,
+      background-color 0.35s ease;
+  }
+
+  .homepage-card-hover:hover {
+    transform: translateY(-6px);
+  }
+
+  .homepage-icon-hover {
+    transition:
+      transform 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+      color 0.3s ease;
+  }
+
+  .homepage-icon-hover:hover {
+    transform: translateY(-4px) scale(1.04);
+  }
+
+  .homepage-pill-hover {
+    transition:
+      transform 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+      color 0.25s ease;
+  }
+
+  .homepage-pill-hover:hover {
+    transform: translateY(-2px);
+  }
 
   /* Safe area padding for mobile bottom nav */
   .safe-area-pb {
@@ -207,5 +275,92 @@
   to {
     opacity: 0;
     transform: scale(0.95);
+  }
+}
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes stagger-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes wave {
+  0% {
+    transform: rotate(0deg);
+  }
+  15% {
+    transform: rotate(14deg);
+  }
+  30% {
+    transform: rotate(-8deg);
+  }
+  45% {
+    transform: rotate(14deg);
+  }
+  60% {
+    transform: rotate(-4deg);
+  }
+  75% {
+    transform: rotate(10deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes homepage-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes homepage-reveal-soft {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes homepage-reveal-pop {
+  from {
+    opacity: 0;
+    transform: translateY(22px) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes homepage-stagger {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

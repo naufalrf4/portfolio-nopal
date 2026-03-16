@@ -3,7 +3,7 @@ import { NeuBadge } from '../shared/NeuBadge';
 import type { Skill } from '../../types';
 
 interface SkillBadgesProps {
-  skills: Skill[];
+  skills?: Skill[];
 }
 
 export const SkillBadges: FC<SkillBadgesProps> = ({ skills }) => {

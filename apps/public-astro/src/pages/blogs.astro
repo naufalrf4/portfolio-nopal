@@ -1,24 +1,26 @@
 ---
-import PageLayout from '@/layouts/PageLayout.astro';
+import { NotebookPen } from 'lucide-react';
 import { BlogsContent } from '@/components/blogs';
-import { SectionHeader } from '@/components/shared';
+import { PageHero } from '@/components/shared';
+import PageLayout from '@/layouts/PageLayout.astro';
 import { getBlogs } from '@/lib/api';
 
 const { blogs } = await getBlogs();
 
-const title = "Blog & Articles";
-const description = "Read my thoughts on software engineering, web development, and technology. Links to articles on Medium, Dev.to, and more.";
-
+const title = 'Blog & Articles';
+const description =
+  'Read my thoughts on software engineering, web development, and technology. Links to articles on Medium, Dev.to, and more.';
 ---
 
 <PageLayout title={title} description={description}>
-  <div class="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-7xl mx-auto">
-      <SectionHeader
-        title="Articles & Blog Posts"
-        subtitle="Thoughts, tutorials, and insights on web development, software engineering, and technology published on various platforms."
+  <div class="min-h-screen px-4 py-12 sm:px-6 lg:px-8">
+    <div class="mx-auto max-w-7xl">
+      <PageHero
+        icon={NotebookPen}
+        title="Blog Links & Writing"
+        description="A curated stream of essays, tutorials, and technical notes published across the platforms where I write most often."
       />
-      
+
       <BlogsContent initialBlogs={blogs} client:load />
     </div>
   </div>

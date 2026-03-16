@@ -34,7 +34,7 @@ export const NeuButton = forwardRef<HTMLButtonElement, NeuButtonProps>(
             'bg-[#3B82F6] text-white shadow-[6px_6px_12px_rgba(59,130,246,0.3),-6px_-6px_12px_rgba(255,255,255,0.5)] hover:bg-[#2563EB] active:shadow-[inset_4px_4px_8px_rgba(0,0,0,0.2)] hover:-translate-y-0.5 active:translate-y-0',
 
           variant === 'accent' &&
-            'bg-accent text-white shadow-[6px_6px_12px_rgba(108,99,255,0.3),-6px_-6px_12px_rgba(255,255,255,0.5)] hover:bg-accent-light active:shadow-[inset_4px_4px_8px_rgba(0,0,0,0.2)] hover:-translate-y-0.5 active:translate-y-0',
+            'bg-accent text-white shadow-[6px_6px_12px_rgba(59,130,246,0.3),-6px_-6px_12px_rgba(255,255,255,0.5)] hover:bg-accent-light active:shadow-[inset_4px_4px_8px_rgba(0,0,0,0.2)] hover:-translate-y-0.5 active:translate-y-0',
 
           variant === 'ghost' &&
             'bg-transparent text-[#3D4852] hover:bg-[#E0E5EC]/50 hover:text-[#3B82F6] hover:shadow-[6px_6px_12px_rgba(163,177,198,0.6),-6px_-6px_12px_rgba(255,255,255,0.5)] active:shadow-[inset_4px_4px_8px_rgba(163,177,198,0.6),inset_-4px_-4px_8px_rgba(255,255,255,0.5)]',

@@ -50,7 +50,7 @@ export function MessageList({
       <div
         ref={containerRef}
         className={cn(
-          'flex-1 overflow-y-auto p-4',
+          'flex-1 overflow-y-auto bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.58),transparent_44%),linear-gradient(180deg,rgba(231,238,246,0.62),rgba(226,234,244,0.86))] p-5',
           'scrollbar-thin scrollbar-thumb-[#D1D5DB] scrollbar-track-transparent'
         )}
       >
@@ -58,10 +58,9 @@ export function MessageList({
           <div className="text-center space-y-4 max-w-md">
             <div
               className={cn(
-                'w-16 h-16 mx-auto rounded-2xl',
-                'bg-gradient-to-br from-[#3B82F6] to-[#2563EB]',
-                'shadow-[6px_6px_12px_rgba(59,130,246,0.4),-6px_-6px_12px_rgba(255,255,255,0.3)]',
-                'flex items-center justify-center'
+                'mx-auto flex h-16 w-16 items-center justify-center rounded-[22px]',
+                'bg-[linear-gradient(145deg,rgba(221,232,248,0.98),rgba(236,242,249,0.94))]',
+                'shadow-[8px_8px_16px_rgba(163,177,198,0.28),-8px_-8px_16px_rgba(255,255,255,0.34)]'
               )}
             >
               <MessageCircle size={32} className="text-white" />
@@ -70,7 +69,7 @@ export function MessageList({
               Start a Conversation
             </h3>
             <p className="text-sm text-[#6B7280] leading-relaxed text-center">
-              Ask me anything about my portfolio, projects, or experience!
+              Ask about projects, architecture choices, skills, or the kind of work I am open to.
             </p>
           </div>
         </div>
@@ -82,7 +81,7 @@ export function MessageList({
     <div
       ref={containerRef}
       className={cn(
-        'flex-1 overflow-y-auto p-4 space-y-4',
+        'flex-1 overflow-y-auto bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.58),transparent_44%),linear-gradient(180deg,rgba(231,238,246,0.62),rgba(226,234,244,0.86))] p-5 space-y-4',
         'scrollbar-thin scrollbar-thumb-[#D1D5DB] scrollbar-track-transparent'
       )}
     >
@@ -92,10 +91,10 @@ export function MessageList({
 
       {isLoading && (
         <div className="flex gap-3 justify-start animate-in fade-in slide-in-from-bottom-2 duration-300">
-          <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#3B82F6] shadow-[4px_4px_8px_rgba(59,130,246,0.3),-4px_-4px_8px_rgba(255,255,255,0.5)] flex items-center justify-center">
+          <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-[linear-gradient(145deg,rgba(59,130,246,0.96),rgba(37,99,235,0.96))] shadow-[4px_4px_10px_rgba(59,130,246,0.22),-4px_-4px_8px_rgba(255,255,255,0.25)]">
             <Bot size={18} className="text-white" />
           </div>
-          <div className="bg-[#E0E5EC] rounded-2xl rounded-bl-md px-4 py-3 shadow-[6px_6px_12px_rgba(163,177,198,0.5),-6px_-6px_12px_rgba(255,255,255,0.5)]">
+          <div className="rounded-2xl rounded-bl-md bg-[linear-gradient(145deg,rgba(223,233,245,0.98),rgba(237,242,248,0.94))] px-4 py-3 shadow-[6px_6px_12px_rgba(163,177,198,0.26),-6px_-6px_12px_rgba(255,255,255,0.34)]">
             <div className="text-sm text-[#6B7280] font-medium">Thinking...</div>
           </div>
         </div>

@@ -4,6 +4,9 @@ import Navbar from '../components/layout/Navbar.astro';
 import Footer from '../components/layout/Footer.astro';
 import FloatingBlobs from '../components/layout/FloatingBlobs.astro';
 import { MobileBottomNav } from '../components/layout/MobileBottomNav';
+import { ChatWidget } from '../components/chatbot/ChatWidget';
+import { LiveCursorBand } from '../components/home/LiveCursorBand';
+import { ScrollToTopButton } from '../components/shared/ScrollToTopButton';
 
 interface Props {
   title: string;
@@ -15,6 +18,7 @@ interface Props {
 
 const { title, description, ogImage, canonicalUrl, ogType } = Astro.props;
 const currentPath = Astro.url.pathname;
+const ragServiceUrl = import.meta.env.PUBLIC_RAG_SERVICE_URL || 'http://localhost:3005';
 
 ---
 
@@ -25,8 +29,11 @@ const currentPath = Astro.url.pathname;
   canonicalUrl={canonicalUrl}
   ogType={ogType}
 >
+  <slot name="head" slot="head" />
 
   <FloatingBlobs />
+  <LiveCursorBand client:load currentPath={currentPath} />
+  <ScrollToTopButton client:load currentPath={currentPath} />
   
   <Navbar />
   
@@ -35,6 +42,8 @@ const currentPath = Astro.url.pathname;
   </main>
   
   <Footer className="relative z-10" />
+
+  {currentPath !== '/ai-chatbot' && <ChatWidget client:load ragServiceUrl={ragServiceUrl} />}
   
   <MobileBottomNav client:load currentPath={currentPath} />
 </BaseLayout>

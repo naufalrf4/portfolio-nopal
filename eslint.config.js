@@ -32,6 +32,14 @@ export default [
     },
   },
   {
+    files: ['apps/live-presence/src/**/*.{ts,tsx,js,jsx}'],
+    languageOptions: {
+      globals: {
+        Bun: 'readonly',
+      },
+    },
+  },
+  {
     ignores: [
       'dist',
       'node_modules',

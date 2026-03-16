@@ -4,7 +4,7 @@ import { NeuCard } from '../shared';
 import type { BlogLink } from '@/types';
 
 interface BlogsContentProps {
-  initialBlogs: BlogLink[];
+  initialBlogs?: BlogLink[];
 }
 
 export function BlogsContent({ initialBlogs }: BlogsContentProps) {

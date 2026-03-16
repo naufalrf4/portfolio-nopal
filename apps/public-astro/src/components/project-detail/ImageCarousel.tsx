@@ -10,11 +10,12 @@ interface ImageCarouselProps {
 
 export function ImageCarousel({ images, title }: ImageCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const safeTitle = title?.trim() || 'Untitled Project';
 
   if (!images || images.length === 0) {
     return (
       <div className="w-full h-full bg-gradient-to-br from-[#3B82F6] to-[#8B5CF6] flex items-center justify-center">
-        <span className="text-7xl text-white font-bold opacity-80">{title.charAt(0)}</span>
+        <span className="text-7xl text-white font-bold opacity-80">{safeTitle.charAt(0)}</span>
       </div>
     );
   }
@@ -23,7 +24,7 @@ export function ImageCarousel({ images, title }: ImageCarouselProps) {
     return (
       <img
         src={images[0].url}
-        alt={images[0].alt || title}
+        alt={images[0].alt || safeTitle}
         className="w-full h-full object-cover"
         loading="eager"
       />
@@ -42,7 +43,7 @@ export function ImageCarousel({ images, title }: ImageCarouselProps) {
     <div className="relative w-full h-full group">
       <img
         src={images[currentIndex].url}
-        alt={images[currentIndex].alt || title}
+        alt={images[currentIndex].alt || safeTitle}
         className="w-full h-full object-cover transition-opacity duration-300"
         loading={currentIndex === 0 ? 'eager' : 'lazy'}
       />

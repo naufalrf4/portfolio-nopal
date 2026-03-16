@@ -24,7 +24,8 @@ const canonical = canonicalUrl || new URL(currentPath, siteUrl).href;
 const personSchema = {
   "@context": "https://schema.org",
   "@type": "Person",
-  "name": "Naufal Rizqullah Fauzan",
+  "name": "Naufal Rizqullah Firdaus",
+  "alternateName": "NaufalRF",
   "jobTitle": "Full-Stack Engineer",
   "url": "https://naufalrf.tech",
   "sameAs": [
@@ -63,6 +64,8 @@ const websiteSchema = {
     
     <!-- Open Graph -->
     <meta property="og:type" content={ogType} />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:site_name" content="NaufalRF Portfolio" />
     <meta property="og:url" content={canonical} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
@@ -80,6 +83,7 @@ const websiteSchema = {
     <!-- JSON-LD -->
     <script type="application/ld+json" set:html={JSON.stringify(personSchema)} />
     <script type="application/ld+json" set:html={JSON.stringify(websiteSchema)} />
+    <slot name="head" />
 
 
     <!-- Google Fonts -->

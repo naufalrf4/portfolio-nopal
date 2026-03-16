@@ -11,22 +11,23 @@ const isActive = (href: string) => {
 };
 ---
 
-<header class="sticky top-0 z-50 px-4 pt-4">
-  <nav class="mx-auto max-w-7xl rounded-2xl bg-[#E0E5EC]/80 backdrop-blur-md shadow-[9px_9px_16px_rgb(163,177,198,0.6),-9px_-9px_16px_rgba(255,255,255,0.5)] px-4 md:px-8">
+<header class="sticky top-0 z-50 px-4 pt-4 homepage-reveal-soft" style="animation-delay: 0.05s;">
+  <nav class="mx-auto max-w-7xl rounded-2xl bg-[#E0E5EC]/80 backdrop-blur-md shadow-[9px_9px_16px_rgb(163,177,198,0.6),-9px_-9px_16px_rgba(255,255,255,0.5)] px-4 md:px-8 homepage-card-hover hover:shadow-[14px_14px_24px_rgba(163,177,198,0.62),-14px_-14px_24px_rgba(255,255,255,0.58)]">
     <div class="flex h-16 items-center justify-between">
       <a
         href="/"
-        class="text-xl font-bold text-[#3B82F6] hover:text-[#2563EB] transition-colors font-display"
+        class="text-xl font-bold text-[#3B82F6] hover:text-[#2563EB] homepage-icon-hover font-display homepage-reveal-soft"
+        style="animation-delay: 0.12s;"
       >
         Nau.
       </a>
 
-      <div class="hidden md:flex items-center gap-1">
+      <div class="hidden md:flex items-center gap-1 homepage-reveal-soft" style="animation-delay: 0.18s;">
         {NAV_ITEMS.map((link) => (
           <a
             href={link.href}
             class:list={[
-              'px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200',
+              'px-4 py-2 rounded-xl text-sm font-medium homepage-pill-hover',
               isActive(link.href)
                 ? 'text-[#3B82F6] shadow-[inset_4px_4px_8px_rgba(163,177,198,0.6),inset_-4px_-4px_8px_rgba(255,255,255,0.5)]'
                 : 'text-[#3D4852] hover:text-[#3B82F6] hover:shadow-[4px_4px_8px_rgba(163,177,198,0.6),-4px_-4px_8px_rgba(255,255,255,0.5)]'
@@ -40,7 +41,7 @@ const isActive = (href: string) => {
           <button
             id="other-dropdown-trigger"
             class:list={[
-              'flex items-center gap-1 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200',
+              'flex items-center gap-1 px-4 py-2 rounded-xl text-sm font-medium homepage-pill-hover',
               'text-[#3D4852] hover:text-[#3B82F6] hover:shadow-[4px_4px_8px_rgba(163,177,198,0.6),-4px_-4px_8px_rgba(255,255,255,0.5)]'
             ]}
             aria-expanded="false"
@@ -48,13 +49,13 @@ const isActive = (href: string) => {
             Other
             <ChevronDown
               size={16}
-              className="transition-transform duration-200 group-data-[state=open]:rotate-180"
+              className="transition-transform duration-300 ease-out group-data-[state=open]:rotate-180"
             />
           </button>
 
           <div 
             id="other-dropdown-menu"
-            class="hidden absolute top-full right-0 mt-2 w-56 py-2 rounded-xl bg-[#E0E5EC] shadow-[9px_9px_16px_rgba(163,177,198,0.6),-9px_-9px_16px_rgba(255,255,255,0.5)] animate-in slide-in-from-top-2 fade-in duration-200"
+            class="hidden absolute top-full right-0 mt-2 w-56 py-2 rounded-xl bg-[#E0E5EC] shadow-[9px_9px_16px_rgba(163,177,198,0.6),-9px_-9px_16px_rgba(255,255,255,0.5)] homepage-reveal-soft"
           >
             {OTHER_LINKS.map((link) => {
               const Icon = link.icon;
@@ -67,7 +68,7 @@ const isActive = (href: string) => {
                   target={isExternal ? "_blank" : undefined}
                   rel={isExternal ? "noopener noreferrer" : undefined}
                   class:list={[
-                    'group/item flex items-center gap-3 px-4 py-3 mx-2 rounded-lg text-sm transition-all duration-200',
+                    'group/item flex items-center gap-3 px-4 py-3 mx-2 rounded-lg text-sm transition-all duration-300 ease-out',
                     active && !isExternal
                       ? 'text-[#3B82F6] shadow-[inset_2px_2px_4px_rgba(163,177,198,0.4),inset_-2px_-2px_4px_rgba(255,255,255,0.4)]'
                       : 'text-[#3D4852] hover:text-[#3B82F6] hover:shadow-[inset_2px_2px_4px_rgba(163,177,198,0.4),inset_-2px_-2px_4px_rgba(255,255,255,0.4)]'
@@ -75,13 +76,13 @@ const isActive = (href: string) => {
                 >
                   <Icon
                     size={18}
-                    className="transition-transform duration-200 group-hover/item:scale-110"
+                      className="transition-transform duration-300 ease-out group-hover/item:translate-x-0.5 group-hover/item:scale-110"
                   />
                   <span class="flex-1">{link.label}</span>
                   {isExternal && (
                     <ExternalLink
                       size={14}
-                      className="text-[#6B7280] transition-opacity duration-200 group-hover/item:opacity-100 opacity-60"
+                       className="text-[#6B7280] transition-all duration-300 ease-out group-hover/item:opacity-100 group-hover/item:translate-x-0.5 opacity-60"
                     />
                   )}
                 </a>
