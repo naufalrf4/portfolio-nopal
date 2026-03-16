@@ -1,7 +1,0 @@
-grep -n ".turbo" .gitignore
-
-grep -c "node_modules" .gitignore
-1
-
-grep -c ".env" .gitignore
-3

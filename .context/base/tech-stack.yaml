@@ -1,153 +1,64 @@
----
-# Tech Stack — Migration Target
-# Source of truth: AGENTS.md
-# This file describes the TARGET stack (post-migration), not the legacy codebase.
+repository:
+  name: naufalrf-portfolio
+  type: root-shell
+  runtime:
+    node: '>=22.0.0'
+  package_manager: none-at-root
+  version_sources:
+    - package manifests in each app
+    - app-local lockfiles (`bun.lock`, `uv.lock`)
 
-project: naufalrf-portfolio
-type: personal-portfolio-monorepo
-
-monorepo:
-  tooling: pnpm workspaces (native)
-  package_manager: pnpm
-  pnpm_version: '>=9.0.0'
-  no_turborepo: true
-
-runtime:
-  node_version: '22 LTS'
-  python_version: '3.12'
-
-applications:
-  apps/admin:
-    framework: Next.js 14+ App Router
-    port: 3001
-    auth: NextAuth v5 + Google OAuth
-    db_access: Direct Drizzle ORM
-    language: TypeScript 5.x strict
-
-  apps/public:
-    framework: Astro SSR
-    port: 3000
-    auth: Lucia Auth v3 + Google OAuth
-    db_access: Admin API (SDK)
-    language: TypeScript 5.x strict
-
-  apps/links:
-    framework: Astro SSR
-    port: 3002
-    auth: None
-    db_access: Admin API (read-only, SDK)
-    language: TypeScript 5.x strict
-
-  apps/ngl:
-    framework: SvelteKit
-    port: 3003
-    auth: None
-    db_access: Admin API (write-only, SDK)
-    language: TypeScript 5.x strict
-
-  apps/rag-service:
-    framework: Python FastAPI + uvicorn
-    port: 3004
-    auth: X-Service-Token header
-    db_access: Admin API + pgvector
-    language: Python 3.12 (type hints throughout)
-    dependency_manager: uv
-
-shared_packages:
-  packages/ui:
-    contents: Shared React components (Neumorphism + shadcn/ui base)
-  packages/types:
-    contents: TypeScript DTOs, enums, API contracts
-  packages/sdk:
-    contents: Typed API clients (used by all non-admin apps)
-  packages/config:
-    contents: Shared ESLint, TypeScript, Tailwind configs
-  packages/auth:
-    contents: Shared NextAuth v5 config (DrizzleAdapter)
-
-database:
-  engine: PostgreSQL (Neon — serverless)
-  orm: Drizzle ORM
-  driver: postgres.js
-  vector_extension: pgvector
-  schema_location: apps/admin/db/schema.ts
-  migrations_location: apps/admin/db/migrations/
-  drizzle_config: apps/admin/drizzle.config.ts
-  access_boundary: ONLY apps/admin connects directly; all others use Admin API
-
-storage:
-  primary_db: PostgreSQL on Neon (serverless)
-  vector_store: pgvector (PostgreSQL extension — NOT a separate service)
-
-auth:
+apps:
   admin:
-    library: NextAuth v5
-    provider: Google OAuth
-    adapter: DrizzleAdapter
-    session: database sessions
-  public:
-    library: Lucia Auth v3 + arctic
-    provider: Google OAuth
-    session: cookies via Astro middleware
+    path: apps/admin
+    framework: Next.js 16.1.1
+    language: TypeScript
+    runtime: Bun + Node-compatible Next runtime
+    styling: Tailwind CSS 4 + Radix UI + custom neumorphic utility classes
+    database: Drizzle ORM 0.45.1 + postgres 3.4.8 against centralized Neon/Postgres
+    auth: NextAuth 5 beta + Google OAuth allowlist
+    testing_stack: typecheck only evidenced in manifest; no dedicated test script found
+    lockfile: apps/admin/bun.lock
+  public_astro:
+    path: apps/public-astro
+    framework: Astro 5.17.1 + React 19.2.4
+    language: TypeScript
+    runtime: Bun
+    styling: Tailwind CSS 4 + neumorphic React/Astro components + Framer Motion
+    data_access: Admin public API + direct browser/server fetch to RAG service for chat
+    testing_stack: no lint or test script found in manifest
+    lockfile: apps/public-astro/bun.lock
+  links_astro:
+    path: apps/links-astro
+    framework: Astro 5.17.1 + React 19.2.4
+    language: TypeScript
+    runtime: Bun
+    styling: Tailwind CSS 4 + neumorphic Astro components
+    data_access: Admin public API only
+    testing_stack: no lint or test script found in manifest
+    lockfile: apps/links-astro/bun.lock
+  ngl_svelte:
+    path: apps/ngl-svelte
+    framework: SvelteKit 2.50.2 + Svelte 5.51.0
+    language: TypeScript
+    runtime: Bun + Vite
+    styling: Tailwind CSS 4 + custom neumorphic utility classes
+    data_access: Admin public API only
+    testing_stack: svelte-check + eslint + prettier; no dedicated automated test runner found
+    lockfile: apps/ngl-svelte/bun.lock
+  rag_service:
+    path: apps/rag-service
+    framework: FastAPI >=0.115,<1 with Uvicorn
+    language: Python 3.12+
+    wrapper_runtime: Bun scripts shelling into `fastapi/`
+    data_access: direct Postgres/pgvector access via SQLAlchemy async engine
+    ai_stack: Google Gemini via `google-genai`
+    testing_stack: pytest + pytest-asyncio + ruff in `fastapi/pyproject.toml`
+    lockfile: apps/rag-service/fastapi/uv.lock
 
-frameworks:
-  web:
-    admin: Next.js 14+ App Router
-    public: Astro SSR (node adapter)
-    links: Astro SSR (node adapter)
-    ngl: SvelteKit (node adapter)
-  backend_service:
-    rag: FastAPI (Python 3.12) + uvicorn
-
-ai:
-  embeddings:
-    provider: OpenAI
-    model: text-embedding-3-small
-    dimensions: 1536
-  llm:
-    primary: configurable (PRIMARY_LLM env var)
-    fallback: configurable (FALLBACK_LLM env var)
-    supported_providers: [openai, gemini, groq]
-  vector_search: pgvector (cosine similarity)
-  no_langchain: true
-
-ui:
-  design_system:
-    theme: neumorphism
-    color_mode: light_only
-    background: '#E0E5EC'
-    text: '#3D4852'
-    accent: '#6C63FF'
-    shadow_system: dual (extruded + inset)
-  typography:
-    font_sans: Plus Jakarta Sans
-    font_ui: DM Sans
-    font_mono: JetBrains Mono
-  component_base: shadcn/ui (modified for Neumorphism)
-  css_framework: Tailwind CSS
-
-forms:
-  library: react-hook-form
-  validation: zod
-  resolver: '@hookform/resolvers/zod'
-
-state:
-  client: Zustand or React context (feature-scoped, if needed)
-
-analytics:
-  provider: Google Analytics 4
-
-notifications:
-  provider: Telegram Bot API
-
-ci_cd:
-  commands:
-    lint: pnpm lint
-    typecheck: pnpm typecheck
-    test: pnpm test
-    build: pnpm build
-  no_turbo_cache: true
-
-dockerfile_pattern:
-  base: node:22-alpine
-  python_base: python:3.12-slim
+shared_tooling:
+  root_hooks:
+    - Husky pre-commit
+    - lint-staged
+    - root ESLint config
+  ci: no `.github/workflows` directory found

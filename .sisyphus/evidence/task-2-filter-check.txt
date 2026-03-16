@@ -1,5 +1,0 @@
-grep "filter=!rag-service" package.json
-    "build": "pnpm -r --filter=!rag-service run build",
-    "dev": "pnpm -r --parallel --filter=!rag-service run dev",
-    "start": "pnpm -r --parallel --filter=!rag-service run start",
-    "typecheck": "pnpm -r --filter=!rag-service run typecheck",

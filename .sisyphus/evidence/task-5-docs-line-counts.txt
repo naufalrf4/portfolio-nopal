@@ -1,4 +1,0 @@
-2403 docs/DEPLOYMENT.md
-649 docs/SETUP.md
-949 docs/TROUBLESHOOTING.md
-4001 total

@@ -1,9 +1,0 @@
-=== Evidence: Task 6 - TypeScript compilation ===
-
---- Check 1: Auth package compiles ---
-PASS: Auth package compiles
-
---- Check 2: Admin auth.ts compiles ---
-PASS: Admin auth.ts compiles
-
-=== ALL CHECKS PASSED ===

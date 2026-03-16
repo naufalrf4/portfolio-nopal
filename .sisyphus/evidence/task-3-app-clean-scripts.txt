@@ -1,4 +1,0 @@
-apps/admin/package.json: 0
-apps/links/package.json: 0
-apps/ngl/package.json: 0
-apps/rag-service/package.json: 0

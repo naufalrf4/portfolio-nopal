@@ -6,6 +6,13 @@ dist
 .next
 build
 
+# Python
+.venv
+__pycache__
+.pytest_cache
+.ruff_cache
+*.pyc
+
 # IDE
 .idea
 .vscode
@@ -35,3 +42,11 @@ coverage
 # Misc
 *.tsbuildinfo
 .eslintcache
+
+# Local agent and review artifacts
+.agents/
+.agent-workspace/
+.agent-review/
+.evals/
+.reviews/
+.opencode/

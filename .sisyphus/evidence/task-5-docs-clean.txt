@@ -1,9 +1,0 @@
-docs/API.md:0
-docs/ARCHITECTURE.md:0
-docs/DEVELOPMENT.md:0
-docs/APPS.md:0
-docs/CACHE_REVALIDATION.md:0
-docs/DATABASE.md:0
-docs/DEPLOYMENT.md:0
-docs/SETUP.md:0
-docs/TROUBLESHOOTING.md:0

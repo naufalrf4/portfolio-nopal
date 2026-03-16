@@ -1,7 +1,0 @@
-TypeScript Check for Task 10 (contacts, chat-logs, anonymous-messages, content-export)
-Date: 2026-02-22
-Command: pnpm --filter admin exec tsc --noEmit --pretty 2>&1 | grep -E "(contacts|chat-logs|anonymous-messages|content-export)\.service\.ts"
-
-Result: PASS - Zero TypeScript errors in migrated files
-
-All 4 service files successfully migrated from Prisma to Drizzle with no type errors.
