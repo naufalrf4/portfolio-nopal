@@ -1,37 +1,26 @@
 {
   "name": "naufalrf-portfolio",
   "private": true,
-  "engines": {
-    "node": ">=22.0.0",
-    "pnpm": ">=8.0.0"
-  },
-  "packageManager": "pnpm@9.15.0",
+  "description": "Meta repository for standalone apps under apps/*",
   "scripts": {
-    "build": "pnpm -r --filter=!rag-service run build",
-    "build:links-astro": "pnpm --filter links-astro run build",
-    "build:ngl-svelte": "pnpm --filter ngl-svelte run build",
-    "build:public-astro": "pnpm --filter public-astro run build",
-    "dev": "pnpm -r --parallel --filter=!rag-service run dev",
-    "dev:public-astro": "pnpm --filter public-astro run dev",
-    "dev:links-astro": "pnpm --filter links-astro run dev",
-    "dev:ngl-svelte": "pnpm --filter ngl-svelte run dev",
-    "start": "pnpm -r --parallel --filter=!rag-service run start",
-    "typecheck": "pnpm -r --filter=!rag-service run typecheck",
-    "test": "pnpm -r run test",
-    "clean": "pnpm -r run clean && rm -rf node_modules",
-    "prepare": "husky"
+    "dev:all": "./start-dev.sh",
+    "reset:seed": "./reset-seed-rag.sh",
+    "lint-staged": "lint-staged",
+    "commitlint": "commitlint"
   },
   "devDependencies": {
-    "@commitlint/cli": "^20.3.1",
-    "@commitlint/config-conventional": "^20.3.1",
-    "@typescript-eslint/eslint-plugin": "^8.52.0",
-    "@typescript-eslint/parser": "^8.52.0",
-    "eslint": "latest",
+    "@commitlint/cli": "^20.1.0",
+    "@commitlint/config-conventional": "^20.0.0",
+    "@eslint/js": "^10.0.1",
+    "@typescript-eslint/eslint-plugin": "^8.57.0",
+    "@typescript-eslint/parser": "^8.57.0",
+    "eslint": "^9.39.1",
     "eslint-plugin-react": "^7.37.5",
-    "globals": "^17.0.0",
-    "husky": "^9.1.7",
-    "lint-staged": "^16.2.7",
-    "prettier": "latest",
-    "typescript": "latest"
+    "globals": "^17.4.0",
+    "lint-staged": "^16.2.6",
+    "prettier": "^3.6.2"
+  },
+  "engines": {
+    "node": ">=22.0.0"
   }
 }
