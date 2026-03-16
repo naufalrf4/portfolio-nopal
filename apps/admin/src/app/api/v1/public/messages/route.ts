@@ -9,17 +9,16 @@ import {
   errorResponse,
 } from '@/lib/api/responses';
 import { checkRateLimit, getRateLimitHeaders } from '@/lib/services/rate-limiter';
-import { getIpLocation } from '@/lib/services/geoIpService';
-import { createHash } from 'crypto';
-import { verifyTurnstileToken, isTurnstileConfigured } from '@/lib/services/turnstile';
+import { validateTurnstileToken } from '@/lib/services/turnstile';
 import { createId } from '@paralleldrive/cuid2';
+import { getSubmissionContext } from '@/lib/api/submission-context';
 
 const publicMessageSchema = z.object({
   content: z
     .string()
     .min(1, 'Message is required')
     .max(500, 'Message must be 500 characters or less'),
-  turnstileToken: z.string().min(1, 'CAPTCHA verification is required'),
+  turnstileToken: z.string().optional(),
 });
 
 const RATE_LIMIT_CONFIG = {
@@ -27,17 +26,14 @@ const RATE_LIMIT_CONFIG = {
   windowMs: 60 * 1000,
 };
 
-function hashIp(ip: string): string {
-  return createHash('sha256').update(ip).digest('hex').slice(0, 16);
-}
-
 export async function POST(request: NextRequest) {
   try {
-    const forwarded = request.headers.get('x-forwarded-for');
-    const clientIp = forwarded ? forwarded.split(',')[0].trim() : 'unknown';
-    const ipHash = hashIp(clientIp);
+    const submissionContext = getSubmissionContext(request);
 
-    const rateLimitResult = checkRateLimit(`messages:${ipHash}`, RATE_LIMIT_CONFIG);
+    const rateLimitResult = checkRateLimit(
+      `messages:${submissionContext.ipHash}`,
+      RATE_LIMIT_CONFIG
+    );
     const rateLimitHeaders = getRateLimitHeaders(rateLimitResult);
 
     if (!rateLimitResult.allowed) {
@@ -68,37 +64,30 @@ export async function POST(request: NextRequest) {
 
     const { content, turnstileToken } = parsed.data;
 
-    if (isTurnstileConfigured() && turnstileToken) {
-      const turnstileResult = await verifyTurnstileToken(turnstileToken);
-
-      if (!turnstileResult.success) {
-        return errorResponse(
-          'CAPTCHA verification failed. Please try again.',
-          400,
-          'TURNSTILE_VERIFICATION_FAILED'
-        );
-      }
+    const turnstileValidation = await validateTurnstileToken(turnstileToken);
+    if (!turnstileValidation.success) {
+      return errorResponse(
+        turnstileValidation.message ?? 'CAPTCHA verification failed. Please try again.',
+        turnstileValidation.status ?? 400,
+        turnstileValidation.code ?? 'TURNSTILE_VERIFICATION_FAILED'
+      );
     }
 
-    const geoLocation = getIpLocation(clientIp);
-
     const now = new Date().toISOString();
-    const messageData: any = {
+    const messageData = {
       id: createId(),
       content,
-      ipHash,
-      ipAddress: clientIp,
+      ipHash: submissionContext.ipHash,
+      ipAddress: submissionContext.ipAddress,
+      countryCode: submissionContext.countryCode,
+      country: submissionContext.country,
+      city: submissionContext.city,
+      region: submissionContext.region,
+      metadata: submissionContext.metadata,
       read: false,
       createdAt: now,
       updatedAt: now,
     };
-
-    if (geoLocation) {
-      if (geoLocation.countryCode) messageData.countryCode = geoLocation.countryCode;
-      if (geoLocation.country) messageData.country = geoLocation.country;
-      if (geoLocation.city) messageData.city = geoLocation.city;
-      if (geoLocation.region) messageData.region = geoLocation.region;
-    }
 
     await db.insert(anonymousMessages).values(messageData);
 

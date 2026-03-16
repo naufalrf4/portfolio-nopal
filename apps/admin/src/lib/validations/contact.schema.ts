@@ -11,6 +11,7 @@ export const createContactSchema = z.object({
   country: z.string().max(100).optional().nullable(),
   city: z.string().max(100).optional().nullable(),
   region: z.string().max(100).optional().nullable(),
+  metadata: z.record(z.string(), z.unknown()).optional().nullable(),
 });
 
 export const updateContactSchema = z.object({

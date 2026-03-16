@@ -82,7 +82,10 @@ export const bookingsService = {
         phone: booking.phone,
         date: slot?.date || '',
         time: slot?.time || '',
-        timezone: 'UTC',
+        timezone:
+          booking.metadata && typeof booking.metadata === 'object' && 'timezone' in booking.metadata
+            ? String(booking.metadata.timezone)
+            : 'Asia/Jakarta',
         notes: booking.notes,
         status: booking.status,
         createdAt: booking.createdAt,
@@ -147,6 +150,7 @@ export const bookingsService = {
         country: data.country || null,
         city: data.city || null,
         region: data.region || null,
+        metadata: data.metadata || {},
         status: 'PENDING',
         slotId: slot.id,
         createdAt: now,

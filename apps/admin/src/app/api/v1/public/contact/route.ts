@@ -1,12 +1,19 @@
 import { NextRequest } from 'next/server';
-import { successResponse, serverErrorResponse, validationErrorResponse } from '@/lib/api/responses';
+import { NextResponse } from 'next/server';
+import {
+  successResponse,
+  serverErrorResponse,
+  validationErrorResponse,
+  errorResponse,
+} from '@/lib/api/responses';
 import { db } from '@/lib/db';
 import { contactForms, contactSettings } from '@/lib/db/schema';
 import { z } from 'zod';
-import { getIpLocation } from '@/lib/services/geoIpService';
-import { hashIp } from '@/lib/utils/hash';
 import { emailService } from '@/lib/services/emailService';
+import { checkRateLimit, getRateLimitHeaders } from '@/lib/services/rate-limiter';
+import { validateTurnstileToken } from '@/lib/services/turnstile';
 import { createId } from '@paralleldrive/cuid2';
+import { getSubmissionContext } from '@/lib/api/submission-context';
 
 const createContactSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -15,6 +22,11 @@ const createContactSchema = z.object({
   message: z.string().min(1, 'Message is required'),
   turnstileToken: z.string().optional(),
 });
+
+const RATE_LIMIT_CONFIG = {
+  maxRequests: 3,
+  windowMs: 5 * 60 * 1000,
+};
 
 export async function POST(request: NextRequest) {
   try {
@@ -25,10 +37,46 @@ export async function POST(request: NextRequest) {
       return validationErrorResponse(parsed.error.flatten().fieldErrors);
     }
 
-    const forwarded = request.headers.get('x-forwarded-for');
-    const clientIp = forwarded?.split(',')[0]?.trim() || 'unknown';
-    const geoLocation = getIpLocation(clientIp);
-    const ipHashValue = hashIp(clientIp);
+    const submissionContext = getSubmissionContext(request);
+    const rateLimitResult = checkRateLimit(
+      `contact:${submissionContext.ipHash}`,
+      RATE_LIMIT_CONFIG
+    );
+    const rateLimitHeaders = getRateLimitHeaders(rateLimitResult);
+
+    if (!rateLimitResult.allowed) {
+      const response = NextResponse.json(
+        {
+          success: false,
+          error: {
+            message: 'Too many requests. Please try again later.',
+            code: 'RATE_LIMITED',
+          },
+        },
+        { status: 429 }
+      );
+
+      Object.entries(rateLimitHeaders).forEach(([key, value]) => {
+        response.headers.set(key, value);
+      });
+
+      return response;
+    }
+
+    const turnstileValidation = await validateTurnstileToken(parsed.data.turnstileToken);
+    if (!turnstileValidation.success) {
+      const response = errorResponse(
+        turnstileValidation.message ?? 'CAPTCHA verification failed. Please try again.',
+        turnstileValidation.status ?? 400,
+        turnstileValidation.code ?? 'TURNSTILE_VERIFICATION_FAILED'
+      );
+
+      Object.entries(rateLimitHeaders).forEach(([key, value]) => {
+        response.headers.set(key, value);
+      });
+
+      return response;
+    }
 
     const now = new Date().toISOString();
     const [contact] = await db
@@ -39,17 +87,18 @@ export async function POST(request: NextRequest) {
         email: parsed.data.email,
         subject: parsed.data.subject || null,
         message: parsed.data.message,
-        ipHash: ipHashValue,
-        ipAddress: clientIp !== 'unknown' ? clientIp : null,
-        countryCode: geoLocation?.countryCode || null,
-        country: geoLocation?.country || null,
-        city: geoLocation?.city || null,
-        region: geoLocation?.region || null,
+        ipHash: submissionContext.ipHash,
+        ipAddress: submissionContext.ipAddress,
+        countryCode: submissionContext.countryCode,
+        country: submissionContext.country,
+        city: submissionContext.city,
+        region: submissionContext.region,
+        metadata: submissionContext.metadata,
         read: false,
         replied: false,
         createdAt: now,
         updatedAt: now,
-      } as any)
+      })
       .returning();
 
     try {
@@ -79,8 +128,8 @@ export async function POST(request: NextRequest) {
             email: parsed.data.email,
             subject: parsed.data.subject,
             message: parsed.data.message,
-            country: geoLocation?.country,
-            city: geoLocation?.city,
+            country: submissionContext.country,
+            city: submissionContext.city,
           },
           dashboardLink: `${process.env.NEXTAUTH_URL || 'http://localhost:3001'}/admin/contacts/${contact.id}`,
           receivedAt: new Date().toLocaleString('en-US', {
@@ -94,7 +143,13 @@ export async function POST(request: NextRequest) {
       console.error('[Contact API] Admin notification email failed:', emailError);
     }
 
-    return successResponse(contact, 'Message sent successfully');
+    const response = successResponse(contact, 'Message sent successfully');
+
+    Object.entries(rateLimitHeaders).forEach(([key, value]) => {
+      response.headers.set(key, value);
+    });
+
+    return response;
   } catch {
     return serverErrorResponse();
   }

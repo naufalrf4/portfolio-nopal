@@ -370,6 +370,9 @@ export const anonymousMessages = pgTable(
     id: text().primaryKey().notNull(),
     content: text().notNull(),
     ipHash: text().notNull(),
+    metadata: jsonb()
+      .default(sql`'{}'::jsonb`)
+      .notNull(),
     read: boolean().default(false).notNull(),
     createdAt: timestamp({ precision: 3, mode: 'string' })
       .default(sql`CURRENT_TIMESTAMP`)
@@ -444,6 +447,9 @@ export const bookings = pgTable(
     email: text().notNull(),
     phone: text(),
     notes: text(),
+    metadata: jsonb()
+      .default(sql`'{}'::jsonb`)
+      .notNull(),
     status: bookingStatus().default('PENDING').notNull(),
     slotId: text(),
     ipHash: text().notNull(),
@@ -490,6 +496,9 @@ export const contactForms = pgTable(
     subject: text(),
     message: text().notNull(),
     ipHash: text().notNull(),
+    metadata: jsonb()
+      .default(sql`'{}'::jsonb`)
+      .notNull(),
     read: boolean().default(false).notNull(),
     replied: boolean().default(false).notNull(),
     createdAt: timestamp({ precision: 3, mode: 'string' })
@@ -521,6 +530,10 @@ export const guestbookEntries = pgTable(
     id: text().primaryKey().notNull(),
     userId: text().notNull(),
     message: text().notNull(),
+    ipHash: text(),
+    metadata: jsonb()
+      .default(sql`'{}'::jsonb`)
+      .notNull(),
     reactions: jsonb().default([]).notNull(),
     visible: boolean().default(true).notNull(),
     createdAt: timestamp({ precision: 3, mode: 'string' })

@@ -10,10 +10,10 @@ import {
   errorResponse,
   notFoundResponse,
 } from '@/lib/api/responses';
-import { verifyTurnstileToken, isTurnstileConfigured } from '@/lib/services/turnstile';
-import { createHash } from 'crypto';
+import { validateTurnstileToken } from '@/lib/services/turnstile';
 import { emailService } from '@/lib/services/emailService';
 import { createId } from '@paralleldrive/cuid2';
+import { getSubmissionContext } from '@/lib/api/submission-context';
 
 const publicBookingSchema = z.object({
   slotId: z.string().min(1),
@@ -21,40 +21,30 @@ const publicBookingSchema = z.object({
   email: z.string().email().max(255),
   phone: z.string().max(20).optional(),
   notes: z.string().max(1000).optional(),
-  turnstileToken: z.string().min(1, 'CAPTCHA verification is required'),
+  turnstileToken: z.string().optional(),
+  timezone: z.string().max(100).optional(),
 });
-
-function hashIp(ip: string): string {
-  return createHash('sha256').update(ip).digest('hex').slice(0, 16);
-}
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    console.log('[Bookings API] Received body:', JSON.stringify(body, null, 2));
 
     const parsed = publicBookingSchema.safeParse(body);
 
     if (!parsed.success) {
-      console.error('[Bookings API] Validation failed:', parsed.error.flatten());
       return validationErrorResponse(parsed.error.flatten().fieldErrors);
     }
 
-    console.log('[Bookings API] Validation passed, data:', parsed.data);
-
-    if (isTurnstileConfigured() && parsed.data.turnstileToken) {
-      const turnstileResult = await verifyTurnstileToken(parsed.data.turnstileToken);
-
-      if (!turnstileResult.success) {
-        return errorResponse(
-          'CAPTCHA verification failed. Please try again.',
-          400,
-          'TURNSTILE_VERIFICATION_FAILED'
-        );
-      }
+    const turnstileValidation = await validateTurnstileToken(parsed.data.turnstileToken);
+    if (!turnstileValidation.success) {
+      return errorResponse(
+        turnstileValidation.message ?? 'CAPTCHA verification failed. Please try again.',
+        turnstileValidation.status ?? 400,
+        turnstileValidation.code ?? 'TURNSTILE_VERIFICATION_FAILED'
+      );
     }
 
-    const { slotId, name, email, phone, notes } = parsed.data;
+    const { slotId, name, email, phone, notes, timezone } = parsed.data;
 
     const slotResult = await db.query.bookingSlots.findFirst({
       where: eq(bookingSlots.id, slotId),
@@ -83,15 +73,13 @@ export async function POST(request: NextRequest) {
       return errorResponse('Cannot book a slot in the past', 400);
     }
 
-    const forwarded = request.headers.get('x-forwarded-for');
-    const ip = forwarded?.split(',')[0]?.trim() || 'unknown';
-    const ipHash = hashIp(ip);
+    const submissionContext = getSubmissionContext(request);
 
     const nowStr = new Date().toISOString();
     const booking = await db.transaction(async (tx) => {
       await tx
         .update(bookingSlots)
-        .set({ status: 'BOOKED', updatedAt: nowStr } as any)
+        .set({ status: 'BOOKED', updatedAt: nowStr })
         .where(eq(bookingSlots.id, slotId));
 
       const [created] = await tx
@@ -102,12 +90,21 @@ export async function POST(request: NextRequest) {
           email,
           phone: phone || null,
           notes: notes || null,
-          ipHash,
+          ipHash: submissionContext.ipHash,
+          ipAddress: submissionContext.ipAddress,
+          countryCode: submissionContext.countryCode,
+          country: submissionContext.country,
+          city: submissionContext.city,
+          region: submissionContext.region,
+          metadata: {
+            ...submissionContext.metadata,
+            timezone: timezone || submissionContext.metadata.timezone,
+          },
           status: 'PENDING',
           slotId,
           createdAt: nowStr,
           updatedAt: nowStr,
-        } as any)
+        })
         .returning();
 
       return created;

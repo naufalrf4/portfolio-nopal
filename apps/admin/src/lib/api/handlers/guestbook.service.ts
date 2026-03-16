@@ -47,11 +47,13 @@ export class GuestbookService {
     userId: string,
     message: string,
     locationData?: {
+      ipHash?: string | null;
       ipAddress?: string;
       countryCode?: string;
       country?: string;
       city?: string;
       region?: string;
+      metadata?: Record<string, unknown> | null;
     }
   ) {
     const now = new Date().toISOString();
@@ -62,11 +64,13 @@ export class GuestbookService {
         userId,
         message,
         visible: true,
+        ipHash: locationData?.ipHash || null,
         ipAddress: locationData?.ipAddress || null,
         countryCode: locationData?.countryCode || null,
         country: locationData?.country || null,
         city: locationData?.city || null,
         region: locationData?.region || null,
+        metadata: locationData?.metadata || {},
         reactions: [],
         createdAt: now,
         updatedAt: now,
