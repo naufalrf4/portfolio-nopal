@@ -12,4 +12,14 @@ export const createAnalyticsEventSchema = z.object({
   city: z.string().max(100).optional().nullable(),
 });
 
+export const publicAnalyticsEventSchema = z.object({
+  page: z.string().min(1).max(100),
+  eventType: z.enum(['click', 'pageview']),
+  entityType: z.string().min(1).max(50),
+  entityId: z.string().min(1).max(255).optional().nullable(),
+  userSession: z.string().min(1).max(255).optional().nullable(),
+  data: z.record(z.string(), z.union([z.string(), z.number(), z.boolean(), z.null()])).optional(),
+});
+
 export type CreateAnalyticsEventInput = z.infer<typeof createAnalyticsEventSchema>;
+export type PublicAnalyticsEventInput = z.infer<typeof publicAnalyticsEventSchema>;
