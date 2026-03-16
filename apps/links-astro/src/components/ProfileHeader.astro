@@ -10,10 +10,10 @@ const { name, bio, avatarUrl, tagline } = Astro.props;
 const initial = name.charAt(0).toUpperCase();
 ---
 
-<div class="flex flex-col items-center gap-5 md:gap-7 py-8 md:py-10">
+<div class="homepage-reveal flex flex-col items-center gap-4 py-5 md:gap-5 md:py-6">
   <div class="relative">
-    <div class="md:scale-125 relative rounded-full p-2 bg-surface shadow-neu-extruded transition-transform duration-300">
-      <div class="w-24 h-24 md:w-28 md:h-28 rounded-full overflow-hidden bg-surface shadow-neu-inset flex items-center justify-center">
+    <div class="homepage-reveal-pop relative rounded-full bg-surface p-2 shadow-neu-extruded transition-transform duration-300 md:scale-110">
+      <div class="w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden bg-surface shadow-neu-inset flex items-center justify-center">
         {avatarUrl ? (
           <img
             src={avatarUrl}
@@ -23,30 +23,30 @@ const initial = name.charAt(0).toUpperCase();
             class="w-full h-full object-cover"
           />
         ) : (
-          <div class="w-full h-full flex items-center justify-center text-4xl font-bold bg-gradient-to-br from-accent to-accent-light text-white">
+          <div class="w-full h-full flex items-center justify-center text-3xl font-bold bg-gradient-to-br from-accent to-accent-light text-white md:text-4xl">
             {initial}
           </div>
         )}
       </div>
     </div>
-    <div class="absolute -bottom-1 -right-1 bg-surface p-1.5 rounded-full shadow-neu-extruded-sm animate-bounce duration-1000">
-      <span class="text-lg">👋</span>
+    <div class="absolute -bottom-1 -right-1 rounded-full bg-surface p-1.5 shadow-neu-extruded-sm animate-bounce duration-1000">
+      <span class="text-base md:text-lg">👋</span>
     </div>
   </div>
 
-  <div class="text-center space-y-3 md:space-y-4">
-    <h1 class="text-2xl md:text-3xl font-bold text-foreground tracking-tight font-display">{name}</h1>
+  <div class="text-center space-y-2.5 md:space-y-3">
+    <h1 class="homepage-reveal-soft text-xl font-bold tracking-tight text-foreground font-display md:text-2xl" style="animation-delay: 0.08s">{name}</h1>
     {tagline && (
-      <p class="text-lg md:text-xl font-medium text-accent">{tagline}</p>
+      <p class="homepage-reveal-soft text-base font-medium text-accent md:text-lg" style="animation-delay: 0.14s">{tagline}</p>
     )}
-    <p class="text-base md:text-lg text-foreground-muted max-w-xs md:max-w-md mx-auto leading-relaxed">
+    <p class="homepage-reveal-soft mx-auto max-w-sm text-sm leading-7 text-foreground-muted md:max-w-lg md:text-base" style="animation-delay: 0.2s">
       {bio}
     </p>
   </div>
 
-  <div class="md:scale-110 flex items-center gap-2 px-4 py-2 bg-surface rounded-full shadow-neu-extruded-sm">
+  <div class="homepage-reveal-soft flex items-center gap-2 rounded-full bg-surface px-3.5 py-2 shadow-neu-extruded-sm" style="animation-delay: 0.28s">
     <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.6)]" />
-    <span class="text-sm md:text-base text-foreground-muted font-medium">
+    <span class="text-xs md:text-sm text-foreground-muted font-medium">
       Available for work
     </span>
   </div>

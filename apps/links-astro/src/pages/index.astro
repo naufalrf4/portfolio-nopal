@@ -1,41 +1,115 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import ErrorState from '../components/ErrorState.astro';
 import ProfileHeader from '../components/ProfileHeader.astro';
 import LinkButtons from '../components/LinkButtons.astro';
 import SocialIcons from '../components/SocialIcons.astro';
-import { getProfileLinks } from '../lib/api';
-import type { ProfileLink } from '../types';
+import { getLinksPageData } from '../lib/api';
+import type { AboutData, ProfileLink, SocialLink } from '../types';
 
-const profile = {
-  name: 'Naufal Rizqullah Fauzan',
+const fallbackAboutData: AboutData = {
+  fullName: 'NaufalRF',
   tagline: 'Full-Stack Engineer',
   bio: 'Building scalable web applications. Open to collaboration and opportunities.',
+  avatarUrl: null,
+  socialLinks: [],
 };
 
+let aboutData = fallbackAboutData;
 let links: ProfileLink[] = [];
+let errorMessage: string | null = null;
 
 try {
-  links = await getProfileLinks();
+  const pageData = await getLinksPageData();
+  aboutData = pageData.aboutData;
+  links = pageData.links;
 } catch (error) {
   console.error('Failed to load profile links', error);
-  links = [];
+  errorMessage = error instanceof Error ? error.message : 'Failed to load links. Please try again later.';
 }
+
+const SOCIAL_KEYWORDS = ['github', 'linkedin', 'twitter', 'x', 'instagram', 'youtube', 'email', 'mail'];
+
+function normalizeUrl(url: string) {
+  return url.trim().replace(/\/$/, '').toLowerCase();
+}
+
+function isSocialLink(link: ProfileLink) {
+  const iconLower = link.icon?.toLowerCase() || '';
+  const labelLower = link.label.toLowerCase();
+  return SOCIAL_KEYWORDS.some(
+    (keyword) => iconLower.includes(keyword) || labelLower.includes(keyword)
+  );
+}
+
+function inferPlatform(link: ProfileLink): string {
+  const combined = `${link.icon || ''} ${link.label}`.toLowerCase();
+  if (combined.includes('linkedin')) return 'linkedin';
+  if (combined.includes('twitter') || combined.includes(' x ')) return 'twitter';
+  if (combined.includes('instagram')) return 'instagram';
+  if (combined.includes('youtube')) return 'youtube';
+  if (combined.includes('email') || combined.includes('mail')) return 'email';
+  return 'github';
+}
+
+const inferredSocialLinks: SocialLink[] = links
+  .filter(isSocialLink)
+  .map((link) => ({
+    platform: inferPlatform(link),
+    url: link.url,
+    label: link.label,
+    icon: link.icon,
+  }));
+
+const allSocialLinks = [...aboutData.socialLinks, ...inferredSocialLinks].filter((link, index, items) => {
+  const normalized = normalizeUrl(link.url);
+  return items.findIndex((candidate) => normalizeUrl(candidate.url) === normalized) === index;
+});
+
+const socialLinkUrls = new Set(allSocialLinks.map((link) => normalizeUrl(link.url)));
+const websiteLinks = links.filter((link) => !socialLinkUrls.has(normalizeUrl(link.url)));
 ---
 
 <BaseLayout
-  title="NaufalRF | Links"
-  description="Links and social profiles for Naufal Rizqullah Fauzan, Full-Stack Engineer"
+  title="Links - NaufalRF"
+  description="A central hub of official links by Naufal Rizqullah Firdaus including portfolio, GitHub, LinkedIn, automation projects, IoT systems, blogs, and contact details."
   canonicalUrl="https://links.naufalrf.tech"
 >
-  <main class="min-h-screen bg-background flex items-center justify-center px-4 py-16">
-    <section class="w-full max-w-3xl rounded-[34px] bg-surface shadow-neu-extruded px-6 py-10 sm:px-10 sm:py-12 flex flex-col gap-10">
-      <ProfileHeader name={profile.name} tagline={profile.tagline} bio={profile.bio} />
-      <div class="flex justify-center">
-        <SocialIcons links={links} />
-      </div>
-      <div class="w-full">
-        <LinkButtons links={links} />
-      </div>
+  <main class="relative min-h-screen overflow-hidden bg-background px-4 py-10 sm:px-5 sm:py-12">
+    <div class="pointer-events-none absolute inset-0">
+      <div class="absolute left-[-6rem] top-10 h-48 w-48 rounded-full bg-[radial-gradient(circle,rgba(59,130,246,0.18),transparent_68%)] blur-2xl"></div>
+      <div class="absolute right-[-4rem] top-1/4 h-56 w-56 rounded-full bg-[radial-gradient(circle,rgba(96,165,250,0.16),transparent_72%)] blur-3xl"></div>
+      <div class="absolute bottom-[-3rem] left-1/2 h-64 w-64 -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(20,184,166,0.12),transparent_70%)] blur-3xl"></div>
+    </div>
+
+    <section class="relative mx-auto flex w-full max-w-2xl flex-col gap-7 rounded-[34px] bg-[linear-gradient(145deg,rgba(233,239,246,0.96),rgba(220,228,238,0.94))] px-5 py-8 shadow-neu-extruded sm:px-7 sm:py-9">
+      {errorMessage ? (
+        <ErrorState message={errorMessage} />
+      ) : (
+        <>
+          <ProfileHeader
+            name={aboutData.fullName}
+            tagline={aboutData.tagline ?? undefined}
+            bio={aboutData.bio ?? ''}
+            avatarUrl={aboutData.avatarUrl ?? undefined}
+          />
+          {allSocialLinks.length > 0 && (
+            <div class="flex justify-center pt-1">
+              <SocialIcons links={allSocialLinks} />
+            </div>
+          )}
+          {websiteLinks.length > 0 && (
+            <div class="w-full">
+              <LinkButtons links={websiteLinks} />
+            </div>
+          )}
+          <footer class="pt-2 text-center">
+            <p class="text-sm text-foreground-muted">
+              © {new Date().getFullYear()} Naufal Rizqullah Firdaus.
+            </p>
+          </footer>
+        </>
+      )}
     </section>
   </main>
 </BaseLayout>

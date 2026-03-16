@@ -12,9 +12,9 @@
   --neu-fg-subtle: oklch(0.72 0.01 240);
 
   /* Accent colors */
-  --neu-accent: oklch(0.58 0.2 280);
-  --neu-accent-light: oklch(0.68 0.18 280);
-  --neu-accent-secondary: oklch(0.68 0.1 190);
+  --neu-accent: #3b82f6;
+  --neu-accent-light: #60a5fa;
+  --neu-accent-secondary: #93c5fd;
 
   /* Shadow colors - RGBA for smooth blending */
   --neu-shadow-light: rgba(255, 255, 255, 0.5);
@@ -29,7 +29,13 @@
 }
 
 body {
-  background-color: var(--neu-bg);
+  background:
+    radial-gradient(circle at top, rgba(255, 255, 255, 0.82), transparent 42%),
+    radial-gradient(circle at bottom left, rgba(59, 130, 246, 0.16), transparent 28%),
+    radial-gradient(circle at top right, rgba(96, 165, 250, 0.14), transparent 24%),
+    radial-gradient(circle at top left, rgba(147, 197, 253, 0.1), transparent 22%),
+    linear-gradient(180deg, rgba(233, 239, 246, 0.97) 0%, rgba(224, 231, 240, 1) 100%),
+    var(--neu-bg);
   color: var(--neu-fg);
   font-family: 'DM Sans', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -81,4 +87,51 @@ h6 {
 
 .neu-flat {
   box-shadow: none;
+}
+
+@keyframes homepageReveal {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes homepageRevealPop {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.94);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.homepage-reveal,
+.homepage-reveal-soft,
+.homepage-reveal-pop {
+  opacity: 0;
+  animation-fill-mode: forwards;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.homepage-reveal {
+  animation-name: homepageReveal;
+  animation-duration: 0.82s;
+}
+
+.homepage-reveal-soft {
+  animation-name: homepageReveal;
+  animation-duration: 0.72s;
+}
+
+.homepage-reveal-pop {
+  animation-name: homepageRevealPop;
+  animation-duration: 0.78s;
 }

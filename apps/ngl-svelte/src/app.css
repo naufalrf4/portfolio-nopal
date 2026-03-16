@@ -1,14 +1,15 @@
 @import 'tailwindcss';
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=DM+Sans:wght@400;500;700&display=swap');
 
 @theme {
-	/* OKLCH Dark Palette */
-	--color-neu-bg: oklch(0.25 0.02 240);
-	--color-neu-surface: oklch(0.25 0.02 240);
-	--color-neu-fg: oklch(0.9 0.01 240);
+	--color-neu-bg: oklch(0.92 0.008 240);
+	--color-neu-surface: oklch(0.92 0.008 240);
+	--color-neu-fg: oklch(0.35 0.015 240);
+	--color-neu-fg-muted: oklch(0.52 0.012 240);
+	--color-neu-fg-subtle: oklch(0.72 0.01 240);
 	--color-neu-accent: oklch(0.6 0.18 245);
-	--color-neu-shadow-light: rgba(255, 255, 255, 0.05);
-	--color-neu-shadow-dark: rgba(0, 0, 0, 0.5);
+	--color-neu-accent-secondary: oklch(0.65 0.12 175);
+	--color-neu-shadow-light: rgba(255, 255, 255, 0.5);
+	--color-neu-shadow-dark: rgba(163, 177, 198, 0.6);
 
 	--font-display: 'Plus Jakarta Sans', sans-serif;
 	--font-body: 'DM Sans', sans-serif;
@@ -18,21 +19,29 @@
 	--radius-inner: 12px;
 }
 
-/* Base Styles */
 :root {
-	--neu-bg: oklch(0.25 0.02 240);
-	--neu-surface: oklch(0.25 0.02 240);
-	--neu-fg: oklch(0.9 0.01 240);
+	--neu-bg: oklch(0.92 0.008 240);
+	--neu-surface: oklch(0.92 0.008 240);
+	--neu-fg: oklch(0.35 0.015 240);
+	--neu-fg-muted: oklch(0.52 0.012 240);
+	--neu-fg-subtle: oklch(0.72 0.01 240);
 	--neu-accent: oklch(0.6 0.18 245);
-	--neu-shadow-light: rgba(255, 255, 255, 0.05);
-	--neu-shadow-dark: rgba(0, 0, 0, 0.5);
+	--neu-accent-secondary: oklch(0.65 0.12 175);
+	--neu-shadow-light: rgba(255, 255, 255, 0.5);
+	--neu-shadow-dark: rgba(163, 177, 198, 0.6);
 
 	--font-plus-jakarta: 'Plus Jakarta Sans', sans-serif;
 	--font-dm-sans: 'DM Sans', sans-serif;
 }
 
 body {
-	background-color: var(--neu-bg);
+	background:
+		radial-gradient(circle at top, rgba(255, 255, 255, 0.82), transparent 42%),
+		radial-gradient(circle at top right, rgba(96, 165, 250, 0.14), transparent 24%),
+		radial-gradient(circle at bottom left, rgba(59, 130, 246, 0.15), transparent 28%),
+		radial-gradient(circle at bottom, rgba(147, 197, 253, 0.12), transparent 30%),
+		linear-gradient(180deg, rgba(233, 239, 246, 0.96) 0%, rgba(224, 231, 240, 0.98) 100%),
+		var(--neu-bg);
 	color: var(--neu-fg);
 	font-family: var(--font-dm-sans);
 	-webkit-font-smoothing: antialiased;
@@ -41,13 +50,21 @@ body {
 	min-height: 100vh;
 }
 
-/* Neumorphic Utilities */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	font-family: var(--font-plus-jakarta);
+}
+
 .neu-card {
 	background: var(--neu-surface);
 	border-radius: var(--radius-container);
 	box-shadow:
-		8px 8px 16px var(--neu-shadow-dark),
-		-8px -8px 16px var(--neu-shadow-light);
+		9px 9px 16px var(--neu-shadow-dark),
+		-9px -9px 16px var(--neu-shadow-light);
 }
 
 .neu-button {
@@ -70,8 +87,8 @@ body {
 .neu-button:hover:not(:disabled) {
 	transform: translateY(-2px);
 	box-shadow:
-		8px 8px 16px var(--neu-shadow-dark),
-		-8px -8px 16px var(--neu-shadow-light);
+		8px 8px 16px rgba(163, 177, 198, 0.7),
+		-8px -8px 16px rgba(255, 255, 255, 0.6);
 }
 
 .neu-button:active:not(:disabled) {
@@ -82,40 +99,40 @@ body {
 }
 
 .neu-button:disabled {
-	opacity: 0.6;
+	opacity: 0.55;
 	cursor: not-allowed;
 	box-shadow: none;
 }
 
 .neu-button-primary {
-	background: var(--neu-accent);
+	background: linear-gradient(135deg, #3b82f6, #60a5fa);
 	color: white;
 	box-shadow:
-		6px 6px 12px rgba(0, 0, 0, 0.3),
-		-6px -6px 12px rgba(255, 255, 255, 0.1);
+		10px 10px 18px rgba(96, 165, 250, 0.28),
+		-10px -10px 18px rgba(255, 255, 255, 0.68);
+	border: 1px solid rgba(147, 197, 253, 0.65);
 }
 
 .neu-button-primary:hover:not(:disabled) {
-	filter: brightness(1.1);
-	transform: translateY(-2px);
-	box-shadow:
-		8px 8px 16px rgba(0, 0, 0, 0.4),
-		-8px -8px 16px rgba(255, 255, 255, 0.15);
+	filter: brightness(1.04);
 }
 
-.neu-button-primary:active:not(:disabled) {
-	transform: translateY(0);
+.neu-button-primary:disabled {
+	opacity: 0.72;
+	background: linear-gradient(135deg, rgba(59, 130, 246, 0.78), rgba(96, 165, 250, 0.72));
+	color: rgba(255, 255, 255, 0.94);
 	box-shadow:
-		inset 3px 3px 6px rgba(0, 0, 0, 0.3),
-		inset -3px -3px 6px rgba(255, 255, 255, 0.1);
+		7px 7px 14px rgba(163, 177, 198, 0.28),
+		-7px -7px 14px rgba(255, 255, 255, 0.55);
+	border: 1px solid rgba(147, 197, 253, 0.55);
 }
 
 .neu-input {
 	background: var(--neu-surface);
 	border-radius: var(--radius-base);
 	box-shadow:
-		inset 4px 4px 8px var(--neu-shadow-dark),
-		inset -4px -4px 8px var(--neu-shadow-light);
+		inset 6px 6px 10px var(--neu-shadow-dark),
+		inset -6px -6px 10px var(--neu-shadow-light);
 	border: none;
 	color: var(--neu-fg);
 	padding: 1rem;
@@ -126,33 +143,53 @@ body {
 .neu-input:focus {
 	outline: none;
 	box-shadow:
-		inset 6px 6px 12px var(--neu-shadow-dark),
-		inset -6px -6px 12px var(--neu-shadow-light);
+		inset 8px 8px 14px rgba(163, 177, 198, 0.65),
+		inset -8px -8px 14px rgba(255, 255, 255, 0.6);
 }
 
-.neu-avatar-ring {
-	border-radius: 50%;
-	padding: 4px;
-	background: var(--neu-surface);
+.ngl-panel {
+	background:
+		radial-gradient(circle at top right, rgba(96, 165, 250, 0.16), transparent 30%),
+		radial-gradient(circle at bottom left, rgba(59, 130, 246, 0.14), transparent 24%),
+		linear-gradient(150deg, rgba(239, 244, 250, 0.96), rgba(223, 231, 241, 0.94));
+}
+
+.ngl-title {
+	color: var(--neu-fg);
+}
+
+.ngl-muted {
+	color: var(--neu-fg-muted);
+}
+
+.ngl-subtle {
+	color: var(--neu-fg-subtle);
+}
+
+.ngl-success-badge {
+	background: color-mix(in oklch, var(--neu-accent-secondary) 14%, white);
+	color: var(--neu-accent-secondary);
+}
+
+.ngl-error-card {
+	background: color-mix(in oklch, #ef4444 9%, var(--neu-surface));
+	border: 1px solid color-mix(in oklch, #ef4444 24%, transparent);
+}
+
+.ngl-notice-card {
+	background: color-mix(in oklch, var(--neu-accent) 8%, var(--neu-surface));
+	border: 1px solid color-mix(in oklch, var(--neu-accent) 20%, transparent);
+}
+
+.ngl-turnstile-shell {
+	border-radius: var(--radius-base);
+	padding: 0.875rem;
+	background: linear-gradient(145deg, rgba(237, 242, 248, 0.94), rgba(224, 232, 241, 0.9));
 	box-shadow:
-		6px 6px 12px var(--neu-shadow-dark),
-		-6px -6px 12px var(--neu-shadow-light),
-		inset 2px 2px 4px var(--neu-shadow-light),
-		inset -2px -2px 4px var(--neu-shadow-dark);
+		inset 3px 3px 6px rgba(163, 177, 198, 0.45),
+		inset -3px -3px 6px rgba(255, 255, 255, 0.45);
 }
 
-.neu-avatar-inner {
-	width: 100%;
-	height: 100%;
-	border-radius: 50%;
-	overflow: hidden;
-	background: var(--neu-surface);
-	box-shadow:
-		inset 3px 3px 6px var(--neu-shadow-dark),
-		inset -3px -3px 6px var(--neu-shadow-light);
-}
-
-/* Animations */
 @keyframes fadeInUp {
 	from {
 		opacity: 0;
@@ -167,7 +204,7 @@ body {
 @keyframes scaleIn {
 	from {
 		opacity: 0;
-		transform: scale(0.9);
+		transform: scale(0.94);
 	}
 	to {
 		opacity: 1;
@@ -180,15 +217,17 @@ body {
 }
 
 .animate-scale-in {
-	animation: scaleIn 0.5s ease-out forwards;
+	animation: scaleIn 0.45s ease-out forwards;
 }
 
 .stagger-1 {
 	animation-delay: 0.1s;
 }
+
 .stagger-2 {
 	animation-delay: 0.2s;
 }
+
 .stagger-3 {
 	animation-delay: 0.3s;
 }
