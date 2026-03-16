@@ -1,16 +1,15 @@
 import { NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
+import { withAdminAuthContext } from '@/lib/api/middleware/auth';
 import { db } from '@/lib/db';
 import { projects } from '@/lib/db/schema';
 import { eq, isNotNull } from 'drizzle-orm';
 
-export async function POST() {
-  try {
-    const session = await auth();
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+type ProjectContentRepairUpdate = Partial<
+  Pick<typeof projects.$inferInsert, 'content' | 'updatedAt'>
+>;
 
+async function handlePost() {
+  try {
     const allProjects = await db
       .select({ id: projects.id, title: projects.title, content: projects.content })
       .from(projects)
@@ -30,10 +29,11 @@ export async function POST() {
           const parsed = JSON.parse(content);
           if (typeof parsed === 'object' && parsed !== null && parsed.type === 'doc') {
             const now = new Date().toISOString();
-            await db
-              .update(projects)
-              .set({ content: JSON.stringify(parsed), updatedAt: now } as any)
-              .where(eq(projects.id, project.id));
+            const updateData: ProjectContentRepairUpdate = {
+              content: JSON.stringify(parsed),
+              updatedAt: now,
+            };
+            await db.update(projects).set(updateData).where(eq(projects.id, project.id));
 
             fixedProjects.push({
               id: project.id,
@@ -47,10 +47,11 @@ export async function POST() {
           }
         } catch {
           const now = new Date().toISOString();
-          await db
-            .update(projects)
-            .set({ content: '{"type":"doc","content":[]}', updatedAt: now } as any)
-            .where(eq(projects.id, project.id));
+          const updateData: ProjectContentRepairUpdate = {
+            content: '{"type":"doc","content":[]}',
+            updatedAt: now,
+          };
+          await db.update(projects).set(updateData).where(eq(projects.id, project.id));
 
           fixedProjects.push({
             id: project.id,
@@ -63,10 +64,11 @@ export async function POST() {
 
       if (iterations >= maxIterations) {
         const now = new Date().toISOString();
-        await db
-          .update(projects)
-          .set({ content: '{"type":"doc","content":[]}', updatedAt: now } as any)
-          .where(eq(projects.id, project.id));
+        const updateData: ProjectContentRepairUpdate = {
+          content: '{"type":"doc","content":[]}',
+          updatedAt: now,
+        };
+        await db.update(projects).set(updateData).where(eq(projects.id, project.id));
 
         fixedProjects.push({
           id: project.id,
@@ -86,3 +88,5 @@ export async function POST() {
     return NextResponse.json({ success: false, error: 'Failed to fix content' }, { status: 500 });
   }
 }
+
+export const POST = withAdminAuthContext(handlePost);

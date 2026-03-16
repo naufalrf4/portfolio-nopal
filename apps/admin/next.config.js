@@ -1,9 +1,18 @@
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const appRoot = path.dirname(fileURLToPath(import.meta.url));
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
   output: 'standalone',
+  outputFileTracingRoot: appRoot,
   transpilePackages: ['react-map-gl', 'mapbox-gl'],
   serverExternalPackages: ['geoip-lite'],
+  turbopack: {
+    root: appRoot,
+  },
   async headers() {
     return [
       {

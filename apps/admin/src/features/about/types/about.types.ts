@@ -21,6 +21,28 @@ export interface SocialLinks {
   website?: string;
 }
 
+export interface FreelanceFeaturePrice {
+  feature: string;
+  price?: number | null;
+  notes?: string;
+  relatedProjectSlugs?: string[];
+}
+
+export interface FreelanceProjectReference {
+  slug: string;
+  title: string;
+  notes?: string;
+}
+
+export interface FreelanceProfile {
+  hourlyRate?: number | null;
+  currency?: string;
+  completedProjects?: number | null;
+  pricingNotes?: string;
+  featurePricing?: FreelanceFeaturePrice[];
+  projectReferences?: FreelanceProjectReference[];
+}
+
 export interface AboutMeData {
   id: string;
   fullName: string;
@@ -36,6 +58,7 @@ export interface AboutMeData {
   skills: string[];
   experience: ExperienceItem[] | null;
   socialLinks: SocialLinks | null;
+  freelanceProfile: FreelanceProfile | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -54,6 +77,7 @@ export interface UpdateAboutInput {
   resumeUrl?: string | null;
   experience?: ExperienceItem[] | null;
   socialLinks?: SocialLinks | null;
+  freelanceProfile?: FreelanceProfile | null;
 }
 
 export interface UseAboutOptions {

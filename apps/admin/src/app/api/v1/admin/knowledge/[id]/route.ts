@@ -1,14 +1,11 @@
 import { NextRequest } from 'next/server';
-import { auth } from '@/lib/auth';
-import type { Session } from 'next-auth';
+import { withAdminAuthContext } from '@/lib/api/middleware/auth';
 import { knowledgeDocsService } from '@/lib/api/handlers/knowledge-docs.service';
 import {
   successResponse,
   validationErrorResponse,
   notFoundResponse,
   serverErrorResponse,
-  unauthorizedResponse,
-  forbiddenResponse,
 } from '@/lib/api/responses';
 import { updateKnowledgeDocSchema } from '@/lib/validations/knowledge.schema';
 
@@ -16,22 +13,7 @@ interface RouteContext {
   params: Promise<{ id: string }>;
 }
 
-async function checkAdminAuth(): Promise<{ authorized: boolean; response?: Response }> {
-  const session = (await auth()) as Session | null;
-  if (!session?.user) {
-    return { authorized: false, response: unauthorizedResponse() };
-  }
-  const userRole = (session.user as { role?: string }).role;
-  if (userRole !== 'ADMIN') {
-    return { authorized: false, response: forbiddenResponse('Admin access required') };
-  }
-  return { authorized: true };
-}
-
-export async function GET(_req: NextRequest, context: RouteContext) {
-  const authCheck = await checkAdminAuth();
-  if (!authCheck.authorized) return authCheck.response!;
-
+async function handleGet(_req: NextRequest, context: RouteContext) {
   try {
     const { id } = await context.params;
     const doc = await knowledgeDocsService.getById(id);
@@ -46,10 +28,7 @@ export async function GET(_req: NextRequest, context: RouteContext) {
   }
 }
 
-export async function PUT(req: NextRequest, context: RouteContext) {
-  const authCheck = await checkAdminAuth();
-  if (!authCheck.authorized) return authCheck.response!;
-
+async function handlePut(req: NextRequest, context: RouteContext) {
   try {
     const { id } = await context.params;
     const body = await req.json();
@@ -78,10 +57,7 @@ export async function PUT(req: NextRequest, context: RouteContext) {
   }
 }
 
-export async function DELETE(_req: NextRequest, context: RouteContext) {
-  const authCheck = await checkAdminAuth();
-  if (!authCheck.authorized) return authCheck.response!;
-
+async function handleDelete(_req: NextRequest, context: RouteContext) {
   try {
     const { id } = await context.params;
     const existing = await knowledgeDocsService.getById(id);
@@ -96,3 +72,7 @@ export async function DELETE(_req: NextRequest, context: RouteContext) {
     return serverErrorResponse('Failed to delete knowledge document');
   }
 }
+
+export const GET = withAdminAuthContext(handleGet);
+export const PUT = withAdminAuthContext(handlePut);
+export const DELETE = withAdminAuthContext(handleDelete);

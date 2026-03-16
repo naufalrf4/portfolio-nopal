@@ -1,16 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
+import { withAdminAuthContext } from '@/lib/api/middleware/auth';
 import { db } from '@/lib/db';
 import { projects } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
 
-export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  try {
-    const session = await auth();
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+interface RouteContext {
+  params: Promise<{ id: string }>;
+}
 
+type ProjectContentUpdate = Partial<
+  Pick<typeof projects.$inferInsert, 'content' | 'summary' | 'updatedAt'>
+>;
+
+async function handlePatch(request: NextRequest, { params }: RouteContext) {
+  try {
     const { id } = await params;
     const body = await request.json();
     const { content, summary } = body;
@@ -26,15 +29,25 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     const contentToSave = content;
 
     const now = new Date().toISOString();
+    const updateData: ProjectContentUpdate = { updatedAt: now };
+
+    if (contentToSave !== undefined) {
+      updateData.content = contentToSave;
+    }
+
+    if (summary !== undefined) {
+      updateData.summary = summary;
+    }
+
     const [project] = await db
       .update(projects)
-      .set({
-        ...(contentToSave !== undefined && { content: contentToSave }),
-        ...(summary !== undefined && { summary }),
-        updatedAt: now,
-      } as any)
+      .set(updateData)
       .where(eq(projects.id, id))
       .returning();
+
+    if (!project) {
+      return NextResponse.json({ error: 'Project not found' }, { status: 404 });
+    }
 
     return NextResponse.json({
       success: true,
@@ -53,13 +66,8 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   }
 }
 
-export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+async function handleGet(_request: NextRequest, { params }: RouteContext) {
   try {
-    const session = await auth();
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
     const { id } = await params;
     const result = await db
       .select({
@@ -91,3 +99,6 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     return NextResponse.json({ success: false, error: 'Failed to fetch content' }, { status: 500 });
   }
 }
+
+export const PATCH = withAdminAuthContext(handlePatch);
+export const GET = withAdminAuthContext(handleGet);

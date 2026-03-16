@@ -1,17 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
+import { withAdminAuthContext } from '@/lib/api/middleware/auth';
 import { db } from '@/lib/db';
 import { projectImages, projects } from '@/lib/db/schema';
 import { eq, asc, desc } from 'drizzle-orm';
 import { createId } from '@paralleldrive/cuid2';
 
-export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  try {
-    const session = await auth();
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+interface RouteContext {
+  params: Promise<{ id: string }>;
+}
 
+type ProjectImageInsert = typeof projectImages.$inferInsert;
+type ProjectUpdate = Partial<Pick<typeof projects.$inferInsert, 'thumbnailId' | 'updatedAt'>>;
+
+async function handleGet(_request: NextRequest, { params }: RouteContext) {
+  try {
     const { id } = await params;
     const images = await db
       .select()
@@ -28,13 +30,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   }
 }
 
-export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+async function handlePost(request: NextRequest, { params }: RouteContext) {
   try {
-    const session = await auth();
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
     const { id } = await params;
     const body = await request.json();
     const { url, key, caption, alt } = body;
@@ -53,25 +50,22 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     const order = maxOrderResult.length > 0 ? maxOrderResult[0].order + 1 : 0;
 
     const now = new Date().toISOString();
-    const [image] = await db
-      .insert(projectImages)
-      .values({
-        id: createId(),
-        projectId: id,
-        url,
-        key,
-        caption,
-        alt,
-        order,
-        createdAt: now,
-      } as any)
-      .returning();
+    const imageData: ProjectImageInsert = {
+      id: createId(),
+      projectId: id,
+      url,
+      key,
+      caption,
+      alt,
+      order,
+      createdAt: now,
+    };
+
+    const [image] = await db.insert(projectImages).values(imageData).returning();
 
     if (order === 0) {
-      await db
-        .update(projects)
-        .set({ thumbnailId: image.id, updatedAt: now } as any)
-        .where(eq(projects.id, id));
+      const projectUpdate: ProjectUpdate = { thumbnailId: image.id, updatedAt: now };
+      await db.update(projects).set(projectUpdate).where(eq(projects.id, id));
     }
 
     return NextResponse.json({
@@ -82,3 +76,6 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     return NextResponse.json({ success: false, error: 'Failed to create image' }, { status: 500 });
   }
 }
+
+export const GET = withAdminAuthContext(handleGet);
+export const POST = withAdminAuthContext(handlePost);

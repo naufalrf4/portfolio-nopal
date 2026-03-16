@@ -1,7 +1,6 @@
-import { db } from '@/lib/db';
-import { aboutMe } from '@/lib/db/schema';
 import { successResponse, notFoundResponse, serverErrorResponse } from '@/lib/api/responses';
 import { signAssetUrls } from '@/lib/utils/sign-urls';
+import { getAboutMeRecord } from '@/lib/api/handlers/about-read.service';
 
 interface Skill {
   name: string;
@@ -217,8 +216,7 @@ function normalizeSocialLinks(value: unknown): SocialLink[] {
 
 export async function GET() {
   try {
-    const result = await db.select().from(aboutMe).limit(1);
-    const aboutMeData = result[0];
+    const aboutMeData = await getAboutMeRecord();
 
     if (!aboutMeData) {
       return notFoundResponse('About me');

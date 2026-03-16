@@ -46,6 +46,24 @@ type SocialLinkMap = {
   website?: string;
 };
 
+type FreelanceProfileSeed = {
+  hourlyRate: number;
+  currency: string;
+  completedProjects: number;
+  pricingNotes: string;
+  featurePricing: Array<{
+    feature: string;
+    price: number;
+    notes?: string;
+    relatedProjectSlugs?: string[];
+  }>;
+  projectReferences: Array<{
+    slug: string;
+    title: string;
+    notes?: string;
+  }>;
+};
+
 type JsonKnowledgeEntry = {
   text: string;
   metadata?: {
@@ -268,6 +286,34 @@ const PUBLIC_PROFILE = {
     instagram: 'https://instagram.com/naufalrf__',
     website: 'https://naufalrf.tech',
   } satisfies SocialLinkMap,
+  freelanceProfile: {
+    hourlyRate: 150000,
+    currency: 'IDR',
+    completedProjects: 12,
+    pricingNotes:
+      'Use this profile only for pricing and freelance-intent tool workflows. Final quotes still depend on scope, integrations, and delivery risk.',
+    featurePricing: [
+      {
+        feature: 'Drizzle authentication system',
+        price: 1000000,
+        notes: 'Includes credential auth, session wiring, and protected dashboard access.',
+        relatedProjectSlugs: ['naufalrf-portfolio'],
+      },
+      {
+        feature: 'Admin dashboard CRUD module',
+        price: 1500000,
+        notes: 'Reference for scoped dashboard content management work.',
+        relatedProjectSlugs: ['naufalrf-portfolio'],
+      },
+    ],
+    projectReferences: [
+      {
+        slug: 'naufalrf-portfolio',
+        title: 'NaufalRF Portfolio Platform',
+        notes: 'Multi-app portfolio platform with Admin, public apps, and RAG service.',
+      },
+    ],
+  } satisfies FreelanceProfileSeed,
 };
 
 const PUBLIC_PROJECTS: SeedProject[] = [
@@ -710,6 +756,7 @@ function buildAboutRow(now: string): AboutInsert {
     skills: uniqueStrings(PUBLIC_PROFILE.skills),
     experience: PUBLIC_PROFILE.experience,
     socialLinks: PUBLIC_PROFILE.socialLinks,
+    freelanceProfile: PUBLIC_PROFILE.freelanceProfile,
     createdAt: now,
     updatedAt: now,
   };

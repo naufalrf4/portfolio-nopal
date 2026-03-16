@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import { auth } from '@/lib/auth';
+import { safeAuth } from '@/lib/auth';
 import { SignInForm } from '@/app/auth/signin/sign-in-form';
 
 interface PublicGuestbookSignInPageProps {
@@ -9,7 +9,7 @@ interface PublicGuestbookSignInPageProps {
 export default async function PublicGuestbookSignInPage({
   searchParams,
 }: PublicGuestbookSignInPageProps) {
-  const session = await auth();
+  const session = await safeAuth();
   const params = await searchParams;
 
   if (session?.user) {

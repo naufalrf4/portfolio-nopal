@@ -3,6 +3,7 @@ import { aboutMe } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
 import type { UpdateAboutInput } from '@/lib/validations/about.schema';
 import { createId } from '@paralleldrive/cuid2';
+import { getAboutMeRecord } from '@/lib/api/handlers/about-read.service';
 
 type AboutInsert = typeof aboutMe.$inferInsert;
 
@@ -58,10 +59,59 @@ function normalizeExperienceItems(
   }));
 }
 
+function normalizeFreelanceProfile(
+  profile: UpdateAboutInput['freelanceProfile']
+): AboutInsert['freelanceProfile'] {
+  if (!profile) {
+    return null;
+  }
+
+  const featurePricing = (profile.featurePricing ?? [])
+    .map((item) => ({
+      feature: item.feature.trim(),
+      price: typeof item.price === 'number' && Number.isFinite(item.price) ? item.price : null,
+      notes: item.notes?.trim() || '',
+      relatedProjectSlugs:
+        item.relatedProjectSlugs?.map((slug) => slug.trim()).filter(Boolean) ?? [],
+    }))
+    .filter((item) => item.feature);
+
+  const projectReferences = (profile.projectReferences ?? [])
+    .map((item) => ({
+      slug: item.slug.trim(),
+      title: item.title.trim(),
+      notes: item.notes?.trim() || '',
+    }))
+    .filter((item) => item.slug && item.title);
+
+  const normalized = {
+    hourlyRate:
+      typeof profile.hourlyRate === 'number' && Number.isFinite(profile.hourlyRate)
+        ? profile.hourlyRate
+        : null,
+    currency: profile.currency?.trim().toUpperCase() || 'IDR',
+    completedProjects:
+      typeof profile.completedProjects === 'number' && Number.isFinite(profile.completedProjects)
+        ? Math.max(0, Math.trunc(profile.completedProjects))
+        : null,
+    pricingNotes: profile.pricingNotes?.trim() || '',
+    featurePricing,
+    projectReferences,
+  };
+
+  const hasContent =
+    normalized.hourlyRate !== null ||
+    normalized.completedProjects !== null ||
+    normalized.pricingNotes.length > 0 ||
+    normalized.featurePricing.length > 0 ||
+    normalized.projectReferences.length > 0;
+
+  return hasContent ? normalized : null;
+}
+
 export class AboutService {
   async get() {
-    const result = await db.select().from(aboutMe).limit(1);
-    const aboutMeData = result[0];
+    const aboutMeData = await getAboutMeRecord();
 
     if (!aboutMeData) {
       return this.createDefault();
@@ -96,6 +146,7 @@ export class AboutService {
         skills: normalizedData.skills,
         experience: normalizedData.experience,
         socialLinks: normalizedData.socialLinks,
+        freelanceProfile: normalizedData.freelanceProfile,
         updatedAt: normalizedData.updatedAt,
       })
       .where(eq(aboutMe.id, existing.id))
@@ -121,6 +172,7 @@ export class AboutService {
       skills: data.skills,
       experience: normalizeExperienceItems(data.experience),
       socialLinks: data.socialLinks ?? null,
+      freelanceProfile: normalizeFreelanceProfile(data.freelanceProfile),
     };
   }
 
@@ -137,6 +189,7 @@ export class AboutService {
         bio: '',
         roles: [],
         skills: [],
+        freelanceProfile: null,
       })
       .returning();
 

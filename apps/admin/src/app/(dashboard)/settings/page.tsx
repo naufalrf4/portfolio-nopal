@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { auth } from '@/lib/auth';
+import { safeAuth } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { PageWrapper } from '@/components/layout/PageWrapper';
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 };
 
 export default async function SettingsPage() {
-  const session = await auth();
+  const session = await safeAuth();
 
   if (!session?.user) {
     redirect('/auth/signin');

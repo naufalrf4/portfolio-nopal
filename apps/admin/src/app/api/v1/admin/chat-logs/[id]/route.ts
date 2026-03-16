@@ -1,35 +1,13 @@
 import { NextRequest } from 'next/server';
-import { auth } from '@/lib/auth';
-import type { Session } from 'next-auth';
+import { withAdminAuthContext } from '@/lib/api/middleware/auth';
 import { chatLogsService } from '@/lib/api/handlers/chat-logs.service';
-import {
-  successResponse,
-  notFoundResponse,
-  serverErrorResponse,
-  unauthorizedResponse,
-  forbiddenResponse,
-} from '@/lib/api/responses';
+import { successResponse, notFoundResponse, serverErrorResponse } from '@/lib/api/responses';
 
 interface RouteContext {
   params: Promise<{ id: string }>;
 }
 
-async function checkAdminAuth(): Promise<{ authorized: boolean; response?: Response }> {
-  const session = (await auth()) as Session | null;
-  if (!session?.user) {
-    return { authorized: false, response: unauthorizedResponse() };
-  }
-  const userRole = (session.user as { role?: string }).role;
-  if (userRole !== 'ADMIN') {
-    return { authorized: false, response: forbiddenResponse('Admin access required') };
-  }
-  return { authorized: true };
-}
-
-export async function GET(_req: NextRequest, context: RouteContext) {
-  const authCheck = await checkAdminAuth();
-  if (!authCheck.authorized) return authCheck.response!;
-
+async function handleGet(_req: NextRequest, context: RouteContext) {
   try {
     const { id } = await context.params;
     const log = await chatLogsService.getById(id);
@@ -44,10 +22,7 @@ export async function GET(_req: NextRequest, context: RouteContext) {
   }
 }
 
-export async function DELETE(_req: NextRequest, context: RouteContext) {
-  const authCheck = await checkAdminAuth();
-  if (!authCheck.authorized) return authCheck.response!;
-
+async function handleDelete(_req: NextRequest, context: RouteContext) {
   try {
     const { id } = await context.params;
     const existing = await chatLogsService.getById(id);
@@ -62,3 +37,6 @@ export async function DELETE(_req: NextRequest, context: RouteContext) {
     return serverErrorResponse('Failed to delete chat log');
   }
 }
+
+export const GET = withAdminAuthContext(handleGet);
+export const DELETE = withAdminAuthContext(handleDelete);

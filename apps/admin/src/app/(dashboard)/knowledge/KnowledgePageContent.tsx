@@ -5,8 +5,9 @@ import { FileText, Plus, RefreshCw } from 'lucide-react';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { PageWrapper } from '@/components/layout/PageWrapper';
 import { Button } from '@/components/ui/button';
-import { KnowledgeTable } from '@/components/knowledge';
+import { KnowledgeTable, FreelanceToolPanel } from '@/components/knowledge';
 import { KnowledgeModal } from '@/components/knowledge/KnowledgeModal';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface KnowledgeDoc {
   id: string;
@@ -30,6 +31,7 @@ export function KnowledgePageContent() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<'documents' | 'freelance-tool'>('documents');
 
   const fetchDocs = useCallback(async () => {
     try {
@@ -105,24 +107,39 @@ export function KnowledgePageContent() {
           { label: 'Pending', value: pendingCount, variant: 'warning' },
         ]}
         actions={
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" onClick={handleRefresh} disabled={refreshing}>
-              <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
-            </Button>
-            <Button variant="primary" onClick={() => setIsModalOpen(true)}>
-              <Plus className="h-4 w-4 mr-2" />
-              Add Document
-            </Button>
-          </div>
+          activeTab === 'documents' ? (
+            <div className="flex items-center gap-2">
+              <Button variant="ghost" size="icon" onClick={handleRefresh} disabled={refreshing}>
+                <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+              </Button>
+              <Button variant="primary" onClick={() => setIsModalOpen(true)}>
+                <Plus className="h-4 w-4 mr-2" />
+                Add Document
+              </Button>
+            </div>
+          ) : null
         }
       />
 
-      <KnowledgeTable
-        docs={docs}
-        loading={loading}
-        onDelete={handleDelete}
-        onIngest={handleIngest}
-      />
+      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as typeof activeTab)}>
+        <TabsList className="mb-6 grid w-full max-w-xl grid-cols-2">
+          <TabsTrigger value="documents">Knowledge Documents</TabsTrigger>
+          <TabsTrigger value="freelance-tool">Freelance Tool</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="documents">
+          <KnowledgeTable
+            docs={docs}
+            loading={loading}
+            onDelete={handleDelete}
+            onIngest={handleIngest}
+          />
+        </TabsContent>
+
+        <TabsContent value="freelance-tool">
+          <FreelanceToolPanel />
+        </TabsContent>
+      </Tabs>
 
       <KnowledgeModal
         isOpen={isModalOpen}

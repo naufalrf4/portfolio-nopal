@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import { auth } from '@/lib/auth';
+import { safeAuth } from '@/lib/auth';
 import { SignInForm } from './sign-in-form';
 
 interface SignInPageProps {
@@ -7,13 +7,29 @@ interface SignInPageProps {
 }
 
 export default async function SignInPage({ searchParams }: SignInPageProps) {
-  const session = await auth();
+  const session = await safeAuth();
   const params = await searchParams;
+  const errorMessage =
+    params.error === 'access_denied'
+      ? 'Access denied. Admin privileges required.'
+      : params.error === 'unauthorized'
+        ? 'You do not have admin privileges.'
+        : params.error === 'OAuthAccountNotLinked'
+          ? 'Email already used with different provider.'
+          : params.error === 'Configuration'
+            ? 'Google sign-in could not be completed for this request. If you opened the admin from another host alias, retry from localhost:3001.'
+            : params.error === 'MissingCSRF'
+              ? 'Your sign-in session expired. Please try again.'
+              : params.error
+                ? 'Authentication error occurred.'
+                : null;
 
   if (session?.user) {
-    redirect(
-      params.callbackUrl || (session.user.role === 'ADMIN' ? '/dashboard' : '/unauthorized')
-    );
+    if (session.user.role === 'ADMIN') {
+      redirect(params.callbackUrl || '/dashboard');
+    }
+
+    redirect('/unauthorized');
   }
 
   return (
@@ -29,14 +45,9 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
             </p>
           </div>
 
-          {params.error && (
+          {errorMessage && (
             <div className="neu-shadow-inset bg-destructive/10 text-destructive rounded-xl p-4 text-sm text-center">
-              {params.error === 'access_denied' && 'Access denied. Admin privileges required.'}
-              {params.error === 'unauthorized' && 'You do not have admin privileges.'}
-              {params.error === 'OAuthAccountNotLinked' &&
-                'Email already used with different provider.'}
-              {!['access_denied', 'unauthorized', 'OAuthAccountNotLinked'].includes(params.error) &&
-                'Authentication error occurred.'}
+              {errorMessage}
             </div>
           )}
 

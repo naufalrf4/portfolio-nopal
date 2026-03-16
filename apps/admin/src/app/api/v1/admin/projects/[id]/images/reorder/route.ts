@@ -1,16 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
+import { withAdminAuthContext } from '@/lib/api/middleware/auth';
 import { db } from '@/lib/db';
 import { projectImages, projects } from '@/lib/db/schema';
-import { eq, asc } from 'drizzle-orm';
+import { and, asc, eq, inArray } from 'drizzle-orm';
 
-export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+interface RouteContext {
+  params: Promise<{ id: string }>;
+}
+
+type ProjectImageOrderUpdate = Partial<Pick<typeof projectImages.$inferInsert, 'order'>>;
+type ProjectThumbnailUpdate = Partial<
+  Pick<typeof projects.$inferInsert, 'thumbnailId' | 'updatedAt'>
+>;
+
+async function handlePatch(request: NextRequest, { params }: RouteContext) {
   try {
-    const session = await auth();
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
     const { id } = await params;
     const body = await request.json();
     const { imageIds } = body as { imageIds: string[] };
@@ -19,21 +23,34 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       return NextResponse.json({ error: 'imageIds must be an array' }, { status: 400 });
     }
 
+    if (imageIds.length > 0) {
+      const ownedImages = await db
+        .select({ id: projectImages.id })
+        .from(projectImages)
+        .where(and(eq(projectImages.projectId, id), inArray(projectImages.id, imageIds)));
+
+      if (ownedImages.length !== imageIds.length) {
+        return NextResponse.json(
+          { error: 'One or more images do not belong to this project' },
+          { status: 400 }
+        );
+      }
+    }
+
     await db.transaction(async (tx) => {
       for (let index = 0; index < imageIds.length; index++) {
+        const imageUpdate: ProjectImageOrderUpdate = { order: index };
         await tx
           .update(projectImages)
-          .set({ order: index } as any)
-          .where(eq(projectImages.id, imageIds[index]));
+          .set(imageUpdate)
+          .where(and(eq(projectImages.id, imageIds[index]), eq(projectImages.projectId, id)));
       }
     });
 
     if (imageIds.length > 0) {
       const now = new Date().toISOString();
-      await db
-        .update(projects)
-        .set({ thumbnailId: imageIds[0], updatedAt: now } as any)
-        .where(eq(projects.id, id));
+      const projectUpdate: ProjectThumbnailUpdate = { thumbnailId: imageIds[0], updatedAt: now };
+      await db.update(projects).set(projectUpdate).where(eq(projects.id, id));
     }
 
     const images = await db
@@ -53,3 +70,5 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     );
   }
 }
+
+export const PATCH = withAdminAuthContext(handlePatch);

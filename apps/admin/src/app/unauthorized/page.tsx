@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
-import { auth } from '@/lib/auth';
 import { redirect } from 'next/navigation';
-import { UnauthorizedPageContent } from './UnauthorizedPageContent';
+import { safeAuth } from '@/lib/auth';
+import { UnauthorizedPageContent } from '@/app/(dashboard)/unauthorized/UnauthorizedPageContent';
 
 export const metadata: Metadata = {
   title: 'Access Denied',
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 };
 
 export default async function UnauthorizedPage() {
-  const session = await auth();
+  const session = await safeAuth();
 
   if (!session?.user) {
     redirect('/auth/signin');

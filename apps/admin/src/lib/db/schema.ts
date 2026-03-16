@@ -741,6 +741,7 @@ export const aboutMe = pgTable('AboutMe', {
   skills: text().array(),
   experience: jsonb(),
   socialLinks: jsonb(),
+  freelanceProfile: jsonb(),
   createdAt: timestamp({ precision: 3, mode: 'string' })
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),

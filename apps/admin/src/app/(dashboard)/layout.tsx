@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { auth } from '@/lib/auth';
+import { safeAuth } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/layout/AppSidebar';
@@ -7,10 +7,14 @@ import { BottomNav } from '@/components/layout/BottomNav';
 import { isEmailAllowed } from '@/lib/auth-security';
 
 export default async function DashboardLayout({ children }: { children: ReactNode }) {
-  const session = await auth();
+  const session = await safeAuth();
 
-  if (!session?.user || session.user.role !== 'ADMIN') {
+  if (!session?.user) {
     redirect('/auth/signin');
+  }
+
+  if (session.user.role !== 'ADMIN') {
+    redirect('/unauthorized');
   }
 
   if (!isEmailAllowed(session.user.email)) {

@@ -46,7 +46,7 @@ function createAuthConfig(authCallbacks: AuthDbCallbacks) {
     },
     pages: {
       signIn: '/auth/signin',
-      error: '/auth/error',
+      error: '/auth/signin',
     },
     callbacks: {
       async signIn({ account, profile, user }) {
@@ -102,6 +102,26 @@ function createAuthConfig(authCallbacks: AuthDbCallbacks) {
   });
 }
 
+function isRecoverableSessionError(error: unknown) {
+  if (!(error instanceof Error)) {
+    return false;
+  }
+
+  const errorWithCause: Error & { cause?: unknown } = error;
+  const causeMessage =
+    errorWithCause.cause instanceof Error
+      ? errorWithCause.cause.message
+      : typeof errorWithCause.cause === 'string'
+        ? errorWithCause.cause
+        : '';
+
+  return [error.name, error.message, causeMessage].some((value) =>
+    ['JWTSessionError', 'JWEInvalid', 'Invalid Compact JWE'].some((needle) =>
+      value.includes(needle)
+    )
+  );
+}
+
 const authCallbacks: AuthDbCallbacks = {
   async getUserByEmail(email: string) {
     const result = await db
@@ -124,3 +144,15 @@ const authCallbacks: AuthDbCallbacks = {
 };
 
 export const { auth, signIn, signOut, handlers } = createAuthConfig(authCallbacks);
+
+export async function safeAuth() {
+  try {
+    return await auth();
+  } catch (error) {
+    if (isRecoverableSessionError(error)) {
+      return null;
+    }
+
+    throw error;
+  }
+}

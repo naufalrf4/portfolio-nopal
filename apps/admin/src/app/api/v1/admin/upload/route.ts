@@ -1,19 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
+import type { Session } from 'next-auth';
+import { withAdminAuthContext } from '@/lib/api/middleware/auth';
 import { storageService, UploadFolder } from '@/lib/services/storage';
-import { auth } from '@/lib/auth';
 import { logger } from '@/lib/utils/logger';
 import { handleApiError } from '@/lib/api/utils/error-handler';
 
-export async function POST(request: NextRequest) {
+async function handlePost(request: NextRequest, _context: unknown, session: Session) {
   const requestId = crypto.randomUUID();
 
   try {
-    const session = await auth();
-    if (!session?.user) {
-      logger.warn('Unauthorized upload attempt', { requestId });
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
     const formData = await request.formData();
     const file = formData.get('file') as File | null;
     const folder = formData.get('folder') as UploadFolder | null;
@@ -60,3 +55,5 @@ export async function POST(request: NextRequest) {
     });
   }
 }
+
+export const POST = withAdminAuthContext(handlePost);

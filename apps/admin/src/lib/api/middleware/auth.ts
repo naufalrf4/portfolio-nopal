@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { auth } from '@/lib/auth';
+import { safeAuth } from '@/lib/auth';
 import type { Session } from 'next-auth';
 import { unauthorizedResponse, forbiddenResponse } from '../responses';
 
@@ -7,7 +7,7 @@ const ADMIN_SERVICE_TOKEN = process.env.ADMIN_SERVICE_TOKEN;
 
 export function withAuth(handler: (req: NextRequest) => Promise<Response>) {
   return async (req: NextRequest) => {
-    const session = (await auth()) as Session | null;
+    const session = (await safeAuth()) as Session | null;
 
     if (!session?.user) {
       return unauthorizedResponse();
@@ -19,7 +19,7 @@ export function withAuth(handler: (req: NextRequest) => Promise<Response>) {
 
 export function withAdminAuth(handler: (req: NextRequest) => Promise<Response>) {
   return async (req: NextRequest) => {
-    const session = (await auth()) as Session | null;
+    const session = (await safeAuth()) as Session | null;
 
     if (!session?.user) {
       return unauthorizedResponse();
@@ -30,6 +30,24 @@ export function withAdminAuth(handler: (req: NextRequest) => Promise<Response>) 
     }
 
     return handler(req);
+  };
+}
+
+export function withAdminAuthContext<T>(
+  handler: (req: NextRequest, context: T, session: Session) => Promise<Response>
+) {
+  return async (req: NextRequest, context: T) => {
+    const session = (await safeAuth()) as Session | null;
+
+    if (!session?.user) {
+      return unauthorizedResponse();
+    }
+
+    if (session.user.role !== 'ADMIN') {
+      return forbiddenResponse('Admin access required');
+    }
+
+    return handler(req, context, session);
   };
 }
 

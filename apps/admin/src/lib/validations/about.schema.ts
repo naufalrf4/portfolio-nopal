@@ -21,6 +21,28 @@ const socialLinksSchema = z.object({
   website: z.string().url().optional().or(z.literal('')),
 });
 
+const freelanceFeaturePriceSchema = z.object({
+  feature: z.string().min(1).max(160),
+  price: z.number().nonnegative().nullable().optional(),
+  notes: z.string().max(500).optional().or(z.literal('')),
+  relatedProjectSlugs: z.array(z.string().min(1).max(160)).max(20).optional(),
+});
+
+const freelanceProjectReferenceSchema = z.object({
+  slug: z.string().min(1).max(160),
+  title: z.string().min(1).max(160),
+  notes: z.string().max(500).optional().or(z.literal('')),
+});
+
+const freelanceProfileSchema = z.object({
+  hourlyRate: z.number().nonnegative().nullable().optional(),
+  currency: z.string().min(3).max(8).optional().or(z.literal('')),
+  completedProjects: z.number().int().nonnegative().nullable().optional(),
+  pricingNotes: z.string().max(2000).optional().or(z.literal('')),
+  featurePricing: z.array(freelanceFeaturePriceSchema).max(100).optional(),
+  projectReferences: z.array(freelanceProjectReferenceSchema).max(100).optional(),
+});
+
 export const updateAboutSchema = z.object({
   fullName: z.string().min(2).max(100),
   tagline: z.string().max(200).optional().or(z.literal('')).nullable(),
@@ -35,8 +57,12 @@ export const updateAboutSchema = z.object({
   skills: z.array(z.string()).max(50),
   experience: z.array(experienceItemSchema).optional().nullable(),
   socialLinks: socialLinksSchema.optional().nullable(),
+  freelanceProfile: freelanceProfileSchema.optional().nullable(),
 });
 
 export type UpdateAboutInput = z.infer<typeof updateAboutSchema>;
 export type ExperienceItem = z.infer<typeof experienceItemSchema>;
 export type SocialLinks = z.infer<typeof socialLinksSchema>;
+export type FreelanceFeaturePrice = z.infer<typeof freelanceFeaturePriceSchema>;
+export type FreelanceProjectReference = z.infer<typeof freelanceProjectReferenceSchema>;
+export type FreelanceProfile = z.infer<typeof freelanceProfileSchema>;

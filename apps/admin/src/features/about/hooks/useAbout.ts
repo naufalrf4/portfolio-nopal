@@ -112,6 +112,7 @@ export function useAbout(options: UseAboutOptions = {}): UseAboutResult {
         resumeUrl: data.resumeUrl ?? undefined,
         experience: data.experience ?? undefined,
         socialLinks: data.socialLinks ?? undefined,
+        freelanceProfile: data.freelanceProfile ?? undefined,
         [field]: value,
       };
 
