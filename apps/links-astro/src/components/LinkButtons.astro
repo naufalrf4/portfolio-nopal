@@ -41,6 +41,11 @@ const icons = {
         href={link.url}
         target="_blank"
         rel="noopener noreferrer"
+        data-analytics-link
+        data-entity-type="profile_link"
+        data-entity-id={link.id}
+        data-entity-label={link.label}
+        data-entity-url={link.url}
         class="group flex items-center p-4 md:py-5 md:px-6 bg-surface rounded-container shadow-neu-extruded hover:shadow-neu-extruded-hover active:shadow-neu-inset transition-all duration-300 transform hover:-translate-y-1"
         style={`animation-delay: ${delay}`}
       >

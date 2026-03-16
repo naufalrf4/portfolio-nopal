@@ -30,8 +30,6 @@ const {
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
-    
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -43,5 +41,63 @@ const {
   </head>
   <body class="bg-background text-foreground antialiased min-h-screen">
     <slot />
+    <script is:inline>
+      {`
+        (function () {
+          if (typeof window === 'undefined' || typeof document === 'undefined') return;
+
+          function getSessionId() {
+            try {
+              const key = 'links_analytics_session';
+              const existing = window.localStorage.getItem(key);
+              if (existing) return existing;
+              const next = 'links-' + Date.now() + '-' + Math.random().toString(36).slice(2, 10);
+              window.localStorage.setItem(key, next);
+              return next;
+            } catch {
+              return 'links-session';
+            }
+          }
+
+          function sendAnalytics(payload) {
+            const body = JSON.stringify(payload);
+
+            if (navigator.sendBeacon) {
+              const blob = new Blob([body], { type: 'application/json' });
+              navigator.sendBeacon('/api/analytics', blob);
+              return;
+            }
+
+            fetch('/api/analytics', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body,
+              keepalive: true,
+            }).catch(function () {});
+          }
+
+          document.addEventListener('click', function (event) {
+            const target = event.target;
+            if (!(target instanceof Element)) return;
+
+            const anchor = target.closest('[data-analytics-link]');
+            if (!(anchor instanceof HTMLAnchorElement)) return;
+
+            sendAnalytics({
+              page: window.location.pathname || '/',
+              eventType: 'click',
+              entityType: anchor.dataset.entityType || 'link',
+              entityId: anchor.dataset.entityId || anchor.href,
+              userSession: getSessionId(),
+              timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || '',
+              data: {
+                label: anchor.dataset.entityLabel || anchor.textContent?.trim() || anchor.href,
+                url: anchor.dataset.entityUrl || anchor.href,
+              },
+            });
+          }, { passive: true });
+        })();
+      `}
+    </script>
   </body>
 </html>
