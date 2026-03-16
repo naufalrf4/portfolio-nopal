@@ -4,9 +4,9 @@ import { anonymousMessagesService } from '@/lib/api/handlers/anonymous-messages.
 import { successResponse, serverErrorResponse, validationErrorResponse } from '@/lib/api/responses';
 import { createAnonymousMessageSchema } from '@/lib/validations/anonymous-message.schema';
 import { getIpLocation } from '@/lib/services/geoIpService';
-import { db } from '@/lib/db';
-import { anonymousMessages } from '@/lib/db/schema';
 import { createId } from '@paralleldrive/cuid2';
+
+type AnonymousMessageCreateInput = Parameters<typeof anonymousMessagesService.create>[0];
 
 async function handleGet(req: NextRequest) {
   try {
@@ -33,11 +33,12 @@ async function handlePost(req: NextRequest) {
     const geoLocation = getIpLocation(clientIp);
 
     const now = new Date().toISOString();
-    const data: any = {
+    const data: AnonymousMessageCreateInput = {
       id: createId(),
       content: parsed.content,
-      ipHash: parsed.ipHash,
+      ipHash: parsed.ipHash || clientIp,
       ipAddress: clientIp,
+      read: false,
       createdAt: now,
       updatedAt: now,
     };
@@ -49,7 +50,9 @@ async function handlePost(req: NextRequest) {
       if (geoLocation.region) data.region = geoLocation.region;
     }
 
-    const [message] = await db.insert(anonymousMessages).values(data).returning();
+    const message = await anonymousMessagesService.create({
+      ...data,
+    });
 
     return successResponse(message, 'Message sent successfully');
   } catch (error) {

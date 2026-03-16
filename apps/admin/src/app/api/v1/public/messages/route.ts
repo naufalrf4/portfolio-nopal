@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { db } from '@/lib/db';
-import { anonymousMessages } from '@/lib/db/schema';
 import {
   successResponse,
   validationErrorResponse,
@@ -12,6 +10,7 @@ import { checkRateLimit, getRateLimitHeaders } from '@/lib/services/rate-limiter
 import { validateTurnstileToken } from '@/lib/services/turnstile';
 import { createId } from '@paralleldrive/cuid2';
 import { getSubmissionContext } from '@/lib/api/submission-context';
+import { anonymousMessagesService } from '@/lib/api/handlers/anonymous-messages.service';
 
 const publicMessageSchema = z.object({
   content: z
@@ -89,7 +88,7 @@ export async function POST(request: NextRequest) {
       updatedAt: now,
     };
 
-    await db.insert(anonymousMessages).values(messageData);
+    await anonymousMessagesService.create(messageData);
 
     const response = successResponse({ success: true }, 'Message sent successfully');
 
