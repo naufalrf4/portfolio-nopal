@@ -1,34 +1,29 @@
 import { NextRequest } from 'next/server';
 import { knowledgeDocsService } from '@/lib/api/handlers/knowledge-docs.service';
-import {
-  successResponse,
-  notFoundResponse,
-  serverErrorResponse,
-  unauthorizedResponse,
-} from '@/lib/api/responses';
-
-const ADMIN_SERVICE_TOKEN = process.env.ADMIN_SERVICE_TOKEN;
+import { successResponse, notFoundResponse, serverErrorResponse } from '@/lib/api/responses';
+import { withServiceAuth } from '@/lib/api/middleware/auth';
 
 interface RouteContext {
   params: Promise<{ id: string }>;
 }
 
-export async function GET(_req: NextRequest, context: RouteContext) {
-  const token = _req.headers.get('X-Service-Token');
-  if (!token || token !== ADMIN_SERVICE_TOKEN) {
-    return unauthorizedResponse('Invalid service token');
-  }
+export const GET = withServiceAuth<RouteContext>(
+  async (_req: NextRequest, context?: RouteContext) => {
+    try {
+      if (!context) {
+        return serverErrorResponse('Missing route context');
+      }
 
-  try {
-    const { id } = await context.params;
-    const doc = await knowledgeDocsService.getById(id);
+      const { id } = await context.params;
+      const doc = await knowledgeDocsService.getById(id);
 
-    if (!doc) {
-      return notFoundResponse('Knowledge document');
+      if (!doc) {
+        return notFoundResponse('Knowledge document');
+      }
+
+      return successResponse(doc);
+    } catch {
+      return serverErrorResponse('Failed to fetch knowledge document');
     }
-
-    return successResponse(doc);
-  } catch {
-    return serverErrorResponse('Failed to fetch knowledge document');
   }
-}
+);

@@ -97,7 +97,7 @@ export function KnowledgePageContent() {
     <PageWrapper>
       <PageHeader
         title="Knowledge Base"
-        description="Manage documents for the RAG-powered AI assistant"
+        description="Manage the knowledge corpus that powers the Agentic Contextual RAG experience"
         icon={<FileText />}
         stats={[
           { label: 'Total', value: pagination?.total || docs.length },

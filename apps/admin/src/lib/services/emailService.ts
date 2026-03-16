@@ -17,6 +17,16 @@ import type {
   BookingReminderData,
 } from '@/lib/email/types';
 
+class EmailServiceError extends Error {
+  cause?: unknown;
+
+  constructor(message: string, cause?: unknown) {
+    super(message);
+    this.name = 'EmailServiceError';
+    this.cause = cause;
+  }
+}
+
 export class EmailService {
   async sendContactConfirmation(to: string, data: ContactConfirmationData): Promise<void> {
     if (!isEmailConfigured()) {
@@ -24,8 +34,13 @@ export class EmailService {
       return;
     }
 
+    const client = resend;
+    if (!client) {
+      return;
+    }
+
     try {
-      await resend.emails.send({
+      await client.emails.send({
         from: EMAIL_CONFIG.from,
         to,
         subject: 'We received your message! ✨',
@@ -36,7 +51,7 @@ export class EmailService {
       console.log(`[EmailService] Contact confirmation sent to ${to}`);
     } catch (error) {
       console.error('[EmailService] Failed to send contact confirmation:', error);
-      throw new Error('Failed to send confirmation email');
+      throw new EmailServiceError('Failed to send confirmation email', error);
     }
   }
 
@@ -49,8 +64,13 @@ export class EmailService {
       return;
     }
 
+    const client = resend;
+    if (!client) {
+      return;
+    }
+
     try {
-      await resend.emails.send({
+      await client.emails.send({
         from: EMAIL_CONFIG.from,
         to,
         subject: `📬 New contact: ${data.contact.subject || data.contact.name}`,
@@ -60,7 +80,7 @@ export class EmailService {
       console.log(`[EmailService] Admin contact notification sent to ${to}`);
     } catch (error) {
       console.error('[EmailService] Failed to send admin contact notification:', error);
-      throw new Error('Failed to send admin notification email');
+      throw new EmailServiceError('Failed to send admin notification email', error);
     }
   }
 
@@ -70,8 +90,13 @@ export class EmailService {
       return;
     }
 
+    const client = resend;
+    if (!client) {
+      return;
+    }
+
     try {
-      await resend.emails.send({
+      await client.emails.send({
         from: EMAIL_CONFIG.from,
         to,
         subject: '📅 Booking Request Received',
@@ -82,7 +107,7 @@ export class EmailService {
       console.log(`[EmailService] Booking confirmation sent to ${to}`);
     } catch (error) {
       console.error('[EmailService] Failed to send booking confirmation:', error);
-      throw new Error('Failed to send booking confirmation email');
+      throw new EmailServiceError('Failed to send booking confirmation email', error);
     }
   }
 
@@ -95,8 +120,13 @@ export class EmailService {
       return;
     }
 
+    const client = resend;
+    if (!client) {
+      return;
+    }
+
     try {
-      await resend.emails.send({
+      await client.emails.send({
         from: EMAIL_CONFIG.from,
         to,
         subject: `📅 New booking: ${data.booking.name} - ${data.booking.date} ${data.booking.time}`,
@@ -106,7 +136,7 @@ export class EmailService {
       console.log(`[EmailService] Admin booking notification sent to ${to}`);
     } catch (error) {
       console.error('[EmailService] Failed to send admin booking notification:', error);
-      throw new Error('Failed to send admin booking notification email');
+      throw new EmailServiceError('Failed to send admin booking notification email', error);
     }
   }
 
@@ -116,8 +146,13 @@ export class EmailService {
       return;
     }
 
+    const client = resend;
+    if (!client) {
+      return;
+    }
+
     try {
-      await resend.emails.send({
+      await client.emails.send({
         from: EMAIL_CONFIG.from,
         to,
         subject: '✅ Your Booking is Confirmed!',
@@ -128,7 +163,7 @@ export class EmailService {
       console.log(`[EmailService] Booking confirmed email sent to ${to}`);
     } catch (error) {
       console.error('[EmailService] Failed to send booking confirmed email:', error);
-      throw new Error('Failed to send booking confirmed email');
+      throw new EmailServiceError('Failed to send booking confirmed email', error);
     }
   }
 
@@ -138,8 +173,13 @@ export class EmailService {
       return;
     }
 
+    const client = resend;
+    if (!client) {
+      return;
+    }
+
     try {
-      await resend.emails.send({
+      await client.emails.send({
         from: EMAIL_CONFIG.from,
         to,
         subject: 'Booking Status Update',
@@ -150,7 +190,7 @@ export class EmailService {
       console.log(`[EmailService] Booking rejected email sent to ${to}`);
     } catch (error) {
       console.error('[EmailService] Failed to send booking rejected email:', error);
-      throw new Error('Failed to send booking rejected email');
+      throw new EmailServiceError('Failed to send booking rejected email', error);
     }
   }
 
@@ -160,8 +200,13 @@ export class EmailService {
       return;
     }
 
+    const client = resend;
+    if (!client) {
+      return;
+    }
+
     try {
-      await resend.emails.send({
+      await client.emails.send({
         from: EMAIL_CONFIG.from,
         to,
         subject: '📅 Reminder: Your booking is coming up soon!',
@@ -172,7 +217,7 @@ export class EmailService {
       console.log(`[EmailService] Booking reminder sent to ${to}`);
     } catch (error) {
       console.error('[EmailService] Failed to send booking reminder:', error);
-      throw new Error('Failed to send booking reminder email');
+      throw new EmailServiceError('Failed to send booking reminder email', error);
     }
   }
 }

@@ -1,6 +1,6 @@
 import { db } from '@/lib/db';
-import { eq, asc } from 'drizzle-orm';
-import { aboutMe, projects, projectContexts, knowledgeDocs } from '@/lib/db/schema';
+import { eq } from 'drizzle-orm';
+import { aboutMe, projects, knowledgeDocs } from '@/lib/db/schema';
 
 interface ExperienceItem {
   title?: string;
@@ -46,11 +46,6 @@ export class ContentExportService {
   private async getProjects() {
     const projectsList = await db.query.projects.findMany({
       where: eq(projects.visible, true),
-      with: {
-        projectContexts: {
-          orderBy: [asc(projectContexts.order)],
-        },
-      },
     });
 
     return projectsList.map((project) => ({
@@ -58,12 +53,8 @@ export class ContentExportService {
       slug: project.slug,
       summary: project.summary || '',
       description: project.description || '',
+      content: project.content || '',
       techStack: project.techStack || [],
-      contexts: project.projectContexts.map((ctx) => ({
-        type: ctx.type,
-        title: ctx.title,
-        content: ctx.content,
-      })),
     }));
   }
 

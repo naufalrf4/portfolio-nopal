@@ -80,6 +80,6 @@ export default [
     },
   },
   {
-    ignores: ['node_modules/**', '.next/**', 'prisma/generated/**', '*.config.js', '*.config.mjs'],
+    ignores: ['node_modules/**', '.next/**', '*.config.js', '*.config.mjs'],
   },
 ];

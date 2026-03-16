@@ -9,7 +9,7 @@ import { isEmailAllowed } from '@/lib/auth-security';
 export default async function DashboardLayout({ children }: { children: ReactNode }) {
   const session = await auth();
 
-  if (!session?.user || (session.user as any).role !== 'ADMIN') {
+  if (!session?.user || session.user.role !== 'ADMIN') {
     redirect('/auth/signin');
   }
 

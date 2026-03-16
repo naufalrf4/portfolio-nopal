@@ -2,16 +2,15 @@ import { NextRequest } from 'next/server';
 import { auth } from '@/lib/auth';
 import type { Session } from 'next-auth';
 import { knowledgeDocsService } from '@/lib/api/handlers/knowledge-docs.service';
+import { dispatchRagIngest } from '@/lib/services/ragIngest';
 import {
-  successResponse,
-  notFoundResponse,
-  serverErrorResponse,
-  unauthorizedResponse,
+  errorResponse,
   forbiddenResponse,
+  notFoundResponse,
+  successResponse,
+  unauthorizedResponse,
+  serverErrorResponse,
 } from '@/lib/api/responses';
-
-const RAG_SERVICE_URL = process.env.RAG_SERVICE_URL || 'http://localhost:3004';
-const ADMIN_SERVICE_TOKEN = process.env.ADMIN_SERVICE_TOKEN;
 
 interface RouteContext {
   params: Promise<{ id: string }>;
@@ -41,28 +40,27 @@ export async function POST(_req: NextRequest, context: RouteContext) {
       return notFoundResponse('Knowledge document');
     }
 
-    const response = await fetch(`${RAG_SERVICE_URL}/ingest`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Service-Token': ADMIN_SERVICE_TOKEN || '',
-      },
-      body: JSON.stringify({
-        type: 'knowledge',
-        documentId: id,
-      }),
+    const result = await dispatchRagIngest({
+      type: 'knowledge',
+      documentId: id,
     });
 
-    if (!response.ok) {
-      const error = await response.text();
-      return serverErrorResponse(`RAG ingestion failed: ${error}`);
+    if (!result.ok) {
+      return errorResponse(
+        result.errorMessage || 'Failed to trigger knowledge ingestion',
+        result.status,
+        'RAG_INGEST_FAILED',
+        {
+          ingest: result,
+        }
+      );
     }
 
-    const result = await response.json();
     return successResponse(
       {
         success: true,
-        chunksIngested: result.data?.chunksIngested || 0,
+        chunksIngested: result.chunksIngested,
+        target: 'fastapi',
       },
       'Document ingested successfully'
     );

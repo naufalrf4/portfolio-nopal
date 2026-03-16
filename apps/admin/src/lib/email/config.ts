@@ -4,7 +4,7 @@ if (!process.env.RESEND_API_KEY) {
   console.warn('[Email] RESEND_API_KEY not configured - email sending will be disabled');
 }
 
-export const resend = new Resend(process.env.RESEND_API_KEY || '');
+export const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 export const EMAIL_CONFIG = {
   from: process.env.EMAIL_FROM || 'NaufalRF <noreply@naufalrf.tech>',

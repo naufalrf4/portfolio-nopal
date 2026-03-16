@@ -29,10 +29,24 @@ function getErrorType(error: unknown): ErrorType {
   }
 
   if (error instanceof Error) {
-    if (error.name === 'PrismaClientKnownRequestError' || error.name.includes('Prisma')) {
+    const errorName = error.name.toLowerCase();
+    const errorMessage = error.message.toLowerCase();
+
+    if (
+      errorName.includes('postgres') ||
+      errorName.includes('drizzle') ||
+      errorMessage.includes('duplicate key') ||
+      errorMessage.includes('violates') ||
+      errorMessage.includes('foreign key') ||
+      errorMessage.includes('relation')
+    ) {
       return 'DATABASE_ERROR';
     }
-    if (error.name === 'PrismaClientValidationError') {
+    if (
+      errorMessage.includes('invalid input syntax') ||
+      errorMessage.includes('malformed array literal') ||
+      errorMessage.includes('violates check constraint')
+    ) {
       return 'VALIDATION_ERROR';
     }
     if (error.name === 'UnauthorizedError' || error.message.includes('Unauthorized')) {

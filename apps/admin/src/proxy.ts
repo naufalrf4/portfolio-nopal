@@ -40,6 +40,10 @@ export async function proxy(req: NextRequest) {
   }
 
   if (isAuthRoute && isLoggedIn) {
+    if (nextUrl.searchParams.get('callbackUrl')) {
+      return NextResponse.next();
+    }
+
     return NextResponse.redirect(new URL('/dashboard', nextUrl));
   }
 

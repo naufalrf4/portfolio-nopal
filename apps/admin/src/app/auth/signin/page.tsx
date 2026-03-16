@@ -10,8 +10,10 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
   const session = await auth();
   const params = await searchParams;
 
-  if (session?.user && (session.user as any).role === 'ADMIN') {
-    redirect(params.callbackUrl || '/dashboard');
+  if (session?.user) {
+    redirect(
+      params.callbackUrl || (session.user.role === 'ADMIN' ? '/dashboard' : '/unauthorized')
+    );
   }
 
   return (

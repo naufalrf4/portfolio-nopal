@@ -25,8 +25,7 @@ export function withAdminAuth(handler: (req: NextRequest) => Promise<Response>) 
       return unauthorizedResponse();
     }
 
-    const userRole = (session.user as any).role;
-    if (userRole !== 'ADMIN') {
+    if (session.user.role !== 'ADMIN') {
       return forbiddenResponse('Admin access required');
     }
 

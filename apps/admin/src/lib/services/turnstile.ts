@@ -14,6 +14,13 @@ interface TurnstileVerifyResult {
   hostname?: string;
 }
 
+interface TurnstileValidationResult {
+  success: boolean;
+  status?: number;
+  code?: string;
+  message?: string;
+}
+
 const TURNSTILE_VERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
 
 export async function verifyTurnstileToken(token: string): Promise<TurnstileVerifyResult> {
@@ -58,4 +65,44 @@ export async function verifyTurnstileToken(token: string): Promise<TurnstileVeri
 
 export function isTurnstileConfigured(): boolean {
   return Boolean(process.env.TURNSTILE_SECRET_KEY);
+}
+
+export async function validateTurnstileToken(token?: string): Promise<TurnstileValidationResult> {
+  const turnstileConfigured = isTurnstileConfigured();
+  const shouldEnforce = process.env.NODE_ENV === 'production' || turnstileConfigured;
+
+  if (!shouldEnforce) {
+    return { success: true };
+  }
+
+  if (!turnstileConfigured) {
+    return {
+      success: false,
+      status: 503,
+      code: 'TURNSTILE_NOT_CONFIGURED',
+      message: 'CAPTCHA verification is temporarily unavailable.',
+    };
+  }
+
+  if (!token || token.trim() === '') {
+    return {
+      success: false,
+      status: 400,
+      code: 'TURNSTILE_TOKEN_REQUIRED',
+      message: 'CAPTCHA verification is required.',
+    };
+  }
+
+  const result = await verifyTurnstileToken(token);
+
+  if (!result.success) {
+    return {
+      success: false,
+      status: 400,
+      code: 'TURNSTILE_VERIFICATION_FAILED',
+      message: 'CAPTCHA verification failed. Please try again.',
+    };
+  }
+
+  return { success: true };
 }

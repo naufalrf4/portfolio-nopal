@@ -2,7 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
   output: 'standalone',
-  transpilePackages: ['@prisma/client', 'react-map-gl', 'mapbox-gl'],
+  transpilePackages: ['react-map-gl', 'mapbox-gl'],
   serverExternalPackages: ['geoip-lite'],
   async headers() {
     return [

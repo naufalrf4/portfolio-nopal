@@ -1,15 +1,61 @@
+const JAKARTA_TIME_ZONE = 'Asia/Jakarta';
+const JAKARTA_DATE_TIME_FORMATTER = new Intl.DateTimeFormat('en-US', {
+  timeZone: JAKARTA_TIME_ZONE,
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+  second: '2-digit',
+  hour12: false,
+});
+
+function getValidDate(date: string | Date | null | undefined): Date | null {
+  if (!date) {
+    return null;
+  }
+
+  const dateObj = typeof date === 'string' ? new Date(date) : date;
+  return isNaN(dateObj.getTime()) ? null : dateObj;
+}
+
+function toJakartaDate(date: string | Date | null | undefined): Date | null {
+  const source = getValidDate(date);
+  if (!source) {
+    return null;
+  }
+
+  const parts = JAKARTA_DATE_TIME_FORMATTER.formatToParts(source);
+  const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+
+  return new Date(
+    Date.UTC(
+      Number(values.year),
+      Number(values.month) - 1,
+      Number(values.day),
+      Number(values.hour),
+      Number(values.minute),
+      Number(values.second)
+    )
+  );
+}
+
+function formatJakartaKey(date: string | Date | null | undefined): string | null {
+  const zonedDate = toJakartaDate(date);
+  if (!zonedDate) {
+    return null;
+  }
+
+  return zonedDate.toISOString().slice(0, 10);
+}
+
 export function formatDate(
   date: string | Date | null | undefined,
   format: 'short' | 'long' | 'full' = 'short'
 ): string {
-  if (!date) {
+  const dateObj = getValidDate(date);
+  if (!dateObj) {
     return 'N/A';
-  }
-
-  const dateObj = typeof date === 'string' ? new Date(date) : date;
-
-  if (isNaN(dateObj.getTime())) {
-    return 'Invalid Date';
   }
 
   if (format === 'long') {
@@ -18,6 +64,7 @@ export function formatDate(
       year: 'numeric',
       month: 'long',
       day: 'numeric',
+      timeZone: JAKARTA_TIME_ZONE,
     });
   }
 
@@ -28,6 +75,7 @@ export function formatDate(
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
+      timeZone: JAKARTA_TIME_ZONE,
     });
   }
 
@@ -35,18 +83,14 @@ export function formatDate(
     year: 'numeric',
     month: 'short',
     day: 'numeric',
+    timeZone: JAKARTA_TIME_ZONE,
   });
 }
 
 export function formatDateTime(date: string | Date | null | undefined): string {
-  if (!date) {
+  const dateObj = getValidDate(date);
+  if (!dateObj) {
     return 'N/A';
-  }
-
-  const dateObj = typeof date === 'string' ? new Date(date) : date;
-
-  if (isNaN(dateObj.getTime())) {
-    return 'Invalid Date';
   }
 
   return dateObj.toLocaleString('en-US', {
@@ -55,21 +99,20 @@ export function formatDateTime(date: string | Date | null | undefined): string {
     day: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
+    timeZone: JAKARTA_TIME_ZONE,
   });
 }
 
 export function formatRelativeTime(date: string | Date | null | undefined): string {
-  if (!date) {
+  const dateObj = toJakartaDate(date);
+  if (!dateObj) {
     return 'N/A';
   }
 
-  const dateObj = typeof date === 'string' ? new Date(date) : date;
-
-  if (isNaN(dateObj.getTime())) {
-    return 'Invalid Date';
+  const now = toJakartaDate(new Date());
+  if (!now) {
+    return 'N/A';
   }
-
-  const now = new Date();
   const diffInSeconds = Math.floor((now.getTime() - dateObj.getTime()) / 1000);
 
   if (diffInSeconds < 60) {
@@ -110,54 +153,24 @@ export function formatRelativeTime(date: string | Date | null | undefined): stri
 }
 
 export function isToday(date: string | Date | null | undefined): boolean {
-  if (!date) {
-    return false;
-  }
-
-  const dateObj = typeof date === 'string' ? new Date(date) : date;
-
-  if (isNaN(dateObj.getTime())) {
-    return false;
-  }
-
-  const today = new Date();
-  return (
-    dateObj.getDate() === today.getDate() &&
-    dateObj.getMonth() === today.getMonth() &&
-    dateObj.getFullYear() === today.getFullYear()
-  );
+  const todayKey = formatJakartaKey(new Date());
+  const dateKey = formatJakartaKey(date);
+  return Boolean(todayKey && dateKey && todayKey === dateKey);
 }
 
 export function isYesterday(date: string | Date | null | undefined): boolean {
-  if (!date) {
+  const yesterday = toJakartaDate(new Date());
+  const dateKey = formatJakartaKey(date);
+  if (!yesterday || !dateKey) {
     return false;
   }
 
-  const dateObj = typeof date === 'string' ? new Date(date) : date;
-
-  if (isNaN(dateObj.getTime())) {
-    return false;
-  }
-
-  const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 1);
-  return (
-    dateObj.getDate() === yesterday.getDate() &&
-    dateObj.getMonth() === yesterday.getMonth() &&
-    dateObj.getFullYear() === yesterday.getFullYear()
-  );
+  yesterday.setUTCDate(yesterday.getUTCDate() - 1);
+  return formatJakartaKey(yesterday) === dateKey;
 }
 
 export function isFuture(date: string | Date | null | undefined): boolean {
-  if (!date) {
-    return false;
-  }
-
-  const dateObj = typeof date === 'string' ? new Date(date) : date;
-
-  if (isNaN(dateObj.getTime())) {
-    return false;
-  }
-
-  return dateObj.getTime() > new Date().getTime();
+  const targetDate = toJakartaDate(date);
+  const now = toJakartaDate(new Date());
+  return Boolean(targetDate && now && targetDate.getTime() > now.getTime());
 }

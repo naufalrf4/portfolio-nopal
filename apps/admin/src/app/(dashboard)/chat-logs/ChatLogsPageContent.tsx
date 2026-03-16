@@ -91,7 +91,7 @@ export function ChatLogsPageContent() {
     <PageWrapper>
       <PageHeader
         title="Chat Logs"
-        description="View AI assistant conversation logs"
+        description="Review portfolio Agentic Contextual RAG conversation logs"
         icon={<MessageSquare />}
         stats={[
           { label: 'Sessions', value: pagination?.total || logs.length },
