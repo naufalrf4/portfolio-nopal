@@ -4,6 +4,14 @@ Chronological timeline of meaningful project work, discoveries, decisions, and b
 
 ## Entries
 
+
+### 2026-03-20 05:12
+
+- Task: add interactive single-host Paramiko deployment adapter
+- Mode: implementation
+- Files: `deploy.py`, `AGENTS.md`, `PROGRESS.md`
+- Status: done
+- Notes: Added a root-level interactive deployment adapter runnable as `uv run deploy.py`. The adapter collects SSH/repo/env inputs through CLI prompts, uses Paramiko for a single SSH transport, can optionally bootstrap a Debian/Ubuntu host (Docker/git/ufw + firewall), uploads `.env.docker.prod`, clones or fast-forward pulls the repo on the server, and runs the existing production Docker scripts (`docker-prod-bootstrap.sh` or `docker-prod-up.sh`). Manual QA passed with `uv run deploy.py --help` and an interactive dry-run session showing the expected SSH/bootstrap/git/env/deploy command sequence against `34.142.218.199` without performing remote changes.
 ### 2026-03-17 08:18
 
 - Task: Repair Admin lint command for Next 16 flat ESLint setup

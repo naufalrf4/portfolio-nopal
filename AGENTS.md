@@ -73,3 +73,4 @@ Authoritative AI control contract for this repository.
 - Legacy phase2 is the visual baseline until the user explicitly replaces it.
 - Root now has local orchestration scripts: `bun run dev:all` starts all apps, and `bun run reset:seed` resets Admin + RAG data, seeds Admin from `data/`, then triggers proper Admin -> RAG ingest.
 - Root hook/tooling is Bun-aligned; remove stale pnpm lockfiles and pnpm-only root docs when updating repo shell docs.
+- Root deployment automation now includes interactive `deploy.py` (run via `uv run deploy.py`) for single-host Paramiko SSH deploys; keep it pull-based on the server and do not turn it into a push-to-server file sync workflow unless the deployment architecture is intentionally changed.
