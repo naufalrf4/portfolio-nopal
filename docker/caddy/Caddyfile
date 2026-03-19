@@ -1,0 +1,74 @@
+{
+	email {$CADDY_EMAIL}
+}
+
+(security_headers) {
+	header {
+		-Server
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Permissions-Policy "camera=(), geolocation=(), microphone=()"
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		Content-Security-Policy-Report-Only "default-src 'self'; base-uri 'self'; frame-ancestors 'none'; object-src 'none'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: blob: https:; font-src 'self' data: https:; connect-src 'self' https: ws: wss:; frame-src 'self' https://challenges.cloudflare.com;"
+	}
+}
+
+{$PUBLIC_DOMAIN} {
+	import security_headers
+	encode zstd gzip
+
+	reverse_proxy public:3000 {
+		header_up Host {host}
+		header_up X-Forwarded-Host {host}
+		header_up X-Forwarded-Proto {scheme}
+		header_up X-Real-IP {remote_host}
+	}
+}
+
+{$ADMIN_DOMAIN} {
+	import security_headers
+	encode zstd gzip
+
+	reverse_proxy admin:3001 {
+		header_up Host {host}
+		header_up X-Forwarded-Host {host}
+		header_up X-Forwarded-Proto {scheme}
+		header_up X-Real-IP {remote_host}
+	}
+}
+
+{$LINKS_DOMAIN} {
+	import security_headers
+	encode zstd gzip
+
+	reverse_proxy links:3002 {
+		header_up Host {host}
+		header_up X-Forwarded-Host {host}
+		header_up X-Forwarded-Proto {scheme}
+		header_up X-Real-IP {remote_host}
+	}
+}
+
+{$NGL_DOMAIN} {
+	import security_headers
+	encode zstd gzip
+
+	reverse_proxy ngl:3003 {
+		header_up Host {host}
+		header_up X-Forwarded-Host {host}
+		header_up X-Forwarded-Proto {scheme}
+		header_up X-Real-IP {remote_host}
+	}
+}
+
+{$PRESENCE_DOMAIN} {
+	import security_headers
+
+	reverse_proxy live-presence:3006 {
+		header_up Host {host}
+		header_up X-Forwarded-Host {host}
+		header_up X-Forwarded-Proto {scheme}
+		header_up X-Real-IP {remote_host}
+	}
+}

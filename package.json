@@ -3,8 +3,16 @@
   "private": true,
   "description": "Meta repository for standalone apps under apps/*",
   "scripts": {
-    "dev:all": "./start-dev.sh",
-    "reset:seed": "./reset-seed-rag.sh",
+    "dev:all": "bash ./start-dev.sh",
+    "reset:seed": "bash ./reset-seed-rag.sh",
+    "docker:dev": "bash ./scripts/docker-dev-up.sh",
+    "docker:dev:down": "bash ./scripts/docker-dev-down.sh",
+    "docker:dev:migrate": "bash ./scripts/docker-dev-migrate.sh",
+    "docker:dev:seed": "bash ./scripts/docker-dev-seed.sh",
+    "docker:dev:reset-seed": "bash ./scripts/docker-dev-reset-seed.sh",
+    "docker:prod": "bash ./scripts/docker-prod-up.sh",
+    "docker:prod:migrate": "bash ./scripts/docker-prod-migrate.sh",
+    "docker:prod:bootstrap": "bash ./scripts/docker-prod-bootstrap.sh",
     "lint-staged": "lint-staged",
     "commitlint": "commitlint"
   },
