@@ -75,8 +75,12 @@ Authoritative AI control contract for this repository.
 - Project detail `content` from Admin may arrive as plain text/markdown or serialized Tiptap JSON, so public renderers must support both formats safely.
 - Public project detail pages now consume only the simplified slug contract (`summary`, `description`, `content`, `images`) and must not depend on legacy `contexts` payloads.
 - Public contact and booking flows go through local Astro API proxies (`src/pages/api/contact.ts`, `src/pages/api/bookings.ts`, `src/pages/api/bookings/available.ts`) so the browser never depends on the Admin base URL directly.
+- Public AI chat should also go through the local Astro proxy layer (`src/pages/api/rag/chat.ts`) with `RAG_SERVICE_URL` on the server side; do not switch the browser back to a raw public RAG hostname.
 - Guestbook auth now returns directly to `/#guestbook`; `src/components/home/Guestbook.tsx` owns syncing `guestbook_*` query params into local storage and reopening the modal, so the guestbook sign-in flow should stay modal-based instead of routing users through a dedicated public sign-in page.
+- Guestbook local storage is display state only; posting now depends on the short-lived `guestbook_token` returned by Admin auth completion, not on the stored email alone.
 - Shared Turnstile widgets on the public site stay hidden until the user starts typing; keep submit enforcement intact, but do not show the CAPTCHA shell or extra helper copy before interaction.
 - Sticky sub-bars in the public app (project filters, about tabs) should sit below the sticky navbar with a `top-20` offset and a blurred supporting surface so they do not collide with the `h-16` navigation shell.
 - Public relative-time displays should use the shared Jakarta-aware helpers in `src/lib/utils.ts`; do not reintroduce raw `new Date()` display math for guestbook/chat/project timestamps.
 - The homepage guestbook list now follows a compact legacy-style marquee strip instead of stacked cards; keep the CTA separate and preserve the compact repeated-pill presentation.
+- With Astro `ClientRouter` enabled, React islands that depend on the current pathname must derive it from the browser and resync on `astro:page-load`; a one-time `Astro.url.pathname` prop will go stale after client-side navigation.
+- Public first-party analytics now go through the local Astro proxy route `src/pages/api/analytics.ts`; keep browser telemetry same-origin and forward source headers to Admin instead of posting directly to the Admin hostname from the browser.

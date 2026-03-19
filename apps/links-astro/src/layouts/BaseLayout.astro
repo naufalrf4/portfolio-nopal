@@ -1,5 +1,5 @@
 ---
-import "../styles/globals.css";
+import '../styles/globals.css';
 
 interface Props {
   title: string;
@@ -7,11 +7,15 @@ interface Props {
   canonicalUrl: string;
 }
 
+const SITE_NAME = 'NaufalRF Portfolio';
+
 const {
   title,
-  description = "NaufalRF Links - A central hub of official links.",
+  description = 'NaufalRF Links - A central hub of official links.',
   canonicalUrl,
 } = Astro.props;
+
+const formattedTitle = title === SITE_NAME ? SITE_NAME : `${title} - ${SITE_NAME}`;
 ---
 
 <!doctype html>
@@ -20,15 +24,16 @@ const {
     <meta charset="UTF-8" />
     <meta name="description" content={description} />
     <meta name="viewport" content="width=device-width" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
     <meta name="generator" content={Astro.generator} />
-    <meta property="og:title" content={title} />
+    <meta property="og:site_name" content={SITE_NAME} />
+    <meta property="og:title" content={formattedTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
     <meta property="og:url" content={canonicalUrl} />
     <link rel="canonical" href={canonicalUrl} />
     <meta name="twitter:card" content="summary" />
-    <meta name="twitter:title" content={title} />
+    <meta name="twitter:title" content={formattedTitle} />
     <meta name="twitter:description" content={description} />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -37,7 +42,8 @@ const {
       rel="stylesheet"
     />
 
-    <title>{title}</title>
+    <slot name="head" />
+    <title>{formattedTitle}</title>
   </head>
   <body class="bg-background text-foreground antialiased min-h-screen">
     <slot />
@@ -59,6 +65,14 @@ const {
             }
           }
 
+          function getTimezone() {
+            try {
+              return Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+            } catch {
+              return '';
+            }
+          }
+
           function sendAnalytics(payload) {
             const body = JSON.stringify(payload);
 
@@ -76,6 +90,19 @@ const {
             }).catch(function () {});
           }
 
+          sendAnalytics({
+            page: window.location.pathname || '/',
+            eventType: 'pageview',
+            entityType: 'page',
+            entityId: window.location.pathname || '/',
+            userSession: getSessionId(),
+            timezone: getTimezone(),
+            data: {
+              title: document.title,
+              url: window.location.href,
+            },
+          });
+
           document.addEventListener('click', function (event) {
             const target = event.target;
             if (!(target instanceof Element)) return;
@@ -89,7 +116,7 @@ const {
               entityType: anchor.dataset.entityType || 'link',
               entityId: anchor.dataset.entityId || anchor.href,
               userSession: getSessionId(),
-              timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || '',
+              timezone: getTimezone(),
               data: {
                 label: anchor.dataset.entityLabel || anchor.textContent?.trim() || anchor.href,
                 url: anchor.dataset.entityUrl || anchor.href,

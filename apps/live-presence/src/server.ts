@@ -3,6 +3,18 @@ const ROOM_ID = 'public-home';
 const IDLE_TTL_MS = 15000;
 const CLEANUP_INTERVAL_MS = 5000;
 
+const isProduction = process.env.NODE_ENV === 'production';
+const configuredAllowedOrigins = (process.env.ALLOWED_ORIGINS || '')
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+const allowedOrigins =
+  configuredAllowedOrigins.length > 0
+    ? configuredAllowedOrigins
+    : isProduction
+      ? []
+      : ['http://localhost:3000', 'http://127.0.0.1:3000'];
+
 type PresenceParticipant = {
   id: string;
   name: string;
@@ -119,6 +131,14 @@ function sanitizeLabel(value: string | undefined, fallback: string): string {
 function sanitizeSectionId(value: string | null | undefined): string | null {
   const trimmed = (value || '').trim();
   return trimmed ? trimmed.slice(0, 48) : null;
+}
+
+function isAllowedOrigin(origin: string | null): boolean {
+  if (!origin) {
+    return !isProduction;
+  }
+
+  return allowedOrigins.includes(origin);
 }
 
 function getRoom(roomId: string): Map<string, PresenceParticipant> {
@@ -266,6 +286,11 @@ const server = Bun.serve<ConnectionData>({
     }
 
     if (url.pathname === '/ws') {
+      const origin = req.headers.get('origin');
+      if (!isAllowedOrigin(origin)) {
+        return new Response('Forbidden', { status: 403 });
+      }
+
       const upgraded = server.upgrade(req, {
         data: {
           socketId: crypto.randomUUID(),

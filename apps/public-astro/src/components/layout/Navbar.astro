@@ -96,54 +96,83 @@ const isActive = (href: string) => {
 </header>
 
 <script>
-  const container = document.getElementById('other-dropdown-container');
-  const trigger = document.getElementById('other-dropdown-trigger');
-  const menu = document.getElementById('other-dropdown-menu');
-  let isOpen = false;
-  let hoverTimeout: number | null = null;
-
-  function setOpen(state: boolean) {
-    isOpen = state;
-    if (state) {
-      menu?.classList.remove('hidden');
-      trigger?.setAttribute('aria-expanded', 'true');
-      trigger?.classList.add('text-[#3B82F6]', 'shadow-[inset_4px_4px_8px_rgba(163,177,198,0.6),inset_-4px_-4px_8px_rgba(255,255,255,0.5)]');
-      trigger?.classList.remove('shadow-none');
-    } else {
-      menu?.classList.add('hidden');
-      trigger?.setAttribute('aria-expanded', 'false');
-      trigger?.classList.remove('text-[#3B82F6]', 'shadow-[inset_4px_4px_8px_rgba(163,177,198,0.6),inset_-4px_-4px_8px_rgba(255,255,255,0.5)]');
-    }
+  interface WindowWithNavbarCleanup extends Window {
+    __navbarCleanup?: () => void;
   }
 
-  // Hover logic
-  container?.addEventListener('mouseenter', () => {
-    if (hoverTimeout) clearTimeout(hoverTimeout);
-    hoverTimeout = window.setTimeout(() => setOpen(true), 100);
-  });
+  function bindNavbarDropdown() {
+    const container = document.getElementById('other-dropdown-container');
+    const trigger = document.getElementById('other-dropdown-trigger');
+    const menu = document.getElementById('other-dropdown-menu');
+    let isOpen = false;
+    let hoverTimeout: number | null = null;
 
-  container?.addEventListener('mouseleave', () => {
-    if (hoverTimeout) clearTimeout(hoverTimeout);
-    hoverTimeout = window.setTimeout(() => setOpen(false), 150);
-  });
-
-  // Click logic
-  trigger?.addEventListener('click', (e) => {
-    e.stopPropagation(); // Prevent closing immediately
-    setOpen(!isOpen);
-  });
-
-  // Close on outside click
-  document.addEventListener('click', (e) => {
-    if (container && !container.contains(e.target as Node)) {
-      setOpen(false);
+    function setOpen(state: boolean) {
+      isOpen = state;
+      if (state) {
+        menu?.classList.remove('hidden');
+        trigger?.setAttribute('aria-expanded', 'true');
+        trigger?.classList.add('text-[#3B82F6]', 'shadow-[inset_4px_4px_8px_rgba(163,177,198,0.6),inset_-4px_-4px_8px_rgba(255,255,255,0.5)]');
+        trigger?.classList.remove('shadow-none');
+      } else {
+        menu?.classList.add('hidden');
+        trigger?.setAttribute('aria-expanded', 'false');
+        trigger?.classList.remove('text-[#3B82F6]', 'shadow-[inset_4px_4px_8px_rgba(163,177,198,0.6),inset_-4px_-4px_8px_rgba(255,255,255,0.5)]');
+      }
     }
-  });
 
-  // Close on Escape
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      setOpen(false);
-    }
+    const handleMouseEnter = () => {
+      if (hoverTimeout) clearTimeout(hoverTimeout);
+      hoverTimeout = window.setTimeout(() => setOpen(true), 100);
+    };
+
+    const handleMouseLeave = () => {
+      if (hoverTimeout) clearTimeout(hoverTimeout);
+      hoverTimeout = window.setTimeout(() => setOpen(false), 150);
+    };
+
+    const handleTriggerClick = (e: Event) => {
+      e.stopPropagation();
+      setOpen(!isOpen);
+    };
+
+    const handleDocumentClick = (e: Event) => {
+      if (container && !container.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+
+    const handleDocumentKeydown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setOpen(false);
+      }
+    };
+
+    container?.addEventListener('mouseenter', handleMouseEnter);
+    container?.addEventListener('mouseleave', handleMouseLeave);
+    trigger?.addEventListener('click', handleTriggerClick);
+    document.addEventListener('click', handleDocumentClick);
+    document.addEventListener('keydown', handleDocumentKeydown);
+
+    return () => {
+      if (hoverTimeout) clearTimeout(hoverTimeout);
+      container?.removeEventListener('mouseenter', handleMouseEnter);
+      container?.removeEventListener('mouseleave', handleMouseLeave);
+      trigger?.removeEventListener('click', handleTriggerClick);
+      document.removeEventListener('click', handleDocumentClick);
+      document.removeEventListener('keydown', handleDocumentKeydown);
+    };
+  }
+
+  const windowWithNavbarCleanup = window as WindowWithNavbarCleanup;
+
+  function refreshNavbarDropdown() {
+    windowWithNavbarCleanup.__navbarCleanup?.();
+    windowWithNavbarCleanup.__navbarCleanup = bindNavbarDropdown();
+  }
+
+  refreshNavbarDropdown();
+  document.addEventListener('astro:page-load', () => {
+    refreshNavbarDropdown();
   });
 </script>

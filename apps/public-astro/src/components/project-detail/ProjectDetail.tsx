@@ -36,6 +36,10 @@ export function ProjectDetail({ project }: ProjectDetailProps) {
         <motion.a
           href="/projects"
           className="inline-flex items-center gap-2 text-[#6B7280] hover:text-[#3B82F6] transition-colors mb-8 group"
+          data-entity-type="project_back_link"
+          data-entity-id={project.slug}
+          data-entity-label="Back to projects"
+          data-entity-url="/projects"
           {...reveal(0.02)}
         >
           <ArrowLeft size={20} className="transition-transform group-hover:-translate-x-1" />
@@ -142,6 +146,10 @@ export function ProjectDetail({ project }: ProjectDetailProps) {
                         target="_blank"
                         rel="noopener noreferrer"
                         className="block"
+                        data-entity-type="project_live_demo"
+                        data-entity-id={project.slug}
+                        data-entity-label={`Live demo: ${title}`}
+                        data-entity-url={project.liveUrl}
                       >
                         <NeuButton
                           variant="accent"
@@ -159,6 +167,10 @@ export function ProjectDetail({ project }: ProjectDetailProps) {
                         target="_blank"
                         rel="noopener noreferrer"
                         className="block"
+                        data-entity-type="project_source_code"
+                        data-entity-id={project.slug}
+                        data-entity-label={`Source code: ${title}`}
+                        data-entity-url={project.repoUrl}
                       >
                         <NeuButton
                           variant="default"

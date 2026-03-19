@@ -74,3 +74,4 @@ Authoritative AI control contract for this repository.
 - Turnstile-backed NGL delivery requires CSP allowances for `https://challenges.cloudflare.com`; blocking that origin breaks submission before the Admin API is reached.
 - Use SvelteKit public env access (`$env/dynamic/public`) for public browser-exposed runtime config like Turnstile and GA in this app; `import.meta.env` is not reliable here for the current setup.
 - NGL Turnstile stays visually hidden until the message field has content; when configured, avoid pre-typing helper copy and reveal the challenge only after user input starts.
+- NGL first-party analytics now proxy through `src/routes/api/analytics/+server.ts`; keep pageview/submission telemetry same-origin and separate from GA snippets.

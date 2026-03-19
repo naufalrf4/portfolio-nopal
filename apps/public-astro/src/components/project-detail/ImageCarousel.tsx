@@ -50,6 +50,10 @@ export function ImageCarousel({ images, title }: ImageCarouselProps) {
 
       <button
         onClick={goToPrevious}
+        data-analytics-button
+        data-entity-type="project_gallery_prev"
+        data-entity-id={safeTitle}
+        data-entity-label={`Previous image: ${safeTitle}`}
         className={cn(
           'absolute left-4 top-1/2 -translate-y-1/2 z-10',
           'bg-[#E0E5EC] rounded-full p-3',
@@ -65,6 +69,10 @@ export function ImageCarousel({ images, title }: ImageCarouselProps) {
 
       <button
         onClick={goToNext}
+        data-analytics-button
+        data-entity-type="project_gallery_next"
+        data-entity-id={safeTitle}
+        data-entity-label={`Next image: ${safeTitle}`}
         className={cn(
           'absolute right-4 top-1/2 -translate-y-1/2 z-10',
           'bg-[#E0E5EC] rounded-full p-3',
@@ -83,6 +91,10 @@ export function ImageCarousel({ images, title }: ImageCarouselProps) {
           <button
             key={index}
             onClick={() => setCurrentIndex(index)}
+            data-analytics-button
+            data-entity-type="project_gallery_index"
+            data-entity-id={`${safeTitle}:${index + 1}`}
+            data-entity-label={`Image ${index + 1}: ${safeTitle}`}
             className={cn(
               'w-2 h-2 rounded-full transition-all duration-200',
               index === currentIndex ? 'bg-[#3B82F6] w-8' : 'bg-white/50 hover:bg-white/75'

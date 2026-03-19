@@ -242,6 +242,10 @@ export function BookingCalendar() {
         <button
           type="button"
           onClick={() => void loadAvailability()}
+          data-analytics-button
+          data-entity-type="booking_refresh"
+          data-entity-id="booking-calendar"
+          data-entity-label="Refresh booking availability"
           className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-[#E0E5EC] text-[#6B7280] shadow-[6px_6px_12px_rgba(163,177,198,0.55),-6px_-6px_12px_rgba(255,255,255,0.45)] transition-all duration-200 hover:-translate-y-0.5 hover:text-[#3B82F6]"
           aria-label="Refresh availability"
         >
@@ -260,6 +264,10 @@ export function BookingCalendar() {
               key={step.id}
               type="button"
               onClick={() => isAccessible && goToStep(step.id)}
+              data-analytics-button
+              data-entity-type="booking_step"
+              data-entity-id={String(step.id)}
+              data-entity-label={step.title}
               disabled={!isAccessible}
               className={cn(
                 'rounded-[24px] px-4 py-4 text-left transition-all duration-200',
@@ -333,6 +341,10 @@ export function BookingCalendar() {
                       <button
                         key={date}
                         type="button"
+                        data-analytics-button
+                        data-entity-type="booking_date"
+                        data-entity-id={date}
+                        data-entity-label={formatDateLabel(date)}
                         onClick={() => {
                           setSelectedDate(date);
                           setSubmitError(null);
@@ -368,6 +380,10 @@ export function BookingCalendar() {
                 onClick={() => goToStep(2)}
                 disabled={!selectedDate || isLoading}
                 className="gap-2"
+                data-analytics-button
+                data-entity-type="booking_continue"
+                data-entity-id="step-2"
+                data-entity-label="Continue to booking times"
               >
                 Continue to time
                 <ArrowRight size={16} />
@@ -397,6 +413,10 @@ export function BookingCalendar() {
                   <button
                     key={slot.id}
                     type="button"
+                    data-analytics-button
+                    data-entity-type="booking_slot"
+                    data-entity-id={slot.id}
+                    data-entity-label={formatTimeRange(slot)}
                     onClick={() => {
                       setSelectedSlotId(slot.id);
                       setSubmitError(null);
@@ -428,6 +448,10 @@ export function BookingCalendar() {
                 variant="ghost"
                 onClick={() => setCurrentStep(1)}
                 className="gap-2"
+                data-analytics-button
+                data-entity-type="booking_back"
+                data-entity-id="step-1"
+                data-entity-label="Back to booking dates"
               >
                 <ArrowLeft size={16} />
                 Back to dates
@@ -438,6 +462,10 @@ export function BookingCalendar() {
                 onClick={() => goToStep(3)}
                 disabled={!selectedSlotId}
                 className="gap-2"
+                data-analytics-button
+                data-entity-type="booking_continue"
+                data-entity-id="step-3"
+                data-entity-label="Continue to booking details"
               >
                 Continue to details
                 <ArrowRight size={16} />
@@ -550,6 +578,10 @@ export function BookingCalendar() {
                 variant="ghost"
                 onClick={() => setCurrentStep(2)}
                 className="gap-2"
+                data-analytics-button
+                data-entity-type="booking_back"
+                data-entity-id="step-2"
+                data-entity-label="Back to booking times"
               >
                 <ArrowLeft size={16} />
                 Back to time
@@ -561,6 +593,10 @@ export function BookingCalendar() {
                 isLoading={isSubmitting}
                 disabled={isSubmitting || !selectedSlotId || (hasTurnstile && !turnstileToken)}
                 className="gap-2 sm:min-w-[240px]"
+                data-analytics-button
+                data-entity-type="booking_submit"
+                data-entity-id="booking-calendar"
+                data-entity-label="Submit booking request"
               >
                 Reserve selected slot
                 <ArrowRight size={16} />

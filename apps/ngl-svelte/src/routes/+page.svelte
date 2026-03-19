@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import { enhance } from '$app/forms';
 	import { env } from '$env/dynamic/public';
 	import type { ActionData } from './$types';
@@ -27,8 +28,52 @@
 	const PUBLIC_TURNSTILE_SITE_KEY = env.PUBLIC_TURNSTILE_SITE_KEY ?? '';
 
 	const hasTrackedSuccess = { value: false };
+	const hasTrackedCompose = { value: false };
 
 	const hasTurnstileConfig = Boolean(PUBLIC_TURNSTILE_SITE_KEY);
+
+	function getAnalyticsSessionId() {
+		try {
+			const key = 'ngl_analytics_session';
+			const existing = window.localStorage.getItem(key);
+			if (existing) return existing;
+			const next = `ngl-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+			window.localStorage.setItem(key, next);
+			return next;
+		} catch {
+			return 'ngl-session';
+		}
+	}
+
+	async function sendFirstPartyAnalytics(payload: Record<string, unknown>) {
+		try {
+			await fetch('/api/analytics', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify(payload),
+				keepalive: true
+			});
+		} catch {
+			return;
+		}
+	}
+
+	function trackPageView() {
+		void sendFirstPartyAnalytics({
+			page: '/',
+			eventType: 'pageview',
+			entityType: 'page',
+			entityId: '/',
+			userSession: getAnalyticsSessionId(),
+			timezone,
+			data: {
+				title: document.title,
+				url: window.location.href
+			}
+		});
+	}
 
 	let message = $state('');
 	let isSubmitting = $state(false);
@@ -81,6 +126,22 @@
 		});
 	}
 
+	function trackInteraction(entityType: string, entityId: string, label: string) {
+		void sendFirstPartyAnalytics({
+			page: '/',
+			eventType: 'click',
+			entityType,
+			entityId,
+			userSession: getAnalyticsSessionId(),
+			timezone,
+			data: {
+				title: document.title,
+				url: window.location.href,
+				label
+			}
+		});
+	}
+
 	function trackSubmission() {
 		const windowWithGtag = window as WindowWithGtag;
 
@@ -88,6 +149,8 @@
 			event_category: 'engagement',
 			event_label: 'anonymous_message'
 		});
+
+		trackInteraction('message_submission', 'anonymous_message', 'Anonymous message sent');
 	}
 
 	$effect(() => {
@@ -106,6 +169,15 @@
 	});
 
 	$effect(() => {
+		if (message.trim().length > 0 && !hasTrackedCompose.value) {
+			hasTrackedCompose.value = true;
+			trackInteraction('message_compose', 'anonymous_message', 'Started composing anonymous message');
+		}
+
+		if (message.trim().length === 0) {
+			hasTrackedCompose.value = false;
+		}
+
 		if (shouldShowTurnstile) {
 			mountTurnstile();
 			return;
@@ -117,6 +189,7 @@
 
 	onMount(() => {
 		timezone = Intl.DateTimeFormat().resolvedOptions().timeZone ?? '';
+		trackPageView();
 
 		if (!hasTurnstileConfig) {
 			return;
@@ -189,7 +262,11 @@
 					</div>
 					<h2 class="ngl-title mb-2 text-2xl font-bold">Message Sent!</h2>
 					<p class="ngl-muted mb-6 max-w-sm text-sm">Your anonymous message has been delivered.</p>
-					<a href="/" class="neu-button px-6 py-3 text-sm inline-flex" data-sveltekit-reload>
+					<a
+						href={resolve('/')}
+						class="neu-button px-6 py-3 text-sm inline-flex"
+						data-sveltekit-reload
+					>
 						Send Another Message
 					</a>
 				</div>
@@ -272,10 +349,10 @@
 								CAPTCHA is not configured right now, so anonymous message delivery is temporarily
 								unavailable.
 							</div>
-					{/if}
-					<input type="hidden" name="turnstileToken" value={turnstileToken} />
-					<input type="hidden" name="timezone" value={timezone} />
-				</div>
+						{/if}
+						<input type="hidden" name="turnstileToken" value={turnstileToken} />
+						<input type="hidden" name="timezone" value={timezone} />
+					</div>
 
 					{#if form?.error}
 						<div transition:fade class="ngl-error-card flex items-start gap-3 rounded-[22px] p-4">

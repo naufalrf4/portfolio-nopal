@@ -11,6 +11,7 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import { OTHER_LINKS } from '../../lib/constants';
+import { useAstroPathname } from '../../lib/useAstroPathname';
 
 const navItems = [
   { href: '/', label: 'Home', icon: Home },
@@ -25,18 +26,19 @@ interface MobileBottomNavProps {
 }
 
 export function MobileBottomNav({ currentPath }: MobileBottomNavProps) {
+  const pathname = useAstroPathname(currentPath);
   const [otherOpen, setOtherOpen] = useState(false);
 
   // Helper to check active state
   const isActive = (href: string) => {
-    if (href === '/') return currentPath === '/';
-    return currentPath.startsWith(href);
+    if (href === '/') return pathname === '/';
+    return pathname.startsWith(href);
   };
 
   return (
     <>
       {otherOpen && (
-        <div className="fixed inset-0 z-40 md:hidden" onClick={() => setOtherOpen(false)}>
+        <div className="fixed inset-0 z-40 md:hidden" onClick={() => setOtherOpen(false)} data-analytics-button data-entity-type="mobile_nav_overlay" data-entity-id="other-links-overlay" data-entity-label="Close other links overlay">
           <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" />
 
           <div
@@ -47,6 +49,10 @@ export function MobileBottomNav({ currentPath }: MobileBottomNavProps) {
               <span className="text-sm font-semibold text-[#3D4852]">Other Links</span>
               <button
                 onClick={() => setOtherOpen(false)}
+                data-analytics-button
+                data-entity-type="mobile_nav_close"
+                data-entity-id="other-links-menu"
+                data-entity-label="Close other links menu"
                 className="p-1 rounded-lg text-[#6B7280] hover:text-[#3B82F6]"
               >
                 <X size={18} />
@@ -65,6 +71,10 @@ export function MobileBottomNav({ currentPath }: MobileBottomNavProps) {
                   rel={isExternal ? 'noopener noreferrer' : undefined}
                   className="flex items-center gap-3 px-4 py-3 text-sm text-[#3D4852] hover:text-[#3B82F6] hover:bg-[#E0E5EC]/50 transition-colors"
                   onClick={() => setOtherOpen(false)}
+                  data-entity-type={link.external ? 'mobile_nav_external' : 'mobile_nav_internal'}
+                  data-entity-id={link.label}
+                  data-entity-label={link.label}
+                  data-entity-url={link.href}
                 >
                   <Icon size={20} />
                   <span className="flex-1">{link.label}</span>
@@ -93,6 +103,10 @@ export function MobileBottomNav({ currentPath }: MobileBottomNavProps) {
                     : 'text-[#6B7280] hover:text-[#3B82F6]'
                 )}
                 aria-label={item.label}
+                data-entity-type="mobile_nav_link"
+                data-entity-id={item.href}
+                data-entity-label={item.label}
+                data-entity-url={item.href}
               >
                 <Icon size={20} strokeWidth={active ? 2.5 : 2} />
                 <span className="text-[10px] mt-0.5 font-medium">{item.label}</span>
@@ -102,6 +116,10 @@ export function MobileBottomNav({ currentPath }: MobileBottomNavProps) {
 
           <button
             onClick={() => setOtherOpen(!otherOpen)}
+            data-analytics-button
+            data-entity-type="mobile_nav_other_toggle"
+            data-entity-id="other-links-toggle"
+            data-entity-label={otherOpen ? 'Close other links' : 'Open other links'}
             className={cn(
               'flex flex-col items-center justify-center min-w-[44px] min-h-[44px] px-2 py-1.5 rounded-xl transition-all duration-200',
               otherOpen

@@ -36,3 +36,5 @@ Authoritative AI control contract for this repository.
 
 - Local presence verification relies on `/health` plus at least one additional websocket client; do not trust only the homepage indicator.
 - The service is designed for playful public presence, not durable messaging or gameplay state.
+- Production websocket upgrades must enforce an explicit browser-origin allowlist; CORS does not protect the Bun websocket handshake.
+- Keep `ALLOWED_ORIGINS` wired explicitly in both local Docker and production env examples so websocket origin policy does not depend on implicit runtime defaults.

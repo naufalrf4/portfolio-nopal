@@ -4,7 +4,7 @@ import { PageHero } from '@/components/shared';
 import PageLayout from '../layouts/PageLayout.astro';
 import { ChatWindow } from '../components/chatbot/ChatWindow';
 
-const ragServiceUrl = import.meta.env.PUBLIC_RAG_SERVICE_URL || 'http://localhost:3005';
+const ragServiceUrl = '/api/rag';
 
 const title = "AI Assistant";
 const description = "Chat with my AI assistant to explore my projects, technical skills, and software engineering experience in a conversational way.";

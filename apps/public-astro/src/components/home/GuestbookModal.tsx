@@ -11,6 +11,7 @@ interface GuestbookUser {
   email: string;
   name: string | null;
   image: string | null;
+  token: string;
 }
 
 interface GuestbookModalProps {
@@ -57,7 +58,7 @@ export function GuestbookModal({ isOpen, onClose, user, onSuccess }: GuestbookMo
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault();
 
-    if (!user?.email) {
+    if (!user?.email || !user.token) {
       setError('Sign in with Google before posting to the guestbook.');
       return;
     }
@@ -83,7 +84,7 @@ export function GuestbookModal({ isOpen, onClose, user, onSuccess }: GuestbookMo
         },
         body: JSON.stringify({
           message: message.trim(),
-          userEmail: user.email,
+          guestbookToken: user.token,
           turnstileToken: turnstileToken || undefined,
           timezone: getBrowserTimezone(),
         }),
@@ -135,7 +136,7 @@ export function GuestbookModal({ isOpen, onClose, user, onSuccess }: GuestbookMo
       footer={
         isComposerMode ? (
           <div className="flex flex-col-reverse gap-3 md:flex-row md:justify-end">
-            <NeuButton type="button" variant="ghost" onClick={onClose} disabled={isSubmitting}>
+            <NeuButton type="button" variant="ghost" onClick={onClose} disabled={isSubmitting} data-analytics-button data-entity-type="guestbook_modal_cancel" data-entity-id="guestbook-modal" data-entity-label="Cancel guestbook compose">
               Cancel
             </NeuButton>
             <NeuButton
@@ -151,7 +152,7 @@ export function GuestbookModal({ isOpen, onClose, user, onSuccess }: GuestbookMo
           </div>
         ) : (
           <div className="flex flex-col-reverse gap-3 md:flex-row md:justify-end">
-            <NeuButton type="button" variant="ghost" onClick={onClose} disabled={isSigningIn}>
+            <NeuButton type="button" variant="ghost" onClick={onClose} disabled={isSigningIn} data-analytics-button data-entity-type="guestbook_signin_cancel" data-entity-id="guestbook-signin" data-entity-label="Close guestbook sign in">
               Maybe later
             </NeuButton>
             <NeuButton

@@ -46,6 +46,7 @@ export function useLiveCursorPresence(currentPath: string) {
   const socketRef = useRef<WebSocket | null>(null);
   const heartbeatRef = useRef<number | null>(null);
   const reconnectTimeoutRef = useRef<number | null>(null);
+  const shouldReconnectRef = useRef(false);
   const queuedMoveRef = useRef<{ x: number; y: number; isTouching: boolean } | null>(null);
   const rafRef = useRef<number | null>(null);
   const lastSentAtRef = useRef(0);
@@ -120,12 +121,20 @@ export function useLiveCursorPresence(currentPath: string) {
   const connect = useCallback(
     (activeIdentity: LiveCursorIdentity) => {
       clearTimers();
+      shouldReconnectRef.current = true;
       setStatus('connecting');
+      setParticipants([]);
+      setOverviewParticipants([]);
+      setSelfId(null);
 
       const socket = new WebSocket(getSocketUrl());
       socketRef.current = socket;
 
       socket.addEventListener('open', () => {
+        if (socketRef.current !== socket) {
+          return;
+        }
+
         setStatus('connected');
         sendMessage({
           type: 'join',
@@ -144,11 +153,17 @@ export function useLiveCursorPresence(currentPath: string) {
         });
 
         heartbeatRef.current = window.setInterval(() => {
-          sendMessage({ type: 'ping' });
+          if (socketRef.current === socket) {
+            sendMessage({ type: 'ping' });
+          }
         }, HEARTBEAT_MS);
       });
 
       socket.addEventListener('message', (event) => {
+        if (socketRef.current !== socket) {
+          return;
+        }
+
         try {
           const message = JSON.parse(event.data) as PresenceMessage;
           if (message.type === 'welcome') {
@@ -168,15 +183,25 @@ export function useLiveCursorPresence(currentPath: string) {
       });
 
       socket.addEventListener('close', () => {
-        setStatus('disconnected');
+        if (socketRef.current === socket) {
+          socketRef.current = null;
+          setStatus('disconnected');
+        }
+
         clearTimers();
+        if (!shouldReconnectRef.current || socketRef.current !== null) {
+          return;
+        }
+
         reconnectTimeoutRef.current = window.setTimeout(() => {
           connect(activeIdentity);
         }, 1500);
       });
 
       socket.addEventListener('error', () => {
-        setStatus('disconnected');
+        if (socketRef.current === socket) {
+          setStatus('disconnected');
+        }
       });
     },
     [clearTimers, currentPath, pageLabel, roomId, sendMessage]
@@ -186,6 +211,7 @@ export function useLiveCursorPresence(currentPath: string) {
     setIdentity(resolveLiveCursorIdentity());
 
     return () => {
+      shouldReconnectRef.current = false;
       clearTimers();
     };
   }, [clearTimers]);
@@ -198,12 +224,25 @@ export function useLiveCursorPresence(currentPath: string) {
     connect(identity);
 
     return () => {
-      sendMessage({ type: 'leave' });
+      shouldReconnectRef.current = false;
+      const activeSocket = socketRef.current;
       clearTimers();
-      socketRef.current?.close();
-      socketRef.current = null;
+      queuedMoveRef.current = null;
+      setParticipants([]);
+      setOverviewParticipants([]);
+      setSelfId(null);
+
+      if (activeSocket?.readyState === WebSocket.OPEN) {
+        activeSocket.send(JSON.stringify({ type: 'leave' }));
+      }
+
+      if (socketRef.current === activeSocket) {
+        socketRef.current = null;
+      }
+
+      activeSocket?.close();
     };
-  }, [clearTimers, connect, identity, sendMessage]);
+  }, [clearTimers, connect, identity]);
 
   const self = participants.find((participant) => participant.id === selfId) || null;
   const others = participants.filter((participant) => participant.id !== selfId);

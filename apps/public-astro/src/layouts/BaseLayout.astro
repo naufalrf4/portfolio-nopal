@@ -1,5 +1,8 @@
 ---
+import { ClientRouter } from 'astro:transitions';
 import '../styles/globals.css';
+
+const SITE_NAME = 'NaufalRF Portfolio';
 
 interface Props {
   title: string;
@@ -9,44 +12,45 @@ interface Props {
   ogType?: 'website' | 'article' | 'profile';
 }
 
-const { 
-  title, 
-  description, 
-  ogImage = '/og-image.png', 
+const {
+  title: rawTitle,
+  description,
+  ogImage = '/og-image.png',
   canonicalUrl,
   ogType = 'website'
 } = Astro.props;
+
+const title = rawTitle === SITE_NAME ? SITE_NAME : `${rawTitle} - ${SITE_NAME}`;
 
 const currentPath = Astro.url.pathname;
 const siteUrl = import.meta.env.SITE_URL || 'https://naufalrf.tech';
 const canonical = canonicalUrl || new URL(currentPath, siteUrl).href;
 
 const personSchema = {
-  "@context": "https://schema.org",
-  "@type": "Person",
-  "name": "Naufal Rizqullah Firdaus",
-  "alternateName": "NaufalRF",
-  "jobTitle": "Full-Stack Engineer",
-  "url": "https://naufalrf.tech",
-  "sameAs": [
-    "https://github.com/naufalrf",
-    "https://linkedin.com/in/naufalrf",
-    "https://twitter.com/naufalrf"
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: 'Naufal Rizqullah Firdaus',
+  alternateName: 'NaufalRF',
+  jobTitle: 'Full-Stack Engineer',
+  url: 'https://naufalrf.tech',
+  sameAs: [
+    'https://github.com/naufalrf',
+    'https://linkedin.com/in/naufalrf',
+    'https://twitter.com/naufalrf'
   ]
 };
 
 const websiteSchema = {
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  "name": "NaufalRF Portfolio",
-  "url": "https://naufalrf.tech",
-  "potentialAction": {
-    "@type": "SearchAction",
-    "target": "https://naufalrf.tech/search?q={search_term_string}",
-    "query-input": "required name=search_term_string"
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'NaufalRF Portfolio',
+  url: 'https://naufalrf.tech',
+  potentialAction: {
+    '@type': 'SearchAction',
+    target: 'https://naufalrf.tech/search?q={search_term_string}',
+    'query-input': 'required name=search_term_string'
   }
 };
-
 ---
 
 <!doctype html>
@@ -54,15 +58,14 @@ const websiteSchema = {
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <meta name="generator" content={Astro.generator} />
-    
-    <!-- SEO -->
+    <ClientRouter />
+
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
-    
-    <!-- Open Graph -->
+
     <meta property="og:type" content={ogType} />
     <meta property="og:locale" content="en_US" />
     <meta property="og:site_name" content="NaufalRF Portfolio" />
@@ -70,8 +73,7 @@ const websiteSchema = {
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:image" content={new URL(ogImage, siteUrl).href} />
-    
-    <!-- Twitter -->
+
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@naufalrf" />
     <meta name="twitter:creator" content="@naufalrf" />
@@ -80,18 +82,131 @@ const websiteSchema = {
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={new URL(ogImage, siteUrl).href} />
 
-    <!-- JSON-LD -->
     <script type="application/ld+json" set:html={JSON.stringify(personSchema)} />
     <script type="application/ld+json" set:html={JSON.stringify(websiteSchema)} />
     <slot name="head" />
 
-
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   </head>
-<body class="bg-background text-foreground min-h-screen selection:bg-accent selection:text-white">
+  <body class="bg-background text-foreground min-h-screen selection:bg-accent selection:text-white">
     <slot />
+    <script is:inline>
+      {`
+        (function () {
+          if (typeof window === 'undefined' || typeof document === 'undefined') return;
+
+          const sessionKey = 'public_analytics_session';
+          let lastTrackedPage = '';
+
+          function getSessionId() {
+            try {
+              const existing = window.localStorage.getItem(sessionKey);
+              if (existing) return existing;
+              const next = 'public-' + Date.now() + '-' + Math.random().toString(36).slice(2, 10);
+              window.localStorage.setItem(sessionKey, next);
+              return next;
+            } catch {
+              return 'public-session';
+            }
+          }
+
+          function getTimezone() {
+            try {
+              return Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+            } catch {
+              return '';
+            }
+          }
+
+          function sendAnalytics(payload) {
+            const body = JSON.stringify(payload);
+
+            if (navigator.sendBeacon) {
+              const blob = new Blob([body], { type: 'application/json' });
+              navigator.sendBeacon('/api/analytics', blob);
+              return;
+            }
+
+            fetch('/api/analytics', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body,
+              keepalive: true,
+            }).catch(function () {});
+          }
+
+          function trackPageView() {
+            const page = window.location.pathname || '/';
+            const pageKey = page + window.location.search;
+            if (pageKey === lastTrackedPage) return;
+            lastTrackedPage = pageKey;
+
+            sendAnalytics({
+              page,
+              eventType: 'pageview',
+              entityType: 'page',
+              entityId: pageKey,
+              userSession: getSessionId(),
+              timezone: getTimezone(),
+              data: {
+                title: document.title,
+                url: window.location.href,
+              },
+            });
+          }
+
+          if (!window.__portfolioAnalyticsBound) {
+            window.__portfolioAnalyticsBound = true;
+
+            document.addEventListener('click', function (event) {
+              const target = event.target;
+              if (!(target instanceof Element)) return;
+
+              const button = target.closest('[data-analytics-button]');
+              if (button instanceof HTMLElement) {
+                sendAnalytics({
+                  page: window.location.pathname || '/',
+                  eventType: button.dataset.eventType || 'click',
+                  entityType: button.dataset.entityType || 'button',
+                  entityId: button.dataset.entityId || button.getAttribute('aria-label') || button.textContent?.trim() || 'button',
+                  userSession: getSessionId(),
+                  timezone: getTimezone(),
+                  data: {
+                    label: button.dataset.entityLabel || button.getAttribute('aria-label') || button.textContent?.trim() || 'button',
+                    url: button.dataset.entityUrl || window.location.href,
+                  },
+                });
+                return;
+              }
+
+              const anchor = target.closest('a[href]');
+              if (!(anchor instanceof HTMLAnchorElement)) return;
+
+              const rawHref = anchor.getAttribute('href') || '';
+              if (!rawHref || rawHref.startsWith('javascript:')) return;
+
+              sendAnalytics({
+                page: window.location.pathname || '/',
+                eventType: anchor.dataset.eventType || 'click',
+                entityType: anchor.dataset.entityType || (anchor.target === '_blank' ? 'outbound_link' : 'link'),
+                entityId: anchor.dataset.entityId || rawHref,
+                userSession: getSessionId(),
+                timezone: getTimezone(),
+                data: {
+                  label: anchor.dataset.entityLabel || anchor.textContent?.trim() || rawHref,
+                  url: anchor.dataset.entityUrl || anchor.href,
+                },
+              });
+            }, { passive: true });
+
+            document.addEventListener('astro:page-load', trackPageView);
+          }
+
+          trackPageView();
+        })();
+      `}
+    </script>
   </body>
 </html>

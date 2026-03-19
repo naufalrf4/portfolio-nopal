@@ -13,7 +13,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
   const thumbnailUrl = project.imageUrl || project.images?.[0]?.url;
 
   return (
-    <a href={`/projects/${project.slug}`} className="block h-full group no-underline">
+    <a href={`/projects/${project.slug}`} className="block h-full group no-underline" data-entity-type="project_card" data-entity-id={project.slug} data-entity-label={title} data-entity-url={`/projects/${project.slug}`}>
       <NeuCard hover className="h-full">
         <div className="relative aspect-video rounded-xl overflow-hidden mb-4 shadow-[inset_4px_4px_8px_rgba(163,177,198,0.6),inset_-4px_-4px_8px_rgba(255,255,255,0.5)]">
           {thumbnailUrl ? (

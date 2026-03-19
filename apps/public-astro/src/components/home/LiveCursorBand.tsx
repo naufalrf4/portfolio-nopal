@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Activity, MousePointer2 } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useLiveCursorPresence } from './useLiveCursorPresence';
+import { useAstroPathname } from '@/lib/useAstroPathname';
 
 function clamp(value: number) {
   return Math.min(1, Math.max(0, value));
@@ -12,9 +13,10 @@ interface LiveCursorBandProps {
 }
 
 export function LiveCursorBand({ currentPath }: LiveCursorBandProps) {
+  const pathname = useAstroPathname(currentPath);
   const reduceMotion = useReducedMotion();
   const { identity, status, self, others, overviewParticipants, totalParticipants, sendMove } =
-    useLiveCursorPresence(currentPath);
+    useLiveCursorPresence(pathname);
   const [isListOpen, setIsListOpen] = useState(false);
   const [documentMetrics, setDocumentMetrics] = useState({
     width: 0,
@@ -266,7 +268,7 @@ export function LiveCursorBand({ currentPath }: LiveCursorBandProps) {
 
               <div className="max-h-[40vh] space-y-2 overflow-y-auto pr-1">
                 {participantList.map((participant) => {
-                  const isHere = participant.pagePath === currentPath;
+                  const isHere = participant.pagePath === pathname;
                   return (
                     <div
                       key={`${participant.id}-${participant.pagePath}`}

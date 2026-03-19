@@ -71,10 +71,26 @@ const websiteLinks = links.filter((link) => !socialLinkUrls.has(normalizeUrl(lin
 ---
 
 <BaseLayout
-  title="Links - NaufalRF"
+  title="Links"
   description="A central hub of official links by Naufal Rizqullah Firdaus including portfolio, GitHub, LinkedIn, automation projects, IoT systems, blogs, and contact details."
   canonicalUrl="https://links.naufalrf.tech"
 >
+  <Fragment slot="head">
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'Person',
+        name: aboutData.fullName || 'Naufal Rizqullah Firdaus',
+        alternateName: 'NaufalRF',
+        url: 'https://links.naufalrf.tech',
+        description:
+          aboutData.bio ||
+          'Official profile links for Naufal Rizqullah Firdaus, full-stack engineer and builder of web, automation, and AI-powered systems.',
+        sameAs: allSocialLinks.map((link) => link.url),
+      })}
+    />
+  </Fragment>
   <main class="relative min-h-screen overflow-hidden bg-background px-4 py-10 sm:px-5 sm:py-12">
     <div class="pointer-events-none absolute inset-0">
       <div class="absolute left-[-6rem] top-10 h-48 w-48 rounded-full bg-[radial-gradient(circle,rgba(59,130,246,0.18),transparent_68%)] blur-2xl"></div>

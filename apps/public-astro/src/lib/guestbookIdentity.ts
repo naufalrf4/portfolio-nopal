@@ -3,6 +3,7 @@ export interface StoredGuestbookUser {
   email: string;
   name: string | null;
   image: string | null;
+  token: string;
 }
 
 export interface LiveCursorIdentity {
@@ -47,7 +48,23 @@ function getStoredValue<T>(key: string): T | null {
 }
 
 export function getStoredGuestbookUser(): StoredGuestbookUser | null {
-  return getStoredValue<StoredGuestbookUser>(GUESTBOOK_STORAGE_KEY);
+  const stored = getStoredValue<StoredGuestbookUser>(GUESTBOOK_STORAGE_KEY);
+
+  if (
+    !stored ||
+    typeof stored.id !== 'string' ||
+    typeof stored.email !== 'string' ||
+    typeof stored.token !== 'string'
+  ) {
+    clearStoredGuestbookUser();
+    return null;
+  }
+
+  return {
+    ...stored,
+    name: typeof stored.name === 'string' ? stored.name : null,
+    image: typeof stored.image === 'string' ? stored.image : null,
+  };
 }
 
 export function setStoredGuestbookUser(user: StoredGuestbookUser): void {

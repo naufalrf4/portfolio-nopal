@@ -31,6 +31,7 @@ const SYNC_KEYS = [
   'guestbook_email',
   'guestbook_name',
   'guestbook_image',
+  'guestbook_token',
 ] as const;
 
 export function Guestbook({ initialEntries = [] }: GuestbookProps) {
@@ -44,13 +45,15 @@ export function Guestbook({ initialEntries = [] }: GuestbookProps) {
     const currentUrl = new URL(window.location.href);
     const isSynced = currentUrl.searchParams.get('guestbook_sync') === '1';
     const syncedEmail = currentUrl.searchParams.get('guestbook_email');
+    const syncedToken = currentUrl.searchParams.get('guestbook_token');
 
-    if (isSynced && syncedEmail) {
+    if (isSynced && syncedEmail && syncedToken) {
       const syncedUser: StoredGuestbookUser = {
         id: syncedEmail,
         email: syncedEmail,
         name: currentUrl.searchParams.get('guestbook_name'),
         image: currentUrl.searchParams.get('guestbook_image'),
+        token: syncedToken,
       };
 
       setStoredGuestbookUser(syncedUser);
@@ -187,7 +190,7 @@ export function Guestbook({ initialEntries = [] }: GuestbookProps) {
                 viewport={{ once: true, amount: 0.8 }}
                 transition={{ duration: 0.62, delay: 0.14, ease: [0.22, 1, 0.36, 1] }}
               >
-                <NeuButton variant="primary" size="md" onClick={() => setIsModalOpen(true)}>
+                <NeuButton variant="primary" size="md" onClick={() => setIsModalOpen(true)} data-analytics-button data-entity-type="guestbook_open_compose" data-entity-id="guestbook" data-entity-label="Leave a guestbook message">
                   <Plus size={18} className="mr-2" />
                   Leave a message
                 </NeuButton>
@@ -205,7 +208,7 @@ export function Guestbook({ initialEntries = [] }: GuestbookProps) {
                 viewport={{ once: true, amount: 0.8 }}
                 transition={{ duration: 0.62, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
               >
-                <NeuButton variant="accent" size="md" onClick={() => setIsModalOpen(true)}>
+                <NeuButton variant="accent" size="md" onClick={() => setIsModalOpen(true)} data-analytics-button data-entity-type="guestbook_signin_cta" data-entity-id="guestbook" data-entity-label="Sign in to guestbook">
                   <LogIn size={18} className="mr-2" />
                   Sign in to guestbook
                 </NeuButton>

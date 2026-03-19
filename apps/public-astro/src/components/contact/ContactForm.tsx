@@ -200,6 +200,10 @@ export function ContactForm() {
 
       <NeuButton
         type="submit"
+        data-analytics-button
+        data-entity-type="contact_submit"
+        data-entity-id="contact-form"
+        data-entity-label="Send contact message"
         variant="accent"
         size="lg"
         isLoading={isLoading}

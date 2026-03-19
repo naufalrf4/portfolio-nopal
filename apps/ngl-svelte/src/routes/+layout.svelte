@@ -1,9 +1,8 @@
 <script lang="ts">
 	import { env } from '$env/dynamic/public';
 	import '../app.css';
-	import favicon from '$lib/assets/favicon.svg';
 
-	const title = 'Anonymous Message - NaufalRF';
+	const title = 'Anonymous Message - NaufalRF Portfolio';
 	const description =
 		'Send anonymous messages, feedback, or questions to Naufal Rizqullah Firdaus regarding his work, projects, or engineering approach in a safe and open way.';
 	const canonicalUrl = 'https://ngl.naufalrf.tech';
@@ -16,8 +15,9 @@
 
 <svelte:head>
 	<title>{title}</title>
-	<link rel="icon" href={favicon} />
+	<link rel="icon" href="/favicon.ico" sizes="any" />
 	<meta name="description" content={description} />
+	<meta name="robots" content="noindex, nofollow" />
 	<meta
 		name="keywords"
 		content="Anonymous Message Portfolio, Feedback Software Engineer, NGL Developer Page"
@@ -29,11 +29,11 @@
 	<meta property="og:locale" content="en_US" />
 	<meta property="og:url" content={canonicalUrl} />
 	<meta property="og:site_name" content="NaufalRF NGL" />
-	<meta property="og:title" content="Anonymous Messages for NaufalRF" />
+	<meta property="og:title" content={title} />
 	<meta property="og:description" content={ogDescription} />
 	<meta name="twitter:card" content="summary_large_image" />
 	<meta name="twitter:creator" content="@naufalrf" />
-	<meta name="twitter:title" content="Anonymous Messages for NaufalRF" />
+	<meta name="twitter:title" content={title} />
 	<meta name="twitter:description" content={ogDescription} />
 	<link rel="preconnect" href="https://fonts.googleapis.com" />
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />

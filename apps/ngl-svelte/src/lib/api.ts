@@ -1,4 +1,4 @@
-import { ADMIN_API_URL } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 import type { MessagePayload, MessageResponse } from '../types';
 
 interface MessageResult extends MessageResponse {
@@ -6,6 +6,7 @@ interface MessageResult extends MessageResponse {
 }
 
 const API_TIMEOUT_MS = 5000;
+const adminApiUrl = env.ADMIN_API_URL ?? 'http://localhost:3001';
 const FORWARDED_HEADER_NAMES = [
 	'x-forwarded-for',
 	'x-real-ip',
@@ -58,7 +59,7 @@ export async function submitMessageWithContext(
 			headers.set('x-portfolio-timezone', payload.timezone.trim().slice(0, 100));
 		}
 
-		const response = await fetch(`${ADMIN_API_URL}/api/v1/public/messages`, {
+		const response = await fetch(`${adminApiUrl}/api/v1/public/messages`, {
 			method: 'POST',
 			headers,
 			body: JSON.stringify(payload),
