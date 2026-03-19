@@ -19,16 +19,18 @@ class AdminApiClient:
         self.timeout = httpx.Timeout(settings.admin_api_timeout_ms / 1000)
 
     def _headers(self) -> dict[str, str]:
-        if not settings.admin_service_token:
+        admin_internal_api_token = settings.admin_internal_api_token or settings.admin_service_token
+
+        if not admin_internal_api_token:
             raise RagServiceError(
-                "ADMIN_SERVICE_TOKEN is not configured.",
-                "ADMIN_SERVICE_TOKEN_NOT_CONFIGURED",
+                "ADMIN_INTERNAL_API_TOKEN is not configured.",
+                "ADMIN_INTERNAL_API_TOKEN_NOT_CONFIGURED",
                 503,
             )
 
         return {
             "Content-Type": "application/json",
-            "X-Service-Token": settings.admin_service_token,
+            "X-Service-Token": admin_internal_api_token,
         }
 
     async def _request(self, method: str, path: str, json: dict[str, Any] | None = None) -> Any:

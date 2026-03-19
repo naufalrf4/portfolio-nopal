@@ -1,33 +1,28 @@
-import { emailLayout } from './layout';
 import type { BookingReminderData } from '../types';
+import { formatDuration, formatReference } from './helper';
+import { renderCard, renderDetailList, renderHeader, renderMeta } from './partials';
+import { emailLayout } from './layout';
 
 export function bookingReminderTemplate(data: BookingReminderData): string {
-  const { bookingId, name, date, time, duration, hoursUntil } = data;
+  const { bookingId, date, time, duration, hoursUntil } = data;
 
   const content = `
-    <div class="header">
-      <h1>📅 Booking Reminder</h1>
-    </div>
+    ${renderHeader('Booking reminder', `Your session starts in about ${hoursUntil} hours.`)}
     <div class="content">
-      <h2>Hi ${name},</h2>
-      <p>This is a friendly reminder about your upcoming booking in <strong>${hoursUntil} hours</strong>.</p>
-      
-      <div class="info-box">
-        <p><strong>Booking ID:</strong> <span class="reference-id">#${bookingId.slice(0, 8).toUpperCase()}</span></p>
-        <p><strong>Date:</strong> ${date}</p>
-        <p><strong>Time:</strong> ${time}</p>
-        <p><strong>Duration:</strong> ${duration} minutes</p>
-      </div>
-
-      <p>Looking forward to meeting with you!</p>
-
-      <hr class="divider" />
-
-      <p style="color: #888; font-size: 14px;">
-        <strong>Need to reschedule?</strong> Please contact me as soon as possible.
-      </p>
+      ${renderCard(
+        renderDetailList([
+          { label: 'Reference', value: formatReference(bookingId) },
+          { label: 'Date', value: date },
+          { label: 'Time', value: time },
+          { label: 'Duration', value: formatDuration(duration) },
+        ])
+      )}
+      ${renderMeta('If timing changed, please reach out as soon as possible.')}
     </div>
   `;
 
-  return emailLayout(content);
+  return emailLayout({
+    preheader: 'A reminder for your upcoming booking.',
+    content,
+  });
 }

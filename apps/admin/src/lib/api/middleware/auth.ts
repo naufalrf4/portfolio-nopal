@@ -3,7 +3,8 @@ import { safeAuth } from '@/lib/auth';
 import type { Session } from 'next-auth';
 import { unauthorizedResponse, forbiddenResponse } from '../responses';
 
-const ADMIN_SERVICE_TOKEN = process.env.ADMIN_SERVICE_TOKEN;
+const ADMIN_INTERNAL_API_TOKEN =
+  process.env.ADMIN_INTERNAL_API_TOKEN || process.env.ADMIN_SERVICE_TOKEN;
 
 export function withAuth(handler: (req: NextRequest) => Promise<Response>) {
   return async (req: NextRequest) => {
@@ -55,7 +56,7 @@ export function withServiceAuth<T>(handler: (req: NextRequest, context?: T) => P
   return async (req: NextRequest, context?: T) => {
     const token = req.headers.get('X-Service-Token');
 
-    if (!token || token !== ADMIN_SERVICE_TOKEN) {
+    if (!token || token !== ADMIN_INTERNAL_API_TOKEN) {
       return unauthorizedResponse('Invalid service token');
     }
 

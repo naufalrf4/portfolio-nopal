@@ -32,7 +32,6 @@ function readProfileImage(profile: unknown, fallbackImage?: string | null) {
 
 function createAuthConfig(authCallbacks: AuthDbCallbacks) {
   return NextAuth({
-    trustHost: true,
     providers: [
       Google({
         clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -70,6 +69,18 @@ function createAuthConfig(authCallbacks: AuthDbCallbacks) {
         }
         return true;
       },
+      async redirect({ url, baseUrl }) {
+        if (url.startsWith('/')) {
+          return `${baseUrl}${url}`;
+        }
+
+        try {
+          const redirectUrl = new URL(url);
+          return redirectUrl.origin === baseUrl ? url : baseUrl;
+        } catch {
+          return baseUrl;
+        }
+      },
       async jwt({ token, user, trigger }) {
         if (user) {
           token.userId = user.id;
@@ -81,7 +92,7 @@ function createAuthConfig(authCallbacks: AuthDbCallbacks) {
             const dbUser = await authCallbacks.getUserByEmail(token.email);
             if (dbUser) {
               token.userId = dbUser.id;
-              token.role = dbUser.role;
+              token.role = dbUser.role === 'ADMIN' || dbUser.role === 'USER' ? dbUser.role : 'USER';
             }
           }
         }

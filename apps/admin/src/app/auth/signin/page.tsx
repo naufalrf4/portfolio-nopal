@@ -1,32 +1,23 @@
 import { redirect } from 'next/navigation';
-import { safeAuth } from '@/lib/auth';
+import { auth } from '@/lib/auth';
 import { SignInForm } from './sign-in-form';
 
 interface SignInPageProps {
   searchParams: Promise<{ error?: string; callbackUrl?: string }>;
 }
 
+function normalizeAdminCallbackUrl(callbackUrl: string | undefined): string {
+  return callbackUrl && callbackUrl.startsWith('/') ? callbackUrl : '/dashboard';
+}
+
 export default async function SignInPage({ searchParams }: SignInPageProps) {
-  const session = await safeAuth();
+  const session = await auth();
   const params = await searchParams;
-  const errorMessage =
-    params.error === 'access_denied'
-      ? 'Access denied. Admin privileges required.'
-      : params.error === 'unauthorized'
-        ? 'You do not have admin privileges.'
-        : params.error === 'OAuthAccountNotLinked'
-          ? 'Email already used with different provider.'
-          : params.error === 'Configuration'
-            ? 'Google sign-in could not be completed for this request. If you opened the admin from another host alias, retry from localhost:3001.'
-            : params.error === 'MissingCSRF'
-              ? 'Your sign-in session expired. Please try again.'
-              : params.error
-                ? 'Authentication error occurred.'
-                : null;
+  const callbackUrl = normalizeAdminCallbackUrl(params.callbackUrl);
 
   if (session?.user) {
     if (session.user.role === 'ADMIN') {
-      redirect(params.callbackUrl || '/dashboard');
+      redirect(callbackUrl);
     }
 
     redirect('/unauthorized');
@@ -45,13 +36,18 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
             </p>
           </div>
 
-          {errorMessage && (
+          {params.error && (
             <div className="neu-shadow-inset bg-destructive/10 text-destructive rounded-xl p-4 text-sm text-center">
-              {errorMessage}
+              {params.error === 'access_denied' && 'Access denied. Admin privileges required.'}
+              {params.error === 'unauthorized' && 'You do not have admin privileges.'}
+              {params.error === 'OAuthAccountNotLinked' &&
+                'Email already used with different provider.'}
+              {!['access_denied', 'unauthorized', 'OAuthAccountNotLinked'].includes(params.error) &&
+                'Authentication error occurred.'}
             </div>
           )}
 
-          <SignInForm callbackUrl={params.callbackUrl} />
+          <SignInForm callbackUrl={callbackUrl} mode="admin" />
         </div>
       </div>
     </div>

@@ -22,6 +22,8 @@ class Settings(BaseSettings):
     )
     admin_api_url: str = Field(default="http://localhost:3001", alias="ADMIN_API_URL")
     admin_service_token: str = Field(default="", alias="ADMIN_SERVICE_TOKEN")
+    admin_internal_api_token: str = Field(default="", alias="ADMIN_INTERNAL_API_TOKEN")
+    rag_ingest_service_token: str = Field(default="", alias="RAG_INGEST_SERVICE_TOKEN")
 
     gemini_api_key: str = Field(default="", alias="GEMINI_API_KEY")
     embedding_model: str = Field(default="gemini-embedding-001", alias="EMBEDDING_MODEL")

@@ -6,9 +6,14 @@ import { Button } from '@/components/ui/button';
 
 interface SignInFormProps {
   callbackUrl?: string;
+  mode?: 'admin' | 'public';
 }
 
-export function SignInForm({ callbackUrl }: SignInFormProps) {
+function normalizeCallbackUrl(callbackUrl: string | undefined, fallback: string) {
+  return callbackUrl && callbackUrl.startsWith('/') ? callbackUrl : fallback;
+}
+
+export function SignInForm({ callbackUrl, mode = 'admin' }: SignInFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -17,7 +22,7 @@ export function SignInForm({ callbackUrl }: SignInFormProps) {
       setIsLoading(true);
       setErrorMessage(null);
       await signIn('google', {
-        callbackUrl: callbackUrl || '/dashboard',
+        callbackUrl: normalizeCallbackUrl(callbackUrl, mode === 'public' ? '/' : '/dashboard'),
       });
     } catch {
       setErrorMessage('Google sign-in could not be started. Please try again.');

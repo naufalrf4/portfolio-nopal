@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { users } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
@@ -13,15 +13,22 @@ import {
 import { z } from 'zod';
 import { validateTurnstileToken } from '@/lib/services/turnstile';
 import { getSubmissionContext } from '@/lib/api/submission-context';
+import { checkRateLimit, getRateLimitHeaders } from '@/lib/services/rate-limiter';
+import { verifyGuestbookToken } from '@/lib/guestbook-token';
 
 const createGuestbookEntrySchema = z.object({
   message: z
     .string()
     .min(1, 'Message is required')
     .max(500, 'Message must be 500 characters or less'),
-  userEmail: z.string().email('Invalid email'),
+  guestbookToken: z.string().min(1, 'Missing guestbook token'),
   turnstileToken: z.string().optional(),
 });
+
+const RATE_LIMIT_CONFIG = {
+  maxRequests: 5,
+  windowMs: 5 * 60 * 1000,
+};
 
 export async function GET() {
   try {
@@ -45,6 +52,32 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
+    const submissionContext = getSubmissionContext(request);
+    const rateLimitResult = checkRateLimit(
+      `guestbook:${submissionContext.ipHash}`,
+      RATE_LIMIT_CONFIG
+    );
+    const rateLimitHeaders = getRateLimitHeaders(rateLimitResult);
+
+    if (!rateLimitResult.allowed) {
+      const response = NextResponse.json(
+        {
+          success: false,
+          error: {
+            message: 'Too many requests. Please try again later.',
+            code: 'RATE_LIMITED',
+          },
+        },
+        { status: 429 }
+      );
+
+      Object.entries(rateLimitHeaders).forEach(([key, value]) => {
+        response.headers.set(key, value);
+      });
+
+      return response;
+    }
+
     const body = await request.json();
     const parsed = createGuestbookEntrySchema.safeParse(body);
 
@@ -52,30 +85,52 @@ export async function POST(request: NextRequest) {
       return validationErrorResponse(parsed.error.flatten().fieldErrors);
     }
 
-    const { message, userEmail, turnstileToken } = parsed.data;
+    const { message, guestbookToken, turnstileToken } = parsed.data;
 
     const turnstileValidation = await validateTurnstileToken(turnstileToken);
     if (!turnstileValidation.success) {
-      return errorResponse(
+      const response = errorResponse(
         turnstileValidation.message ?? 'CAPTCHA verification failed. Please try again.',
         turnstileValidation.status ?? 400,
         turnstileValidation.code ?? 'TURNSTILE_VERIFICATION_FAILED'
       );
+
+      Object.entries(rateLimitHeaders).forEach(([key, value]) => {
+        response.headers.set(key, value);
+      });
+
+      return response;
+    }
+
+    const guestbookIdentity = await verifyGuestbookToken(guestbookToken);
+
+    if (!guestbookIdentity) {
+      const response = unauthorizedResponse('Guestbook sign-in expired. Please sign in again.');
+
+      Object.entries(rateLimitHeaders).forEach(([key, value]) => {
+        response.headers.set(key, value);
+      });
+
+      return response;
     }
 
     const userResult = await db
       .select({ id: users.id })
       .from(users)
-      .where(eq(users.email, userEmail))
+      .where(eq(users.id, guestbookIdentity.sub))
       .limit(1);
 
     const user = userResult[0];
 
     if (!user) {
-      return unauthorizedResponse('User not found. Please sign in again.');
-    }
+      const response = unauthorizedResponse('User not found. Please sign in again.');
 
-    const submissionContext = getSubmissionContext(request);
+      Object.entries(rateLimitHeaders).forEach(([key, value]) => {
+        response.headers.set(key, value);
+      });
+
+      return response;
+    }
 
     const locationData = {
       ipHash: submissionContext.ipHash,
@@ -89,7 +144,13 @@ export async function POST(request: NextRequest) {
 
     const entry = await guestbookService.create(user.id, message, locationData);
 
-    return successResponse(entry, 'Entry added successfully');
+    const response = successResponse(entry, 'Entry added successfully');
+
+    Object.entries(rateLimitHeaders).forEach(([key, value]) => {
+      response.headers.set(key, value);
+    });
+
+    return response;
   } catch {
     return serverErrorResponse();
   }

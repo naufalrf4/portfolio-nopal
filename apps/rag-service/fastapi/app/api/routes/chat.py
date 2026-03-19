@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException
+from typing import Annotated, cast
+
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.ext.asyncio import AsyncSession
-from typing import cast
 
 from app.api.responses import error_response, success_response
 from app.db.session import get_async_session
@@ -9,13 +10,19 @@ from app.services.chat_service import ChatService
 from app.services.errors import RagServiceError
 
 router = APIRouter(tags=["chat"])
+SessionDep = Annotated[AsyncSession, Depends(get_async_session)]
 
 
 @router.post("/chat")
-async def chat(request: ChatRequest, session: AsyncSession = Depends(get_async_session)):
+async def chat(
+    request: ChatRequest,
+    http_request: Request,
+    session: SessionDep,
+):
     service = ChatService(session)
+    preferred_language = http_request.headers.get("accept-language")
     try:
-        response = await service.chat(request)
+        response = await service.chat(request, preferred_language)
         return success_response(response.model_dump(mode="json", by_alias=True))
     except RagServiceError as exc:
         return error_response(exc.message, exc.status_code, exc.code)

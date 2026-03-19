@@ -1,7 +1,9 @@
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { users } from '@/lib/db/schema';
 import { successResponse, serverErrorResponse, validationErrorResponse } from '@/lib/api/responses';
+import { getSubmissionContext } from '@/lib/api/submission-context';
+import { checkRateLimit, getRateLimitHeaders } from '@/lib/services/rate-limiter';
 import { z } from 'zod';
 import { createId } from '@paralleldrive/cuid2';
 
@@ -14,8 +16,39 @@ const syncUserSchema = z.object({
   image: z.string().url().optional().nullable(),
 });
 
+const RATE_LIMIT_CONFIG = {
+  maxRequests: 10,
+  windowMs: 5 * 60 * 1000,
+};
+
 export async function POST(request: NextRequest) {
   try {
+    const submissionContext = getSubmissionContext(request);
+    const rateLimitResult = checkRateLimit(
+      `public-auth-sync:${submissionContext.ipHash}`,
+      RATE_LIMIT_CONFIG
+    );
+    const rateLimitHeaders = getRateLimitHeaders(rateLimitResult);
+
+    if (!rateLimitResult.allowed) {
+      const response = NextResponse.json(
+        {
+          success: false,
+          error: {
+            message: 'Too many requests. Please try again later.',
+            code: 'RATE_LIMITED',
+          },
+        },
+        { status: 429 }
+      );
+
+      Object.entries(rateLimitHeaders).forEach(([key, value]) => {
+        response.headers.set(key, value);
+      });
+
+      return response;
+    }
+
     const body = await request.json();
     const parsed = syncUserSchema.safeParse(body);
 
@@ -58,7 +91,13 @@ export async function POST(request: NextRequest) {
         image: users.image,
       });
 
-    return successResponse(user, 'User synced successfully');
+    const response = successResponse(user, 'User synced successfully');
+
+    Object.entries(rateLimitHeaders).forEach(([key, value]) => {
+      response.headers.set(key, value);
+    });
+
+    return response;
   } catch {
     return serverErrorResponse();
   }

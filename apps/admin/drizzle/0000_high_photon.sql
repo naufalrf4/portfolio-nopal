@@ -1,6 +1,3 @@
--- Current sql file was generated after introspecting the database
--- If you want to run this migration please uncomment this code before executing migrations
-/*
 CREATE TYPE "public"."BookingStatus" AS ENUM('PENDING', 'CONFIRMED', 'CANCELLED', 'COMPLETED');--> statement-breakpoint
 CREATE TYPE "public"."ProjectContextType" AS ENUM('CONTEXT', 'ROLE', 'DECISIONS', 'TRADEOFFS', 'RESULT', 'ARCHITECTURE', 'OPERATIONS', 'METRICS');--> statement-breakpoint
 CREATE TYPE "public"."SlotStatus" AS ENUM('AVAILABLE', 'BOOKED', 'BLOCKED');--> statement-breakpoint
@@ -320,14 +317,14 @@ CREATE UNIQUE INDEX "users_email_key" ON "users" USING btree ("email" text_ops);
 CREATE UNIQUE INDEX "verification_tokens_identifier_token_key" ON "verification_tokens" USING btree ("identifier" text_ops,"token" text_ops);--> statement-breakpoint
 CREATE UNIQUE INDEX "verification_tokens_token_key" ON "verification_tokens" USING btree ("token" text_ops);--> statement-breakpoint
 CREATE INDEX "booking_availability_dayOfWeek_idx" ON "booking_availability" USING btree ("dayOfWeek" int4_ops);--> statement-breakpoint
-CREATE UNIQUE INDEX "booking_availability_dayOfWeek_startTime_endTime_key" ON "booking_availability" USING btree ("dayOfWeek" int4_ops,"startTime" int4_ops,"endTime" text_ops);--> statement-breakpoint
+CREATE UNIQUE INDEX "booking_availability_dayOfWeek_startTime_endTime_key" ON "booking_availability" USING btree ("dayOfWeek" int4_ops,"startTime" text_ops,"endTime" text_ops);--> statement-breakpoint
 CREATE INDEX "booking_availability_enabled_idx" ON "booking_availability" USING btree ("enabled" bool_ops);--> statement-breakpoint
 CREATE UNIQUE INDEX "accounts_provider_providerAccountId_key" ON "accounts" USING btree ("provider" text_ops,"providerAccountId" text_ops);--> statement-breakpoint
 CREATE UNIQUE INDEX "sessions_sessionToken_key" ON "sessions" USING btree ("sessionToken" text_ops);--> statement-breakpoint
 CREATE INDEX "project_images_order_idx" ON "project_images" USING btree ("order" int4_ops);--> statement-breakpoint
 CREATE INDEX "project_images_projectId_idx" ON "project_images" USING btree ("projectId" text_ops);--> statement-breakpoint
-CREATE INDEX "booking_slots_date_status_idx" ON "booking_slots" USING btree ("date" date_ops,"status" date_ops);--> statement-breakpoint
-CREATE UNIQUE INDEX "booking_slots_date_time_key" ON "booking_slots" USING btree ("date" text_ops,"time" text_ops);--> statement-breakpoint
+CREATE INDEX "booking_slots_date_status_idx" ON "booking_slots" USING btree ("date" date_ops,"status" enum_ops);--> statement-breakpoint
+CREATE UNIQUE INDEX "booking_slots_date_time_key" ON "booking_slots" USING btree ("date" date_ops,"time" text_ops);--> statement-breakpoint
 CREATE INDEX "anonymous_messages_city_idx" ON "anonymous_messages" USING btree ("city" text_ops);--> statement-breakpoint
 CREATE INDEX "anonymous_messages_countryCode_idx" ON "anonymous_messages" USING btree ("countryCode" text_ops);--> statement-breakpoint
 CREATE INDEX "anonymous_messages_createdAt_idx" ON "anonymous_messages" USING btree ("createdAt" timestamp_ops);--> statement-breakpoint
@@ -354,5 +351,4 @@ CREATE INDEX "projects_slug_idx" ON "projects" USING btree ("slug" text_ops);-->
 CREATE UNIQUE INDEX "projects_slug_key" ON "projects" USING btree ("slug" text_ops);--> statement-breakpoint
 CREATE INDEX "projects_visible_idx" ON "projects" USING btree ("visible" bool_ops);--> statement-breakpoint
 CREATE INDEX "achievements_order_idx" ON "achievements" USING btree ("order" int4_ops);--> statement-breakpoint
-CREATE INDEX "achievements_visible_idx" ON "achievements" USING btree ("visible" bool_ops);
-*/
+CREATE INDEX "achievements_visible_idx" ON "achievements" USING btree ("visible" bool_ops);--> statement-breakpoint

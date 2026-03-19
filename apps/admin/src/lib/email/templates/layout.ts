@@ -1,136 +1,230 @@
-export function emailLayout(content: string): string {
+import { escapeHtml } from './helper';
+
+type EmailLayoutOptions = {
+  preheader: string;
+  content: string;
+};
+
+export function emailLayout({ preheader, content }: EmailLayoutOptions): string {
   return `
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Email from NaufalRF</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NaufalRF</title>
   <style>
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      line-height: 1.6;
-      color: #333;
-      background-color: #f4f4f4;
       margin: 0;
       padding: 0;
+      background: #eef3fb;
+      color: #16355d;
+      font-family: 'Segoe UI', Arial, sans-serif;
     }
-    .container {
-      max-width: 600px;
-      margin: 20px auto;
-      background-color: #ffffff;
-      border-radius: 8px;
+    .preheader {
+      display: none !important;
+      visibility: hidden;
+      opacity: 0;
+      color: transparent;
+      height: 0;
+      width: 0;
       overflow: hidden;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      mso-hide: all;
     }
-    .header {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: #ffffff;
-      padding: 30px;
-      text-align: center;
+    .shell {
+      width: 100%;
+      padding: 24px 12px;
+      box-sizing: border-box;
     }
-    .header h1 {
+    .frame {
+      max-width: 640px;
+      margin: 0 auto;
+      background: #f8fbff;
+      border: 1px solid #d7e3f4;
+      border-radius: 28px;
+      overflow: hidden;
+      box-shadow: 18px 18px 36px rgba(180, 196, 219, 0.38), -18px -18px 36px rgba(255, 255, 255, 0.9);
+    }
+    .top-line {
+      height: 6px;
+      background: linear-gradient(90deg, #2563eb 0%, #38bdf8 100%);
+    }
+    .hero {
+      padding: 32px 32px 12px;
+    }
+    .eyebrow {
+      margin: 0 0 10px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #2563eb;
+    }
+    .hero h1 {
+      margin: 0 0 12px;
+      font-size: 30px;
+      line-height: 1.15;
+      color: #102a4c;
+    }
+    .hero-copy {
       margin: 0;
-      font-size: 24px;
-      font-weight: 600;
+      font-size: 15px;
+      line-height: 1.6;
+      color: #47688f;
     }
     .content {
-      padding: 30px;
+      padding: 0 32px 32px;
     }
-    .content h2 {
-      color: #333;
-      font-size: 20px;
-      margin-top: 0;
-      margin-bottom: 20px;
+    .card {
+      background: #ffffff;
+      border: 1px solid #dfe9f6;
+      border-radius: 22px;
+      padding: 20px;
+      box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.95), 0 12px 30px rgba(184, 200, 221, 0.16);
+      margin-top: 16px;
     }
-    .content p {
-      margin: 15px 0;
-      color: #555;
+    .details-table {
+      border-collapse: collapse;
     }
-    .info-box {
-      background-color: #f8f9fa;
-      border-left: 4px solid #667eea;
-      padding: 15px 20px;
-      margin: 20px 0;
-      border-radius: 4px;
+    .details-table tr + tr td {
+      border-top: 1px solid #ebf1f8;
     }
-    .info-box p {
-      margin: 8px 0;
+    .detail-label,
+    .detail-value {
+      padding: 12px 0;
+      vertical-align: top;
+      font-size: 14px;
+      line-height: 1.5;
     }
-    .info-box strong {
-      color: #333;
+    .detail-label {
+      width: 38%;
+      color: #6a87ac;
+      padding-right: 16px;
+    }
+    .detail-value {
+      color: #102a4c;
+      font-weight: 600;
+      word-break: break-word;
+    }
+    .status-badge {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .message-block {
+      margin-top: 16px;
+      padding: 16px 18px;
+      border-radius: 18px;
+      background: #f4f8fd;
+      border: 1px solid #dfe9f6;
+    }
+    .message-label {
+      margin: 0 0 8px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #5b7da6;
+    }
+    .message-body {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.7;
+      color: #1b3658;
+    }
+    .button-group {
+      margin-top: 18px;
+      text-align: left;
     }
     .button {
       display: inline-block;
-      padding: 12px 30px;
-      background-color: #667eea;
-      color: #ffffff !important;
+      margin: 0 12px 12px 0;
+      padding: 12px 18px;
+      border-radius: 14px;
       text-decoration: none;
-      border-radius: 6px;
-      font-weight: 600;
-      margin: 10px 5px;
-      transition: background-color 0.3s;
+      font-size: 14px;
+      font-weight: 700;
     }
-    .button:hover {
-      background-color: #5568d3;
-    }
-    .button.success {
-      background-color: #10b981;
-    }
-    .button.success:hover {
-      background-color: #059669;
-    }
-    .button.danger {
-      background-color: #ef4444;
-    }
-    .button.danger:hover {
-      background-color: #dc2626;
+    .meta-note {
+      margin: 14px 0 0;
+      font-size: 13px;
+      line-height: 1.6;
+      color: #5b7da6;
     }
     .footer {
-      background-color: #f8f9fa;
-      padding: 20px 30px;
-      text-align: center;
-      color: #888;
-      font-size: 14px;
+      padding: 0 32px 30px;
     }
-    .footer p {
-      margin: 5px 0;
+    .footer-card {
+      background: #edf4fd;
+      border: 1px solid #d7e3f4;
+      border-radius: 18px;
+      padding: 18px 20px;
+      font-size: 13px;
+      line-height: 1.6;
+      color: #5b7da6;
     }
-    .footer a {
-      color: #667eea;
+    .footer-card strong {
+      color: #16355d;
+    }
+    .footer-card a {
+      color: #2563eb;
       text-decoration: none;
     }
-    .divider {
-      border: 0;
-      height: 1px;
-      background-color: #e5e7eb;
-      margin: 25px 0;
-    }
-    .message-preview {
-      background-color: #f9fafb;
-      border-radius: 6px;
-      padding: 20px;
-      margin: 20px 0;
-      border: 1px solid #e5e7eb;
-    }
-    .reference-id {
-      font-family: 'Courier New', monospace;
-      background-color: #f3f4f6;
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-size: 14px;
+    @media only screen and (max-width: 640px) {
+      .shell {
+        padding: 12px;
+      }
+      .hero,
+      .content,
+      .footer {
+        padding-left: 20px;
+        padding-right: 20px;
+      }
+      .hero {
+        padding-top: 24px;
+      }
+      .hero h1 {
+        font-size: 25px;
+      }
+      .card {
+        padding: 16px;
+        border-radius: 18px;
+      }
+      .detail-label,
+      .detail-value {
+        display: block;
+        width: 100%;
+        padding: 6px 0;
+      }
+      .detail-label {
+        padding-bottom: 0;
+      }
+      .button {
+        display: block;
+        width: auto;
+        text-align: center;
+        margin-right: 0;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    ${content}
-    <div class="footer">
-      <p>NaufalRF | Full-Stack Engineer</p>
-      <p><a href="https://naufalrf.tech">naufalrf.tech</a></p>
-      <p style="margin-top: 15px; font-size: 12px; color: #aaa;">
-        This is an automated message. Please do not reply to this email.
-      </p>
+  <div class="preheader">${escapeHtml(preheader)}</div>
+  <div class="shell">
+    <div class="frame">
+      <div class="top-line"></div>
+      ${content}
+      <div class="footer">
+        <div class="footer-card">
+          <strong>NaufalRF</strong><br />
+          Full-Stack Engineer<br />
+          <a href="https://naufalrf.tech">naufalrf.tech</a>
+        </div>
+      </div>
     </div>
   </div>
 </body>

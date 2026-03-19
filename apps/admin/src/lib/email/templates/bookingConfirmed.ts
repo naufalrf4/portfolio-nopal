@@ -1,45 +1,37 @@
-import { emailLayout } from './layout';
 import type { BookingStatusUpdateData } from '../types';
+import { formatDuration, formatReference } from './helper';
+import {
+  renderCard,
+  renderDetailList,
+  renderHeader,
+  renderMessageBlock,
+  renderMeta,
+  renderStatusBadge,
+} from './partials';
+import { emailLayout } from './layout';
 
 export function bookingConfirmedTemplate(data: BookingStatusUpdateData): string {
-  const { bookingId, name, date, time, duration, message } = data;
+  const { bookingId, date, time, duration, message } = data;
 
   const content = `
-    <div class="header">
-      <h1>✅ Booking Confirmed!</h1>
-    </div>
+    ${renderHeader('Booking confirmed', 'Your session is confirmed. See the details below.')}
     <div class="content">
-      <h2>Hi ${name},</h2>
-      <p>Great news! Your booking has been confirmed.</p>
-      
-      <div class="info-box">
-        <p><strong>Booking ID:</strong> <span class="reference-id">#${bookingId.slice(0, 8).toUpperCase()}</span></p>
-        <p><strong>Date:</strong> ${date}</p>
-        <p><strong>Time:</strong> ${time}</p>
-        <p><strong>Duration:</strong> ${duration} minutes</p>
-        <p><strong>Status:</strong> <span style="color: #10b981; font-weight: 600;">CONFIRMED</span></p>
-      </div>
-
-      ${
-        message
-          ? `
-      <div class="message-preview">
-        <p style="margin: 0; font-weight: 600; color: #666; font-size: 14px; margin-bottom: 8px;">Message from me:</p>
-        <p style="margin: 0; white-space: pre-wrap; word-wrap: break-word;">${message}</p>
-      </div>
-      `
-          : ''
-      }
-
-      <p>Looking forward to meeting with you!</p>
-
-      <hr class="divider" />
-
-      <p style="color: #888; font-size: 14px;">
-        <strong>Need to make changes?</strong> Please reply to this email or contact me directly.
-      </p>
+      ${renderCard(
+        renderDetailList([
+          { label: 'Reference', value: formatReference(bookingId) },
+          { label: 'Date', value: date },
+          { label: 'Time', value: time },
+          { label: 'Duration', value: formatDuration(duration) },
+          { label: 'Status', value: renderStatusBadge('Confirmed', 'success') },
+        ])
+      )}
+      ${message ? renderMessageBlock('Note', message) : ''}
+      ${renderMeta('If you need to make a change, reply to this email.')}
     </div>
   `;
 
-  return emailLayout(content);
+  return emailLayout({
+    preheader: 'Your booking has been confirmed.',
+    content,
+  });
 }

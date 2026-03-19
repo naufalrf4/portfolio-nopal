@@ -1,21 +1,70 @@
-import {
-  S3Client,
-  PutObjectCommand,
-  DeleteObjectCommand,
-  GetObjectCommand,
-  PutObjectCommandInput,
-} from '@aws-sdk/client-s3';
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import { Storage } from '@google-cloud/storage';
 
-export const s3Client = new S3Client({
-  region: process.env.R2_REGION ?? 'ap-southeast-1',
-  credentials: {
-    accessKeyId: process.env.R2_ACCESS_KEY_ID!,
-    secretAccessKey: process.env.R2_SECRET_ACCESS_KEY!,
-  },
-});
+interface ServiceAccountCredentials {
+  client_email?: string;
+  private_key?: string;
+}
 
-const BUCKET_NAME = process.env.R2_BUCKET_NAME!;
+function getCredentials(): ServiceAccountCredentials | undefined {
+  const rawCredentials = process.env.GCS_SERVICE_ACCOUNT_JSON?.trim();
+
+  if (!rawCredentials) {
+    return undefined;
+  }
+
+  const parsed = JSON.parse(rawCredentials) as ServiceAccountCredentials;
+  return parsed.client_email && parsed.private_key ? parsed : undefined;
+}
+
+function getRequiredEnv(name: 'GCS_BUCKET_NAME' | 'GCS_PROJECT_ID'): string {
+  const value = process.env[name]?.trim();
+
+  if (!value) {
+    throw new Error(`${name} is required.`);
+  }
+
+  return value;
+}
+
+function normalizePublicBaseUrl(value: string | undefined): string | null {
+  const trimmed = value?.trim();
+  if (!trimmed) {
+    return null;
+  }
+
+  return trimmed.replace(/\/+$/, '');
+}
+
+function encodeObjectKey(key: string): string {
+  return key
+    .split('/')
+    .map((segment) => encodeURIComponent(segment))
+    .join('/');
+}
+
+let cachedStorageClient: Storage | null = null;
+
+function getStorageClient(): Storage {
+  if (cachedStorageClient) {
+    return cachedStorageClient;
+  }
+
+  const credentials = getCredentials();
+  cachedStorageClient = new Storage({
+    projectId: getRequiredEnv('GCS_PROJECT_ID'),
+    ...(credentials ? { credentials } : {}),
+  });
+
+  return cachedStorageClient;
+}
+
+function getBucketName(): string {
+  return getRequiredEnv('GCS_BUCKET_NAME');
+}
+
+function getPublicBaseUrl(): string | null {
+  return normalizePublicBaseUrl(process.env.GCS_PUBLIC_BASE_URL);
+}
 
 export type UploadFolder = 'projects' | 'about' | 'achievements' | 'resumes';
 
@@ -32,7 +81,7 @@ const ALLOWED_DOCUMENT_TYPES = [
   'text/markdown',
   'application/rtf',
 ];
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
 export class StorageService {
   async uploadFile(file: File, folder: UploadFolder): Promise<UploadResult> {
@@ -41,34 +90,34 @@ export class StorageService {
     const key = this.generateKey(file.name, folder);
     const buffer = Buffer.from(await file.arrayBuffer());
 
-    const params: PutObjectCommandInput = {
-      Bucket: BUCKET_NAME,
-      Key: key,
-      Body: buffer,
-      ContentType: file.type,
-    };
-
-    await s3Client.send(new PutObjectCommand(params));
+    await getStorageClient().bucket(getBucketName()).file(key).save(buffer, {
+      resumable: false,
+      metadata: {
+        contentType: file.type,
+        cacheControl: this.getCacheControl(folder),
+      },
+    });
 
     return { key };
   }
 
   async signGetUrl(key: string, expiresInSeconds = 3600): Promise<string> {
-    const command = new GetObjectCommand({
-      Bucket: BUCKET_NAME,
-      Key: key,
+    const publicBaseUrl = getPublicBaseUrl();
+    if (publicBaseUrl) {
+      return `${publicBaseUrl}/${encodeObjectKey(key)}`;
+    }
+
+    const [signedUrl] = await getStorageClient().bucket(getBucketName()).file(key).getSignedUrl({
+      version: 'v4',
+      action: 'read',
+      expires: Date.now() + expiresInSeconds * 1000,
     });
 
-    return getSignedUrl(s3Client, command, { expiresIn: expiresInSeconds });
+    return signedUrl;
   }
 
   async deleteFile(key: string): Promise<void> {
-    await s3Client.send(
-      new DeleteObjectCommand({
-        Bucket: BUCKET_NAME,
-        Key: key,
-      })
-    );
+    await getStorageClient().bucket(getBucketName()).file(key).delete({ ignoreNotFound: true });
   }
 
   async getPresignedUploadUrl(
@@ -76,12 +125,13 @@ export class StorageService {
     folder: UploadFolder
   ): Promise<{ url: string; key: string }> {
     const key = this.generateKey(filename, folder);
-    const command = new PutObjectCommand({
-      Bucket: BUCKET_NAME,
-      Key: key,
+    const [url] = await getStorageClient().bucket(getBucketName()).file(key).getSignedUrl({
+      version: 'v4',
+      action: 'write',
+      expires: Date.now() + 3600 * 1000,
+      contentType: 'application/octet-stream',
     });
 
-    const url = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
     return { url, key };
   }
 
@@ -101,6 +151,12 @@ export class StorageService {
     const timestamp = Date.now();
     const sanitizedFilename = filename.replace(/[^a-zA-Z0-9.-]/g, '_');
     return `${folder}/${timestamp}-${sanitizedFilename}`;
+  }
+
+  private getCacheControl(folder: UploadFolder): string {
+    return folder === 'resumes'
+      ? 'public, max-age=3600, s-maxage=3600'
+      : 'public, max-age=31536000, immutable';
   }
 }
 

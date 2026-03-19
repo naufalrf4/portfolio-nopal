@@ -9,6 +9,7 @@ import {
 } from '@/lib/db/schema';
 import { createId } from '@paralleldrive/cuid2';
 import type { CreateAnalyticsEventInput } from '@/lib/validations/analytics.schema';
+import { getGaDashboardSummary, getGaOverview, getGaPageViews } from '@/lib/analytics/ga4';
 
 type AnalyticsRange = '7d' | '30d' | '90d';
 type AnalyticsEventInsert = typeof analyticsEvents.$inferInsert;
@@ -103,6 +104,15 @@ export class AnalyticsService {
   }
 
   async getPageViews(page?: string, days: number = 30) {
+    try {
+      const gaPageViews = await getGaPageViews(page, days);
+      if (gaPageViews) {
+        return gaPageViews;
+      }
+    } catch (error) {
+      console.error('[AnalyticsService] Failed to load GA page views, falling back to internal analytics:', error);
+    }
+
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
 
@@ -237,6 +247,15 @@ export class AnalyticsService {
   }
 
   async getOverview(days: number = 30) {
+    try {
+      const gaOverview = await getGaOverview(days);
+      if (gaOverview) {
+        return gaOverview;
+      }
+    } catch (error) {
+      console.error('[AnalyticsService] Failed to load GA overview, falling back to internal analytics:', error);
+    }
+
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
 
@@ -519,6 +538,8 @@ export class AnalyticsService {
         linkStatsMap.set(key, existing);
       });
 
+    const gaSummary = await getGaDashboardSummary(days);
+
     return {
       range,
       overview: {
@@ -527,6 +548,7 @@ export class AnalyticsService {
         uniqueCountries: countriesMap.size,
         sourceApps: sourceAppMap.size,
       },
+      ga4: gaSummary,
       trend: Array.from(trendMap.entries())
         .map(([date, stats]) => ({ date, ...stats }))
         .sort((first, second) => first.date.localeCompare(second.date)),

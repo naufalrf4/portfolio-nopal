@@ -72,12 +72,8 @@ Authoritative AI control contract for this repository.
 - `fastapi/README.md` is the clearest local source for route and schema expectations.
 - The wrapper manifest states that Admin manages the broader migration lifecycle; do not assume RAG owns cross-app schema migrations.
 - RAG is a direct database actor in this repo even though the non-admin frontend apps are not.
-- Admin content export now carries long-form project knowledge in `projects.content`; RAG ingest must prefer that field and only fall back to legacy `contexts` when `content` is empty.
-- Chunk metadata and chat responses are the public chatbot contract surface; preserve route/source fields such as `route`, `route_label`, `source_type`, `source_ref`, `section`, and `title` when evolving ingest or response shapes.
-- Retrieval now mixes dense pgvector search with Postgres lexical ranking and uses evidence gating for low-confidence `rag` answers; keep both retrieval paths and confidence metadata aligned when adjusting chat behavior.
-- Freelance/tool intent handling now normalizes EN/ID planner output into a shared intent taxonomy and should load `aboutMe.freelanceProfile` context for freelance intents generally, not only when the explicit `feature_pricing_quote` tool path is selected.
-- When `intent == "freelance_quote"` and the planner chooses `tool` or `hybrid`, coerce missing `toolName` to `feature_pricing_quote` so EN/ID quote flows stay deterministic.
-- `fastapi/app/services/chat_service.py` should stay a thin orchestrator over history load, planning, intent-context loading, tool execution, retrieval, response generation, and persistence helpers rather than re-accumulating all logic inside `chat()`.
-- `fastapi/app/services/admin_client.py` should save chat logs with `mode="append"` and only the new turn payload; avoid sending the full transcript back to Admin on each request.
-- `fastapi/app/services/prompt_builder.py` fallback planning now parses embedded `toolArguments: {...}` JSON from quote requests; keep that parser aligned with the public quote prompt shape so structured EN/ID requests can bypass LLM extraction failures.
-- Completed `feature_pricing_quote` results should short-circuit the final answer layer even in `hybrid` freelance flows; do not re-route finished deterministic quote output back through freeform generation.
+- Docker `rag-bootstrap` should only provision the `vector` extension and `rag` schema; Admin Drizzle migrations own `rag.documents`, `rag.chunks`, and `rag.ingestion_runs`.
+- FastAPI docs surfaces stay available outside production, but `APP_ENV=production` must keep `/docs` and `/redoc` disabled.
+- RAG should use `ADMIN_INTERNAL_API_TOKEN` for Admin internal API calls and `RAG_INGEST_SERVICE_TOKEN` for validating `/ingest`; `ADMIN_SERVICE_TOKEN` is legacy fallback compatibility only.
+- Production browser chat traffic should reach RAG only through the `apps/public-astro` proxy layer; do not assume `POST /chat` is meant for direct public edge exposure.
+- RAG chat prompt building now uses forwarded `Accept-Language` as a response-language hint; preserve same-language, semi-casual/semi-formal answering unless the user explicitly changes that assistant behavior.

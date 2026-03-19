@@ -23,6 +23,16 @@ export const metadata: Metadata = {
     template: '%s | Admin',
   },
   description: 'Portfolio CMS Admin Dashboard',
+  robots: {
+    index: false,
+    follow: false,
+    nocache: true,
+    googleBot: {
+      index: false,
+      follow: false,
+      noimageindex: true,
+    },
+  },
 };
 
 export default function RootLayout({

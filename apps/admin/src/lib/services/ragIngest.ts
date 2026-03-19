@@ -14,7 +14,8 @@ export interface RagIngestResult {
   errorMessage?: string;
 }
 
-const ADMIN_SERVICE_TOKEN = process.env.ADMIN_SERVICE_TOKEN || '';
+const RAG_INGEST_SERVICE_TOKEN =
+  process.env.RAG_INGEST_SERVICE_TOKEN || process.env.ADMIN_SERVICE_TOKEN || '';
 const FASTAPI_RAG_SERVICE_URL = process.env.FASTAPI_RAG_SERVICE_URL || 'http://localhost:3005';
 
 function normalizeBaseUrl(url: string): string {
@@ -59,7 +60,7 @@ export async function dispatchRagIngest(request: RagIngestRequest): Promise<RagI
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-Service-Token': ADMIN_SERVICE_TOKEN,
+        'X-Service-Token': RAG_INGEST_SERVICE_TOKEN,
       },
       body: JSON.stringify(request),
     });

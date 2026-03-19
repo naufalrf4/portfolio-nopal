@@ -6,14 +6,19 @@ interface PublicGuestbookSignInPageProps {
   searchParams: Promise<{ callbackUrl?: string }>;
 }
 
+function normalizePublicCallbackUrl(callbackUrl: string | undefined): string {
+  return callbackUrl && callbackUrl.startsWith('/') ? callbackUrl : '/';
+}
+
 export default async function PublicGuestbookSignInPage({
   searchParams,
 }: PublicGuestbookSignInPageProps) {
   const session = await safeAuth();
   const params = await searchParams;
+  const callbackUrl = normalizePublicCallbackUrl(params.callbackUrl);
 
   if (session?.user) {
-    redirect(params.callbackUrl || '/');
+    redirect(callbackUrl);
   }
 
   return (
@@ -29,7 +34,7 @@ export default async function PublicGuestbookSignInPage({
             </p>
           </div>
 
-          <SignInForm callbackUrl={params.callbackUrl} />
+          <SignInForm callbackUrl={callbackUrl} mode="public" />
         </div>
       </div>
     </div>

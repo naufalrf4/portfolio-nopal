@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
+import { createGuestbookToken } from '@/lib/guestbook-token';
 
 function buildSignInUrl(request: NextRequest, returnTo: string) {
   const signInUrl = new URL('/auth/signin', request.url);
@@ -19,14 +20,21 @@ export async function GET(request: NextRequest) {
 
   const session = await auth();
 
-  if (!session?.user?.email) {
+  if (!session?.user?.email || !session.user.id) {
     return NextResponse.redirect(buildSignInUrl(request, returnTo));
   }
 
   try {
+    const { token } = await createGuestbookToken({
+      userId: session.user.id,
+      email: session.user.email,
+      name: session.user.name ?? null,
+      image: session.user.image ?? null,
+    });
     const redirectUrl = new URL(returnTo);
     redirectUrl.searchParams.set('guestbook_sync', '1');
     redirectUrl.searchParams.set('guestbook_email', session.user.email);
+    redirectUrl.searchParams.set('guestbook_token', token);
 
     if (session.user.name) {
       redirectUrl.searchParams.set('guestbook_name', session.user.name);

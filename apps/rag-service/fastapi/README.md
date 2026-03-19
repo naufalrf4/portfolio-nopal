@@ -33,6 +33,7 @@ uv run python -c "from app.main import app; print(app.title)"
 
 Notes:
 
-- `/ingest` expects `X-Service-Token`
+- `/ingest` expects `X-Service-Token` that matches `RAG_INGEST_SERVICE_TOKEN` (or legacy `ADMIN_SERVICE_TOKEN` fallback)
+- Admin internal API calls from RAG use `ADMIN_INTERNAL_API_TOKEN` (or legacy `ADMIN_SERVICE_TOKEN` fallback)
 - `/chat` and `/ingest` keep the same external request/response envelope used by the public chatbot and Admin ingest flows
 - local Docker Compose uses `pgvector/pgvector:pg16` so the `vector` extension is available during startup

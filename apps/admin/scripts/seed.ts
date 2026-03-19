@@ -1,5 +1,6 @@
 import { config as loadEnv } from 'dotenv';
 import { promises as fs } from 'node:fs';
+import type { Dirent } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createId } from '@paralleldrive/cuid2';
@@ -884,7 +885,16 @@ async function readPdfText(fileName: string): Promise<string | null> {
 }
 
 async function buildKnowledgeDocs(now: string): Promise<KnowledgeDocInsert[]> {
-  const dataEntries = await fs.readdir(dataDir, { withFileTypes: true });
+  let dataEntries: Dirent<string>[] = [];
+
+  try {
+    dataEntries = await fs.readdir(dataDir, { withFileTypes: true });
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
+      throw error;
+    }
+  }
+
   const supportedFiles = dataEntries
     .filter((entry) => entry.isFile())
     .map((entry) => entry.name)
@@ -968,10 +978,10 @@ async function resetPublicContentTables(runtime: AdminRuntime) {
 
 async function triggerRagIngest() {
   const ragUrl = process.env.FASTAPI_RAG_SERVICE_URL || 'http://127.0.0.1:3005';
-  const serviceToken = process.env.ADMIN_SERVICE_TOKEN;
+  const serviceToken = process.env.RAG_INGEST_SERVICE_TOKEN || process.env.ADMIN_SERVICE_TOKEN;
 
   if (!serviceToken) {
-    console.warn('Skipping RAG ingest because ADMIN_SERVICE_TOKEN is missing.');
+    console.warn('Skipping RAG ingest because RAG_INGEST_SERVICE_TOKEN is missing.');
     return;
   }
 

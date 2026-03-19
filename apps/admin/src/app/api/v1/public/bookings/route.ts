@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { db } from '@/lib/db';
 import { bookings, bookingSlots, bookingSettings } from '@/lib/db/schema';
@@ -14,6 +14,7 @@ import { validateTurnstileToken } from '@/lib/services/turnstile';
 import { emailService } from '@/lib/services/emailService';
 import { createId } from '@paralleldrive/cuid2';
 import { getSubmissionContext } from '@/lib/api/submission-context';
+import { checkRateLimit, getRateLimitHeaders } from '@/lib/services/rate-limiter';
 
 const publicBookingSchema = z.object({
   slotId: z.string().min(1),
@@ -25,8 +26,39 @@ const publicBookingSchema = z.object({
   timezone: z.string().max(100).optional(),
 });
 
+const RATE_LIMIT_CONFIG = {
+  maxRequests: 3,
+  windowMs: 5 * 60 * 1000,
+};
+
 export async function POST(request: NextRequest) {
   try {
+    const submissionContext = getSubmissionContext(request);
+    const rateLimitResult = checkRateLimit(
+      `bookings:${submissionContext.ipHash}`,
+      RATE_LIMIT_CONFIG
+    );
+    const rateLimitHeaders = getRateLimitHeaders(rateLimitResult);
+
+    if (!rateLimitResult.allowed) {
+      const response = NextResponse.json(
+        {
+          success: false,
+          error: {
+            message: 'Too many requests. Please try again later.',
+            code: 'RATE_LIMITED',
+          },
+        },
+        { status: 429 }
+      );
+
+      Object.entries(rateLimitHeaders).forEach(([key, value]) => {
+        response.headers.set(key, value);
+      });
+
+      return response;
+    }
+
     const body = await request.json();
 
     const parsed = publicBookingSchema.safeParse(body);
@@ -37,11 +69,17 @@ export async function POST(request: NextRequest) {
 
     const turnstileValidation = await validateTurnstileToken(parsed.data.turnstileToken);
     if (!turnstileValidation.success) {
-      return errorResponse(
+      const response = errorResponse(
         turnstileValidation.message ?? 'CAPTCHA verification failed. Please try again.',
         turnstileValidation.status ?? 400,
         turnstileValidation.code ?? 'TURNSTILE_VERIFICATION_FAILED'
       );
+
+      Object.entries(rateLimitHeaders).forEach(([key, value]) => {
+        response.headers.set(key, value);
+      });
+
+      return response;
     }
 
     const { slotId, name, email, phone, notes, timezone } = parsed.data;
@@ -72,8 +110,6 @@ export async function POST(request: NextRequest) {
     if (slotDateTime < now) {
       return errorResponse('Cannot book a slot in the past', 400);
     }
-
-    const submissionContext = getSubmissionContext(request);
 
     const nowStr = new Date().toISOString();
     const booking = await db.transaction(async (tx) => {
@@ -166,7 +202,13 @@ export async function POST(request: NextRequest) {
       console.error('[Booking API] Admin notification email failed:', emailError);
     }
 
-    return successResponse(responseData, 'Booking confirmed');
+    const response = successResponse(responseData, 'Booking confirmed');
+
+    Object.entries(rateLimitHeaders).forEach(([key, value]) => {
+      response.headers.set(key, value);
+    });
+
+    return response;
   } catch (error) {
     if (error instanceof SyntaxError) {
       return errorResponse('Invalid JSON body', 400);
