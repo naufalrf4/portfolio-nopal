@@ -183,7 +183,7 @@ def render_bootstrap_script(config: DeployConfig) -> str:
         fi
 
         sudo -n apt-get update
-        sudo -n apt-get install -y ca-certificates curl git ufw
+        sudo -n apt-get install -y ca-certificates curl git ufw fail2ban unattended-upgrades apt-listchanges
 
         if ! command -v docker >/dev/null 2>&1; then
           curl -fsSL https://get.docker.com | sudo -n sh
@@ -192,6 +192,25 @@ def render_bootstrap_script(config: DeployConfig) -> str:
         if ! docker compose version >/dev/null 2>&1; then
           sudo -n apt-get install -y docker-compose-plugin
         fi
+
+        sudo -n mkdir -p /etc/docker
+        cat <<'JSON' | sudo -n tee /etc/docker/daemon.json >/dev/null
+        {{
+          "live-restore": true,
+          "log-driver": "json-file",
+          "log-opts": {{
+            "max-size": "10m",
+            "max-file": "3"
+          }}
+        }}
+JSON
+        sudo -n systemctl enable docker
+        sudo -n systemctl restart docker
+        sudo -n systemctl enable fail2ban
+        sudo -n systemctl restart fail2ban
+        sudo -n systemctl enable unattended-upgrades
+        sudo -n systemctl restart unattended-upgrades || true
+        sudo -n dpkg-reconfigure -f noninteractive unattended-upgrades || true
 
         sudo -n usermod -aG docker {shlex.quote(config.user)} || true
         sudo -n mkdir -p {shlex.quote(config.remote_root)}
