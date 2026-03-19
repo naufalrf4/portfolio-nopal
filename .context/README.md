@@ -26,3 +26,8 @@ Intentionally omitted for now:
 Known contradiction that was repaired during initialization:
 
 - The root `README.md` previously implied that `apps/rag-service` used API-only integration. The app-local FastAPI evidence and user instruction show direct database access to the centralized Neon/Postgres instance through the `rag` schema, plus Admin internal API calls.
+
+Current repair notes:
+
+- Root steering docs now treat `apps/live-presence` as a sixth standalone app in the shell rather than leaving it implicit in `PROGRESS.md` only.
+- Root workflow truth now distinguishes between the working helper `bun run dev:all` and the currently broken manifest entry `bun run reset:seed`, whose backing `reset-seed-rag.sh` file is missing.

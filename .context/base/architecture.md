@@ -8,7 +8,7 @@ Repository shell for independent app repos under `apps/*`, with shared project t
 
 - Root contains metadata, shared linting hooks, and steering docs.
 - Each app owns its own dependencies, scripts, runtime, and environment file.
-- Cross-app communication happens through HTTP APIs and service tokens, except for the direct database actors documented below.
+- Cross-app communication happens through HTTP APIs and service tokens, except for the direct database actors and websocket presence service documented below.
 
 ## App boundaries
 
@@ -21,6 +21,7 @@ Repository shell for independent app repos under `apps/*`, with shared project t
   - Astro 5 + React public portfolio.
   - Reads portfolio content from Admin public APIs.
   - Talks to the RAG service for chat requests.
+  - Talks to `apps/live-presence` for ephemeral websocket presence.
   - Must not connect directly to the database.
 - `apps/links-astro`
   - Astro 5 + React links hub.
@@ -30,6 +31,10 @@ Repository shell for independent app repos under `apps/*`, with shared project t
   - SvelteKit 2 anonymous message app.
   - Submits public messages to Admin public APIs.
   - Must not connect directly to the database.
+- `apps/live-presence`
+  - Bun websocket service.
+  - Supplies ephemeral room-based cursor presence for the public site.
+  - Must not connect to the database or route presence traffic through Admin APIs.
 - `apps/rag-service`
   - Bun wrapper around `fastapi/`.
   - FastAPI app uses its own Python environment and direct Postgres access for the `rag` schema with pgvector.
@@ -41,14 +46,16 @@ Repository shell for independent app repos under `apps/*`, with shared project t
 - Admin owns the primary application schema and operational content flows.
 - RAG is the only non-admin service allowed to connect directly to the database, and that access should stay scoped to RAG-specific schemas/tables plus explicitly approved reads.
 - Public, Links, and NGL stay API-only consumers.
+- Live presence stays persistence-free and outside the database boundary entirely.
 
 ## Data flow
 
 1. Admin stores and exposes portfolio content through public and admin APIs.
 2. Public and Links fetch read models from Admin public endpoints.
 3. NGL submits anonymous messages to Admin public endpoints.
-4. Admin can trigger ingest requests to the RAG service through `dispatchRagIngest()` using `X-Service-Token`.
-5. RAG stores vectors and ingest state in Postgres and can send service-to-service updates back to Admin.
+4. Public site clients exchange ephemeral websocket presence updates with `apps/live-presence`.
+5. Admin can trigger ingest requests to the RAG service through `dispatchRagIngest()` using `X-Service-Token`.
+6. RAG stores vectors and ingest state in Postgres and can send service-to-service updates back to Admin.
 
 ## Design baseline
 
@@ -59,4 +66,5 @@ Repository shell for independent app repos under `apps/*`, with shared project t
 ## Repo truth notes
 
 - Root `README.md` now reflects that RAG has direct database access.
+- Root orchestration now includes `apps/live-presence` as a sixth local service.
 - App-local manifests and env examples are more authoritative than broad root summaries when they disagree.

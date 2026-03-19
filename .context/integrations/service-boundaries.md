@@ -4,12 +4,14 @@
 
 - `apps/admin` is the central HTTP API authority.
 - `apps/public-astro`, `apps/links-astro`, and `apps/ngl-svelte` are consumers of Admin APIs.
+- `apps/live-presence` is a standalone websocket service consumed by the public site presence layer.
 - `apps/rag-service` is both a direct database actor and an internal API consumer.
 
 ## Observed API consumers
 
 - `apps/public-astro/src/lib/api.ts` -> Admin public endpoints for about, projects, blogs, achievements, guestbook
 - `apps/public-astro/src/pages/api/auth/sync.ts` -> Admin public auth sync endpoint
+- `apps/public-astro` -> `apps/live-presence` websocket rooms for layout-wide cursor presence
 - `apps/links-astro/src/lib/api.ts` -> Admin public about and links endpoints
 - `apps/ngl-svelte/src/lib/api.ts` -> Admin public messages endpoint
 - `apps/admin/src/lib/services/ragIngest.ts` -> RAG `/ingest` endpoint using `X-Service-Token`
@@ -17,6 +19,7 @@
 ## Boundary rules
 
 - Public, Links, and NGL must stay API-only consumers.
+- Live presence must stay ephemeral and must not become a database actor or Admin API proxy.
 - Admin owns public, admin, and internal API contracts.
 - RAG may use direct database access only for approved retrieval and ingestion paths plus internal Admin coordination.
 - Internal service-to-service calls must use explicit tokens, not anonymous trust.

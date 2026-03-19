@@ -13,12 +13,16 @@ phases:
   - name: consumer-app-integration
     goal: ensure Public, Links, and NGL consume Admin APIs cleanly without bypassing boundaries
     status: pending
+  - name: presence-service-stability
+    goal: keep the live websocket presence layer ephemeral, page-aware, and cleanly integrated with the public site without adding persistence or Admin coupling
+    status: pending
   - name: rag-hardening
     goal: keep RAG schema/database access least-privileged and preserve contract compatibility with Admin and public chat clients
     status: pending
 
 known_dependencies:
   - Admin public APIs are upstream dependencies for Public, Links, and NGL.
+  - '`apps/public-astro` presence UI depends on the websocket event contract exposed by `apps/live-presence`.'
   - Admin service-token and content contracts are upstream dependencies for RAG.
   - Legacy phase2 design files are the baseline for future UI parity work.
 

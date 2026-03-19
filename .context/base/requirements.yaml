@@ -1,8 +1,9 @@
-mode: init
+mode: repair
 functional_requirements:
   - Keep the repository as a shell for standalone apps under `apps/*`.
   - Maintain `apps/admin` as the primary dashboard, content authority, and API authority.
   - Route all `public-astro`, `links-astro`, and `ngl-svelte` data access through Admin HTTP APIs.
+  - Keep `apps/live-presence` as an ephemeral websocket-only service for public-site presence rather than turning it into a persistence or Admin-proxy layer.
   - Allow direct database access only for `apps/admin` and `apps/rag-service`, with RAG scoped to its approved retrieval and ingest responsibilities.
   - Preserve page, component, and overall design direction from `../naufalrf-portfolio-phase2` across the unfinished apps.
 
@@ -16,8 +17,10 @@ non_goals:
   - Do not invent a shared workspace package manager flow at the root.
   - Do not add speculative feature requirements that are not evidenced yet.
   - Do not move non-admin frontend apps to direct database access.
+  - Do not treat manifest-declared root helpers as canonical if the backing script is missing.
 
 forbidden_changes:
   - No direct Neon/Postgres access from `apps/public-astro`, `apps/links-astro`, or `apps/ngl-svelte`.
+  - No database access or Admin API proxying from `apps/live-presence`.
   - No design reset that discards the legacy phase2 neumorphic baseline without explicit user direction.
   - No silent expansion of root-level commands beyond what manifests and docs currently define.

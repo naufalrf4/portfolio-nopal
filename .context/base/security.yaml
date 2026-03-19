@@ -5,15 +5,18 @@ current_observations:
       provider: Google OAuth via NextAuth v5 beta
       allowlist: ADMIN_EMAILS env gate in `src/lib/auth-security.ts`
     notable_config:
-      - trustHost true in src/lib/auth.ts
-      - public API CORS is currently wildcarded in `src/proxy.ts` and `next.config.js`
-      - internal service token used for RAG ingest requests
+      - proxy deployments should set `AUTH_TRUST_HOST=true` in env rather than hardcoding `trustHost` in `src/lib/auth.ts`
+      - public API CORS is request-scoped from `ADMIN_PUBLIC_API_ALLOWED_ORIGINS` in `src/proxy.ts`
+      - '`ADMIN_INTERNAL_API_TOKEN` protects Admin internal API routes for RAG access, with legacy `ADMIN_SERVICE_TOKEN` fallback only for migration compatibility'
+      - '`RAG_INGEST_SERVICE_TOKEN` is the preferred Admin -> RAG ingest secret, with legacy `ADMIN_SERVICE_TOKEN` fallback only for migration compatibility'
+      - public guestbook, booking, auth sync, and analytics POST routes now share the same in-memory rate-limit posture already used by contact and messages routes
   public_astro:
     direct_db_access: false
     public_inputs:
       - guestbook
       - auth sync
-      - chatbot client requests
+      - analytics events
+      - chatbot proxy requests
   links_astro:
     direct_db_access: false
   ngl_svelte:
@@ -21,12 +24,19 @@ current_observations:
     public_inputs:
       - anonymous message submission
       - Turnstile token
+  live_presence:
+    direct_db_access: false
+    persistence: none; ephemeral in-memory websocket state only
   rag_service:
     direct_db_access: true
     db_scope: intended for `rag` schema and retrieval/ingest responsibilities
     service_auth:
-      - ADMIN_SERVICE_TOKEN
+      - ADMIN_INTERNAL_API_TOKEN for RAG -> Admin internal API calls
+      - RAG_INGEST_SERVICE_TOKEN for Admin -> RAG ingest calls
       - Admin API URL backchannel
+    docs_surface: '`/docs` and `/redoc` stay disabled when `APP_ENV=production`'
+    ingress_headers: Caddy serves HSTS plus `Content-Security-Policy-Report-Only` and `Permissions-Policy` for staged browser hardening
+    public_edge_exposure: raw `/chat` should stay internal-only behind the public Astro proxy rather than a dedicated public RAG hostname
 
 recommended_hardening_from_user_direction_and_reference_research:
   - Use distinct Neon/Postgres roles for Admin, RAG, and migrations; do not share a single super-role.
@@ -36,8 +46,11 @@ recommended_hardening_from_user_direction_and_reference_research:
   - Restrict production database access with allowlists or equivalent network controls.
   - Keep service tokens and database URLs in secrets storage only.
   - Rotate service tokens and non-user credentials on a regular cadence.
-  - Narrow CORS from wildcard origins to explicit allowed origins before production hardening is considered complete.
-  - Keep public write endpoints rate-limited and CAPTCHA-protected.
+  - Keep Admin public API CORS on explicit origin allowlists; do not reintroduce wildcard browser origins.
+  - Keep guestbook posting authorized with short-lived server-signed proofs rather than trusting client-stored email identity.
+  - Keep public write endpoints rate-limited, and keep CAPTCHA protection on user-submitted message/contact/booking surfaces where the current UX already expects it.
+  - Keep browser chat traffic on the public Astro `/api/rag/chat` proxy and avoid re-exposing raw RAG chat at the public edge.
+  - Keep production app containers non-root, read-only, and `no-new-privileges` unless a verified runtime requirement forces a narrower exception.
 
 database_policy:
   centralized_database: Neon/Postgres
@@ -48,9 +61,11 @@ database_policy:
     - apps/public-astro
     - apps/links-astro
     - apps/ngl-svelte
+  ephemeral_non_db_service_actors:
+    - apps/live-presence
 
 known_gaps_or_unverified_items:
   - No row-level security evidence was found in this repo shell.
   - No CI-enforced security checks were found.
-  - Current wildcard CORS settings are broader than the target hardening posture.
+  - No root-level healthcheck or automated verification command exists for `apps/live-presence`; current verification remains manual.
   - The hardening recommendations above come from the user's security-improvement direction plus external best-practice research, not from already-enforced repo policy.

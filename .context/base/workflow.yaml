@@ -1,12 +1,18 @@
 root:
   install: no single root install command; install each app from its own directory
-  dev: no single root dev command; run each app from its own directory
+  dev: bun run dev:all
   build: no single root build command
   test: no single root test command
   lint: no single root lint command
   hooks:
-    pre_commit: pnpm lint-staged
+    pre_commit: bun run lint-staged
+    commit_msg: bun run commitlint --edit "$1"
     lint_staged_config: .lintstagedrc.js
+  helper_notes:
+    - '`bun run dev:all` is backed by `start-dev.sh` and starts six local services.'
+    - '`bun run reset:seed` is declared in `package.json`, but `reset-seed-rag.sh` is currently missing, so do not rely on it as a working root helper.'
+    - 'Docker development now uses `bun run docker:dev` with `.env.docker.dev`, plus `bun run docker:dev:migrate` and `bun run docker:dev:seed` for database bootstrap flows.'
+    - 'Docker production-like orchestration uses `bun run docker:prod` with `.env.docker.prod` and per-app multi-stage Dockerfiles.'
 
 app_commands:
   admin:
@@ -41,6 +47,13 @@ app_commands:
     build: cd apps/ngl-svelte && bun run build
     lint: cd apps/ngl-svelte && bun run lint
     typecheck: cd apps/ngl-svelte && bun run check
+  live_presence:
+    install: no install script defined; app currently has no dependency lockfile
+    dev: cd apps/live-presence && bun run dev
+    start: cd apps/live-presence && bun run start
+    build: not defined in manifest
+    lint: not defined in manifest
+    test: not defined in manifest
   rag_service:
     install: cd apps/rag-service/fastapi && uv sync
     dev: cd apps/rag-service && bun run dev
@@ -48,6 +61,19 @@ app_commands:
     typecheck: cd apps/rag-service && bun run typecheck
     test: cd apps/rag-service/fastapi && uv run pytest
     lint: cd apps/rag-service/fastapi && uv run ruff check .
+
+docker_commands:
+  dev:
+    up: bun run docker:dev
+    down: bun run docker:dev:down
+    migrate: bun run docker:dev:migrate
+    seed: bun run docker:dev:seed
+    reset_seed: bun run docker:dev:reset-seed
+  prod:
+    up: bun run docker:prod
+  notes:
+    - Use `.env.docker.dev` or `.env.docker.prod` copied from the example files before running compose wrappers.
+    - Docker migrate first bootstraps the `rag` schema/vector extension through `apps/rag-service/fastapi/scripts/bootstrap_db.py`, then runs Admin Drizzle migrations.
 
 git_process:
   branch_strategy: not codified in the current repo; default to the user's current branch unless explicitly told otherwise

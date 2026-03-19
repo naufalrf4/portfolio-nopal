@@ -46,6 +46,15 @@ apps:
     data_access: Admin public API only
     testing_stack: svelte-check + eslint + prettier; no dedicated automated test runner found
     lockfile: apps/ngl-svelte/bun.lock
+  live_presence:
+    path: apps/live-presence
+    framework: Bun native server/websocket runtime
+    language: TypeScript
+    runtime: Bun
+    styling: none
+    data_access: no database or Admin API access; ephemeral websocket rooms only
+    testing_stack: no build, lint, or automated test script found; app-local AGENTS directs verification through `bun run start`, `/health`, and websocket QA
+    lockfile: no lockfile found
   rag_service:
     path: apps/rag-service
     framework: FastAPI >=0.115,<1 with Uvicorn
@@ -59,6 +68,7 @@ apps:
 shared_tooling:
   root_hooks:
     - Husky pre-commit
+    - Husky commit-msg
     - lint-staged
     - root ESLint config
   ci: no `.github/workflows` directory found

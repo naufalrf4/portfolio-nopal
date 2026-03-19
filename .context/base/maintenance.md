@@ -11,6 +11,7 @@ Update the shared context and affected `AGENTS.md` files when any of the followi
 
 - app commands or manifests
 - architecture boundaries between Admin, RAG, and API-only apps
+- websocket/service boundaries involving `apps/live-presence`
 - security posture for auth, tokens, CORS, or direct database access
 - legacy design baseline or visual system direction
 - new recurring repo quirks that future agents would otherwise rediscover
