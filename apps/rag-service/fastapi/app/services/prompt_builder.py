@@ -28,6 +28,57 @@ def source_label(source_type: str, source_ref: str, title: str | None = None) ->
     return f"{source_type}:{source_ref}"
 
 
+def build_source_metadata(
+    source_type: str, source_ref: str, title: str | None = None
+) -> dict[str, str | None]:
+    normalized_title = title.strip() if title else None
+    metadata: dict[str, str | None] = {
+        "source_label": source_label(source_type, source_ref, normalized_title),
+        "route": None,
+        "route_label": None,
+        "section": normalized_title,
+        "source_type": source_type,
+        "source_ref": source_ref,
+        "title": normalized_title,
+    }
+
+    if source_type == "project":
+        label = normalized_title or source_ref.replace("-", " ").title()
+        metadata.update(
+            {
+                "route": f"/projects/{source_ref}",
+                "route_label": f"Open {label}",
+                "section": label,
+                "title": label,
+            }
+        )
+        return metadata
+
+    if source_type == "about":
+        metadata.update(
+            {
+                "route": "/about",
+                "route_label": "Open about page",
+                "section": normalized_title or "About",
+                "title": normalized_title or "About NaufalRF",
+            }
+        )
+        return metadata
+
+    if source_type == "knowledge":
+        label = normalized_title or source_ref
+        metadata.update(
+            {
+                "route": "/blogs",
+                "route_label": f"Open {label}",
+                "section": label,
+                "title": label,
+            }
+        )
+
+    return metadata
+
+
 def format_history(messages: Iterable[ChatLogMessage], limit: int) -> str:
     recent_messages = list(messages)[-limit:]
     if not recent_messages:
@@ -243,7 +294,6 @@ def fallback_query_plan(question: str) -> dict[str, object]:
 
     return {
         "workflow": workflow,
-       
         "intent": "portfolio_question",
         "needsPortfolioContext": workflow != "tool",
         "toolName": tool_name,
