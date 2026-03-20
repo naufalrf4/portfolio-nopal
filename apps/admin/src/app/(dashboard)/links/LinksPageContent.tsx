@@ -87,7 +87,7 @@ export function LinksPageContent() {
       <PageWrapper>
         <PageHeader
           title="Profile Links"
-          description="Manage your social media and contact links"
+          description="Manage the single source of truth for socials, contact links, and public profile destinations."
           icon={<Link2 />}
           stats={[
             { label: 'Total', value: stats.total },

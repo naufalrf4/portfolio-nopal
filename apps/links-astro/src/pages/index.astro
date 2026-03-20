@@ -5,6 +5,7 @@ import ProfileHeader from '../components/ProfileHeader.astro';
 import LinkButtons from '../components/LinkButtons.astro';
 import SocialIcons from '../components/SocialIcons.astro';
 import { getLinksPageData } from '../lib/api';
+import { detectSocialPlatform, isSocialProfileLink, normalizeUrl } from '../lib/link-classification';
 import type { AboutData, ProfileLink, SocialLink } from '../types';
 
 const fallbackAboutData: AboutData = {
@@ -28,46 +29,27 @@ try {
   errorMessage = error instanceof Error ? error.message : 'Failed to load links. Please try again later.';
 }
 
-const SOCIAL_KEYWORDS = ['github', 'linkedin', 'twitter', 'x', 'instagram', 'youtube', 'email', 'mail'];
+const allSocialLinks: SocialLink[] = links
+  .flatMap((link) => {
+    const platform = detectSocialPlatform(link);
+    if (!platform) {
+      return [];
+    }
 
-function normalizeUrl(url: string) {
-  return url.trim().replace(/\/$/, '').toLowerCase();
-}
-
-function isSocialLink(link: ProfileLink) {
-  const iconLower = link.icon?.toLowerCase() || '';
-  const labelLower = link.label.toLowerCase();
-  return SOCIAL_KEYWORDS.some(
-    (keyword) => iconLower.includes(keyword) || labelLower.includes(keyword)
-  );
-}
-
-function inferPlatform(link: ProfileLink): string {
-  const combined = `${link.icon || ''} ${link.label}`.toLowerCase();
-  if (combined.includes('linkedin')) return 'linkedin';
-  if (combined.includes('twitter') || combined.includes(' x ')) return 'twitter';
-  if (combined.includes('instagram')) return 'instagram';
-  if (combined.includes('youtube')) return 'youtube';
-  if (combined.includes('email') || combined.includes('mail')) return 'email';
-  return 'github';
-}
-
-const inferredSocialLinks: SocialLink[] = links
-  .filter(isSocialLink)
-  .map((link) => ({
-    platform: inferPlatform(link),
-    url: link.url,
-    label: link.label,
-    icon: link.icon,
-  }));
-
-const allSocialLinks = [...aboutData.socialLinks, ...inferredSocialLinks].filter((link, index, items) => {
-  const normalized = normalizeUrl(link.url);
-  return items.findIndex((candidate) => normalizeUrl(candidate.url) === normalized) === index;
-});
+    return [
+      {
+        platform,
+        url: link.url,
+        label: link.label,
+        icon: link.icon,
+      },
+    ];
+  });
 
 const socialLinkUrls = new Set(allSocialLinks.map((link) => normalizeUrl(link.url)));
-const websiteLinks = links.filter((link) => !socialLinkUrls.has(normalizeUrl(link.url)));
+const websiteLinks = links.filter(
+  (link) => !isSocialProfileLink(link) && !socialLinkUrls.has(normalizeUrl(link.url))
+);
 ---
 
 <BaseLayout

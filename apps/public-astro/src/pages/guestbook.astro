@@ -1,0 +1,29 @@
+---
+import { MessageSquare } from 'lucide-react';
+import PageLayout from '../layouts/PageLayout.astro';
+import { PageHero } from '@/components/shared';
+import { Guestbook } from '@/components/home/Guestbook';
+import { getGuestbookEntries } from '../lib/api';
+
+const turnstileSiteKey =
+  process.env.PUBLIC_TURNSTILE_SITE_KEY?.trim() || import.meta.env.PUBLIC_TURNSTILE_SITE_KEY?.trim() || '';
+const guestbookData = await getGuestbookEntries();
+const title = 'Guestbook';
+const description = 'Read full guestbook messages from visitors, collaborators, and friends, then leave your own note.';
+---
+
+<PageLayout title={title} description={description}>
+  <section class="px-4 py-12 md:px-6 md:py-16">
+    <div class="mx-auto max-w-7xl">
+      <PageHero
+        icon={MessageSquare}
+        title="Guestbook"
+        description="A running wall of notes from people who stopped by. The homepage keeps a compact preview, while this page keeps the full messages readable."
+        className="homepage-reveal"
+      />
+      <div class="homepage-reveal" style="animation-delay:0.18s">
+        <Guestbook client:load initialEntries={guestbookData.entries} turnstileSiteKey={turnstileSiteKey} mode="page" />
+      </div>
+    </div>
+  </section>
+</PageLayout>

@@ -69,7 +69,8 @@ export function MessageList({
               Start a Conversation
             </h3>
             <p className="text-sm text-[#6B7280] leading-relaxed text-center">
-              Ask about projects, architecture choices, skills, or the kind of work I am open to.
+              Ask about my work, random ideas, general knowledge, or just start a casual
+              conversation.
             </p>
           </div>
         </div>

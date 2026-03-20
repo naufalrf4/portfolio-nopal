@@ -74,26 +74,22 @@ export function KnowledgeForm({ doc, onSubmit, isSubmitting }: KnowledgeFormProp
 
     setFile(selectedFile);
     setValue('filename', selectedFile.name);
+
+    setIsExtracting(true);
+    try {
+      const extractedContent = await extractTextFromFile(selectedFile);
+      setValue('content', extractedContent, { shouldValidate: true, shouldDirty: true });
+      toast.success('Text extracted. Review and edit it before saving.');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      toast.error(`Failed to extract text from file: ${message}`);
+    } finally {
+      setIsExtracting(false);
+    }
   };
 
   const onFormSubmit = async (data: KnowledgeDocFormData) => {
-    let content = data.content;
-
-    if (inputMode === 'upload' && file) {
-      setIsExtracting(true);
-      try {
-        content = await extractTextFromFile(file);
-      } catch (error) {
-        const message = error instanceof Error ? error.message : 'Unknown error';
-        toast.error(`Failed to extract text from file: ${message}`);
-        setIsExtracting(false);
-        return;
-      } finally {
-        setIsExtracting(false);
-      }
-    }
-
-    const success = await onSubmit({ ...data, content });
+    const success = await onSubmit(data);
     if (success) {
       router.push('/knowledge');
     }
@@ -171,7 +167,7 @@ export function KnowledgeForm({ doc, onSubmit, isSubmitting }: KnowledgeFormProp
                   <div className="border-2 border-dashed border-[#D1D9E6] rounded-lg p-6 text-center">
                     <Input
                       type="file"
-                      accept=".pdf,.md,.docx,.doc,.txt,.rtf"
+                      accept=".pdf,.md,.docx,.doc,.txt,.rtf,.json"
                       onChange={handleFileChange}
                       className="max-w-md mx-auto"
                     />
@@ -186,11 +182,22 @@ export function KnowledgeForm({ doc, onSubmit, isSubmitting }: KnowledgeFormProp
                   </div>
                   <p className="text-xs text-[#6B7280]">
                     Supported formats: PDF, Markdown (.md), Word (.docx, .doc), Text (.txt), Rich
-                    Text (.rtf)
+                    Text (.rtf), JSON (.json)
                   </p>
                   <p className="text-xs text-[#6B7280]">
-                    Text will be automatically extracted from the file when you submit the form.
+                    Raw files stay transient. Text is extracted in-browser, then you can review and
+                    edit the content before saving or re-ingesting it.
                   </p>
+                  <Textarea
+                    id="content-upload"
+                    placeholder="Extracted content will appear here for review and editing..."
+                    className="min-h-[300px] font-mono text-sm"
+                    {...register('content')}
+                    aria-invalid={!!errors.content}
+                  />
+                  {errors.content && (
+                    <p className="text-sm text-red-500 mt-2">{errors.content.message}</p>
+                  )}
                 </div>
               </TabsContent>
             </Tabs>

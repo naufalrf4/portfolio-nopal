@@ -1,6 +1,7 @@
 import { successResponse, notFoundResponse, serverErrorResponse } from '@/lib/api/responses';
 import { signAssetUrls } from '@/lib/utils/sign-urls';
 import { getAboutMeRecord } from '@/lib/api/handlers/about-read.service';
+import { profileLinksService } from '@/lib/api/handlers/profile-links.service';
 
 interface Skill {
   name: string;
@@ -56,6 +57,20 @@ type StoredExperience = {
 };
 
 type StoredSocialLinkMap = Record<string, unknown>;
+type ProfileLinkRecord = {
+  label?: string | null;
+  icon?: string | null;
+  url?: string | null;
+};
+
+type SupportedPlatform =
+  | 'email'
+  | 'github'
+  | 'linkedin'
+  | 'twitter'
+  | 'instagram'
+  | 'youtube'
+  | 'website';
 
 function parseJsonField<T>(value: unknown, defaultValue: T): T {
   if (value === null || value === undefined) {
@@ -214,9 +229,115 @@ function normalizeSocialLinks(value: unknown): SocialLink[] {
   });
 }
 
+function normalizeComparableUrl(value: string): string {
+  return value.trim().replace(/\/+$/, '').toLowerCase();
+}
+
+function getUrlMetadata(rawUrl: string | null): { normalizedUrl: string; host: string } | null {
+  if (!rawUrl) {
+    return null;
+  }
+
+  const normalizedUrl = normalizeComparableUrl(rawUrl);
+
+  if (normalizedUrl.startsWith('mailto:')) {
+    return { normalizedUrl, host: 'mailto' };
+  }
+
+  try {
+    const url = new URL(normalizedUrl);
+    return { normalizedUrl, host: url.hostname.replace(/^www\./, '') };
+  } catch {
+    return null;
+  }
+}
+
+function hasKeyword(value: string, keyword: string): boolean {
+  return value === keyword || value.includes(`${keyword} `) || value.includes(` ${keyword}`);
+}
+
+function inferPlatform(link: ProfileLinkRecord): SupportedPlatform | null {
+  const label = asString(link.label)?.toLowerCase() ?? '';
+  const icon = asString(link.icon)?.toLowerCase() ?? '';
+  const url = asString(link.url);
+  const urlMetadata = getUrlMetadata(url);
+  const normalizedUrl = urlMetadata?.normalizedUrl ?? '';
+  const host = urlMetadata?.host ?? '';
+  const combined = `${label} ${icon} ${normalizedUrl}`;
+
+  if (host === 'mailto' || hasKeyword(combined, 'email') || hasKeyword(combined, 'mail')) {
+    return 'email';
+  }
+
+  if (host === 'github.com' || combined.includes('github')) {
+    return 'github';
+  }
+
+  if (host === 'linkedin.com' || host.endsWith('.linkedin.com') || combined.includes('linkedin')) {
+    return 'linkedin';
+  }
+
+  if (
+    host === 'twitter.com' ||
+    host === 'x.com' ||
+    host.endsWith('.x.com') ||
+    combined.includes('twitter') ||
+    hasKeyword(combined, 'x')
+  ) {
+    return 'twitter';
+  }
+
+  if (
+    host === 'instagram.com' ||
+    host.endsWith('.instagram.com') ||
+    combined.includes('instagram')
+  ) {
+    return 'instagram';
+  }
+
+  if (host === 'youtube.com' || host === 'youtu.be' || combined.includes('youtube')) {
+    return 'youtube';
+  }
+
+  if (
+    combined.includes('website') ||
+    combined.includes('portfolio') ||
+    combined.includes('site') ||
+    (host.length > 0 && host !== 'mailto')
+  ) {
+    return 'website';
+  }
+
+  return null;
+}
+
+function normalizeProfileLinksAsSocialLinks(links: ProfileLinkRecord[]): SocialLink[] {
+  const seen = new Set<string>();
+
+  return links.flatMap((link) => {
+    const url = asString(link.url);
+    const platform = inferPlatform(link);
+
+    if (!url || !platform) {
+      return [];
+    }
+
+    const key = `${platform}:${normalizeComparableUrl(url)}`;
+    if (seen.has(key)) {
+      return [];
+    }
+
+    seen.add(key);
+    return [{ platform, url }];
+  });
+}
+
 export async function GET() {
   try {
-    const aboutMeData = await getAboutMeRecord();
+    const [aboutMeData, visibleProfileLinks] = await Promise.all([
+      getAboutMeRecord(),
+      profileLinksService.getAll({ visible: true }),
+    ]);
 
     if (!aboutMeData) {
       return notFoundResponse('About me');
@@ -239,7 +360,12 @@ export async function GET() {
           : null,
       skills: normalizeSkills(aboutMeData.skills),
       experience: normalizeExperience(aboutMeData.experience),
-      socialLinks: normalizeSocialLinks(aboutMeData.socialLinks),
+      socialLinks: (() => {
+        const normalizedProfileLinks = normalizeProfileLinksAsSocialLinks(visibleProfileLinks);
+        return normalizedProfileLinks.length > 0
+          ? normalizedProfileLinks
+          : normalizeSocialLinks(aboutMeData.socialLinks);
+      })(),
     };
 
     const signedData = await signAssetUrls(publicData, {

@@ -7,6 +7,15 @@ export async function extractTextFromFile(file: File): Promise<string> {
     case 'rtf':
       return await file.text();
 
+    case 'json': {
+      const raw = await file.text();
+      try {
+        return JSON.stringify(JSON.parse(raw), null, 2);
+      } catch {
+        return raw;
+      }
+    }
+
     case 'pdf': {
       const { PDFParse } = await import('pdf-parse');
       const arrayBuffer = await file.arrayBuffer();

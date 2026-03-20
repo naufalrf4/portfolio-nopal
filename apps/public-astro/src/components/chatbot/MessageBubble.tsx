@@ -2,7 +2,6 @@ import { cn } from '@/lib/utils';
 import { ArrowRight, Bot, User } from 'lucide-react';
 import type { Message } from './types';
 import { MarkdownMessage } from './MarkdownMessage';
-import { SourcesList } from './SourcesList';
 
 interface MessageBubbleProps {
   message: Message;
@@ -11,9 +10,7 @@ interface MessageBubbleProps {
 
 export function MessageBubble({ message, isStreaming = false }: MessageBubbleProps) {
   const isUser = message.role === 'user';
-  const citations = message.citations;
   const suggestedActions = message.suggestedActions;
-  const answerPreview = message.content.trim();
 
   return (
     <div
@@ -39,44 +36,26 @@ export function MessageBubble({ message, isStreaming = false }: MessageBubblePro
         <MarkdownMessage content={message.content} isUser={isUser} isStreaming={isStreaming} />
 
         {!isUser && suggestedActions && suggestedActions.length > 0 ? (
-          <div className="mt-3 space-y-2">
+          <div className="mt-3 flex flex-wrap gap-2">
             {suggestedActions.map((action, index) => {
-              const matchingCitation = citations?.find(
-                (citation) => citation.route === action.target
-              );
-              const title =
-                matchingCitation?.title ||
-                matchingCitation?.routeLabel ||
-                matchingCitation?.section ||
-                action.label;
-
               return (
                 <a
                   key={`${action.target}-${index}`}
                   href={action.target}
                   className={cn(
-                    'flex items-start justify-between gap-3 rounded-2xl px-3 py-3 text-left',
+                    'inline-flex items-center gap-2 rounded-full px-3 py-2 text-sm font-medium',
                     'bg-[linear-gradient(145deg,rgba(59,130,246,0.12),rgba(255,255,255,0.58))] text-[#1D4ED8]',
                     'shadow-[4px_4px_10px_rgba(163,177,198,0.18),-4px_-4px_10px_rgba(255,255,255,0.25)]',
                     'transition-all hover:-translate-y-0.5 hover:text-[#1E40AF]'
                   )}
                 >
-                  <span className="min-w-0">
-                    <span className="block truncate text-sm font-semibold">{title}</span>
-                    {answerPreview ? (
-                      <span className="mt-1 block line-clamp-2 text-xs text-[#5B6B7E]">
-                        {answerPreview}
-                      </span>
-                    ) : null}
-                  </span>
-                  <ArrowRight size={14} className="mt-0.5 shrink-0" />
+                  <span>{action.label}</span>
+                  <ArrowRight size={14} className="shrink-0" />
                 </a>
               );
             })}
           </div>
         ) : null}
-
-        {!isUser ? <SourcesList citations={citations} /> : null}
       </div>
 
       {isUser && (

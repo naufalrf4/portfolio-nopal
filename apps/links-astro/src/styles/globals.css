@@ -1,5 +1,29 @@
 @import 'tailwindcss';
-@config "../../tailwind.config.mjs";
+
+@theme {
+  --font-display: 'Plus Jakarta Sans', sans-serif;
+  --font-sans: 'DM Sans', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --color-background: var(--neu-bg);
+  --color-surface: var(--neu-surface);
+  --color-foreground: var(--neu-fg);
+  --color-foreground-muted: var(--neu-fg-muted);
+  --color-foreground-subtle: var(--neu-fg-subtle);
+  --color-muted-foreground: var(--neu-fg-muted);
+  --color-primary: var(--neu-accent);
+  --color-accent: var(--neu-accent);
+  --color-accent-light: var(--neu-accent-light);
+  --color-accent-secondary: var(--neu-accent-secondary);
+  --radius-container: var(--radius-container);
+  --shadow-neu-extruded:
+    9px 9px 16px var(--neu-shadow-dark), -9px -9px 16px var(--neu-shadow-light);
+  --shadow-neu-extruded-hover:
+    12px 12px 20px var(--neu-shadow-dark-strong), -12px -12px 20px var(--neu-shadow-light-strong);
+  --shadow-neu-extruded-sm:
+    5px 5px 10px var(--neu-shadow-dark), -5px -5px 10px var(--neu-shadow-light);
+  --shadow-neu-inset:
+    inset 6px 6px 10px var(--neu-shadow-dark), inset -6px -6px 10px var(--neu-shadow-light);
+}
 
 :root {
   /* Base surface - cool grey */

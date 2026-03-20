@@ -1,3 +1,4 @@
+import json
 from collections import defaultdict
 from collections.abc import Iterable
 
@@ -15,6 +16,11 @@ def normalize_language(value: str) -> str:
 
 def normalize_intent(value: str) -> str:
     normalized = value.strip().lower().replace(" ", "_")
+    aliases = {
+        "pricing_quote": "freelance_quote",
+        "portfolio_question": "general_portfolio",
+    }
+    normalized = aliases.get(normalized, normalized)
     return normalized or "general_portfolio"
 
 
@@ -30,53 +36,72 @@ def source_label(source_type: str, source_ref: str, title: str | None = None) ->
 
 def build_source_metadata(
     source_type: str, source_ref: str, title: str | None = None
-) -> dict[str, str | None]:
-    normalized_title = title.strip() if title else None
-    metadata: dict[str, str | None] = {
-        "source_label": source_label(source_type, source_ref, normalized_title),
-        "route": None,
-        "route_label": None,
-        "section": normalized_title,
+) -> dict[str, str]:
+    metadata = {
+        "source_label": source_label(source_type, source_ref, title),
         "source_type": source_type,
         "source_ref": source_ref,
-        "title": normalized_title,
     }
-
+    if title:
+        metadata["title"] = title
     if source_type == "project":
-        label = normalized_title or source_ref.replace("-", " ").title()
-        metadata.update(
-            {
-                "route": f"/projects/{source_ref}",
-                "route_label": f"Open {label}",
-                "section": label,
-                "title": label,
-            }
-        )
-        return metadata
-
-    if source_type == "about":
-        metadata.update(
-            {
-                "route": "/about",
-                "route_label": "Open about page",
-                "section": normalized_title or "About",
-                "title": normalized_title or "About NaufalRF",
-            }
-        )
-        return metadata
-
-    if source_type == "knowledge":
-        label = normalized_title or source_ref
-        metadata.update(
-            {
-                "route": "/blogs",
-                "route_label": f"Open {label}",
-                "section": label,
-                "title": label,
-            }
-        )
-
+        route = f"/projects/{source_ref}"
+        metadata["route"] = route
+        metadata["route_label"] = f"Open {title or source_ref}"
+        metadata["section"] = title or source_ref
+    elif source_type == "about":
+        metadata["route"] = "/about"
+        metadata["route_label"] = "Open about page"
+        metadata["section"] = title or "About"
     return metadata
+
+
+def build_grounded_actions(
+    planned_actions: list[dict[str, str]],
+    citations: list[dict[str, str | None]],
+) -> list[dict[str, str]]:
+    citation_route = next(
+        (citation.get("route") for citation in citations if citation.get("route")), None
+    )
+    citation_label = next(
+        (citation.get("routeLabel") for citation in citations if citation.get("routeLabel")), None
+    )
+
+    if planned_actions:
+        grounded_actions: list[dict[str, str]] = []
+        for action in planned_actions:
+            grounded_actions.append(
+                {
+                    "type": action["type"],
+                    "target": str(citation_route or action["target"]),
+                    "label": action["label"],
+                }
+            )
+        return grounded_actions
+
+    if citation_route:
+        return [
+            {
+                "type": "open_page",
+                "target": str(citation_route),
+                "label": str(citation_label or "Open source page"),
+            }
+        ]
+    return []
+
+
+def build_abstention_response(answer_language: str, portfolio_areas: list[str]) -> str:
+    area_list = ", ".join(portfolio_areas) if portfolio_areas else "relevant portfolio areas"
+    if answer_language == "id":
+        return (
+            "Saya belum menemukan bukti portofolio yang cukup kuat untuk menjawab itu "
+            "dengan yakin. "
+            f"Coba arahkan saya ke area berikut: {area_list}."
+        )
+    return (
+        "I haven't found enough strong portfolio evidence to answer that confidently. "
+        f"Try pointing me to these areas: {area_list}."
+    )
 
 
 def format_history(messages: Iterable[ChatLogMessage], limit: int) -> str:
@@ -246,15 +271,22 @@ def build_query_analysis_prompt(
 
 def fallback_query_plan(question: str) -> dict[str, object]:
     normalized = question.lower()
+    query_language = (
+        "id"
+        if any(marker in normalized for marker in ("bagaimana", "tolong", "saya", "buat", "harga"))
+        else "en"
+    )
+    answer_language = query_language
     portfolio_areas: list[str] = ["general"]
     suggested_actions: list[dict[str, str]] = []
     workflow = "rag"
     tool_name = ""
     tool_arguments: dict[str, object] = {}
+    intent = "general_portfolio"
 
     route_map = [
         (
-            ("project", "projects", "case study", "portfolio"),
+            ("project", "projects", "proyek", "case study", "portfolio"),
             "projects",
             "/projects",
             "View projects",
@@ -268,6 +300,8 @@ def fallback_query_plan(question: str) -> dict[str, object]:
         if any(keyword in normalized for keyword in keywords):
             portfolio_areas = [area]
             suggested_actions = [{"type": "open_page", "target": target, "label": label}]
+            if area == "projects":
+                intent = "project_question"
             break
 
     calculator_keywords = (
@@ -277,13 +311,24 @@ def fallback_query_plan(question: str) -> dict[str, object]:
         "quote",
         "calculator",
         "price",
+        "harga",
+        "estimasi",
         "breakdown",
         "feature",
         "module",
+        "modul",
     )
-    portfolio_keywords = ("portfolio", "project", "experience", "background", "skill")
+    portfolio_keywords = (
+        "portfolio",
+        "project",
+        "proyek",
+        "experience",
+        "background",
+        "skill",
+    )
 
     if any(keyword in normalized for keyword in calculator_keywords):
+        intent = "freelance_quote"
         workflow = (
             "hybrid" if any(keyword in normalized for keyword in portfolio_keywords) else "tool"
         )
@@ -292,9 +337,25 @@ def fallback_query_plan(question: str) -> dict[str, object]:
             portfolio_areas = ["general"]
             suggested_actions = []
 
+    if "toolarguments:" in normalized:
+        raw_payload = question.split("toolArguments:", 1)[1].strip()
+        try:
+            parsed_payload = json.loads(raw_payload)
+        except json.JSONDecodeError:
+            parsed_payload = {}
+        if isinstance(parsed_payload, dict):
+            tool_arguments = parsed_payload
+            intent = "freelance_quote"
+            tool_name = "feature_pricing_quote"
+            workflow = "tool"
+            portfolio_areas = ["general"]
+            suggested_actions = []
+
     return {
         "workflow": workflow,
-        "intent": "portfolio_question",
+        "intent": intent,
+        "queryLanguage": query_language,
+        "answerLanguage": answer_language,
         "needsPortfolioContext": workflow != "tool",
         "toolName": tool_name,
         "toolArguments": tool_arguments,

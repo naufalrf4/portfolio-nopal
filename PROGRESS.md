@@ -4,6 +4,13 @@ Chronological timeline of meaningful project work, discoveries, decisions, and b
 
 ## Entries
 
+### 2026-03-21 01:15
+
+- Task: Close follow-up fixes for chat overlay interaction and profile link classification
+- Mode: implementation
+- Files: `apps/public-astro/src/components/home/LiveCursorBand.tsx`, `apps/public-astro/src/components/chatbot/ChatWidget.tsx`, `apps/admin/src/app/api/v1/public/about/route.ts`, `apps/links-astro/src/lib/link-classification.ts`, `apps/links-astro/src/components/SocialIcons.astro`, `apps/links-astro/src/components/LinkButtons.astro`, `apps/links-astro/src/pages/index.astro`, `PROGRESS.md`
+- Status: done
+- Notes: Fixed the desktop public chat trigger being blocked by the live-presence overlay by making the full-screen ambient layer explicitly `pointer-events-none` and raising the chat widget/panel above ambient overlays. Tightened `profile_links` classification so public/about and links-app social surfaces now rely on normalized URL-aware platform detection instead of broad keyword guesses or a default-to-GitHub fallback, while unmatched links stay in the website-link bucket. Verification passed with `apps/public-astro: bun run build`, `apps/links-astro: bun run build`, `apps/admin: bun run lint`, `apps/admin: bun run typecheck`, Playwright desktop QA confirming a normal click opens the widget, and browser evaluation confirming the widget opened with `Nau AI` visible. Remaining console noise is still the pre-existing `ws://localhost:3006/ws` refusal when the live-presence service is not running locally.
 
 ### 2026-03-20 05:44
 
@@ -28,6 +35,7 @@ Chronological timeline of meaningful project work, discoveries, decisions, and b
 - Files: `deploy.py`, `AGENTS.md`, `PROGRESS.md`
 - Status: done
 - Notes: Added a root-level interactive deployment adapter runnable as `uv run deploy.py`. The adapter collects SSH/repo/env inputs through CLI prompts, uses Paramiko for a single SSH transport, can optionally bootstrap a Debian/Ubuntu host (Docker/git/ufw + firewall), uploads `.env.docker.prod`, clones or fast-forward pulls the repo on the server, and runs the existing production Docker scripts (`docker-prod-bootstrap.sh` or `docker-prod-up.sh`). Manual QA passed with `uv run deploy.py --help` and an interactive dry-run session showing the expected SSH/bootstrap/git/env/deploy command sequence against `34.142.218.199` without performing remote changes.
+
 ### 2026-03-17 08:18
 
 - Task: Repair Admin lint command for Next 16 flat ESLint setup

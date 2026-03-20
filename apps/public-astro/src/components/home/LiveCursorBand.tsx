@@ -171,7 +171,7 @@ export function LiveCursorBand({ currentPath, socketUrl }: LiveCursorBandProps) 
   return (
     <>
       <div className="pointer-events-none fixed inset-0 z-[45] overflow-hidden" aria-hidden="true">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.08),transparent_24%),radial-gradient(circle_at_bottom_right,rgba(96,165,250,0.08),transparent_26%)]" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.08),transparent_24%),radial-gradient(circle_at_bottom_right,rgba(96,165,250,0.08),transparent_26%)]" />
 
         {participants.map((participant, index) => {
           const docX = participant.x * Math.max(documentMetrics.width, 1);

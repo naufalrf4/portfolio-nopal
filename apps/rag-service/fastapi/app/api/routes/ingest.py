@@ -1,3 +1,5 @@
+from collections.abc import Mapping
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -9,11 +11,11 @@ from app.services.errors import RagServiceError
 from app.services.ingest_service import IngestService
 
 router = APIRouter(tags=["ingest"])
-session_dependency = Depends(get_async_session)
+async_session_dependency = Depends(get_async_session)
 
 
 @router.post("/ingest", dependencies=[Depends(require_service_token)])
-async def ingest(request: IngestRequest, session: AsyncSession = session_dependency):
+async def ingest(request: IngestRequest, session: AsyncSession = async_session_dependency):
     service = IngestService(session)
     try:
         response = await service.ingest(request)
@@ -23,11 +25,7 @@ async def ingest(request: IngestRequest, session: AsyncSession = session_depende
     except RagServiceError as exc:
         return error_response(exc.message, exc.status_code, exc.code)
     except HTTPException as exc:
-        detail = (
-            exc.detail
-            if isinstance(exc.detail, dict)
-            else {"message": str(exc.detail), "code": "INGEST_ERROR"}
-        )
-        return error_response(
-            detail["message"], exc.status_code, detail.get("code", "INGEST_ERROR")
-        )
+        detail = exc.detail if isinstance(exc.detail, Mapping) else None
+        message = str(detail.get("message")) if detail and "message" in detail else str(exc.detail)
+        code = str(detail.get("code")) if detail and "code" in detail else "INGEST_ERROR"
+        return error_response(message, exc.status_code, code)

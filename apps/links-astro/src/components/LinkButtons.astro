@@ -1,23 +1,12 @@
 ---
 import type { ProfileLink } from '../types';
+import { getWebsiteLinkKind } from '../lib/link-classification';
 
 interface Props {
   links: ProfileLink[];
 }
 
 const { links } = Astro.props;
-
-function getIconType(link: ProfileLink) {
-  const labelLower = link.label.toLowerCase();
-  const iconLower = link.icon?.toLowerCase() || '';
-
-  if (labelLower.includes('portfolio') || iconLower.includes('portfolio')) return 'briefcase';
-  if (labelLower.includes('blog') || iconLower.includes('blog')) return 'book-open';
-  if (labelLower.includes('resume') || labelLower.includes('cv') || iconLower.includes('resume')) return 'file-text';
-  if (labelLower.includes('project') || iconLower.includes('code')) return 'code';
-  if (labelLower.includes('website') || iconLower.includes('website')) return 'globe';
-  return 'globe';
-}
 
 // Simple SVGs for Lucide icons
 const icons = {
@@ -32,7 +21,7 @@ const icons = {
 
 <div class="w-full flex flex-col gap-4 md:gap-5">
   {links.map((link, index) => {
-    const iconType = getIconType(link);
+    const iconType = getWebsiteLinkKind(link);
     const svgPath = icons[iconType as keyof typeof icons] || icons.globe;
     const delay = `${index * 0.1}s`;
 

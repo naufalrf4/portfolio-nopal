@@ -1,8 +1,17 @@
 ---
 import { ClientRouter } from 'astro:transitions';
 import '../styles/globals.css';
+import { getAbout } from '@/lib/api';
 
 const SITE_NAME = 'NaufalRF Portfolio';
+const about = await getAbout();
+const sameAs = about.socialLinks.map((link) => link.url);
+const twitterProfile = about.socialLinks.find((link) => {
+  const platform = link.platform.toLowerCase();
+  const url = link.url.toLowerCase();
+  return platform === 'twitter' || platform === 'x' || url.includes('twitter.com/') || url.includes('x.com/');
+});
+const twitterHandle = twitterProfile?.url.split('/').filter(Boolean).pop() || null;
 
 interface Props {
   title: string;
@@ -23,7 +32,7 @@ const {
 const title = rawTitle === SITE_NAME ? SITE_NAME : `${rawTitle} - ${SITE_NAME}`;
 
 const currentPath = Astro.url.pathname;
-const siteUrl = import.meta.env.SITE_URL || 'https://naufalrf.tech';
+const siteUrl = process.env.SITE_URL?.trim() || import.meta.env.SITE_URL || 'https://naufalrf.tech';
 const canonical = canonicalUrl || new URL(currentPath, siteUrl).href;
 
 const personSchema = {
@@ -33,11 +42,7 @@ const personSchema = {
   alternateName: 'NaufalRF',
   jobTitle: 'Full-Stack Engineer',
   url: 'https://naufalrf.tech',
-  sameAs: [
-    'https://github.com/naufalrf',
-    'https://linkedin.com/in/naufalrf',
-    'https://twitter.com/naufalrf'
-  ]
+  sameAs,
 };
 
 const websiteSchema = {
@@ -75,8 +80,8 @@ const websiteSchema = {
     <meta property="og:image" content={new URL(ogImage, siteUrl).href} />
 
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@naufalrf" />
-    <meta name="twitter:creator" content="@naufalrf" />
+    {twitterHandle ? <meta name="twitter:site" content={`@${twitterHandle}`} /> : null}
+    {twitterHandle ? <meta name="twitter:creator" content={`@${twitterHandle}`} /> : null}
     <meta name="twitter:url" content={canonical} />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />

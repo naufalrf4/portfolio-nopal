@@ -87,16 +87,16 @@ export function BottomNav() {
 
   const allNavItems: NavItem[] = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+    { name: 'About', href: '/about', icon: User },
     { name: 'Projects', href: '/projects', icon: FolderKanban },
     { name: 'Contacts', href: '/contacts', icon: Send },
-    { name: 'Bookings', href: '/bookings', icon: Calendar },
-    { name: 'Blogs', href: '/blogs', icon: BookOpen },
     { name: 'Links', href: '/links', icon: ExternalLink },
-    { name: 'About', href: '/about', icon: User },
+    { name: 'Blogs', href: '/blogs', icon: BookOpen },
     { name: 'Guestbook', href: '/guestbook', icon: MessageSquare },
+    { name: 'Bookings', href: '/bookings', icon: Calendar },
     { name: 'Messages', href: '/messages', icon: Mail, badge: unreadCount },
-    { name: 'Knowledge', href: '/knowledge', icon: FileText },
-    { name: 'Chat Logs', href: '/chat-logs', icon: FileText },
+    { name: 'AI Knowledge', href: '/knowledge', icon: FileText },
+    { name: 'AI Chats', href: '/chat-logs', icon: FileText },
     { name: 'Analytics', href: '/analytics', icon: BarChart3 },
     { name: 'Settings', href: '/settings', icon: Settings },
   ];

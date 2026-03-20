@@ -5,16 +5,17 @@ import { ChatWindow } from './ChatWindow';
 
 const WIDGET_STATE_KEY = 'portfolio-chat-widget-open';
 
-interface ChatWidgetProps {
-  ragServiceUrl: string;
-}
-
-export function ChatWidget({ ragServiceUrl }: ChatWidgetProps) {
+export function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
 
   useEffect(() => {
+    if (window.innerWidth < 768) {
+      sessionStorage.removeItem(WIDGET_STATE_KEY);
+      return;
+    }
+
     const stored = sessionStorage.getItem(WIDGET_STATE_KEY);
     if (stored === 'true') {
       setIsOpen(true);
@@ -22,6 +23,11 @@ export function ChatWidget({ ragServiceUrl }: ChatWidgetProps) {
   }, []);
 
   const handleToggle = useCallback(() => {
+    if (window.innerWidth < 768) {
+      window.location.href = '/ai-chatbot';
+      return;
+    }
+
     setIsAnimating(true);
     if (isOpen) {
       setIsOpen(false);
@@ -50,7 +56,7 @@ export function ChatWidget({ ragServiceUrl }: ChatWidgetProps) {
       <button
         onClick={handleToggle}
         className={cn(
-          'fixed bottom-20 md:bottom-6 left-4 md:left-auto md:right-6 z-40',
+          'fixed bottom-20 md:bottom-6 left-4 md:left-auto md:right-6 z-[60]',
           'w-14 h-14 rounded-full',
           'bg-[#3B82F6] text-white',
           'shadow-[6px_6px_12px_rgba(59,130,246,0.4),-6px_-6px_12px_rgba(255,255,255,0.3)]',
@@ -73,7 +79,7 @@ export function ChatWidget({ ragServiceUrl }: ChatWidgetProps) {
       {isOpen && (
         <div
           className={cn(
-            'fixed z-40',
+            'fixed z-[60]',
             'transition-all duration-300 ease-out',
             isExpanded
               ? 'bottom-4 right-4 left-4 md:left-auto md:w-[600px] h-[80vh]'
@@ -85,7 +91,6 @@ export function ChatWidget({ ragServiceUrl }: ChatWidgetProps) {
             onClose={handleClose}
             onToggleSize={handleToggleSize}
             isExpanded={isExpanded}
-            ragServiceUrl={ragServiceUrl}
           />
         </div>
       )}

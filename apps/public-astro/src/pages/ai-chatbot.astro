@@ -4,10 +4,8 @@ import { PageHero } from '@/components/shared';
 import PageLayout from '../layouts/PageLayout.astro';
 import { ChatWindow } from '../components/chatbot/ChatWindow';
 
-const ragServiceUrl = '/api/rag';
-
 const title = "AI Assistant";
-const description = "Chat with my AI assistant to explore my projects, technical skills, and software engineering experience in a conversational way.";
+const description = 'Chat with Nau AI about my work, broader topics, and whatever is on your mind in a natural conversation.';
 ---
 
 <PageLayout title={title} description={description}>
@@ -16,15 +14,13 @@ const description = "Chat with my AI assistant to explore my projects, technical
       <PageHero
         icon={Sparkles}
         title="AI Assistant"
-        description="Ask about my projects, engineering decisions, tools, and experience through the same portfolio RAG assistant, now in a dedicated full-page workspace."
+        description="Talk with Nau AI about portfolio details, general knowledge, or casual questions in the same language you use."
         className="homepage-reveal"
       />
 
-      <div class="homepage-reveal relative overflow-hidden rounded-[38px] bg-[linear-gradient(160deg,rgba(228,236,246,0.98),rgba(216,228,241,0.98))] p-4 shadow-[16px_16px_36px_rgba(163,177,198,0.34),-16px_-16px_36px_rgba(255,255,255,0.42)] md:p-6" style="animation-delay:0.22s">
-        <div class="pointer-events-none absolute inset-x-10 top-0 h-24 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.16),transparent_68%)]" />
+      <div class="homepage-reveal" style="animation-delay:0.22s">
         <ChatWindow
           client:load
-          ragServiceUrl={ragServiceUrl}
           isFullPage={true}
           className="mx-auto h-[72vh] min-h-[620px] max-w-[1100px]"
         />

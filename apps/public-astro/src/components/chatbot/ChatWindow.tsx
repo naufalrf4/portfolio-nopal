@@ -11,7 +11,6 @@ interface ChatWindowProps {
   isFullPage?: boolean;
   isExpanded?: boolean;
   className?: string;
-  ragServiceUrl: string;
 }
 
 export function ChatWindow({
@@ -19,9 +18,9 @@ export function ChatWindow({
   isFullPage = false,
   isExpanded = false,
   className,
-  ragServiceUrl,
 }: ChatWindowProps) {
-  const { messages, isLoading, error, sendMessage, shouldScrollToBottom } = useChat(ragServiceUrl);
+  const { messages, isLoading, error, sendMessage, clearMessages, shouldScrollToBottom } =
+    useChat();
 
   return (
     <div
@@ -33,7 +32,12 @@ export function ChatWindow({
         className
       )}
     >
-      <ChatHeader onToggleSize={onToggleSize} isFullPage={isFullPage} isExpanded={isExpanded} />
+      <ChatHeader
+        onToggleSize={onToggleSize}
+        onClear={clearMessages}
+        isFullPage={isFullPage}
+        isExpanded={isExpanded}
+      />
 
       <MessageList
         messages={messages}

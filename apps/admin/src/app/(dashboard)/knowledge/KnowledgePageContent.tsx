@@ -1,12 +1,12 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import Link from 'next/link';
 import { FileText, Plus, RefreshCw } from 'lucide-react';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { PageWrapper } from '@/components/layout/PageWrapper';
 import { Button } from '@/components/ui/button';
 import { KnowledgeTable, FreelanceToolPanel } from '@/components/knowledge';
-import { KnowledgeModal } from '@/components/knowledge/KnowledgeModal';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface KnowledgeDoc {
@@ -30,7 +30,6 @@ export function KnowledgePageContent() {
   const [pagination, setPagination] = useState<PaginationInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'documents' | 'freelance-tool'>('documents');
 
   const fetchDocs = useCallback(async () => {
@@ -112,9 +111,11 @@ export function KnowledgePageContent() {
               <Button variant="ghost" size="icon" onClick={handleRefresh} disabled={refreshing}>
                 <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
               </Button>
-              <Button variant="primary" onClick={() => setIsModalOpen(true)}>
-                <Plus className="h-4 w-4 mr-2" />
-                Add Document
+              <Button variant="primary" asChild>
+                <Link href="/knowledge/new">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Document
+                </Link>
               </Button>
             </div>
           ) : null
@@ -140,12 +141,6 @@ export function KnowledgePageContent() {
           <FreelanceToolPanel />
         </TabsContent>
       </Tabs>
-
-      <KnowledgeModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSuccess={fetchDocs}
-      />
     </PageWrapper>
   );
 }

@@ -1,14 +1,26 @@
 ---
-import { Github, Linkedin, Twitter, Mail } from 'lucide-react';
+import { Github, Linkedin, Twitter, Mail, Globe, Instagram, Youtube } from 'lucide-react';
+import { getAbout } from '@/lib/api';
 
 const currentYear = new Date().getFullYear();
+const about = await getAbout();
 
-const socialLinks = [
-  { href: 'https://github.com/naufalrf', label: 'GitHub', icon: Github },
-  { href: 'https://linkedin.com/in/naufalrf', label: 'LinkedIn', icon: Linkedin },
-  { href: 'https://twitter.com/naufalrf', label: 'Twitter', icon: Twitter },
-  { href: 'mailto:contact@naufalrf.tech', label: 'Email', icon: Mail },
-];
+const iconMap = {
+  github: Github,
+  linkedin: Linkedin,
+  twitter: Twitter,
+  x: Twitter,
+  instagram: Instagram,
+  youtube: Youtube,
+  email: Mail,
+  website: Globe,
+} as const;
+
+const socialLinks = (about.socialLinks || []).map((link) => ({
+  href: link.url,
+  label: link.platform,
+  icon: iconMap[link.platform.toLowerCase() as keyof typeof iconMap] || Globe,
+}));
 
 const quickLinks = [
   { href: '/about', label: 'About' },
@@ -25,9 +37,17 @@ interface Props {
 const { className } = Astro.props;
 ---
 
-<footer class:list={['relative z-10 bg-transparent py-12 px-4 md:px-8 pb-28 md:pb-12 homepage-reveal-soft', className]} style="animation-delay: 0.08s;">
+<footer
+  class:list={[
+    'relative z-10 bg-transparent py-12 px-4 md:px-8 pb-28 md:pb-12 homepage-reveal-soft',
+    className,
+  ]}
+  style="animation-delay: 0.08s;"
+>
   <div class="mx-auto max-w-7xl">
-    <div class="rounded-2xl bg-[#E0E5EC] p-8 shadow-[9px_9px_16px_rgb(163,177,198,0.6),-9px_-9px_16px_rgba(255,255,255,0.5)] homepage-card-hover hover:shadow-[16px_16px_28px_rgba(163,177,198,0.62),-16px_-16px_28px_rgba(255,255,255,0.58)]">
+    <div
+      class="rounded-2xl bg-[#E0E5EC] p-8 shadow-[9px_9px_16px_rgb(163,177,198,0.6),-9px_-9px_16px_rgba(255,255,255,0.5)] homepage-card-hover hover:shadow-[16px_16px_28px_rgba(163,177,198,0.62),-16px_-16px_28px_rgba(255,255,255,0.58)]"
+    >
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
         <div class="text-center md:text-left homepage-reveal-soft" style="animation-delay: 0.14s;">
           <a
@@ -36,9 +56,6 @@ const { className } = Astro.props;
           >
             Nau.
           </a>
-          <p class="text-sm text-[#6B7280] mt-2 max-w-xs mx-auto md:mx-0">
-            Full-Stack Engineer & AI Enthusiast crafting digital experiences with passion.
-          </p>
         </div>
 
         <div class="text-center homepage-reveal-soft" style="animation-delay: 0.22s;">
@@ -46,45 +63,50 @@ const { className } = Astro.props;
             Quick Links
           </h3>
           <div class="flex flex-wrap justify-center gap-3">
-            {quickLinks.map((link) => (
-              <a
-                href={link.href}
-                class="px-4 py-2 rounded-xl text-sm text-[#6B7280] hover:text-[#3B82F6] homepage-pill-hover hover:shadow-[4px_4px_8px_rgba(163,177,198,0.6),-4px_-4px_8px_rgba(255,255,255,0.5)]"
-              >
-                {link.label}
-              </a>
-            ))}
+            {
+              quickLinks.map((link) => (
+                <a
+                  href={link.href}
+                  class="px-4 py-2 rounded-xl text-sm text-[#6B7280] hover:text-[#3B82F6] homepage-pill-hover hover:shadow-[4px_4px_8px_rgba(163,177,198,0.6),-4px_-4px_8px_rgba(255,255,255,0.5)]"
+                >
+                  {link.label}
+                </a>
+              ))
+            }
           </div>
         </div>
 
         <div class="text-center md:text-right homepage-reveal-soft" style="animation-delay: 0.3s;">
-          <h3 class="text-sm font-semibold text-[#3D4852] uppercase tracking-wide mb-4">
-            Connect
-          </h3>
+          <h3 class="text-sm font-semibold text-[#3D4852] uppercase tracking-wide mb-4">Connect</h3>
           <div class="flex items-center justify-center md:justify-end gap-3">
-            {socialLinks.map((link) => {
-              const Icon = link.icon;
-              return (
-                <a
-                  href={link.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                   class="p-3 rounded-xl text-[#6B7280] hover:text-[#3B82F6] homepage-icon-hover shadow-[5px_5px_10px_rgb(163,177,198,0.6),-5px_-5px_10px_rgba(255,255,255,0.5)] hover:shadow-[8px_8px_14px_rgb(163,177,198,0.7),-8px_-8px_14px_rgba(255,255,255,0.6)]"
-                  aria-label={link.label}
-                >
-                  <Icon size={20} />
-                </a>
-              );
-            })}
+            {
+              socialLinks.map((link) => {
+                const Icon = link.icon;
+                return (
+                  <a
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="p-3 rounded-xl text-[#6B7280] hover:text-[#3B82F6] homepage-icon-hover shadow-[5px_5px_10px_rgb(163,177,198,0.6),-5px_-5px_10px_rgba(255,255,255,0.5)] hover:shadow-[8px_8px_14px_rgb(163,177,198,0.7),-8px_-8px_14px_rgba(255,255,255,0.6)]"
+                    aria-label={link.label}
+                  >
+                    <Icon size={20} />
+                  </a>
+                );
+              })
+            }
           </div>
         </div>
       </div>
 
-      <div class="mt-8 pt-6 border-t border-[#d1d5db]/50 homepage-reveal-soft" style="animation-delay: 0.4s;">
+      <div
+        class="mt-8 pt-6 border-t border-[#d1d5db]/50 homepage-reveal-soft"
+        style="animation-delay: 0.4s;"
+      >
         <div class="flex items-center justify-center">
           <p class="text-sm text-[#6B7280]">
-            © {currentYear} <span class="text-[#3B82F6] font-medium">Nau.</span> All rights
-            reserved.
+            © {currentYear}
+            <span class="text-[#3B82F6] font-medium">Nau.</span> All rights reserved.
           </p>
         </div>
       </div>

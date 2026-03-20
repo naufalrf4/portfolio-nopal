@@ -1,7 +1,9 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { sendChatMessage } from './chat.service';
 import { useChatSession } from './useChatSession';
 import type { Message } from './types';
+
+const MESSAGE_STORAGE_KEY = 'portfolio-chat-messages-v1';
 
 interface UseChat {
   messages: Message[];
@@ -36,14 +38,94 @@ function simulateStreaming(text: string, onChunk: (chunk: string) => void, onCom
   return interval;
 }
 
-export function useChat(ragServiceUrl: string): UseChat {
+function readStoredMessages(): Message[] {
+  if (typeof window === 'undefined') {
+    return [];
+  }
+
+  try {
+    const raw = window.localStorage.getItem(MESSAGE_STORAGE_KEY);
+    if (!raw) {
+      return [];
+    }
+
+    const parsed = JSON.parse(raw) as Array<Omit<Message, 'timestamp'> & { timestamp: string }>;
+
+    if (!Array.isArray(parsed)) {
+      return [];
+    }
+
+    return parsed.flatMap((message) => {
+      if (!message || typeof message !== 'object') {
+        return [];
+      }
+
+      return [
+        {
+          ...message,
+          timestamp: new Date(message.timestamp),
+        },
+      ];
+    });
+  } catch {
+    return [];
+  }
+}
+
+function persistMessages(messages: Message[]) {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  try {
+    window.localStorage.setItem(
+      MESSAGE_STORAGE_KEY,
+      JSON.stringify(
+        messages.map((message) => ({
+          ...message,
+          timestamp: message.timestamp.toISOString(),
+        }))
+      )
+    );
+  } catch {
+    // Ignore storage write failures.
+  }
+}
+
+function clearStoredMessages() {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  try {
+    window.localStorage.removeItem(MESSAGE_STORAGE_KEY);
+  } catch {
+    // Ignore storage removal failures.
+  }
+}
+
+export function useChat(): UseChat {
   const [messages, setMessages] = useState<Message[]>([]);
+  const [hasHydratedMessages, setHasHydratedMessages] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [streamingMessageId, setStreamingMessageId] = useState<string | null>(null);
   const [shouldScrollToBottom, setShouldScrollToBottom] = useState(false);
   const { sessionId, setSessionId, clearSession } = useChatSession();
   const streamingIntervalRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    setMessages(readStoredMessages());
+    setHasHydratedMessages(true);
+  }, []);
+
+  useEffect(() => {
+    if (!hasHydratedMessages) {
+      return;
+    }
+
+    persistMessages(messages);
+  }, [hasHydratedMessages, messages]);
 
   const sendMessage = useCallback(
     async (content: string) => {
@@ -67,7 +149,6 @@ export function useChat(ragServiceUrl: string): UseChat {
             sessionId: sessionId || undefined,
             message: content.trim(),
           },
-          ragServiceUrl,
         });
 
         if (response.sessionId) {
@@ -115,7 +196,7 @@ export function useChat(ragServiceUrl: string): UseChat {
         setIsLoading(false);
       }
     },
-    [sessionId, setSessionId, ragServiceUrl]
+    [sessionId, setSessionId]
   );
 
   const clearMessages = useCallback(() => {
@@ -127,6 +208,7 @@ export function useChat(ragServiceUrl: string): UseChat {
     setError(null);
     setStreamingMessageId(null);
     setShouldScrollToBottom(false);
+    clearStoredMessages();
     clearSession();
   }, [clearSession]);
 

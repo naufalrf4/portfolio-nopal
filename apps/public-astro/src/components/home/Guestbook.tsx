@@ -17,6 +17,7 @@ import {
 interface GuestbookProps {
   initialEntries?: GuestbookEntry[];
   turnstileSiteKey: string;
+  mode?: 'home' | 'page';
 }
 
 interface GuestbookResponse {
@@ -35,7 +36,11 @@ const SYNC_KEYS = [
   'guestbook_token',
 ] as const;
 
-export function Guestbook({ initialEntries = [], turnstileSiteKey }: GuestbookProps) {
+export function Guestbook({
+  initialEntries = [],
+  turnstileSiteKey,
+  mode = 'home',
+}: GuestbookProps) {
   const [entries, setEntries] = useState<GuestbookEntry[]>(initialEntries);
   const [user, setUser] = useState<StoredGuestbookUser | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -84,6 +89,7 @@ export function Guestbook({ initialEntries = [], turnstileSiteKey }: GuestbookPr
     const secondRow = secondRowSource.length > 0 ? secondRowSource : firstRow;
     return [firstRow, secondRow].filter((row) => row.length > 0);
   }, [latestEntries]);
+  const isPageMode = mode === 'page';
 
   async function refreshEntries(): Promise<void> {
     const response = await fetch('/api/guestbook');
@@ -132,7 +138,11 @@ export function Guestbook({ initialEntries = [], turnstileSiteKey }: GuestbookPr
       `}</style>
       <SectionHeader
         title="Guestbook"
-        subtitle="A few words from people who stopped by. Leave a short message once you sign in with Google."
+        subtitle={
+          isPageMode
+            ? 'Read full notes from visitors, collaborators, and friends, or leave your own once you sign in with Google.'
+            : 'A few words from people who stopped by. Leave a short message once you sign in with Google.'
+        }
       />
 
       <motion.div
@@ -265,6 +275,47 @@ export function Guestbook({ initialEntries = [], turnstileSiteKey }: GuestbookPr
               <p className="mt-2 text-sm text-[#6B7280]">Be the first to leave a short message.</p>
             </NeuCard>
           </motion.div>
+        ) : isPageMode ? (
+          <div className="grid gap-4 md:grid-cols-2">
+            {entries.map((entry, index) => (
+              <motion.div
+                key={entry.id}
+                initial={{ opacity: 0, y: 18 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.15 }}
+                transition={{
+                  duration: 0.56,
+                  delay: index * 0.03,
+                  ease: [0.22, 1, 0.36, 1],
+                }}
+              >
+                <NeuCard className="h-full p-5 md:p-6">
+                  <div className="flex items-start gap-4">
+                    <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#3B82F6]/10 text-[#3B82F6]">
+                      {entry.user.image ? (
+                        <img
+                          src={entry.user.image}
+                          alt={entry.user.name || 'Guestbook visitor'}
+                          className="h-full w-full object-cover"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <UserCircle2 size={20} />
+                      )}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-semibold text-[#3D4852]">
+                        {entry.user.name || 'Anonymous visitor'}
+                      </p>
+                      <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-[#556476]">
+                        {entry.message}
+                      </p>
+                    </div>
+                  </div>
+                </NeuCard>
+              </motion.div>
+            ))}
+          </div>
         ) : (
           <div className="space-y-3 overflow-hidden">
             {marqueeRows.map((row, rowIndex) => (
