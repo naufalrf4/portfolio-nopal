@@ -1,9 +1,7 @@
 import type { AboutData, ProfileLink } from '../types';
 
 const API_BASE =
-  process.env.ADMIN_API_URL?.trim() ||
-  import.meta.env.ADMIN_API_URL?.trim() ||
-  'http://localhost:3001';
+  process.env.ADMIN_API_URL?.trim() || import.meta.env.ADMIN_API_URL?.trim() || 'http://localhost:3001';
 const API_TIMEOUT_MS = 5000;
 
 interface ApiEnvelope<T> {
@@ -81,18 +79,7 @@ export async function getProfileLinks(): Promise<ProfileLink[]> {
 }
 
 export async function getAboutData(): Promise<AboutData> {
-  let aboutData: AboutData | null = null;
-
-  try {
-    aboutData = await apiFetch<AboutData>('/api/v1/public/about');
-  } catch (error) {
-    const isNotFoundError =
-      error instanceof Error && /404\s+Not Found|About me not found/i.test(error.message);
-
-    if (!isNotFoundError) {
-      throw error;
-    }
-  }
+  const aboutData = await apiFetch<AboutData>('/api/v1/public/about');
 
   return {
     fullName: aboutData?.fullName || 'NaufalRF',
