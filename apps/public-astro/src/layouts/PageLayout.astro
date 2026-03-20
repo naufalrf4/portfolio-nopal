@@ -18,7 +18,11 @@ interface Props {
 
 const { title, description, ogImage, canonicalUrl, ogType } = Astro.props;
 const currentPath = Astro.url.pathname;
-const ragServiceUrl = import.meta.env.PUBLIC_RAG_SERVICE_URL || 'http://localhost:3005';
+const ragServiceUrl = '/api/rag';
+const cursorWsUrl =
+  process.env.PUBLIC_CURSOR_WS_URL?.trim() ||
+  import.meta.env.PUBLIC_CURSOR_WS_URL?.trim() ||
+  'wss://presence.naufalrf.tech/ws';
 
 ---
 
@@ -32,7 +36,7 @@ const ragServiceUrl = import.meta.env.PUBLIC_RAG_SERVICE_URL || 'http://localhos
   <slot name="head" slot="head" />
 
   <FloatingBlobs />
-  <LiveCursorBand client:load currentPath={currentPath} />
+  <LiveCursorBand client:load currentPath={currentPath} socketUrl={cursorWsUrl} />
   <ScrollToTopButton client:load currentPath={currentPath} />
   
   <Navbar />

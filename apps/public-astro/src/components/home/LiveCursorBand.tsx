@@ -10,13 +10,14 @@ function clamp(value: number) {
 
 interface LiveCursorBandProps {
   currentPath: string;
+  socketUrl: string;
 }
 
-export function LiveCursorBand({ currentPath }: LiveCursorBandProps) {
+export function LiveCursorBand({ currentPath, socketUrl }: LiveCursorBandProps) {
   const pathname = useAstroPathname(currentPath);
   const reduceMotion = useReducedMotion();
   const { identity, status, self, others, overviewParticipants, totalParticipants, sendMove } =
-    useLiveCursorPresence(pathname);
+    useLiveCursorPresence(pathname, socketUrl);
   const [isListOpen, setIsListOpen] = useState(false);
   const [documentMetrics, setDocumentMetrics] = useState({
     width: 0,

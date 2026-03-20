@@ -25,8 +25,17 @@ type PresenceMessage =
 const HEARTBEAT_MS = 5000;
 const SEND_INTERVAL_MS = 60;
 
-function getSocketUrl(): string {
-  return import.meta.env.PUBLIC_CURSOR_WS_URL?.trim() || 'ws://localhost:3006/ws';
+function getSocketUrl(socketUrl: string): string {
+  const normalized = socketUrl.trim();
+  if (normalized.length > 0) {
+    return normalized;
+  }
+
+  if (typeof window !== 'undefined') {
+    return `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://presence.naufalrf.tech/ws`;
+  }
+
+  return 'wss://presence.naufalrf.tech/ws';
 }
 
 function resolveRoomId(currentPath: string): string {
@@ -37,7 +46,7 @@ function resolveRoomId(currentPath: string): string {
   return `public${currentPath.replace(/[^a-zA-Z0-9/_-]/g, '')}`;
 }
 
-export function useLiveCursorPresence(currentPath: string) {
+export function useLiveCursorPresence(currentPath: string, socketUrl: string) {
   const [status, setStatus] = useState<Status>('disconnected');
   const [participants, setParticipants] = useState<LiveCursorParticipant[]>([]);
   const [overviewParticipants, setOverviewParticipants] = useState<LiveCursorParticipant[]>([]);
@@ -127,7 +136,7 @@ export function useLiveCursorPresence(currentPath: string) {
       setOverviewParticipants([]);
       setSelfId(null);
 
-      const socket = new WebSocket(getSocketUrl());
+      const socket = new WebSocket(getSocketUrl(socketUrl));
       socketRef.current = socket;
 
       socket.addEventListener('open', () => {
@@ -204,7 +213,7 @@ export function useLiveCursorPresence(currentPath: string) {
         }
       });
     },
-    [clearTimers, currentPath, pageLabel, roomId, sendMessage]
+    [clearTimers, currentPath, pageLabel, roomId, sendMessage, socketUrl]
   );
 
   useEffect(() => {
