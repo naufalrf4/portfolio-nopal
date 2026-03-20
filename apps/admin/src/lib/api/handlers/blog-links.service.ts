@@ -3,6 +3,7 @@ import { blogLink } from '@/lib/db/schema';
 import { eq, asc, and, max } from 'drizzle-orm';
 import type { CreateBlogLinkInput } from '@/lib/validations/blog-link.schema';
 import { createId } from '@paralleldrive/cuid2';
+import { normalizeStoredAssetValue } from '@/lib/services/storage';
 
 export type BlogLinkCreateInput = CreateBlogLinkInput;
 type BlogLinkUpdateInput = Partial<BlogLinkCreateInput>;
@@ -45,7 +46,7 @@ export class BlogLinksService {
         url: data.url,
         title: data.title,
         description: data.description || null,
-        imageUrl: data.imageUrl || null,
+        imageUrl: normalizeStoredAssetValue(data.imageUrl),
         source: data.source,
         tags: data.tags || [],
         publishedAt: data.publishedAt
@@ -64,6 +65,7 @@ export class BlogLinksService {
       .update(blogLink)
       .set({
         ...data,
+        imageUrl: normalizeStoredAssetValue(data.imageUrl),
         updatedAt: new Date().toISOString(),
       })
       .where(eq(blogLink.id, id))

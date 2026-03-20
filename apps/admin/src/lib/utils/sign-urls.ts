@@ -1,4 +1,4 @@
-import { storageService } from '@/lib/services/storage';
+import { normalizeStoredAssetValue, storageService } from '@/lib/services/storage';
 
 type SignableRecord = object;
 
@@ -7,20 +7,21 @@ interface SignConfig {
   nested?: Record<string, string[]>;
 }
 
-function isStorageKey(value: string): boolean {
-  if (!value || typeof value !== 'string') {
-    return false;
+function getStorageKey(value: unknown): string | null {
+  if (typeof value !== 'string') {
+    return null;
   }
 
-  const urlPatterns = [/^https?:\/\//, /^\/api\//];
-
-  for (const pattern of urlPatterns) {
-    if (pattern.test(value)) {
-      return false;
-    }
+  const normalizedValue = normalizeStoredAssetValue(value);
+  if (
+    !normalizedValue ||
+    /^https?:\/\//.test(normalizedValue) ||
+    /^\/api\//.test(normalizedValue)
+  ) {
+    return null;
   }
 
-  return value.includes('/');
+  return normalizedValue.includes('/') ? normalizedValue : null;
 }
 
 export async function signAssetUrls<T extends SignableRecord>(
@@ -36,9 +37,9 @@ export async function signAssetUrls<T extends SignableRecord>(
 
   if (config.fields) {
     const promises = config.fields.map(async (field) => {
-      const value = signedRecord[field];
-      if (typeof value === 'string' && isStorageKey(value)) {
-        signedRecord[field] = await storageService.signGetUrl(value, expiresInSeconds);
+      const storageKey = getStorageKey(signedRecord[field]);
+      if (storageKey) {
+        signedRecord[field] = await storageService.signGetUrl(storageKey, expiresInSeconds);
       }
     });
     await Promise.all(promises);
@@ -60,9 +61,9 @@ export async function signAssetUrls<T extends SignableRecord>(
           const signedItem = { ...(item as Record<string, unknown>) };
           await Promise.all(
             fields.map(async (field) => {
-              const value = signedItem[field];
-              if (typeof value === 'string' && isStorageKey(value)) {
-                signedItem[field] = await storageService.signGetUrl(value, expiresInSeconds);
+              const storageKey = getStorageKey(signedItem[field]);
+              if (storageKey) {
+                signedItem[field] = await storageService.signGetUrl(storageKey, expiresInSeconds);
               }
             })
           );
@@ -95,8 +96,9 @@ export async function signStringArray(keys: string[], expiresInSeconds = 3600): 
 
   return Promise.all(
     keys.map(async (key) => {
-      if (key && isStorageKey(key)) {
-        return storageService.signGetUrl(key, expiresInSeconds);
+      const storageKey = getStorageKey(key);
+      if (storageKey) {
+        return storageService.signGetUrl(storageKey, expiresInSeconds);
       }
       return key;
     })

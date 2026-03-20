@@ -5,6 +5,8 @@ interface ServiceAccountCredentials {
   private_key?: string;
 }
 
+type AssetValue = string | null | undefined;
+
 function getCredentials(): ServiceAccountCredentials | undefined {
   const rawCredentials = process.env.GCS_SERVICE_ACCOUNT_JSON?.trim();
 
@@ -44,6 +46,62 @@ function getStorageClient(): Storage {
 
 function getBucketName(): string {
   return getRequiredEnv('GCS_BUCKET_NAME');
+}
+
+function normalizePublicBaseUrl(value: string | undefined): string | null {
+  const trimmed = value?.trim();
+  if (!trimmed) {
+    return null;
+  }
+
+  return trimmed.replace(/\/+$/, '');
+}
+
+function extractStorageKeyFromUrl(value: string): string | null {
+  try {
+    const parsedUrl = new URL(value);
+    const bucketName = process.env.GCS_BUCKET_NAME?.trim();
+    const publicBaseUrl = normalizePublicBaseUrl(process.env.GCS_PUBLIC_BASE_URL);
+
+    if (publicBaseUrl && value.startsWith(`${publicBaseUrl}/`)) {
+      return decodeURIComponent(value.slice(publicBaseUrl.length + 1)) || null;
+    }
+
+    if (!bucketName) {
+      return null;
+    }
+
+    const rawPath = decodeURIComponent(parsedUrl.pathname.replace(/^\/+/, ''));
+
+    if (parsedUrl.hostname === 'storage.googleapis.com' && rawPath.startsWith(`${bucketName}/`)) {
+      return rawPath.slice(bucketName.length + 1) || null;
+    }
+
+    if (parsedUrl.hostname === `${bucketName}.storage.googleapis.com`) {
+      return rawPath || null;
+    }
+
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+export function normalizeStoredAssetValue(value: AssetValue): string | null {
+  if (!value) {
+    return null;
+  }
+
+  const trimmedValue = value.trim();
+  if (!trimmedValue) {
+    return null;
+  }
+
+  if (!/^https?:\/\//i.test(trimmedValue)) {
+    return trimmedValue;
+  }
+
+  return extractStorageKeyFromUrl(trimmedValue) ?? trimmedValue;
 }
 
 export type UploadFolder = 'projects' | 'about' | 'achievements' | 'resumes';

@@ -4,45 +4,12 @@ import { eq } from 'drizzle-orm';
 import type { UpdateAboutInput } from '@/lib/validations/about.schema';
 import { createId } from '@paralleldrive/cuid2';
 import { getAboutMeRecord } from '@/lib/api/handlers/about-read.service';
+import { normalizeStoredAssetValue } from '@/lib/services/storage';
 
 type AboutInsert = typeof aboutMe.$inferInsert;
 
 function sanitizeAssetValue(value?: string | null): string | null {
-  if (!value) {
-    return null;
-  }
-
-  const trimmedValue = value.trim();
-  if (!trimmedValue) {
-    return null;
-  }
-
-  if (/^https?:\/\//i.test(trimmedValue)) {
-    try {
-      const parsedUrl = new URL(trimmedValue);
-      const hasSignedQuery =
-        parsedUrl.searchParams.has('X-Amz-Algorithm') ||
-        parsedUrl.searchParams.has('X-Amz-Signature') ||
-        parsedUrl.searchParams.has('x-id');
-
-      if (!hasSignedQuery) {
-        return trimmedValue;
-      }
-
-      const bucketName = process.env.R2_BUCKET_NAME;
-      const rawPath = decodeURIComponent(parsedUrl.pathname.replace(/^\/+/, ''));
-
-      if (bucketName && rawPath.startsWith(`${bucketName}/`)) {
-        return rawPath.slice(bucketName.length + 1);
-      }
-
-      return rawPath || null;
-    } catch {
-      return trimmedValue;
-    }
-  }
-
-  return trimmedValue;
+  return normalizeStoredAssetValue(value);
 }
 
 function normalizeExperienceItems(
