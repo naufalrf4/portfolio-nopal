@@ -8,7 +8,7 @@
 	const canonicalUrl = 'https://ngl.naufalrf.tech';
 	const ogDescription =
 		'An open space to share feedback or questions anonymously with Naufal Rizqullah Firdaus to support transparency and continuous improvement.';
-	const PUBLIC_GA_MEASUREMENT_ID = env.PUBLIC_GA_MEASUREMENT_ID ?? '';
+	const gaMeasurementId = env.PUBLIC_GA_MEASUREMENT_ID ?? '';
 
 	let { children } = $props();
 </script>
@@ -41,10 +41,10 @@
 		href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=DM+Sans:wght@400;500;700&display=swap"
 		rel="stylesheet"
 	/>
-	{#if PUBLIC_GA_MEASUREMENT_ID}
-		<script async src={`https://www.googletagmanager.com/gtag/js?id=${PUBLIC_GA_MEASUREMENT_ID}`}></script>
+	{#if gaMeasurementId}
+		<script async src={`https://www.googletagmanager.com/gtag/js?id=${gaMeasurementId}`}></script>
 		<script>
-			{`window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', '${PUBLIC_GA_MEASUREMENT_ID}', { send_page_view: false });`}
+			{`window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', ${JSON.stringify(gaMeasurementId)}, { send_page_view: false });`}
 		</script>
 	{/if}
 </svelte:head>
