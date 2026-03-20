@@ -7,7 +7,6 @@ import type {
   UpdateProjectInput,
   ProjectQueryInput,
 } from '@/lib/validations/project.schema';
-import { normalizeStoredAssetValue } from '@/lib/services/storage';
 
 type ProjectInsert = typeof projects.$inferInsert;
 type ProjectUpdate = Partial<ProjectInsert>;
@@ -79,7 +78,6 @@ export class ProjectsService {
       description: description || '',
       liveUrl: liveUrl || null,
       repoUrl: repoUrl || null,
-      imageUrl: normalizeStoredAssetValue(rest.imageUrl),
       tags: tags || [],
       startDate: startDate ? new Date(startDate).toISOString() : null,
       endDate: endDate ? new Date(endDate).toISOString() : null,
@@ -98,7 +96,6 @@ export class ProjectsService {
     const { startDate, endDate, ...rest } = data;
     const updateData: ProjectUpdate = {
       ...rest,
-      imageUrl: normalizeStoredAssetValue(rest.imageUrl),
       updatedAt: new Date().toISOString(),
     };
     if (startDate !== undefined) {
