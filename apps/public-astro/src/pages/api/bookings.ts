@@ -1,7 +1,10 @@
 import type { APIRoute } from 'astro';
 import { buildSubmissionProxyHeaders } from '@/lib/submission-context';
 
-const ADMIN_API_URL = import.meta.env.ADMIN_API_URL || 'http://localhost:3001';
+const ADMIN_API_URL =
+  process.env.ADMIN_API_URL?.trim() ||
+  import.meta.env.ADMIN_API_URL?.trim() ||
+  'http://localhost:3001';
 
 async function proxy(request: Request, body: unknown): Promise<Response> {
   const timezone =

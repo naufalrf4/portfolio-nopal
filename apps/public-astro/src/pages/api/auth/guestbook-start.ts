@@ -1,6 +1,9 @@
 import type { APIRoute } from 'astro';
 
-const ADMIN_API_URL = import.meta.env.ADMIN_API_URL || 'http://localhost:3001';
+const ADMIN_API_URL =
+  process.env.ADMIN_API_URL?.trim() ||
+  import.meta.env.ADMIN_API_URL?.trim() ||
+  'http://localhost:3001';
 
 export const GET: APIRoute = async ({ request, url }) => {
   const callbackUrl = url.searchParams.get('callbackUrl') || '/';
