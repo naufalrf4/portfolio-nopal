@@ -1,6 +1,9 @@
 import type { AboutData, ProfileLink } from '../types';
 
-const API_BASE = import.meta.env.ADMIN_API_URL || 'http://localhost:3001';
+const API_BASE =
+  process.env.ADMIN_API_URL?.trim() ||
+  import.meta.env.ADMIN_API_URL?.trim() ||
+  'http://localhost:3001';
 const API_TIMEOUT_MS = 5000;
 
 interface ApiEnvelope<T> {
