@@ -81,7 +81,18 @@ export async function getProfileLinks(): Promise<ProfileLink[]> {
 }
 
 export async function getAboutData(): Promise<AboutData> {
-  const aboutData = await apiFetch<AboutData>('/api/v1/public/about');
+  let aboutData: AboutData | null = null;
+
+  try {
+    aboutData = await apiFetch<AboutData>('/api/v1/public/about');
+  } catch (error) {
+    const isNotFoundError =
+      error instanceof Error && /404\s+Not Found|About me not found/i.test(error.message);
+
+    if (!isNotFoundError) {
+      throw error;
+    }
+  }
 
   return {
     fullName: aboutData?.fullName || 'NaufalRF',
