@@ -21,9 +21,7 @@ class ApiClientError extends Error {
 }
 
 const API_BASE =
-  process.env.ADMIN_API_URL?.trim() ||
-  import.meta.env.ADMIN_API_URL?.trim() ||
-  'http://localhost:3001';
+  process.env.ADMIN_API_URL?.trim() || import.meta.env.ADMIN_API_URL?.trim() || 'http://localhost:3001';
 const API_TIMEOUT_MS = 5000;
 
 const FALLBACK_ABOUT: AboutData = {

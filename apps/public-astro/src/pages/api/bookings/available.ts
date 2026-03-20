@@ -1,9 +1,7 @@
 import type { APIRoute } from 'astro';
 
 const ADMIN_API_URL =
-  process.env.ADMIN_API_URL?.trim() ||
-  import.meta.env.ADMIN_API_URL?.trim() ||
-  'http://localhost:3001';
+  process.env.ADMIN_API_URL?.trim() || import.meta.env.ADMIN_API_URL?.trim() || 'http://localhost:3001';
 
 export const GET: APIRoute = async ({ url }) => {
   try {

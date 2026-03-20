@@ -2,7 +2,7 @@ import type { APIRoute } from 'astro';
 import { buildSubmissionProxyHeaders } from '@/lib/submission-context';
 
 const RAG_SERVICE_URL =
-  process.env.RAG_SERVICE_URL?.trim() || import.meta.env.RAG_SERVICE_URL || 'http://localhost:3005';
+  process.env.RAG_SERVICE_URL?.trim() || import.meta.env.RAG_SERVICE_URL?.trim() || 'http://localhost:3005';
 const RATE_LIMIT_CONFIG = {
   maxRequests: 12,
   windowMs: 60 * 1000,
