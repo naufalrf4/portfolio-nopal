@@ -1,16 +1,29 @@
 import type { APIRoute } from 'astro';
 
-const ADMIN_API_URL =
-  process.env.ADMIN_API_URL?.trim() ||
-  import.meta.env.ADMIN_API_URL?.trim() ||
-  'http://localhost:3001';
+const ADMIN_PUBLIC_URL =
+  process.env.ADMIN_PUBLIC_URL?.trim() ||
+  import.meta.env.ADMIN_PUBLIC_URL?.trim() ||
+  'https://admin.naufalrf.tech';
+
+const PUBLIC_SITE_URL =
+  process.env.PUBLIC_SITE_URL?.trim() ||
+  import.meta.env.PUBLIC_SITE_URL?.trim() ||
+  'https://naufalrf.tech';
 
 export const GET: APIRoute = async ({ request, url }) => {
   const callbackUrl = url.searchParams.get('callbackUrl') || '/';
   const nextUrl = callbackUrl.startsWith('/') ? callbackUrl : '/';
-  const returnTo = new URL(nextUrl, request.url);
+  const requestOrigin = (() => {
+    try {
+      return new URL(request.url).origin;
+    } catch {
+      return PUBLIC_SITE_URL;
+    }
+  })();
+  const publicOrigin = requestOrigin.includes('localhost') ? PUBLIC_SITE_URL : requestOrigin;
+  const returnTo = new URL(nextUrl, publicOrigin);
 
-  const adminSignInUrl = new URL('/public-auth/signin', ADMIN_API_URL);
+  const adminSignInUrl = new URL('/public-auth/signin', ADMIN_PUBLIC_URL);
   adminSignInUrl.searchParams.set(
     'callbackUrl',
     `/api/v1/public/auth/complete?returnTo=${encodeURIComponent(returnTo.toString())}`
