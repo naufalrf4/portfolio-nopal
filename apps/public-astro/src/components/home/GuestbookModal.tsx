@@ -19,11 +19,18 @@ interface GuestbookModalProps {
   onClose: () => void;
   user: GuestbookUser | null;
   onSuccess: () => Promise<void> | void;
+  turnstileSiteKey: string;
 }
 
 const CALLBACK_URL = '/#guestbook';
 
-export function GuestbookModal({ isOpen, onClose, user, onSuccess }: GuestbookModalProps) {
+export function GuestbookModal({
+  isOpen,
+  onClose,
+  user,
+  onSuccess,
+  turnstileSiteKey,
+}: GuestbookModalProps) {
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSigningIn, setIsSigningIn] = useState(false);
@@ -31,8 +38,7 @@ export function GuestbookModal({ isOpen, onClose, user, onSuccess }: GuestbookMo
   const [turnstileToken, setTurnstileToken] = useState('');
   const [turnstileError, setTurnstileError] = useState<string | null>(null);
   const [turnstileResetKey, setTurnstileResetKey] = useState(0);
-  const siteKey = useMemo(() => import.meta.env.PUBLIC_TURNSTILE_SITE_KEY?.trim() ?? '', []);
-  const hasTurnstile = siteKey.length > 0;
+  const hasTurnstile = useMemo(() => turnstileSiteKey.trim().length > 0, [turnstileSiteKey]);
   const shouldShowTurnstile = message.trim().length > 0;
 
   useEffect(() => {
@@ -136,7 +142,16 @@ export function GuestbookModal({ isOpen, onClose, user, onSuccess }: GuestbookMo
       footer={
         isComposerMode ? (
           <div className="flex flex-col-reverse gap-3 md:flex-row md:justify-end">
-            <NeuButton type="button" variant="ghost" onClick={onClose} disabled={isSubmitting} data-analytics-button data-entity-type="guestbook_modal_cancel" data-entity-id="guestbook-modal" data-entity-label="Cancel guestbook compose">
+            <NeuButton
+              type="button"
+              variant="ghost"
+              onClick={onClose}
+              disabled={isSubmitting}
+              data-analytics-button
+              data-entity-type="guestbook_modal_cancel"
+              data-entity-id="guestbook-modal"
+              data-entity-label="Cancel guestbook compose"
+            >
               Cancel
             </NeuButton>
             <NeuButton
@@ -152,7 +167,16 @@ export function GuestbookModal({ isOpen, onClose, user, onSuccess }: GuestbookMo
           </div>
         ) : (
           <div className="flex flex-col-reverse gap-3 md:flex-row md:justify-end">
-            <NeuButton type="button" variant="ghost" onClick={onClose} disabled={isSigningIn} data-analytics-button data-entity-type="guestbook_signin_cancel" data-entity-id="guestbook-signin" data-entity-label="Close guestbook sign in">
+            <NeuButton
+              type="button"
+              variant="ghost"
+              onClick={onClose}
+              disabled={isSigningIn}
+              data-analytics-button
+              data-entity-type="guestbook_signin_cancel"
+              data-entity-id="guestbook-signin"
+              data-entity-label="Close guestbook sign in"
+            >
               Maybe later
             </NeuButton>
             <NeuButton
@@ -199,6 +223,7 @@ export function GuestbookModal({ isOpen, onClose, user, onSuccess }: GuestbookMo
 
             {(!hasTurnstile || shouldShowTurnstile) && (
               <TurnstileWidget
+                siteKey={turnstileSiteKey}
                 resetKey={turnstileResetKey}
                 onTokenChange={setTurnstileToken}
                 onErrorChange={setTurnstileError}

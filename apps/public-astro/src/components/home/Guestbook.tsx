@@ -16,6 +16,7 @@ import {
 
 interface GuestbookProps {
   initialEntries?: GuestbookEntry[];
+  turnstileSiteKey: string;
 }
 
 interface GuestbookResponse {
@@ -34,7 +35,7 @@ const SYNC_KEYS = [
   'guestbook_token',
 ] as const;
 
-export function Guestbook({ initialEntries = [] }: GuestbookProps) {
+export function Guestbook({ initialEntries = [], turnstileSiteKey }: GuestbookProps) {
   const [entries, setEntries] = useState<GuestbookEntry[]>(initialEntries);
   const [user, setUser] = useState<StoredGuestbookUser | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -190,7 +191,15 @@ export function Guestbook({ initialEntries = [] }: GuestbookProps) {
                 viewport={{ once: true, amount: 0.8 }}
                 transition={{ duration: 0.62, delay: 0.14, ease: [0.22, 1, 0.36, 1] }}
               >
-                <NeuButton variant="primary" size="md" onClick={() => setIsModalOpen(true)} data-analytics-button data-entity-type="guestbook_open_compose" data-entity-id="guestbook" data-entity-label="Leave a guestbook message">
+                <NeuButton
+                  variant="primary"
+                  size="md"
+                  onClick={() => setIsModalOpen(true)}
+                  data-analytics-button
+                  data-entity-type="guestbook_open_compose"
+                  data-entity-id="guestbook"
+                  data-entity-label="Leave a guestbook message"
+                >
                   <Plus size={18} className="mr-2" />
                   Leave a message
                 </NeuButton>
@@ -208,7 +217,15 @@ export function Guestbook({ initialEntries = [] }: GuestbookProps) {
                 viewport={{ once: true, amount: 0.8 }}
                 transition={{ duration: 0.62, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
               >
-                <NeuButton variant="accent" size="md" onClick={() => setIsModalOpen(true)} data-analytics-button data-entity-type="guestbook_signin_cta" data-entity-id="guestbook" data-entity-label="Sign in to guestbook">
+                <NeuButton
+                  variant="accent"
+                  size="md"
+                  onClick={() => setIsModalOpen(true)}
+                  data-analytics-button
+                  data-entity-type="guestbook_signin_cta"
+                  data-entity-id="guestbook"
+                  data-entity-label="Sign in to guestbook"
+                >
                   <LogIn size={18} className="mr-2" />
                   Sign in to guestbook
                 </NeuButton>
@@ -311,6 +328,7 @@ export function Guestbook({ initialEntries = [] }: GuestbookProps) {
         onClose={() => setIsModalOpen(false)}
         user={user}
         onSuccess={handleSuccess}
+        turnstileSiteKey={turnstileSiteKey}
       />
     </Section>
   );

@@ -13,6 +13,10 @@ const [about, projectsData, blogsData, guestbookData] = await Promise.all([
   getBlogs(3),
   getGuestbookEntries(),
 ]);
+const turnstileSiteKey =
+  process.env.PUBLIC_TURNSTILE_SITE_KEY?.trim() ||
+  import.meta.env.PUBLIC_TURNSTILE_SITE_KEY?.trim() ||
+  '';
 
 const title = 'NaufalRF Portfolio';
 const description =
@@ -77,5 +81,5 @@ const personStructuredData = {
   <TechnicalExpertise client:visible />
   <FeaturedProjects client:load projects={projectsData.projects} />
   <LatestArticles client:visible blogs={blogsData.blogs} />
-  <Guestbook client:load initialEntries={guestbookData.entries} />
+  <Guestbook client:load initialEntries={guestbookData.entries} turnstileSiteKey={turnstileSiteKey} />
 </PageLayout>
