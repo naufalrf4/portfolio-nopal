@@ -4,6 +4,20 @@ from collections.abc import Iterable
 from app.schemas.admin import ChatLogMessage
 
 
+def normalize_language(value: str) -> str:
+    normalized = value.strip().lower()
+    if normalized.startswith("id"):
+        return "id"
+    if normalized.startswith("en"):
+        return "en"
+    return "en"
+
+
+def normalize_intent(value: str) -> str:
+    normalized = value.strip().lower().replace(" ", "_")
+    return normalized or "general_portfolio"
+
+
 def source_label(source_type: str, source_ref: str, title: str | None = None) -> str:
     if source_type == "knowledge" and title:
         return f"knowledge:{title}"
