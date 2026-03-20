@@ -5,6 +5,14 @@ Chronological timeline of meaningful project work, discoveries, decisions, and b
 ## Entries
 
 
+### 2026-03-20 05:18
+
+- Task: execute real server bootstrap via interactive Paramiko deploy adapter
+- Mode: implementation
+- Files: `deploy.py`, `PROGRESS.md`
+- Status: done
+- Notes: Extended `deploy.py` with a bootstrap-only mode so the adapter can safely harden and sync a host before full production env/domain values are ready. Fixed Windows newline handling for the uploaded bootstrap script and hardened the bootstrap routine with `fail2ban`, `unattended-upgrades`, and Docker daemon log rotation/live-restore. Real execution against `34.142.218.199` as `naufalrf32` using `C:\Users\LENOVO\.ssh\google_compute_engine` succeeded: Docker Engine + Compose plugin are installed, UFW now only allows SSH/80/443/443-udp, the repo exists at `/opt/portfolio-nopal`, and `main` is cloned and up to date. Full app deployment remains intentionally deferred until final production `.env.docker.prod` values (domains/GCS) are ready.
+
 ### 2026-03-20 05:12
 
 - Task: add interactive single-host Paramiko deployment adapter
