@@ -230,16 +230,16 @@ export function LiveCursorBand({ currentPath, socketUrl }: LiveCursorBandProps) 
       </div>
 
       <motion.div
-        className="fixed right-4 top-5 z-[46] flex justify-end md:inset-x-0 md:top-auto md:bottom-8 md:justify-center md:px-4"
+        className="fixed right-4 top-5 z-[52] flex justify-end px-4 md:right-6 md:top-6 md:px-0 lg:left-6 lg:right-auto lg:top-auto lg:bottom-8"
         initial={reduceMotion ? undefined : { opacity: 0, y: 10 }}
         animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
         transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
       >
-        <div className="pointer-events-auto flex flex-col items-center gap-3">
+        <div className="pointer-events-auto flex flex-col items-end gap-3 lg:items-start">
           <button
             type="button"
             onClick={() => setIsListOpen((open) => !open)}
-            className="inline-flex max-w-full items-center justify-center gap-2 rounded-full border border-white/60 bg-[linear-gradient(150deg,rgba(247,250,255,0.82),rgba(231,239,249,0.72))] px-2.5 py-1.5 text-[10px] font-semibold text-[#475569] shadow-[10px_10px_24px_rgba(163,177,198,0.16),-10px_-10px_24px_rgba(255,255,255,0.48)] backdrop-blur-xl transition-transform duration-200 hover:-translate-y-0.5 md:px-4 md:py-2 md:text-[11px]"
+            className="inline-flex max-w-[calc(100vw-2.5rem)] items-center justify-center gap-2 rounded-full border border-white/60 bg-[linear-gradient(150deg,rgba(247,250,255,0.82),rgba(231,239,249,0.72))] px-2.5 py-1.5 text-[10px] font-semibold text-[#475569] shadow-[10px_10px_24px_rgba(163,177,198,0.16),-10px_-10px_24px_rgba(255,255,255,0.48)] backdrop-blur-xl transition-transform duration-200 hover:-translate-y-0.5 md:max-w-[260px] md:px-4 md:py-2 md:text-[11px] lg:max-w-none"
           >
             <span className="inline-flex items-center gap-2 rounded-full bg-white/72 px-2 py-1 shadow-[inset_2px_2px_4px_rgba(163,177,198,0.18),inset_-2px_-2px_4px_rgba(255,255,255,0.55)] md:px-2.5">
               <span
