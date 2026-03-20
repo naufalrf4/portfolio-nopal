@@ -122,11 +122,40 @@ def ask_bool(prompt: str, default: bool = False) -> bool:
     return value in {"y", "yes", "true", "1"}
 
 
+
+def run_init_mode() -> int:
+    import subprocess
+
+    command = (
+        "cd /opt/portfolio-nopal && "
+        "git fetch origin && git checkout main && git pull --ff-only origin main && "
+        "docker --version && docker compose version && "
+        "docker compose --env-file .env.docker.prod -f docker-compose.prod.yml --profile ops config >/dev/null && "
+        "echo INIT_OK"
+    )
+
+    result = subprocess.run(
+        [
+            "gcloud.cmd",
+            "compute",
+            "ssh",
+            "naufalrf32@portfolio-prod",
+            "--zone=asia-southeast1-a",
+            "--project=naufalrf-personal",
+            f"--command={command}",
+        ],
+        check=False,
+        text=True,
+    )
+    return result.returncode
+
+
 def print_help() -> None:
     print(
         textwrap.dedent(
             f"""
             Usage: uv run deploy.py
+                   uv run deploy.py init
 
             Interactive prompts will ask for:
             - remote host / ssh user / ssh port / ssh key path
@@ -291,6 +320,9 @@ def deploy(config: DeployConfig) -> None:
 
 
 def main() -> int:
+    if len(sys.argv) > 1 and sys.argv[1] == "init":
+        return run_init_mode()
+
     if any(arg in {"-h", "--help"} for arg in sys.argv[1:]):
         print_help()
         return 0

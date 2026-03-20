@@ -5,6 +5,14 @@ Chronological timeline of meaningful project work, discoveries, decisions, and b
 ## Entries
 
 
+### 2026-03-20 05:44
+
+- Task: simplify remote adapter into quick one-command init flow
+- Mode: implementation
+- Files: `deploy.py`, `gcloud_nrfdev.py`, `PROGRESS.md`
+- Status: done
+- Notes: Added a non-interactive `uv run deploy.py init` mode for fast remote init checks using the known GCE host defaults, and updated `gcloud_nrfdev.py` to prefer `gcloud compute ssh/scp` on Windows so it no longer burns time on Paramiko TCP timeouts first. Verification passed with `uv run deploy.py init` returning `INIT_OK`, plus `uv run gcloud_nrfdev.py "whoami && hostname && docker compose version"` returning `naufalrf32`, `portfolio-prod`, and the remote Docker Compose version.
+
 ### 2026-03-20 05:18
 
 - Task: execute real server bootstrap via interactive Paramiko deploy adapter
