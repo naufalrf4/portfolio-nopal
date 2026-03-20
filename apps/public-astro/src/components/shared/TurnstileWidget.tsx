@@ -40,8 +40,7 @@ export function TurnstileWidget({
 }: TurnstileWidgetProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const widgetIdRef = useRef<string | null>(null);
-  const normalizedSiteKey = useMemo(() => siteKey.trim(), [siteKey]);
-  const hasTurnstile = normalizedSiteKey.length > 0;
+  const hasTurnstile = siteKey.length > 0;
 
   useEffect(() => {
     if (!hasTurnstile) {
@@ -58,7 +57,7 @@ export function TurnstileWidget({
       }
 
       widgetIdRef.current = window.turnstile.render(containerRef.current, {
-        sitekey: normalizedSiteKey,
+        sitekey: siteKey,
         theme: 'light',
         callback: (token) => {
           onTokenChange(token);
@@ -111,7 +110,7 @@ export function TurnstileWidget({
       script.removeEventListener('load', handleLoad);
       window.clearInterval(intervalId);
     };
-  }, [hasTurnstile, normalizedSiteKey, onErrorChange, onTokenChange]);
+  }, [hasTurnstile, onErrorChange, onTokenChange, siteKey]);
 
   useEffect(() => {
     onTokenChange('');

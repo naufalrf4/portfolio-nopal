@@ -25,6 +25,10 @@ interface BookingFormData {
   notes: string;
 }
 
+interface BookingCalendarProps {
+  turnstileSiteKey: string;
+}
+
 type BookingStep = 1 | 2 | 3;
 
 const INITIAL_FORM: BookingFormData = {
@@ -56,10 +60,6 @@ function formatDateLabel(value: string): string {
 
 function formatTimeRange(slot: BookingSlot): string {
   return `${slot.startTime} - ${slot.endTime}`;
-}
-
-interface BookingCalendarProps {
-  turnstileSiteKey: string;
 }
 
 export function BookingCalendar({ turnstileSiteKey }: BookingCalendarProps) {
@@ -235,10 +235,6 @@ export function BookingCalendar({ turnstileSiteKey }: BookingCalendarProps) {
             Availability
           </p>
           <h3 className="mt-2 text-xl font-semibold text-[#3D4852]">Book a call</h3>
-          <p className="mt-2 text-sm leading-relaxed text-[#6B7280] md:text-base">
-            A guided 3-step flow: choose a day, lock a time, then send your details for
-            confirmation.
-          </p>
         </div>
         <button
           type="button"

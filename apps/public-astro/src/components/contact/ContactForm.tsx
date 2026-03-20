@@ -14,6 +14,10 @@ interface FormData {
   message: string;
 }
 
+interface ContactFormProps {
+  turnstileSiteKey: string;
+}
+
 const INITIAL_FORM: FormData = {
   name: '',
   email: '',
@@ -23,10 +27,6 @@ const INITIAL_FORM: FormData = {
 
 function isValidEmail(value: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-}
-
-interface ContactFormProps {
-  turnstileSiteKey: string;
 }
 
 export function ContactForm({ turnstileSiteKey }: ContactFormProps) {

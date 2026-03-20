@@ -106,11 +106,7 @@ export function ContactContent({ aboutData, turnstileSiteKey }: ContactContentPr
             </div>
 
             <NeuCard className="homepage-card-hover p-6 md:p-8">
-              {activeTab === 'form' ? (
-                <ContactForm turnstileSiteKey={turnstileSiteKey} />
-              ) : (
-                <BookingCalendar turnstileSiteKey={turnstileSiteKey} />
-              )}
+              {activeTab === 'form' ? <ContactForm turnstileSiteKey={turnstileSiteKey} /> : <BookingCalendar turnstileSiteKey={turnstileSiteKey} />}
             </NeuCard>
           </div>
         </div>
