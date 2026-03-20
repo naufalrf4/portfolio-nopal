@@ -27,7 +27,7 @@ type UploadState = 'idle' | 'uploading' | 'success' | 'error';
 
 interface FileUploadProps {
   value: string | null;
-  onChange: (url: string | null) => void;
+  onChange: (value: string | null) => void;
   accept?: string;
   folder?: UploadFolder;
   label?: string;
@@ -39,6 +39,15 @@ interface FileUploadProps {
 }
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
+
+function isDirectUrl(value: string): boolean {
+  try {
+    new URL(value);
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 function formatFileSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
@@ -109,10 +118,22 @@ export function FileUpload({
   const abortControllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
-    setPreviewUrl(value);
-    if (value) {
-      setUrlInput(value);
+    if (!value) {
+      setPreviewUrl(null);
+      setUrlInput('');
+      setImageLoadError(false);
+      return;
     }
+
+    if (isDirectUrl(value)) {
+      setPreviewUrl(value);
+      setUrlInput(value);
+      setImageLoadError(false);
+      return;
+    }
+
+    setUrlInput('');
+    setImageLoadError(false);
   }, [value]);
 
   const isImage = (filename: string): boolean => {
@@ -185,8 +206,10 @@ export function FileUpload({
         setUploadState('success');
 
         const uploadedUrl = data.data.url;
-        onChange(uploadedUrl);
+        const uploadedKey = data.data.key;
+        onChange(uploadedKey ?? uploadedUrl);
         setPreviewUrl(uploadedUrl);
+        setUrlInput(uploadedUrl);
         setImageLoadError(false);
         toast.success('File uploaded successfully');
 

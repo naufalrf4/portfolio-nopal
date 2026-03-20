@@ -1,10 +1,12 @@
 import { z } from 'zod';
 
+const assetValueSchema = z.string().min(1);
+
 export const createAchievementSchema = z.object({
   name: z.string().min(1).max(255),
   location: z.string().min(1).max(255),
   monthYear: z.string().min(1).max(50),
-  photos: z.array(z.string().url()).default([]),
+  photos: z.array(assetValueSchema).default([]),
   description: z.string().min(1),
   externalUrl: z.string().url().optional().or(z.literal('')).nullable(),
   order: z.coerce.number().int().default(0),
