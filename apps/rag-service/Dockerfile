@@ -19,4 +19,4 @@ RUN groupadd --system app && useradd --system --gid app --create-home --home-dir
 COPY --chown=app:app fastapi ./
 USER app
 EXPOSE 3005
-CMD ["uv", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "3005"]
+CMD [".venv/bin/python", "-m", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "3005"]
