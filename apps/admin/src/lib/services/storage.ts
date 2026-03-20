@@ -26,22 +26,6 @@ function getRequiredEnv(name: 'GCS_BUCKET_NAME' | 'GCS_PROJECT_ID'): string {
   return value;
 }
 
-function normalizePublicBaseUrl(value: string | undefined): string | null {
-  const trimmed = value?.trim();
-  if (!trimmed) {
-    return null;
-  }
-
-  return trimmed.replace(/\/+$/, '');
-}
-
-function encodeObjectKey(key: string): string {
-  return key
-    .split('/')
-    .map((segment) => encodeURIComponent(segment))
-    .join('/');
-}
-
 let cachedStorageClient: Storage | null = null;
 
 function getStorageClient(): Storage {
@@ -60,10 +44,6 @@ function getStorageClient(): Storage {
 
 function getBucketName(): string {
   return getRequiredEnv('GCS_BUCKET_NAME');
-}
-
-function getPublicBaseUrl(): string | null {
-  return normalizePublicBaseUrl(process.env.GCS_PUBLIC_BASE_URL);
 }
 
 export type UploadFolder = 'projects' | 'about' | 'achievements' | 'resumes';
@@ -90,28 +70,29 @@ export class StorageService {
     const key = this.generateKey(file.name, folder);
     const buffer = Buffer.from(await file.arrayBuffer());
 
-    await getStorageClient().bucket(getBucketName()).file(key).save(buffer, {
-      resumable: false,
-      metadata: {
-        contentType: file.type,
-        cacheControl: this.getCacheControl(folder),
-      },
-    });
+    await getStorageClient()
+      .bucket(getBucketName())
+      .file(key)
+      .save(buffer, {
+        resumable: false,
+        metadata: {
+          contentType: file.type,
+          cacheControl: this.getCacheControl(folder),
+        },
+      });
 
     return { key };
   }
 
   async signGetUrl(key: string, expiresInSeconds = 3600): Promise<string> {
-    const publicBaseUrl = getPublicBaseUrl();
-    if (publicBaseUrl) {
-      return `${publicBaseUrl}/${encodeObjectKey(key)}`;
-    }
-
-    const [signedUrl] = await getStorageClient().bucket(getBucketName()).file(key).getSignedUrl({
-      version: 'v4',
-      action: 'read',
-      expires: Date.now() + expiresInSeconds * 1000,
-    });
+    const [signedUrl] = await getStorageClient()
+      .bucket(getBucketName())
+      .file(key)
+      .getSignedUrl({
+        version: 'v4',
+        action: 'read',
+        expires: Date.now() + expiresInSeconds * 1000,
+      });
 
     return signedUrl;
   }
@@ -125,12 +106,15 @@ export class StorageService {
     folder: UploadFolder
   ): Promise<{ url: string; key: string }> {
     const key = this.generateKey(filename, folder);
-    const [url] = await getStorageClient().bucket(getBucketName()).file(key).getSignedUrl({
-      version: 'v4',
-      action: 'write',
-      expires: Date.now() + 3600 * 1000,
-      contentType: 'application/octet-stream',
-    });
+    const [url] = await getStorageClient()
+      .bucket(getBucketName())
+      .file(key)
+      .getSignedUrl({
+        version: 'v4',
+        action: 'write',
+        expires: Date.now() + 3600 * 1000,
+        contentType: 'application/octet-stream',
+      });
 
     return { url, key };
   }
