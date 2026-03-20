@@ -104,6 +104,7 @@ services:
       target: prod
     restart: unless-stopped
     environment:
+      PYTHONPATH: /app/fastapi
       APP_ENV: production
       HOST: 0.0.0.0
       PORT: 3005
