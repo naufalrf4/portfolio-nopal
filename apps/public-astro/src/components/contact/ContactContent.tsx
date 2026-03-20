@@ -9,6 +9,7 @@ import { ContactInfo } from './ContactInfo';
 
 interface ContactContentProps {
   aboutData: AboutData;
+  turnstileSiteKey: string;
 }
 
 const FAQS = [
@@ -52,7 +53,7 @@ const FAQS = [
 
 type Tab = 'form' | 'booking';
 
-export function ContactContent({ aboutData }: ContactContentProps) {
+export function ContactContent({ aboutData, turnstileSiteKey }: ContactContentProps) {
   const [activeTab, setActiveTab] = useState<Tab>('form');
   const [openFaqId, setOpenFaqId] = useState<string | null>(null);
 
@@ -105,7 +106,11 @@ export function ContactContent({ aboutData }: ContactContentProps) {
             </div>
 
             <NeuCard className="homepage-card-hover p-6 md:p-8">
-              {activeTab === 'form' ? <ContactForm /> : <BookingCalendar />}
+              {activeTab === 'form' ? (
+                <ContactForm turnstileSiteKey={turnstileSiteKey} />
+              ) : (
+                <BookingCalendar turnstileSiteKey={turnstileSiteKey} />
+              )}
             </NeuCard>
           </div>
         </div>

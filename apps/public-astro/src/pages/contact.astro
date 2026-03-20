@@ -6,6 +6,10 @@ import PageLayout from '../layouts/PageLayout.astro';
 import { getAbout } from '../lib/api';
 
 const aboutData = await getAbout();
+const turnstileSiteKey =
+  process.env.PUBLIC_TURNSTILE_SITE_KEY?.trim() ||
+  import.meta.env.PUBLIC_TURNSTILE_SITE_KEY?.trim() ||
+  '';
 
 const title = 'Contact';
 const description =
@@ -23,6 +27,6 @@ const description =
         />
       </div>
     </div>
-    <ContactContent client:load aboutData={aboutData} />
+    <ContactContent client:load aboutData={aboutData} turnstileSiteKey={turnstileSiteKey} />
   </div>
 </PageLayout>

@@ -22,6 +22,7 @@ declare global {
 }
 
 interface TurnstileWidgetProps {
+  siteKey: string;
   resetKey?: number;
   onTokenChange: (token: string) => void;
   onErrorChange?: (message: string | null) => void;
@@ -31,6 +32,7 @@ interface TurnstileWidgetProps {
 const TURNSTILE_SCRIPT_ID = 'public-turnstile-script';
 
 export function TurnstileWidget({
+  siteKey,
   resetKey = 0,
   onTokenChange,
   onErrorChange,
@@ -38,8 +40,8 @@ export function TurnstileWidget({
 }: TurnstileWidgetProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const widgetIdRef = useRef<string | null>(null);
-  const siteKey = useMemo(() => import.meta.env.PUBLIC_TURNSTILE_SITE_KEY?.trim() ?? '', []);
-  const hasTurnstile = siteKey.length > 0;
+  const normalizedSiteKey = useMemo(() => siteKey.trim(), [siteKey]);
+  const hasTurnstile = normalizedSiteKey.length > 0;
 
   useEffect(() => {
     if (!hasTurnstile) {
@@ -56,7 +58,7 @@ export function TurnstileWidget({
       }
 
       widgetIdRef.current = window.turnstile.render(containerRef.current, {
-        sitekey: siteKey,
+        sitekey: normalizedSiteKey,
         theme: 'light',
         callback: (token) => {
           onTokenChange(token);
@@ -109,7 +111,7 @@ export function TurnstileWidget({
       script.removeEventListener('load', handleLoad);
       window.clearInterval(intervalId);
     };
-  }, [hasTurnstile, onErrorChange, onTokenChange, siteKey]);
+  }, [hasTurnstile, normalizedSiteKey, onErrorChange, onTokenChange]);
 
   useEffect(() => {
     onTokenChange('');

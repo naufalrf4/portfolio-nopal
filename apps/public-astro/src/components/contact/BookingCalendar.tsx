@@ -58,7 +58,11 @@ function formatTimeRange(slot: BookingSlot): string {
   return `${slot.startTime} - ${slot.endTime}`;
 }
 
-export function BookingCalendar() {
+interface BookingCalendarProps {
+  turnstileSiteKey: string;
+}
+
+export function BookingCalendar({ turnstileSiteKey }: BookingCalendarProps) {
   const [availability, setAvailability] = useState<BookingAvailability>({});
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedSlotId, setSelectedSlotId] = useState<string | null>(null);
@@ -73,10 +77,7 @@ export function BookingCalendar() {
   const [turnstileToken, setTurnstileToken] = useState('');
   const [turnstileError, setTurnstileError] = useState<string | null>(null);
   const [turnstileResetKey, setTurnstileResetKey] = useState(0);
-  const hasTurnstile = useMemo(
-    () => (import.meta.env.PUBLIC_TURNSTILE_SITE_KEY?.trim() ?? '').length > 0,
-    []
-  );
+  const hasTurnstile = useMemo(() => turnstileSiteKey.trim().length > 0, [turnstileSiteKey]);
   const shouldShowTurnstile = useMemo(
     () =>
       Boolean(
@@ -552,6 +553,7 @@ export function BookingCalendar() {
 
             {(!hasTurnstile || shouldShowTurnstile) && (
               <TurnstileWidget
+                siteKey={turnstileSiteKey}
                 resetKey={turnstileResetKey}
                 onTokenChange={setTurnstileToken}
                 onErrorChange={setTurnstileError}

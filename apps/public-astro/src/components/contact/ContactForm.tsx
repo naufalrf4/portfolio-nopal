@@ -25,7 +25,11 @@ function isValidEmail(value: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
 
-export function ContactForm() {
+interface ContactFormProps {
+  turnstileSiteKey: string;
+}
+
+export function ContactForm({ turnstileSiteKey }: ContactFormProps) {
   const [formData, setFormData] = useState<FormData>(INITIAL_FORM);
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -34,10 +38,7 @@ export function ContactForm() {
   const [turnstileToken, setTurnstileToken] = useState('');
   const [turnstileError, setTurnstileError] = useState<string | null>(null);
   const [turnstileResetKey, setTurnstileResetKey] = useState(0);
-  const hasTurnstile = useMemo(
-    () => (import.meta.env.PUBLIC_TURNSTILE_SITE_KEY?.trim() ?? '').length > 0,
-    []
-  );
+  const hasTurnstile = useMemo(() => turnstileSiteKey.trim().length > 0, [turnstileSiteKey]);
   const shouldShowTurnstile = useMemo(
     () =>
       Boolean(
@@ -171,6 +172,7 @@ export function ContactForm() {
 
       {(!hasTurnstile || shouldShowTurnstile) && (
         <TurnstileWidget
+          siteKey={turnstileSiteKey}
           resetKey={turnstileResetKey}
           onTokenChange={setTurnstileToken}
           onErrorChange={setTurnstileError}
