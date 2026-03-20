@@ -12,7 +12,6 @@ export class ChatServiceError extends Error {
 
 interface SendChatMessageOptions {
   request: ChatRequest;
-  ragServiceUrl: string;
 }
 
 const CHAT_REQUEST_TIMEOUT_MS = 10000;
@@ -31,16 +30,13 @@ function isAbortError(error: unknown): boolean {
   return error instanceof Error && (error.name === 'AbortError' || error.name === 'TimeoutError');
 }
 
-export async function sendChatMessage({
-  request,
-  ragServiceUrl,
-}: SendChatMessageOptions): Promise<ChatResponse> {
+export async function sendChatMessage({ request }: SendChatMessageOptions): Promise<ChatResponse> {
   try {
-    const baseUrl = ragServiceUrl.endsWith('/') ? ragServiceUrl.slice(0, -1) : ragServiceUrl;
+    const endpoint = '/api/rag/chat';
     const { signal, cleanup } = createAbortSignal(CHAT_REQUEST_TIMEOUT_MS);
 
     try {
-      const response = await fetch(`${baseUrl}/chat`, {
+      const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

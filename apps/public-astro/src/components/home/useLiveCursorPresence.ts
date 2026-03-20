@@ -26,16 +26,7 @@ const HEARTBEAT_MS = 5000;
 const SEND_INTERVAL_MS = 60;
 
 function getSocketUrl(socketUrl: string): string {
-  const normalized = socketUrl.trim();
-  if (normalized.length > 0) {
-    return normalized;
-  }
-
-  if (typeof window !== 'undefined') {
-    return `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://presence.naufalrf.tech/ws`;
-  }
-
-  return 'wss://presence.naufalrf.tech/ws';
+  return socketUrl.trim() || 'ws://localhost:3006/ws';
 }
 
 function resolveRoomId(currentPath: string): string {
