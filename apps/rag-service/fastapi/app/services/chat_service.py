@@ -1,5 +1,4 @@
 import logging
-import time
 from datetime import datetime, timezone
 from uuid import uuid4
 
@@ -7,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import settings
 from app.schemas.admin import ChatLogMessage
-from app.schemas.chat import ChatRequest, ChatResponse
+from app.schemas.chat import ChatPublicMetadata, ChatRequest, ChatResponse, SuggestedAction
 from app.services.admin_client import AdminApiClient
 from app.services.embedding_service import EmbeddingService
 from app.services.errors import RagServiceError
@@ -39,7 +38,6 @@ class ChatService:
         request: ChatRequest,
         preferred_language: str | None = None,
     ) -> ChatResponse:
-        started_at = time.perf_counter()
         session_id = request.session_id or uuid4()
         try:
             history = await self.admin_client.get_chat_log(str(session_id))
@@ -88,16 +86,11 @@ class ChatService:
                 ) from exc
 
         retrieved_chunks = retrieved_chunks[: settings.retrieval_limit]
+        retrieval_confidence = max((chunk.score for chunk in retrieved_chunks), default=0.0)
 
         sources = list(dict.fromkeys(chunk.source for chunk in retrieved_chunks))
         if query_plan.workflow == "tool" and tool_result is not None:
             final_text = tool_result.text
-            tokens = {
-                "analysisPrompt": query_plan.prompt_tokens,
-                "analysisCompletion": query_plan.completion_tokens,
-                "prompt": 0,
-                "completion": 0,
-            }
         else:
             context_sections: list[dict[str, object]] = []
             if tool_result is not None:
@@ -120,15 +113,9 @@ class ChatService:
             prompt = build_chat_prompt(request.message, history_text, context, preferred_language)
             generated = await self.llm_service.answer_question(prompt)
             final_text = generated.text
-            tokens = {
-                "analysisPrompt": query_plan.prompt_tokens,
-                "analysisCompletion": query_plan.completion_tokens,
-                "prompt": generated.prompt_tokens,
-                "completion": generated.completion_tokens,
-            }
 
         now = datetime.now(timezone.utc)
-        new_messages = [
+        new_messages: list[dict[str, object]] = [
             {
                 "id": f"{session_id}-user-{int(now.timestamp())}",
                 "role": "user",
@@ -142,40 +129,40 @@ class ChatService:
                 "timestamp": datetime.now(timezone.utc).isoformat(),
             },
         ]
-        persisted_messages = [
-            self._message_to_payload(message) for message in history
-        ] + new_messages
+        persisted_messages: list[dict[str, object]] = []
+        for message in history:
+            persisted_messages.append(self._message_to_payload(message))
+        persisted_messages.extend(new_messages)
         try:
             await self.admin_client.save_chat_log(str(session_id), persisted_messages)
         except Exception:  # noqa: BLE001
             logger.warning("Failed to persist chat log to admin API", exc_info=True)
 
-        duration_ms = int((time.perf_counter() - started_at) * 1000)
-        return ChatResponse(
-            sessionId=session_id,
-            message=final_text,
-            sources=sources,
-            metadata={
-                "model": settings.chat_model,
-                "provider": "google",
+        public_metadata = ChatPublicMetadata.model_validate(
+            {
                 "workflow": query_plan.workflow,
                 "intent": query_plan.intent,
-                "needsPortfolioContext": query_plan.needs_portfolio_context,
-                "toolName": query_plan.tool_name,
-                "toolArguments": query_plan.tool_arguments,
-                "toolResult": tool_result.metadata if tool_result is not None else None,
-                "retrievalQueries": query_plan.retrieval_queries,
-                "portfolioAreas": query_plan.portfolio_areas,
-                "suggestedActions": query_plan.suggested_actions,
-                "retrievalPasses": len(query_plan.retrieval_queries),
-                "retrievedChunkCount": len(retrieved_chunks),
-                "preferredLanguage": preferred_language,
-                "tokens": tokens,
-                "durationMs": duration_ms,
-            },
+                "queryLanguage": query_plan.query_language,
+                "answerLanguage": query_plan.answer_language,
+                "retrievalConfidence": retrieval_confidence,
+                "abstained": False,
+            }
+        )
+        suggested_actions = [SuggestedAction(**action) for action in query_plan.suggested_actions]
+
+        return ChatResponse.model_validate(
+            {
+                "sessionId": session_id,
+                "message": final_text,
+                "sources": sources,
+                "suggestedActions": [
+                    action.model_dump(by_alias=True) for action in suggested_actions
+                ],
+                "metadata": public_metadata.model_dump(by_alias=True),
+            }
         )
 
-    def _message_to_payload(self, message: ChatLogMessage) -> dict[str, str]:
+    def _message_to_payload(self, message: ChatLogMessage) -> dict[str, object]:
         timestamp_value = message.timestamp
         timestamp = (
             timestamp_value.isoformat()
