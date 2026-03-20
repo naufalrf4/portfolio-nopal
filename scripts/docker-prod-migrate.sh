@@ -12,4 +12,4 @@ docker compose \
 docker compose \
   --env-file "$ROOT_DIR/.env.docker.prod" \
   -f "$ROOT_DIR/docker-compose.prod.yml" \
-  run --rm admin bun run db:migrate
+  run --rm admin-migrate
