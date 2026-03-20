@@ -146,6 +146,7 @@ services:
       target: prod
     command: ['.venv/bin/python', 'scripts/bootstrap_db.py']
     environment:
+      PYTHONPATH: /app/fastapi
       APP_ENV: production
       HOST: 0.0.0.0
       PORT: 3005
