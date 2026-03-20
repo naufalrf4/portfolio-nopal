@@ -43,6 +43,7 @@ class DeployConfig:
     skip_env_upload: bool
     strict_host_key: bool
     dry_run: bool
+    bootstrap_only: bool
 
 
 class ParamikoAdapter:
@@ -168,6 +169,7 @@ def collect_config() -> DeployConfig:
         skip_env_upload=skip_env_upload,
         strict_host_key=not ask_bool("Allow auto-add SSH host key", False),
         dry_run=ask_bool("Dry run only", False),
+        bootstrap_only=ask_bool("Bootstrap host and sync repo only (skip docker deploy)", False),
     )
 
 
@@ -251,13 +253,14 @@ def deploy(config: DeployConfig) -> None:
     print(f"- Host bootstrap: {'yes' if config.bootstrap_host else 'no'}")
     print(f"- Mode: {'bootstrap' if config.first_deploy else 'steady-state update'}")
     print(f"- Host key policy: {'strict' if config.strict_host_key else 'auto-add'}")
+    print(f"- Bootstrap only: {'yes' if config.bootstrap_only else 'no'}")
 
     with ParamikoAdapter(config) as adapter:
         adapter.run("uname -a")
 
         if config.bootstrap_host:
             local_bootstrap = ROOT / ".deploy-bootstrap.tmp.sh"
-            local_bootstrap.write_text(render_bootstrap_script(config), encoding="utf-8")
+            local_bootstrap.write_text(render_bootstrap_script(config), encoding="utf-8", newline="\n")
             try:
                 adapter.upload(local_bootstrap, "/tmp/portfolio-bootstrap.sh", mode=0o700)
                 adapter.run("/tmp/portfolio-bootstrap.sh")
@@ -274,14 +277,15 @@ def deploy(config: DeployConfig) -> None:
                 mode=0o600,
             )
 
-        deploy_command = (
-            "bash ./scripts/docker-prod-bootstrap.sh"
-            if config.first_deploy
-            else "bash ./scripts/docker-prod-up.sh"
-        )
-        adapter.run(deploy_command, cwd=config.remote_root)
-        adapter.run("docker compose ps", cwd=config.remote_root)
-        adapter.run("docker system df")
+        if not config.bootstrap_only:
+            deploy_command = (
+                "bash ./scripts/docker-prod-bootstrap.sh"
+                if config.first_deploy
+                else "bash ./scripts/docker-prod-up.sh"
+            )
+            adapter.run(deploy_command, cwd=config.remote_root)
+            adapter.run("docker compose ps", cwd=config.remote_root)
+            adapter.run("docker system df")
 
     print("\nDeployment completed successfully.")
 
