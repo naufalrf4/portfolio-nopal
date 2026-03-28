@@ -152,7 +152,7 @@ export function ContactForm({ turnstileSiteKey }: ContactFormProps) {
         name="subject"
         value={formData.subject}
         onChange={handleChange}
-        placeholder="Project, collaboration, or role"
+        placeholder="Question, consultation, collaboration, or booking"
         error={errors.subject}
         disabled={isLoading}
         required
@@ -163,7 +163,7 @@ export function ContactForm({ turnstileSiteKey }: ContactFormProps) {
         name="message"
         value={formData.message}
         onChange={handleChange}
-        placeholder="Tell me a bit about your project, timeline, or what kind of help you need."
+        placeholder="Share what you need, what you want to discuss, or any context that will help me respond well."
         rows={6}
         error={errors.message}
         disabled={isLoading}

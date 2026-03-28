@@ -15,39 +15,27 @@ interface ContactContentProps {
 const FAQS = [
   {
     id: '1',
-    question: 'What services do you offer?',
+    question: 'What kinds of conversations are welcome here?',
     answer:
-      'I specialize in full-stack web development, including frontend (React, Next.js), backend (Node.js, Python), cloud infrastructure (AWS, GCP), and AI/ML integrations.',
+      'You can use this page for general questions, consulting inquiries, collaboration ideas, speaking requests, or to book time for a deeper conversation.',
   },
   {
     id: '2',
-    question: 'Are you available for freelance work?',
+    question: 'Can I use this for quick questions too?',
     answer:
-      'Yes! I am open to freelance projects, consulting, and contract work. Feel free to reach out through the contact form or book a call to discuss your project.',
+      'Yes. If you are not sure whether something needs a full call, send a message first and I can point you in the right direction or suggest the next step.',
   },
   {
     id: '3',
-    question: 'What is your typical project timeline?',
+    question: 'When should I book a call instead of sending a message?',
     answer:
-      'Timelines vary based on project scope. Small projects typically take 2-4 weeks, medium projects 1-3 months, and larger enterprise solutions 3-6 months or more.',
+      'Book a call when the topic needs back-and-forth discussion, planning, or live context. For simple intros or short questions, the message form is usually enough.',
   },
   {
     id: '4',
-    question: 'Do you provide ongoing maintenance and support?',
+    question: 'Do you respond in English and Indonesian?',
     answer:
-      'Yes, I offer maintenance packages for projects I build. This includes bug fixes, security updates, performance optimization, and feature enhancements.',
-  },
-  {
-    id: '5',
-    question: 'What technologies do you work with?',
-    answer:
-      'My primary stack includes TypeScript, React, Next.js, Node.js, PostgreSQL, and AWS. I also work with Python, Docker, Kubernetes, and various AI/ML tools.',
-  },
-  {
-    id: '6',
-    question: 'Can you help with existing projects?',
-    answer:
-      'Absolutely! I can help with code reviews, performance optimization, refactoring, adding new features, or migrating to modern technologies.',
+      'Yes. Feel free to write in whichever language is most natural for you and I will reply accordingly.',
   },
 ];
 
@@ -106,7 +94,11 @@ export function ContactContent({ aboutData, turnstileSiteKey }: ContactContentPr
             </div>
 
             <NeuCard className="homepage-card-hover p-6 md:p-8">
-              {activeTab === 'form' ? <ContactForm turnstileSiteKey={turnstileSiteKey} /> : <BookingCalendar turnstileSiteKey={turnstileSiteKey} />}
+              {activeTab === 'form' ? (
+                <ContactForm turnstileSiteKey={turnstileSiteKey} />
+              ) : (
+                <BookingCalendar turnstileSiteKey={turnstileSiteKey} />
+              )}
             </NeuCard>
           </div>
         </div>
@@ -119,7 +111,7 @@ export function ContactContent({ aboutData, turnstileSiteKey }: ContactContentPr
             <div>
               <h2 className="text-2xl font-bold text-[#3D4852]">Frequently Asked Questions</h2>
               <p className="text-[#6B7280]">
-                Quick answers before you send a message or book time.
+                Quick answers before you send a message or reserve time.
               </p>
             </div>
           </div>

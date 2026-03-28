@@ -365,8 +365,8 @@ export function BookingCalendar({ turnstileSiteKey }: BookingCalendarProps) {
 
             {!isLoading && dates.length === 0 ? (
               <div className="rounded-[24px] bg-[#E0E5EC] p-5 text-sm text-[#6B7280] shadow-[inset_4px_4px_10px_rgba(163,177,198,0.32),inset_-4px_-4px_10px_rgba(255,255,255,0.46)]">
-                No booking slots are available right now. Send a direct message instead and I can
-                coordinate manually.
+                No booking slots are available right now. Send a direct message instead and we can
+                coordinate another time manually.
               </div>
             ) : null}
 

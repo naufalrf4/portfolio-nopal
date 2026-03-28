@@ -9,7 +9,7 @@ const { blogs } = await getBlogs();
 
 const title = 'Blog & Articles';
 const description =
-  'Read my thoughts on software engineering, web development, and technology. Links to articles on Medium, Dev.to, and more.';
+  'Browse writing I have published myself plus references, interviews, and external posts connected to my work.';
 ---
 
 <PageLayout title={title} description={description}>
@@ -17,8 +17,8 @@ const description =
     <div class="mx-auto max-w-7xl">
       <PageHero
         icon={NotebookPen}
-        title="Blog Links & Writing"
-        description="A curated stream of essays, tutorials, and technical notes published across the platforms where I write most often."
+        title="Writing & Mentions"
+        description="A mixed shelf of articles I have written, technical notes I have published, and a few places where my work or perspective is featured."
       />
 
       <BlogsContent initialBlogs={blogs} client:load />

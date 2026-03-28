@@ -23,9 +23,6 @@ export function ChatHeader({
         </div>
         <div>
           <h3 className="text-lg font-bold">Nau AI</h3>
-          <p className="text-xs text-[#6B7280]">
-            Portfolio-aware, casually helpful, and ready to reply in your language.
-          </p>
         </div>
       </div>
       <div className="flex items-center gap-2">
