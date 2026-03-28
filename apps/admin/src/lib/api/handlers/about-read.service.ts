@@ -16,7 +16,6 @@ export interface AboutMeRecord {
   availabilityStatus: string | null;
   skills: string[] | null;
   experience: unknown;
-  socialLinks: unknown;
   freelanceProfile: unknown;
   createdAt: string;
   updatedAt: string;
@@ -52,7 +51,6 @@ async function selectAboutMeWithFreelanceProfile(): Promise<AboutMeRecord | unde
       availabilityStatus: aboutMe.availabilityStatus,
       skills: aboutMe.skills,
       experience: aboutMe.experience,
-      socialLinks: aboutMe.socialLinks,
       freelanceProfile: aboutMe.freelanceProfile,
       createdAt: aboutMe.createdAt,
       updatedAt: aboutMe.updatedAt,
@@ -80,7 +78,6 @@ async function selectAboutMeWithoutFreelanceProfile(): Promise<AboutMeRecord | u
       availabilityStatus: aboutMe.availabilityStatus,
       skills: aboutMe.skills,
       experience: aboutMe.experience,
-      socialLinks: aboutMe.socialLinks,
       createdAt: aboutMe.createdAt,
       updatedAt: aboutMe.updatedAt,
     })

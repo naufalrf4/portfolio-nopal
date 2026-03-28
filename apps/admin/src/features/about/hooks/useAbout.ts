@@ -111,7 +111,6 @@ export function useAbout(options: UseAboutOptions = {}): UseAboutResult {
         avatarUrl: data.avatarUrl ?? undefined,
         resumeUrl: data.resumeUrl ?? undefined,
         experience: data.experience ?? undefined,
-        socialLinks: data.socialLinks ?? undefined,
         freelanceProfile: data.freelanceProfile ?? undefined,
         [field]: value,
       };

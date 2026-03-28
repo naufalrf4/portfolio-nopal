@@ -112,7 +112,6 @@ export class AboutService {
         resumeUrl: normalizedData.resumeUrl,
         skills: normalizedData.skills,
         experience: normalizedData.experience,
-        socialLinks: normalizedData.socialLinks,
         freelanceProfile: normalizedData.freelanceProfile,
         updatedAt: normalizedData.updatedAt,
       })
@@ -138,7 +137,6 @@ export class AboutService {
       resumeUrl: sanitizeAssetValue(data.resumeUrl),
       skills: data.skills,
       experience: normalizeExperienceItems(data.experience),
-      socialLinks: data.socialLinks ?? null,
       freelanceProfile: normalizeFreelanceProfile(data.freelanceProfile),
     };
   }

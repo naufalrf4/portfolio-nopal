@@ -56,7 +56,6 @@ type StoredExperience = {
   skills?: unknown;
 };
 
-type StoredSocialLinkMap = Record<string, unknown>;
 type ProfileLinkRecord = {
   label?: string | null;
   icon?: string | null;
@@ -198,37 +197,6 @@ function normalizeExperience(value: unknown): Experience[] {
   });
 }
 
-function normalizeSocialLinks(value: unknown): SocialLink[] {
-  const parsedArray = parseJsonField<unknown[]>(value, []);
-  if (Array.isArray(parsedArray) && parsedArray.length > 0) {
-    return parsedArray.flatMap((item) => {
-      if (typeof item !== 'object' || item === null) {
-        return [];
-      }
-
-      const raw = item as Record<string, unknown>;
-      const platform = asString(raw.platform);
-      const url = asString(raw.url);
-
-      if (!platform || !url) {
-        return [];
-      }
-
-      return [{ platform, url }];
-    });
-  }
-
-  const parsedObject = parseJsonField<StoredSocialLinkMap | null>(value, null);
-  if (!parsedObject || Array.isArray(parsedObject) || typeof parsedObject !== 'object') {
-    return [];
-  }
-
-  return Object.entries(parsedObject).flatMap(([platform, rawUrl]) => {
-    const url = asString(rawUrl);
-    return url ? [{ platform, url }] : [];
-  });
-}
-
 function normalizeComparableUrl(value: string): string {
   return value.trim().replace(/\/+$/, '').toLowerCase();
 }
@@ -360,12 +328,7 @@ export async function GET() {
           : null,
       skills: normalizeSkills(aboutMeData.skills),
       experience: normalizeExperience(aboutMeData.experience),
-      socialLinks: (() => {
-        const normalizedProfileLinks = normalizeProfileLinksAsSocialLinks(visibleProfileLinks);
-        return normalizedProfileLinks.length > 0
-          ? normalizedProfileLinks
-          : normalizeSocialLinks(aboutMeData.socialLinks);
-      })(),
+      socialLinks: normalizeProfileLinksAsSocialLinks(visibleProfileLinks),
     };
 
     const signedData = await signAssetUrls(publicData, {

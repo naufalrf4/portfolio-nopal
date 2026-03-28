@@ -38,15 +38,6 @@ type SeedExperience = {
   description?: string;
 };
 
-type SocialLinkMap = {
-  github?: string;
-  linkedin?: string;
-  twitter?: string;
-  instagram?: string;
-  youtube?: string;
-  website?: string;
-};
-
 type FreelanceProfileSeed = {
   hourlyRate: number;
   currency: string;
@@ -281,12 +272,6 @@ const PUBLIC_PROFILE = {
         'Framework training focused on building modern web applications with Next.js and React.',
     },
   ] satisfies SeedExperience[],
-  socialLinks: {
-    github: 'https://github.com/naufalrf4',
-    linkedin: 'https://linkedin.com/in/naufalrf',
-    instagram: 'https://instagram.com/naufalrf__',
-    website: 'https://naufalrf.tech',
-  } satisfies SocialLinkMap,
   freelanceProfile: {
     hourlyRate: 150000,
     currency: 'IDR',
@@ -756,7 +741,6 @@ function buildAboutRow(now: string): AboutInsert {
     availabilityStatus: PUBLIC_PROFILE.availabilityStatus,
     skills: uniqueStrings(PUBLIC_PROFILE.skills),
     experience: PUBLIC_PROFILE.experience,
-    socialLinks: PUBLIC_PROFILE.socialLinks,
     freelanceProfile: PUBLIC_PROFILE.freelanceProfile,
     createdAt: now,
     updatedAt: now,

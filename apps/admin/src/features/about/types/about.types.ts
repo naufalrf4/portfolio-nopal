@@ -12,15 +12,6 @@ export interface ExperienceItem {
   skills?: string[];
 }
 
-export interface SocialLinks {
-  github?: string;
-  linkedin?: string;
-  twitter?: string;
-  instagram?: string;
-  youtube?: string;
-  website?: string;
-}
-
 export interface FreelanceFeaturePrice {
   feature: string;
   price?: number | null;
@@ -57,7 +48,6 @@ export interface AboutMeData {
   resumeUrl: string | null;
   skills: string[];
   experience: ExperienceItem[] | null;
-  socialLinks: SocialLinks | null;
   freelanceProfile: FreelanceProfile | null;
   createdAt: string;
   updatedAt: string;
@@ -76,7 +66,6 @@ export interface UpdateAboutInput {
   avatarUrl?: string | null;
   resumeUrl?: string | null;
   experience?: ExperienceItem[] | null;
-  socialLinks?: SocialLinks | null;
   freelanceProfile?: FreelanceProfile | null;
 }
 

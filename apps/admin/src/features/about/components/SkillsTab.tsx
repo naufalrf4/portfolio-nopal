@@ -60,7 +60,6 @@ export function SkillsTab() {
       avatarUrl: data.avatarUrl ?? undefined,
       resumeUrl: data.resumeUrl ?? undefined,
       experience: data.experience ?? undefined,
-      socialLinks: data.socialLinks ?? undefined,
     });
 
     if (success) {

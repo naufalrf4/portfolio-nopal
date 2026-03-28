@@ -14,15 +14,6 @@ const experienceItemSchema = z.object({
   skills: z.array(z.string().min(1).max(100)).max(20).optional(),
 });
 
-const socialLinksSchema = z.object({
-  github: z.string().url().optional().or(z.literal('')),
-  linkedin: z.string().url().optional().or(z.literal('')),
-  twitter: z.string().url().optional().or(z.literal('')),
-  instagram: z.string().url().optional().or(z.literal('')),
-  youtube: z.string().url().optional().or(z.literal('')),
-  website: z.string().url().optional().or(z.literal('')),
-});
-
 const freelanceFeaturePriceSchema = z.object({
   feature: z.string().min(1).max(160),
   price: z.number().nonnegative().nullable().optional(),
@@ -58,13 +49,11 @@ export const updateAboutSchema = z.object({
   resumeUrl: assetValueSchema.optional().or(z.literal('')).nullable(),
   skills: z.array(z.string()).max(50),
   experience: z.array(experienceItemSchema).optional().nullable(),
-  socialLinks: socialLinksSchema.optional().nullable(),
   freelanceProfile: freelanceProfileSchema.optional().nullable(),
 });
 
 export type UpdateAboutInput = z.infer<typeof updateAboutSchema>;
 export type ExperienceItem = z.infer<typeof experienceItemSchema>;
-export type SocialLinks = z.infer<typeof socialLinksSchema>;
 export type FreelanceFeaturePrice = z.infer<typeof freelanceFeaturePriceSchema>;
 export type FreelanceProjectReference = z.infer<typeof freelanceProjectReferenceSchema>;
 export type FreelanceProfile = z.infer<typeof freelanceProfileSchema>;

@@ -86,7 +86,6 @@ export function PersonalInfoTab() {
       bio: bioString,
       skills: data.skills || [],
       experience: data.experience ?? undefined,
-      socialLinks: data.socialLinks ?? undefined,
     });
 
     if (success) {

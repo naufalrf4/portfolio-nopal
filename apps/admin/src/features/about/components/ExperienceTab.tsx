@@ -143,7 +143,6 @@ export function ExperienceTab() {
       avatarUrl: data.avatarUrl ?? undefined,
       resumeUrl: data.resumeUrl ?? undefined,
       skills: data.skills,
-      socialLinks: data.socialLinks ?? undefined,
     });
 
     if (success) {

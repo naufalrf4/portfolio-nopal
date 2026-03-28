@@ -58,7 +58,6 @@ export function BioTab() {
         resumeUrl: data.resumeUrl ?? undefined,
         skills: data.skills,
         experience: data.experience ?? undefined,
-        socialLinks: data.socialLinks ?? undefined,
       });
       setHasUnsavedChangesBio(false);
     } finally {
@@ -102,7 +101,6 @@ export function BioTab() {
       resumeUrl: data.resumeUrl ?? undefined,
       skills: data.skills,
       experience: data.experience ?? undefined,
-      socialLinks: data.socialLinks ?? undefined,
     });
 
     setHasUnsavedChangesRoles(false);
