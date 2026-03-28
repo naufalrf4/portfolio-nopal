@@ -19,7 +19,7 @@ const icons = {
 };
 ---
 
-<div class="w-full flex flex-col gap-4 md:gap-5">
+<div class="w-full flex flex-col gap-3.5 md:gap-4">
   {links.map((link, index) => {
     const iconType = getWebsiteLinkKind(link);
     const svgPath = icons[iconType as keyof typeof icons] || icons.globe;
@@ -35,10 +35,10 @@ const icons = {
         data-entity-id={link.id}
         data-entity-label={link.label}
         data-entity-url={link.url}
-        class="group flex items-center p-4 md:py-5 md:px-6 bg-surface rounded-container shadow-neu-extruded hover:shadow-neu-extruded-hover active:shadow-neu-inset transition-all duration-300 transform hover:-translate-y-1"
+        class="group flex items-center p-3.5 md:px-5 md:py-4 bg-surface rounded-container shadow-neu-extruded hover:shadow-neu-extruded-hover active:shadow-neu-inset transition-all duration-300 transform hover:-translate-y-1"
         style={`animation-delay: ${delay}`}
       >
-        <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-surface shadow-neu-inset flex items-center justify-center mr-4 text-accent group-hover:scale-110 transition-transform duration-300">
+        <div class="w-10 h-10 md:w-11 md:h-11 rounded-full bg-surface shadow-neu-inset flex items-center justify-center mr-3.5 text-accent group-hover:scale-110 transition-transform duration-300">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"
@@ -49,14 +49,14 @@ const icons = {
             stroke-width="2"
             stroke-linecap="round"
             stroke-linejoin="round"
-            class="w-5 h-5 md:w-6 md:h-6"
+            class="w-5 h-5"
             set:html={svgPath}
           />
         </div>
-        <span class="flex-1 font-semibold text-center text-base md:text-lg text-foreground/90 group-hover:text-foreground transition-colors duration-300 font-sans">
+        <span class="flex-1 font-semibold text-center text-[15px] md:text-base text-foreground/90 group-hover:text-foreground transition-colors duration-300 font-sans">
           {link.label}
         </span>
-        <div class="w-10 flex justify-center">
+        <div class="w-8 flex justify-center">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="20"
@@ -67,7 +67,7 @@ const icons = {
             stroke-width="2"
             stroke-linecap="round"
             stroke-linejoin="round"
-            class="w-4 h-4 md:w-5 md:h-5 text-foreground-muted opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:translate-x-0.5"
+            class="w-4 h-4 text-foreground-muted opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:translate-x-0.5"
             set:html={icons['external-link']}
           />
         </div>
