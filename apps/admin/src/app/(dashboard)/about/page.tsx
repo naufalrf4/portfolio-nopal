@@ -3,7 +3,7 @@ import { AboutPageContent } from './AboutPageContent';
 
 export const metadata: Metadata = {
   title: 'About Me',
-  description: 'Manage your personal information, bio, skills, and experience',
+  description: 'Manage your personal information, profile links, bio, skills, and experience',
 };
 
 export default function AboutMePage() {

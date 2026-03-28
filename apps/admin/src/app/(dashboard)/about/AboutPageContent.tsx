@@ -6,6 +6,7 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { PageWrapper } from '@/components/layout/PageWrapper';
 import { PersonalInfoTab, BioTab, SkillsTab, ExperienceTab, useAbout } from '@/features/about';
 import { AchievementsTab } from '@/features/about/components/AchievementsTab';
+import { LinksPageContent } from '../links/LinksPageContent';
 
 export function AboutPageContent() {
   const { loading } = useAbout();
@@ -24,7 +25,7 @@ export function AboutPageContent() {
     <PageWrapper>
       <PageHeader
         title="About Me"
-        description="Manage your personal information, bio, skills, and experience"
+        description="Manage your personal profile, background, achievements, and the profile links shown across the public portfolio surfaces."
         icon={<User />}
       />
 
@@ -36,6 +37,7 @@ export function AboutPageContent() {
             <TabsTrigger value="skills">Skills</TabsTrigger>
             <TabsTrigger value="experience">Experience</TabsTrigger>
             <TabsTrigger value="achievements">Achievements</TabsTrigger>
+            <TabsTrigger value="links">Profile Links</TabsTrigger>
           </TabsList>
 
           <TabsContent value="personal">
@@ -56,6 +58,10 @@ export function AboutPageContent() {
 
           <TabsContent value="achievements">
             <AchievementsTab />
+          </TabsContent>
+
+          <TabsContent value="links">
+            <LinksPageContent embedded />
           </TabsContent>
         </Tabs>
       </div>

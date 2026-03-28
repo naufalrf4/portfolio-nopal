@@ -20,7 +20,7 @@ import {
   type ViewMode,
 } from '@/features/links';
 
-export function LinksPageContent() {
+export function LinksPageContent({ embedded = false }: { embedded?: boolean }) {
   const {
     filteredLinks,
     loading,
@@ -82,25 +82,45 @@ export function LinksPageContent() {
     return null;
   }
 
-  return (
+  const content = (
     <TooltipProvider>
-      <PageWrapper>
-        <PageHeader
-          title="Profile Links"
-          description="Manage the single source of truth for socials, contact links, and public profile destinations."
-          icon={<Link2 />}
-          stats={[
-            { label: 'Total', value: stats.total },
-            { label: 'Visible', value: stats.visible, variant: 'success' },
-            { label: 'Hidden', value: stats.hidden, variant: 'default' },
-          ]}
-          actions={
-            <Button variant="primary" onClick={openCreateModal} className="gap-2">
+      <>
+        {embedded ? (
+          <div className="mb-6 flex flex-col gap-4 rounded-[28px] bg-[#E7ECF2] p-5 shadow-[inset_4px_4px_10px_rgba(163,177,198,0.28),inset_-4px_-4px_10px_rgba(255,255,255,0.45)] md:flex-row md:items-center md:justify-between">
+            <div>
+              <h2 className="text-xl font-semibold text-[#3D4852]">Profile Links</h2>
+              <p className="mt-1 text-sm text-[#6B7280]">
+                Manage the single source of truth for socials, contact links, and public profile
+                destinations.
+              </p>
+            </div>
+            <Button
+              variant="primary"
+              onClick={openCreateModal}
+              className="gap-2 self-start md:self-auto"
+            >
               <Plus className="h-5 w-5" />
               Add Link
             </Button>
-          }
-        />
+          </div>
+        ) : (
+          <PageHeader
+            title="Profile Links"
+            description="Manage the single source of truth for socials, contact links, and public profile destinations."
+            icon={<Link2 />}
+            stats={[
+              { label: 'Total', value: stats.total },
+              { label: 'Visible', value: stats.visible, variant: 'success' },
+              { label: 'Hidden', value: stats.hidden, variant: 'default' },
+            ]}
+            actions={
+              <Button variant="primary" onClick={openCreateModal} className="gap-2">
+                <Plus className="h-5 w-5" />
+                Add Link
+              </Button>
+            }
+          />
+        )}
 
         <FilterButtons filterMode={filterMode} onFilterChange={setFilterMode} stats={stats} />
 
@@ -154,8 +174,16 @@ export function LinksPageContent() {
           deleting={deleting}
         />
 
-        <FloatingActionButton onClick={openCreateModal} label="Add Profile Link" />
-      </PageWrapper>
+        {!embedded ? (
+          <FloatingActionButton onClick={openCreateModal} label="Add Profile Link" />
+        ) : null}
+      </>
     </TooltipProvider>
   );
+
+  if (embedded) {
+    return content;
+  }
+
+  return <PageWrapper>{content}</PageWrapper>;
 }
