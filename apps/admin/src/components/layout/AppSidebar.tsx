@@ -7,7 +7,6 @@ import {
   LayoutDashboard,
   FolderKanban,
   Link as LinkIcon,
-  ExternalLink,
   MessageSquare,
   Mail,
   Send,
@@ -18,7 +17,6 @@ import {
   LogOut,
   Lock,
   FileText,
-  MessagesSquare,
 } from 'lucide-react';
 import { signOut } from 'next-auth/react';
 import type { Session } from 'next-auth';
@@ -44,15 +42,13 @@ interface AppSidebarProps {
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { name: 'About Me', href: '/about', icon: User },
-  { name: 'Profile Links', href: '/links', icon: ExternalLink },
   { name: 'Projects', href: '/projects', icon: FolderKanban },
   { name: 'Blog Links', href: '/blogs', icon: LinkIcon },
   { name: 'Guestbook', href: '/guestbook', icon: MessageSquare },
   { name: 'Contacts', href: '/contacts', icon: Send },
   { name: 'Bookings', href: '/bookings', icon: Calendar },
   { name: 'Messages (NGL)', href: '/messages', icon: Mail },
-  { name: 'AI Knowledge', href: '/knowledge', icon: FileText },
-  { name: 'AI Chat Logs', href: '/chat-logs', icon: MessagesSquare },
+  { name: 'RAG Service', href: '/knowledge', icon: FileText },
   { name: 'Analytics', href: '/analytics', icon: BarChart3 },
   { name: 'Settings', href: '/settings', icon: Settings },
 ];
