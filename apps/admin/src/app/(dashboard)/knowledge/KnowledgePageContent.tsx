@@ -7,6 +7,7 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { PageWrapper } from '@/components/layout/PageWrapper';
 import { Button } from '@/components/ui/button';
 import { KnowledgeTable, FreelanceToolPanel } from '@/components/knowledge';
+import { ChatLogsTable } from '@/components/chat-logs';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface KnowledgeDoc {
@@ -25,12 +26,37 @@ interface PaginationInfo {
   totalPages: number;
 }
 
+interface ChatLog {
+  id: string;
+  sessionId: string;
+  messages: Array<{
+    id: string;
+    role: 'user' | 'assistant' | 'system';
+    content: string;
+    timestamp: string;
+    metadata?: {
+      model?: string;
+      provider?: string;
+      tokens?: number;
+      duration?: number;
+    };
+  }>;
+  messageCount: number;
+  lastMessageAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export function KnowledgePageContent() {
   const [docs, setDocs] = useState<KnowledgeDoc[]>([]);
   const [pagination, setPagination] = useState<PaginationInfo | null>(null);
+  const [logs, setLogs] = useState<ChatLog[]>([]);
   const [loading, setLoading] = useState(true);
+  const [chatLogsLoading, setChatLogsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [activeTab, setActiveTab] = useState<'documents' | 'freelance-tool'>('documents');
+  const [activeTab, setActiveTab] = useState<'documents' | 'chat-logs' | 'freelance-tool'>(
+    'documents'
+  );
 
   const fetchDocs = useCallback(async () => {
     try {
@@ -48,13 +74,32 @@ export function KnowledgePageContent() {
     }
   }, []);
 
+  const fetchLogs = useCallback(async () => {
+    try {
+      const response = await fetch('/api/v1/admin/chat-logs?limit=50');
+      const data = await response.json();
+      if (data.success) {
+        setLogs(data.data.logs);
+      }
+    } catch (error) {
+      void error;
+    } finally {
+      setChatLogsLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     fetchDocs();
   }, [fetchDocs]);
 
+  useEffect(() => {
+    fetchLogs();
+  }, [fetchLogs]);
+
   const handleRefresh = () => {
     setRefreshing(true);
     fetchDocs();
+    fetchLogs();
   };
 
   const handleDelete = async (id: string): Promise<boolean> => {
@@ -91,40 +136,62 @@ export function KnowledgePageContent() {
     }
   };
 
+  const handleDeleteLog = async (id: string): Promise<boolean> => {
+    try {
+      const response = await fetch(`/api/v1/admin/chat-logs/${id}`, {
+        method: 'DELETE',
+      });
+      const data = await response.json();
+      if (data.success) {
+        setLogs((prev) => prev.filter((log) => log.id !== id));
+        return true;
+      }
+      return false;
+    } catch (error) {
+      void error;
+      return false;
+    }
+  };
+
   const indexedCount = docs.filter((d) => d.indexed).length;
   const pendingCount = docs.filter((d) => !d.indexed).length;
+  const totalMessages = logs.reduce((acc, log) => acc + log.messageCount, 0);
 
   return (
     <PageWrapper>
       <PageHeader
-        title="Knowledge Base"
-        description="Manage the knowledge corpus that powers the Agentic Contextual RAG experience"
+        title="RAG Service"
+        description="Manage knowledge documents, review AI chat history, and maintain the admin-side tools that feed the retrieval system."
         icon={<FileText />}
         stats={[
           { label: 'Total', value: pagination?.total || docs.length },
           { label: 'Indexed', value: indexedCount, variant: 'success' },
+          { label: 'Chat Messages', value: totalMessages },
           { label: 'Pending', value: pendingCount, variant: 'warning' },
         ]}
         actions={
-          activeTab === 'documents' ? (
+          activeTab !== 'chat-logs' ? (
             <div className="flex items-center gap-2">
               <Button variant="ghost" size="icon" onClick={handleRefresh} disabled={refreshing}>
                 <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
               </Button>
-              <Button variant="primary" asChild>
-                <Link href="/knowledge/new">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Document
-                </Link>
-              </Button>
+              {activeTab === 'documents' ? (
+                <Button variant="primary" asChild>
+                  <Link href="/knowledge/new">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Document
+                  </Link>
+                </Button>
+              ) : null}
             </div>
           ) : null
         }
       />
 
       <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as typeof activeTab)}>
-        <TabsList className="mb-6 grid w-full max-w-xl grid-cols-2">
+        <TabsList className="mb-6 grid w-full max-w-2xl grid-cols-3">
           <TabsTrigger value="documents">Knowledge Documents</TabsTrigger>
+          <TabsTrigger value="chat-logs">Chat Logs</TabsTrigger>
           <TabsTrigger value="freelance-tool">Freelance Tool</TabsTrigger>
         </TabsList>
 
@@ -135,6 +202,10 @@ export function KnowledgePageContent() {
             onDelete={handleDelete}
             onIngest={handleIngest}
           />
+        </TabsContent>
+
+        <TabsContent value="chat-logs">
+          <ChatLogsTable logs={logs} loading={chatLogsLoading} onDelete={handleDeleteLog} />
         </TabsContent>
 
         <TabsContent value="freelance-tool">
