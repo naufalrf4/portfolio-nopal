@@ -1,6 +1,7 @@
 ---
 import { NAV_ITEMS, OTHER_LINKS } from '../../lib/constants';
-import { ChevronDown, ExternalLink } from 'lucide-react';
+import { ChevronDown, ExternalLink, Menu, X } from 'lucide-react';
+import { MOBILE_NAV_ITEMS } from '../../lib/constants';
 
 const currentPath = Astro.url.pathname;
 
@@ -21,6 +22,16 @@ const isActive = (href: string) => {
       >
         Nau.
       </a>
+
+      <button
+        id="mobile-nav-trigger"
+        class="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#E0E5EC] text-[#3D4852] shadow-[6px_6px_12px_rgba(163,177,198,0.45),-6px_-6px_12px_rgba(255,255,255,0.45)] md:hidden"
+        aria-expanded="false"
+        aria-label="Open navigation menu"
+      >
+        <Menu size={20} class="mobile-nav-icon-open" />
+        <X size={20} class="mobile-nav-icon-close hidden" />
+      </button>
 
       <div class="hidden md:flex items-center gap-1 homepage-reveal-soft" style="animation-delay: 0.18s;">
         {NAV_ITEMS.map((link) => (
@@ -92,6 +103,55 @@ const isActive = (href: string) => {
         </div>
       </div>
     </div>
+
+    <div id="mobile-nav-panel" class="hidden border-t border-[#D0DAE8] py-3 md:hidden">
+      <div class="grid grid-cols-2 gap-2">
+        {MOBILE_NAV_ITEMS.map((link) => {
+          const Icon = link.icon;
+          const active = link.href !== '#other' && isActive(link.href);
+
+          if (link.href === '#other') {
+            return null;
+          }
+
+          return (
+            <a
+              href={link.href}
+              class:list={[
+                'flex items-center gap-2 rounded-2xl px-3 py-3 text-sm font-medium transition-all duration-200',
+                active
+                  ? 'bg-[#DCE8FF] text-[#2453C5] shadow-[inset_4px_4px_8px_rgba(163,177,198,0.32),inset_-4px_-4px_8px_rgba(255,255,255,0.45)]'
+                  : 'bg-[#E0E5EC] text-[#3D4852] shadow-[5px_5px_10px_rgba(163,177,198,0.45),-5px_-5px_10px_rgba(255,255,255,0.45)]'
+              ]}
+            >
+              <Icon size={18} class="text-[#3B82F6]" />
+              <span>{link.label}</span>
+            </a>
+          );
+        })}
+        {OTHER_LINKS.map((link) => {
+          const Icon = link.icon;
+          const active = !link.external && isActive(link.href);
+          return (
+            <a
+              href={link.href}
+              target={link.external ? '_blank' : undefined}
+              rel={link.external ? 'noopener noreferrer' : undefined}
+              class:list={[
+                'flex items-center gap-2 rounded-2xl px-3 py-3 text-sm font-medium transition-all duration-200',
+                active
+                  ? 'bg-[#DCE8FF] text-[#2453C5] shadow-[inset_4px_4px_8px_rgba(163,177,198,0.32),inset_-4px_-4px_8px_rgba(255,255,255,0.45)]'
+                  : 'bg-[#E0E5EC] text-[#3D4852] shadow-[5px_5px_10px_rgba(163,177,198,0.45),-5px_-5px_10px_rgba(255,255,255,0.45)]'
+              ]}
+            >
+              <Icon size={18} class="text-[#3B82F6]" />
+              <span>{link.label}</span>
+              {link.external ? <ExternalLink size={14} class="ml-auto text-[#6B7280]" /> : null}
+            </a>
+          );
+        })}
+      </div>
+    </div>
   </nav>
 </header>
 
@@ -154,6 +214,33 @@ const isActive = (href: string) => {
     document.addEventListener('click', handleDocumentClick);
     document.addEventListener('keydown', handleDocumentKeydown);
 
+    const mobileTrigger = document.getElementById('mobile-nav-trigger');
+    const mobilePanel = document.getElementById('mobile-nav-panel');
+    const openIcon = mobileTrigger?.querySelector('.mobile-nav-icon-open');
+    const closeIcon = mobileTrigger?.querySelector('.mobile-nav-icon-close');
+
+    function setMobileOpen(state: boolean) {
+      if (!mobileTrigger || !mobilePanel) return;
+      mobileTrigger.setAttribute('aria-expanded', state ? 'true' : 'false');
+      mobilePanel.classList.toggle('hidden', !state);
+      openIcon?.classList.toggle('hidden', state);
+      closeIcon?.classList.toggle('hidden', !state);
+    }
+
+    const handleMobileClick = (e: Event) => {
+      e.stopPropagation();
+      const isOpen = mobileTrigger?.getAttribute('aria-expanded') === 'true';
+      setMobileOpen(!isOpen);
+    };
+
+    const handleMobileLinkClick = () => {
+      setMobileOpen(false);
+    };
+
+    const mobileLinks = mobilePanel?.querySelectorAll('a') ?? [];
+    mobileTrigger?.addEventListener('click', handleMobileClick);
+    mobileLinks.forEach((link) => link.addEventListener('click', handleMobileLinkClick));
+
     return () => {
       if (hoverTimeout) clearTimeout(hoverTimeout);
       container?.removeEventListener('mouseenter', handleMouseEnter);
@@ -161,6 +248,8 @@ const isActive = (href: string) => {
       trigger?.removeEventListener('click', handleTriggerClick);
       document.removeEventListener('click', handleDocumentClick);
       document.removeEventListener('keydown', handleDocumentKeydown);
+      mobileTrigger?.removeEventListener('click', handleMobileClick);
+      mobileLinks.forEach((link) => link.removeEventListener('click', handleMobileLinkClick));
     };
   }
 

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { LogIn, LogOut, MessageSquare, Plus, UserCircle2 } from 'lucide-react';
+import { ArrowRight, LogIn, LogOut, MessageSquare, Plus, UserCircle2 } from 'lucide-react';
 import { NeuCard } from '../shared/NeuCard';
 import { NeuButton } from '../shared/NeuButton';
 import { Section } from '../shared/Section';
@@ -244,6 +244,18 @@ export function Guestbook({
           )}
 
           {success ? <p className="mt-4 text-sm text-emerald-600">{success}</p> : null}
+
+          {!isPageMode ? (
+            <div className="mt-5 flex justify-center">
+              <a
+                href="/guestbook"
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-transparent px-6 py-3 text-base font-medium text-[#3D4852] transition-all duration-200 hover:bg-[#E0E5EC]/50 hover:text-[#3B82F6] hover:shadow-[6px_6px_12px_rgba(163,177,198,0.6),-6px_-6px_12px_rgba(255,255,255,0.5)]"
+              >
+                Read full guestbook
+                <ArrowRight size={16} />
+              </a>
+            </div>
+          ) : null}
         </NeuCard>
 
         {error ? (
