@@ -4,6 +4,14 @@ Chronological timeline of meaningful project work, discoveries, decisions, and b
 
 ## Entries
 
+### 2026-03-30 15:50
+
+- Task: align public consumers, fallback behavior, and shared presence rollout
+- Mode: implementation
+- Files: `apps/public-astro/src/lib/social-links.ts`, `apps/public-astro/src/components/home/HeroSection.tsx`, `apps/public-astro/src/components/about/AboutContent.tsx`, `apps/public-astro/src/components/contact/ContactContent.tsx`, `apps/public-astro/src/components/contact/ContactInfo.tsx`, `apps/public-astro/src/components/layout/Footer.astro`, `apps/public-astro/src/lib/guestbookIdentity.ts`, `apps/links-astro/src/pages/index.astro`, `apps/links-astro/src/components/LivePresencePill.tsx`, `apps/ngl-svelte/src/routes/+layout.svelte`, `apps/ngl-svelte/src/lib/LivePresenceBadge.svelte`, `apps/live-presence/src/server.ts`, `apps/rag-service/fastapi/app/services/prompt_builder.py`, `apps/rag-service/fastapi/app/services/chat_service.py`, `apps/rag-service/fastapi/tests/services/test_prompt_builder.py`, `apps/rag-service/fastapi/tests/services/test_chat_service.py`, `docker-compose.prod.yml`, `.env.docker.prod`, `PROGRESS.md`
+- Status: done
+- Notes: Unified public social-link detection so Hero/About/Footer/Contact now normalize platforms consistently and stop leaking `website` links into public-facing icon rows, slightly reduced the Links page shell width, and retuned the achievements shadows toward a deeper neutral neumorphic feel. Updated the RAG abstention path so low-confidence fallback now offers only a single `/about` suggestion, cleaned stale contact-detail glue, added grouped skill authoring UX in Admin, and rolled the existing global presence indicator pattern into Links and NGL using the current live-presence overview stream plus shared guest identity storage. Verification passed with `apps/public-astro: bun run build`, `apps/links-astro: bun run build`, `apps/ngl-svelte: bun run lint`, `apps/ngl-svelte: bun run check`, `apps/ngl-svelte: bun run build`, `apps/admin: bun run lint`, `apps/admin: bun run typecheck`, `apps/admin: bun run build`, `apps/rag-service/fastapi: uv run ruff check app/services/prompt_builder.py app/services/chat_service.py tests/services/test_prompt_builder.py tests/services/test_chat_service.py`, `apps/rag-service/fastapi: uv run pytest tests/services/test_prompt_builder.py tests/services/test_chat_service.py`, and `apps/live-presence: bun src/server.ts` reaching a listening state.
+
 ### 2026-03-30 11:05
 
 - Task: add secure webhook-triggered production auto-deploy path
