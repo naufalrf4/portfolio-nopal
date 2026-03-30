@@ -18,7 +18,7 @@ type SkillGroupDraft = {
 };
 
 export function SkillsTab() {
-  const { data, updateAbout, saving } = useAbout();
+  const { data, updateField, saving } = useAbout();
 
   const [skills, setSkills] = useState<AboutSkill[]>([]);
   const [skillGroups, setSkillGroups] = useState<SkillGroupDraft[]>([
@@ -133,28 +133,7 @@ export function SkillsTab() {
   };
 
   const handleSave = async () => {
-    if (!data) return;
-
-    const bioString = data.bio
-      ? typeof data.bio === 'string'
-        ? data.bio
-        : JSON.stringify(data.bio)
-      : undefined;
-
-    const success = await updateAbout({
-      fullName: data.fullName,
-      email: data.email,
-      skills,
-      roles: data.roles || [],
-      tagline: data.tagline ?? undefined,
-      shortBio: data.shortBio ?? undefined,
-      bio: bioString,
-      phone: data.phone ?? undefined,
-      location: data.location ?? undefined,
-      avatarUrl: data.avatarUrl ?? undefined,
-      resumeUrl: data.resumeUrl ?? undefined,
-      experience: data.experience ?? undefined,
-    });
+    const success = await updateField('skills', skills);
 
     if (success) {
       setHasUnsavedChanges(false);

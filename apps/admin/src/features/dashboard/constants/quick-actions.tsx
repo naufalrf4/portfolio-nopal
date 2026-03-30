@@ -1,15 +1,13 @@
 import {
-  MessageSquare,
-  Mail,
   FolderKanban,
   Link,
   BookOpen,
-  Users,
   Calendar,
   User,
   BarChart3,
   FileText,
   MessagesSquare,
+  Send,
 } from 'lucide-react';
 import type { QuickAction } from '../types';
 
@@ -22,26 +20,26 @@ export const QUICK_ACTIONS: QuickAction[] = [
   },
   {
     icon: <BookOpen className="w-4 h-4" />,
-    label: 'Add Blog Link',
+    label: 'Manage Blogs',
     href: '/blogs',
     delay: 750,
   },
   {
-    icon: <MessageSquare className="w-4 h-4" />,
-    label: 'Guestbook',
-    href: '/guestbook',
+    icon: <Send className="w-4 h-4" />,
+    label: 'Contact Hub',
+    href: '/contacts',
     delay: 800,
   },
   {
-    icon: <Mail className="w-4 h-4" />,
-    label: 'Messages',
-    href: '/messages',
+    icon: <Calendar className="w-4 h-4" />,
+    label: 'Booking Queue',
+    href: '/contacts?tab=bookings',
     delay: 850,
   },
   {
-    icon: <Users className="w-4 h-4" />,
-    label: 'Contacts',
-    href: '/contacts',
+    icon: <MessagesSquare className="w-4 h-4" />,
+    label: 'NGL Inbox',
+    href: '/contacts?tab=messages',
     delay: 900,
   },
   {
@@ -51,9 +49,9 @@ export const QUICK_ACTIONS: QuickAction[] = [
     delay: 950,
   },
   {
-    icon: <Calendar className="w-4 h-4" />,
-    label: 'Bookings',
-    href: '/bookings',
+    icon: <MessagesSquare className="w-4 h-4" />,
+    label: 'Guestbook',
+    href: '/contacts?tab=guestbook',
     delay: 1000,
   },
   {
@@ -70,7 +68,7 @@ export const QUICK_ACTIONS: QuickAction[] = [
   },
   {
     icon: <FileText className="w-4 h-4" />,
-    label: 'Knowledge Docs',
+    label: 'AI Service',
     href: '/knowledge',
     delay: 1150,
   },

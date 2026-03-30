@@ -6,7 +6,7 @@ import { FileText, Plus, RefreshCw } from 'lucide-react';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { PageWrapper } from '@/components/layout/PageWrapper';
 import { Button } from '@/components/ui/button';
-import { KnowledgeTable, FreelanceToolPanel } from '@/components/knowledge';
+import { KnowledgeTable } from '@/components/knowledge';
 import { ChatLogsTable } from '@/components/chat-logs';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
@@ -54,9 +54,7 @@ export function KnowledgePageContent() {
   const [loading, setLoading] = useState(true);
   const [chatLogsLoading, setChatLogsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [activeTab, setActiveTab] = useState<'documents' | 'chat-logs' | 'freelance-tool'>(
-    'documents'
-  );
+  const [activeTab, setActiveTab] = useState<'documents' | 'chat-logs'>('documents');
 
   const fetchDocs = useCallback(async () => {
     try {
@@ -160,8 +158,8 @@ export function KnowledgePageContent() {
   return (
     <PageWrapper>
       <PageHeader
-        title="RAG Service"
-        description="Manage knowledge documents, review AI chat history, and maintain the admin-side tools that feed the retrieval system."
+        title="AI Service"
+        description="Manage knowledge documents and AI chat history without the old freelance-side helper copy."
         icon={<FileText />}
         stats={[
           { label: 'Total', value: pagination?.total || docs.length },
@@ -189,10 +187,9 @@ export function KnowledgePageContent() {
       />
 
       <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as typeof activeTab)}>
-        <TabsList className="mb-6 grid w-full max-w-2xl grid-cols-3">
+        <TabsList className="mb-6 grid w-full max-w-xl grid-cols-2">
           <TabsTrigger value="documents">Knowledge Documents</TabsTrigger>
           <TabsTrigger value="chat-logs">Chat Logs</TabsTrigger>
-          <TabsTrigger value="freelance-tool">Freelance Tool</TabsTrigger>
         </TabsList>
 
         <TabsContent value="documents">
@@ -206,10 +203,6 @@ export function KnowledgePageContent() {
 
         <TabsContent value="chat-logs">
           <ChatLogsTable logs={logs} loading={chatLogsLoading} onDelete={handleDeleteLog} />
-        </TabsContent>
-
-        <TabsContent value="freelance-tool">
-          <FreelanceToolPanel />
         </TabsContent>
       </Tabs>
     </PageWrapper>

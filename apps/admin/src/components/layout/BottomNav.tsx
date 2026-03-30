@@ -7,15 +7,12 @@ import {
   FolderKanban,
   BookOpen,
   User,
-  MessageSquare,
-  Mail,
   Send,
-  Calendar,
   BarChart3,
-  Settings,
   MoreHorizontal,
   X,
   FileText,
+  Link as LinkIcon,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -29,22 +26,37 @@ interface NavItem {
 export function BottomNav() {
   const pathname = usePathname();
   const router = useRouter();
-  const [unreadCount, setUnreadCount] = useState(0);
+  const [contactUpdatesCount, setContactUpdatesCount] = useState(0);
   const [isMoreOpen, setIsMoreOpen] = useState(false);
   const moreMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const controller = new AbortController();
 
-    async function fetchUnreadCount() {
+    async function fetchContactUpdates() {
       try {
-        const response = await fetch('/api/v1/admin/messages', {
-          signal: controller.signal,
-        });
-        const data = await response.json();
-        if (data.success) {
-          setUnreadCount(data.data.unreadCount);
-        }
+        const [contactsResponse, messagesResponse, bookingsResponse] = await Promise.all([
+          fetch('/api/v1/admin/contacts', { signal: controller.signal }),
+          fetch('/api/v1/admin/messages', { signal: controller.signal }),
+          fetch('/api/v1/admin/bookings?limit=100', { signal: controller.signal }),
+        ]);
+
+        const [contactsData, messagesData, bookingsData] = await Promise.all([
+          contactsResponse.json(),
+          messagesResponse.json(),
+          bookingsResponse.json(),
+        ]);
+
+        const unreadContacts = contactsData.success ? (contactsData.data.unreadCount ?? 0) : 0;
+        const unreadMessages = messagesData.success ? (messagesData.data.unreadCount ?? 0) : 0;
+        const pendingBookings =
+          bookingsData.success && Array.isArray(bookingsData.data)
+            ? bookingsData.data.filter(
+                (booking: { status: string }) => booking.status === 'PENDING'
+              ).length
+            : 0;
+
+        setContactUpdatesCount(unreadContacts + unreadMessages + pendingBookings);
       } catch (error) {
         if ((error as Error).name !== 'AbortError') {
           void error;
@@ -52,9 +64,9 @@ export function BottomNav() {
       }
     }
 
-    fetchUnreadCount();
+    fetchContactUpdates();
 
-    const interval = setInterval(fetchUnreadCount, 30000);
+    const interval = setInterval(fetchContactUpdates, 30000);
 
     return () => {
       controller.abort();
@@ -88,15 +100,11 @@ export function BottomNav() {
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
     { name: 'About', href: '/about', icon: User },
     { name: 'Projects', href: '/projects', icon: FolderKanban },
-    { name: 'Contacts', href: '/contacts', icon: Send },
-    { name: 'RAG Service', href: '/knowledge', icon: FileText },
+    { name: 'Contact', href: '/contacts', icon: Send, badge: contactUpdatesCount },
+    { name: 'AI Service', href: '/knowledge', icon: FileText },
     { name: 'Blogs', href: '/blogs', icon: BookOpen },
-    { name: 'Guestbook', href: '/guestbook', icon: MessageSquare },
-    { name: 'Bookings', href: '/bookings', icon: Calendar },
-    { name: 'Messages', href: '/messages', icon: Mail, badge: unreadCount },
-    { name: 'Links', href: '/links', icon: FileText },
+    { name: 'Links', href: '/links', icon: LinkIcon },
     { name: 'Analytics', href: '/analytics', icon: BarChart3 },
-    { name: 'Settings', href: '/settings', icon: Settings },
   ];
 
   const primaryItems = allNavItems.slice(0, 4);

@@ -1,11 +1,5 @@
-import type { Metadata } from 'next';
-import { GuestbookPageContent } from './GuestbookPageContent';
-
-export const metadata: Metadata = {
-  title: 'Guestbook',
-  description: 'Manage guestbook entries from visitors',
-};
+import { redirect } from 'next/navigation';
 
 export default function GuestbookPage() {
-  return <GuestbookPageContent />;
+  redirect('/contacts?tab=guestbook');
 }

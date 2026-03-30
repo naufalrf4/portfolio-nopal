@@ -17,6 +17,14 @@ import {
 } from '@/features/messages';
 
 export function MessagesPageContent() {
+  return <MessagesPanel showHeader />;
+}
+
+interface MessagesPanelProps {
+  showHeader?: boolean;
+}
+
+export function MessagesPanel({ showHeader = false }: MessagesPanelProps) {
   const {
     messages,
     loading,
@@ -41,22 +49,23 @@ export function MessagesPageContent() {
   return (
     <>
       <GlobalStyles />
-      <PageWrapper>
-        <PageHeader
-          title="Anonymous Messages"
-          description="Manage anonymous messages from your visitors"
-          icon={<Mail />}
-          stats={[
-            { label: 'Total', value: messages.length },
-            { label: 'Unread', value: unreadCount, variant: 'warning' },
-          ]}
-          actions={
-            unreadCount > 0 ? (
-              <MarkAllAsReadButton onClick={markAllAsRead} disabled={markingAllRead} />
-            ) : null
-          }
-        />
-
+      <PageWrapper className={showHeader ? undefined : 'px-0 pb-0'}>
+        {showHeader ? (
+          <PageHeader
+            title="Anonymous Messages"
+            description="Manage anonymous messages from your visitors"
+            icon={<Mail />}
+            stats={[
+              { label: 'Total', value: messages.length },
+              { label: 'Unread', value: unreadCount, variant: 'warning' },
+            ]}
+            actions={
+              unreadCount > 0 ? (
+                <MarkAllAsReadButton onClick={markAllAsRead} disabled={markingAllRead} />
+              ) : null
+            }
+          />
+        ) : null}
         <FilterTabs
           activeTab={activeTab}
           onTabChange={setActiveTab}

@@ -1,11 +1,5 @@
-import type { Metadata } from 'next';
-import { BookingsPageContent } from './BookingsPageContent';
-
-export const metadata: Metadata = {
-  title: 'Booking Management',
-  description: 'Manage appointments and availability slots',
-};
+import { redirect } from 'next/navigation';
 
 export default function BookingsPage() {
-  return <BookingsPageContent />;
+  redirect('/contacts?tab=bookings');
 }

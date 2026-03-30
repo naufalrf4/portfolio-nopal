@@ -13,6 +13,14 @@ import {
 } from '@/features/guestbook';
 
 export function GuestbookPageContent() {
+  return <GuestbookPanel showHeader />;
+}
+
+interface GuestbookPanelProps {
+  showHeader?: boolean;
+}
+
+export function GuestbookPanel({ showHeader = false }: GuestbookPanelProps) {
   const { entries, filteredEntries, loading, filter, setFilter, toggleVisibility, deleteEntry } =
     useGuestbook();
 
@@ -20,17 +28,19 @@ export function GuestbookPageContent() {
   const hiddenCount = entries.filter((e) => !e.visible).length;
 
   return (
-    <PageWrapper>
-      <PageHeader
-        title="Guestbook"
-        description="Manage guestbook entries from visitors"
-        icon={<MessageSquare />}
-        stats={[
-          { label: 'Total', value: entries.length, variant: 'default' },
-          { label: 'Visible', value: visibleCount, variant: 'success' },
-          { label: 'Hidden', value: hiddenCount, variant: 'default' },
-        ]}
-      />
+    <PageWrapper className={showHeader ? undefined : 'px-0 pb-0'}>
+      {showHeader ? (
+        <PageHeader
+          title="Guestbook"
+          description="Manage guestbook entries from visitors"
+          icon={<MessageSquare />}
+          stats={[
+            { label: 'Total', value: entries.length, variant: 'default' },
+            { label: 'Visible', value: visibleCount, variant: 'success' },
+            { label: 'Hidden', value: hiddenCount, variant: 'default' },
+          ]}
+        />
+      ) : null}
 
       <div
         className="rounded-[24px] p-2 mb-8 inline-flex gap-2"

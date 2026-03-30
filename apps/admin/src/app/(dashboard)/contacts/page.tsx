@@ -2,8 +2,9 @@ import type { Metadata } from 'next';
 import { ContactsPageContent } from './ContactsPageContent';
 
 export const metadata: Metadata = {
-  title: 'Contact Management',
-  description: 'Manage contact form submissions and settings',
+  title: 'Contact',
+  description:
+    'Manage contact forms, bookings, anonymous messages, guestbook entries, and contact settings.',
 };
 
 export default function ContactsPage() {

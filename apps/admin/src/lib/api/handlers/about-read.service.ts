@@ -1,5 +1,6 @@
 import { db } from '@/lib/db';
 import { aboutMe } from '@/lib/db/schema';
+import { normalizeAboutSkills } from '@/lib/about-skills';
 
 export interface AboutMeRecord {
   id: string;
@@ -19,6 +20,17 @@ export interface AboutMeRecord {
   freelanceProfile: unknown;
   createdAt: string;
   updatedAt: string;
+}
+
+function normalizeAboutRecord(record: AboutMeRecord | undefined): AboutMeRecord | undefined {
+  if (!record) {
+    return undefined;
+  }
+
+  return {
+    ...record,
+    skills: normalizeAboutSkills(record.skills),
+  };
 }
 
 function isMissingFreelanceProfileColumnError(error: unknown): boolean {
@@ -96,12 +108,12 @@ async function selectAboutMeWithoutFreelanceProfile(): Promise<AboutMeRecord | u
 
 export async function getAboutMeRecord(): Promise<AboutMeRecord | undefined> {
   try {
-    return await selectAboutMeWithFreelanceProfile();
+    return normalizeAboutRecord(await selectAboutMeWithFreelanceProfile());
   } catch (error) {
     if (!isMissingFreelanceProfileColumnError(error)) {
       throw error;
     }
 
-    return selectAboutMeWithoutFreelanceProfile();
+    return normalizeAboutRecord(await selectAboutMeWithoutFreelanceProfile());
   }
 }

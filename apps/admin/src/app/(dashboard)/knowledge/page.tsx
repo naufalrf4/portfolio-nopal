@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import { KnowledgePageContent } from './KnowledgePageContent';
 
 export const metadata: Metadata = {
-  title: 'Knowledge Base',
-  description: 'Manage knowledge documents for RAG-powered AI assistant',
+  title: 'AI Service',
+  description: 'Manage knowledge documents and chat logs that support the portfolio AI service.',
 };
 
 export default function KnowledgePage() {

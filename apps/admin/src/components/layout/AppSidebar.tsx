@@ -7,16 +7,13 @@ import {
   LayoutDashboard,
   FolderKanban,
   Link as LinkIcon,
-  MessageSquare,
-  Mail,
   Send,
-  Calendar,
   User,
   BarChart3,
-  Settings,
   LogOut,
   Lock,
   FileText,
+  BookOpen,
 } from 'lucide-react';
 import { signOut } from 'next-auth/react';
 import type { Session } from 'next-auth';
@@ -43,14 +40,11 @@ const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { name: 'About Me', href: '/about', icon: User },
   { name: 'Projects', href: '/projects', icon: FolderKanban },
-  { name: 'Blog Links', href: '/blogs', icon: LinkIcon },
-  { name: 'Guestbook', href: '/guestbook', icon: MessageSquare },
-  { name: 'Contacts', href: '/contacts', icon: Send },
-  { name: 'Bookings', href: '/bookings', icon: Calendar },
-  { name: 'Messages (NGL)', href: '/messages', icon: Mail },
-  { name: 'RAG Service', href: '/knowledge', icon: FileText },
+  { name: 'Blogs', href: '/blogs', icon: BookOpen },
+  { name: 'Contact', href: '/contacts', icon: Send },
+  { name: 'Links', href: '/links', icon: LinkIcon },
+  { name: 'AI Service', href: '/knowledge', icon: FileText },
   { name: 'Analytics', href: '/analytics', icon: BarChart3 },
-  { name: 'Settings', href: '/settings', icon: Settings },
 ];
 
 function NeuBadge({ count }: { count: number }) {
@@ -116,22 +110,37 @@ function NeuAvatar({
 export function AppSidebar({ session }: AppSidebarProps) {
   const pathname = usePathname();
   const { state } = useSidebar();
-  const [unreadCount, setUnreadCount] = useState(0);
+  const [contactUpdatesCount, setContactUpdatesCount] = useState(0);
 
   const isCollapsed = state === 'collapsed';
 
   useEffect(() => {
     const controller = new AbortController();
 
-    async function fetchUnreadCount() {
+    async function fetchContactUpdates() {
       try {
-        const response = await fetch('/api/v1/admin/messages', {
-          signal: controller.signal,
-        });
-        const data = await response.json();
-        if (data.success) {
-          setUnreadCount(data.data.unreadCount);
-        }
+        const [contactsResponse, messagesResponse, bookingsResponse] = await Promise.all([
+          fetch('/api/v1/admin/contacts', { signal: controller.signal }),
+          fetch('/api/v1/admin/messages', { signal: controller.signal }),
+          fetch('/api/v1/admin/bookings?limit=100', { signal: controller.signal }),
+        ]);
+
+        const [contactsData, messagesData, bookingsData] = await Promise.all([
+          contactsResponse.json(),
+          messagesResponse.json(),
+          bookingsResponse.json(),
+        ]);
+
+        const unreadContacts = contactsData.success ? (contactsData.data.unreadCount ?? 0) : 0;
+        const unreadMessages = messagesData.success ? (messagesData.data.unreadCount ?? 0) : 0;
+        const pendingBookings =
+          bookingsData.success && Array.isArray(bookingsData.data)
+            ? bookingsData.data.filter(
+                (booking: { status: string }) => booking.status === 'PENDING'
+              ).length
+            : 0;
+
+        setContactUpdatesCount(unreadContacts + unreadMessages + pendingBookings);
       } catch (error) {
         if ((error as Error).name !== 'AbortError') {
           void error;
@@ -139,9 +148,9 @@ export function AppSidebar({ session }: AppSidebarProps) {
       }
     }
 
-    fetchUnreadCount();
+    fetchContactUpdates();
 
-    const interval = setInterval(fetchUnreadCount, 30000);
+    const interval = setInterval(fetchContactUpdates, 30000);
 
     return () => {
       controller.abort();
@@ -211,7 +220,7 @@ export function AppSidebar({ session }: AppSidebarProps) {
                 {navigation.map((item) => {
                   const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
                   const Icon = item.icon;
-                  const showBadge = item.href === '/messages' && unreadCount > 0;
+                  const showBadge = item.href === '/contacts' && contactUpdatesCount > 0;
 
                   const buttonContent = (
                     <SidebarMenuButton
@@ -256,7 +265,7 @@ export function AppSidebar({ session }: AppSidebarProps) {
                           />
                           {!isCollapsed && <span>{item.name}</span>}
                         </div>
-                        {showBadge && !isCollapsed && <NeuBadge count={unreadCount} />}
+                        {showBadge && !isCollapsed && <NeuBadge count={contactUpdatesCount} />}
                       </Link>
                     </SidebarMenuButton>
                   );
@@ -275,7 +284,7 @@ export function AppSidebar({ session }: AppSidebarProps) {
                               'animate-pulse'
                             )}
                           >
-                            {unreadCount > 9 ? '9+' : unreadCount}
+                            {contactUpdatesCount > 9 ? '9+' : contactUpdatesCount}
                           </span>
                         </div>
                       ) : (

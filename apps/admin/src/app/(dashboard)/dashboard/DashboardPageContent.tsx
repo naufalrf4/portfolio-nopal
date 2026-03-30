@@ -31,20 +31,20 @@ function DashboardStatsContent() {
     <>
       <div className="grid gap-4 grid-cols-2 lg:gap-6 lg:grid-cols-4">
         <StatCard
-          icon={<MessageSquare className="w-5 h-5 lg:w-6 lg:h-6" />}
-          iconColor="text-blue-500"
-          iconBgGradient="bg-gradient-to-br from-blue-400/20 to-cyan-500/20"
-          title="Guestbook"
-          total={stats?.guestbook.total ?? 0}
+          icon={<Send className="w-5 h-5 lg:w-6 lg:h-6" />}
+          iconColor="text-emerald-500"
+          iconBgGradient="bg-gradient-to-br from-emerald-400/20 to-teal-500/20"
+          title="Contact Center"
+          total={(stats?.contacts.total ?? 0) + (stats?.bookings.total ?? 0)}
           primaryStat={{
-            label: 'visible',
-            value: stats?.guestbook.visible ?? 0,
-            variant: 'success',
+            label: 'forms',
+            value: stats?.contacts.unread ?? 0,
+            variant: 'warning',
           }}
           secondaryStat={{
-            label: 'hidden',
-            value: stats?.guestbook.hidden ?? 0,
-            variant: 'muted',
+            label: 'pending calls',
+            value: stats?.bookings.pending ?? 0,
+            variant: 'warning',
           }}
           delay={200}
         />
@@ -53,7 +53,7 @@ function DashboardStatsContent() {
           icon={<Mail className="w-5 h-5 lg:w-6 lg:h-6" />}
           iconColor="text-purple-500"
           iconBgGradient="bg-gradient-to-br from-purple-400/20 to-pink-500/20"
-          title="Messages (NGL)"
+          title="NGL Inbox"
           total={stats?.messages.total ?? 0}
           primaryStat={{
             label: 'unread',
@@ -69,19 +69,19 @@ function DashboardStatsContent() {
         />
 
         <StatCard
-          icon={<Send className="w-5 h-5 lg:w-6 lg:h-6" />}
-          iconColor="text-emerald-500"
-          iconBgGradient="bg-gradient-to-br from-emerald-400/20 to-teal-500/20"
-          title="Contact Forms"
-          total={stats?.contacts.total ?? 0}
+          icon={<MessageSquare className="w-5 h-5 lg:w-6 lg:h-6" />}
+          iconColor="text-blue-500"
+          iconBgGradient="bg-gradient-to-br from-blue-400/20 to-cyan-500/20"
+          title="Guestbook"
+          total={stats?.guestbook.total ?? 0}
           primaryStat={{
-            label: 'unread',
-            value: stats?.contacts.unread ?? 0,
-            variant: 'warning',
+            label: 'visible',
+            value: stats?.guestbook.visible ?? 0,
+            variant: 'success',
           }}
           secondaryStat={{
-            label: 'read',
-            value: stats?.contacts.read ?? 0,
+            label: 'hidden',
+            value: stats?.guestbook.hidden ?? 0,
             variant: 'muted',
           }}
           delay={400}
@@ -91,7 +91,7 @@ function DashboardStatsContent() {
           icon={<Calendar className="w-5 h-5 lg:w-6 lg:h-6" />}
           iconColor="text-amber-500"
           iconBgGradient="bg-gradient-to-br from-amber-400/20 to-orange-500/20"
-          title="Book a Call"
+          title="Bookings"
           total={stats?.bookings.total ?? 0}
           primaryStat={{
             label: 'pending',
