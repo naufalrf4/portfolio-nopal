@@ -146,6 +146,13 @@ type ServerMessage =
 const roomParticipants = new Map<string, Map<string, PresenceParticipant>>();
 const sockets = new Set<PresenceSocket>();
 
+function createCorsHeaders(origin: string | null): HeadersInit {
+  return {
+    'Access-Control-Allow-Origin': origin && isAllowedOrigin(origin) ? origin : 'https://naufalrf.tech',
+    Vary: 'Origin',
+  };
+}
+
 function clampCoordinate(value: number | undefined, fallback: number): number {
   if (typeof value !== 'number' || Number.isNaN(value)) {
     return fallback;
@@ -334,9 +341,24 @@ const server = Bun.serve<ConnectionData>({
   idleTimeout: 30,
   fetch(req: Request, server: PresenceUpgradeServer) {
     const url = new URL(req.url);
+    const origin = req.headers.get('origin');
+
+    if (req.method === 'OPTIONS' && url.pathname === '/health') {
+      return new Response(null, {
+        status: 204,
+        headers: {
+          ...createCorsHeaders(origin),
+          'Access-Control-Allow-Methods': 'GET, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type',
+        },
+      });
+    }
 
     if (url.pathname === '/health') {
-      return Response.json({ ok: true, roomCount: roomParticipants.size, port: PORT });
+      return Response.json(
+        { ok: true, roomCount: roomParticipants.size, port: PORT },
+        { headers: createCorsHeaders(origin) }
+      );
     }
 
     if (url.pathname === '/llms.txt') {
@@ -356,7 +378,6 @@ const server = Bun.serve<ConnectionData>({
     }
 
     if (url.pathname === '/ws') {
-      const origin = req.headers.get('origin');
       if (!isAllowedOrigin(origin)) {
         return new Response('Forbidden', { status: 403 });
       }
