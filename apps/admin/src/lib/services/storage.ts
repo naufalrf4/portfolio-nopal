@@ -57,6 +57,30 @@ function normalizePublicBaseUrl(value: string | undefined): string | null {
   return trimmed.replace(/\/+$/, '');
 }
 
+function normalizeStorageKeyCandidate(value: string): string | null {
+  const [pathPart, queryPart] = value.split('?', 2);
+  const normalizedPath = pathPart?.trim();
+
+  if (!normalizedPath) {
+    return null;
+  }
+
+  if (!queryPart) {
+    return normalizedPath;
+  }
+
+  const loweredQuery = queryPart.toLowerCase();
+  const looksLikeSignedQuery = [
+    'x-goog-',
+    'x-amz-',
+    'googleaccessid=',
+    'signature=',
+    'expires=',
+  ].some((token) => loweredQuery.includes(token));
+
+  return looksLikeSignedQuery ? normalizedPath : value.trim();
+}
+
 function isLikelySignedStorageUrl(url: URL): boolean {
   return [
     'X-Goog-Algorithm',
@@ -109,7 +133,7 @@ export function normalizeStoredAssetValue(value: AssetValue): string | null {
   }
 
   if (!/^https?:\/\//i.test(trimmedValue)) {
-    return trimmedValue;
+    return normalizeStorageKeyCandidate(trimmedValue);
   }
 
   const extractedKey = extractStorageKeyFromUrl(trimmedValue);

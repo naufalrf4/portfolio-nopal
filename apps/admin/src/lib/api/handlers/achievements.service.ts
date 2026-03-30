@@ -2,10 +2,18 @@ import { db } from '@/lib/db';
 import { achievements } from '@/lib/db/schema';
 import { eq, asc } from 'drizzle-orm';
 import { createId } from '@paralleldrive/cuid2';
+import { normalizeStoredAssetValue } from '@/lib/services/storage';
 
 type AchievementInsert = typeof achievements.$inferInsert;
 type AchievementCreateInput = Omit<AchievementInsert, 'id' | 'updatedAt'>;
 type AchievementUpdateInput = Partial<AchievementCreateInput>;
+
+function normalizeAchievementPhotos(photos: string[] | null | undefined): string[] {
+  return (photos ?? []).flatMap((photo) => {
+    const normalized = normalizeStoredAssetValue(photo);
+    return normalized ? [normalized] : [];
+  });
+}
 
 export class AchievementsService {
   async getAll(query?: { visible?: boolean }) {
@@ -32,16 +40,22 @@ export class AchievementsService {
         id: createId(),
         updatedAt: new Date().toISOString(),
         ...data,
+        photos: normalizeAchievementPhotos(data.photos),
       })
       .returning();
     return created;
   }
 
   async update(id: string, data: AchievementUpdateInput) {
+    const normalizedData = {
+      ...data,
+      ...(data.photos ? { photos: normalizeAchievementPhotos(data.photos) } : {}),
+    };
+
     const [updated] = await db
       .update(achievements)
       .set({
-        ...data,
+        ...normalizedData,
         updatedAt: new Date().toISOString(),
       })
       .where(eq(achievements.id, id))
