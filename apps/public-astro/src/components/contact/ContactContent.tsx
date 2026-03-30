@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Calendar, ChevronDown, HelpCircle, Mail } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import type { AboutData } from '../../types';
+import { filterPublicSocialLinks } from '@/lib/social-links';
 import { NeuCard } from '../shared/NeuCard';
 import { BookingCalendar } from './BookingCalendar';
 import { ContactForm } from './ContactForm';
@@ -57,7 +58,7 @@ export function ContactContent({ aboutData, turnstileSiteKey }: ContactContentPr
             <ContactInfo
               location={aboutData.location}
               email={aboutData.email}
-              socialLinks={aboutData.socialLinks}
+              socialLinks={filterPublicSocialLinks(aboutData.socialLinks)}
               availabilityStatus={aboutData.availabilityStatus}
               error={null}
             />

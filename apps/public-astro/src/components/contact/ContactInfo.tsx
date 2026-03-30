@@ -13,6 +13,7 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import type { SocialLink } from '../../types';
+import { detectPublicSocialPlatform } from '@/lib/social-links';
 
 interface ContactInfoProps {
   location?: string | null;
@@ -26,6 +27,7 @@ const socialIcons: Record<string, ComponentType<{ size?: number; className?: str
   github: Github,
   linkedin: Linkedin,
   twitter: Twitter,
+  x: Twitter,
   instagram: Instagram,
   youtube: Youtube,
   email: Mail,
@@ -112,7 +114,8 @@ export function ContactInfo({
             <p className="text-sm text-[#6B7280] mb-4">Connect with me</p>
             <div className="flex flex-wrap gap-3">
               {socialLinks.map((link, index) => {
-                const Icon = socialIcons[link.platform.toLowerCase()] || Globe;
+                const platform = detectPublicSocialPlatform(link) ?? link.platform.toLowerCase();
+                const Icon = socialIcons[platform] || Globe;
                 return (
                   <a
                     key={index}

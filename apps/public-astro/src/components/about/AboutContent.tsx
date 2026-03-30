@@ -13,6 +13,7 @@ import {
   Twitter,
   Instagram,
   Youtube,
+  Globe,
 } from 'lucide-react';
 import type { AboutData } from '../../types';
 import { filterPublicSocialLinks } from '@/lib/social-links';
@@ -26,9 +27,11 @@ const socialIcons: Record<string, ComponentType<{ size?: number; className?: str
   github: Github,
   linkedin: Linkedin,
   twitter: Twitter,
+  x: Twitter,
   instagram: Instagram,
   youtube: Youtube,
   email: Mail,
+  website: Globe,
 };
 
 export const AboutContent: FC<AboutContentProps> = ({ about, achievements }) => {
@@ -89,7 +92,7 @@ export const AboutContent: FC<AboutContentProps> = ({ about, achievements }) => 
               {socialLinksList.length > 0 && (
                 <div className="flex items-center justify-center gap-3 mb-4">
                   {socialLinksList.map((link, index) => {
-                    const Icon = socialIcons[link.platform.toLowerCase()] || Mail;
+                    const Icon = socialIcons[link.platform.toLowerCase()] || Globe;
                     return (
                       <a
                         key={index}

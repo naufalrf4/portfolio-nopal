@@ -1,7 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { filterPublicSocialLinks } from '@/lib/social-links';
-import { Github, Linkedin, Twitter, Mail, Download, ArrowRight } from 'lucide-react';
+import {
+  Github,
+  Linkedin,
+  Twitter,
+  Mail,
+  Download,
+  ArrowRight,
+  Instagram,
+  Youtube,
+} from 'lucide-react';
 import { NeuButton } from '@/components/shared/NeuButton';
 import type { AboutData } from '@/types';
 import { motion, useScroll, useTransform } from 'framer-motion';
@@ -34,6 +43,8 @@ const socialIcons: Record<string, React.ComponentType<{ size?: number; className
   github: Github,
   linkedin: Linkedin,
   twitter: Twitter,
+  instagram: Instagram,
+  youtube: Youtube,
   email: Mail,
 };
 
