@@ -51,6 +51,7 @@
     "dom-to-image-more": "^3.7.2",
     "dotenv": "^17.2.3",
     "drizzle-orm": "^0.45.1",
+    "googleapis": "^171.4.0",
     "html2canvas": "^1.4.1",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.562.0",

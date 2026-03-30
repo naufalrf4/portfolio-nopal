@@ -11,6 +11,7 @@ import {
   Check,
   X,
   CheckCircle,
+  ExternalLink,
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { ResponsiveModal } from '@/components/ui/responsive-modal';
@@ -148,7 +149,16 @@ export function BookingsTab({ onPendingCountChange }: BookingsTabProps) {
           toast.success('Status updated successfully');
           fetchBookings();
           if (isDetailModalOpen) {
-            setSelectedBooking({ ...selectedBooking!, status });
+            setSelectedBooking(
+              selectedBooking
+                ? {
+                    ...selectedBooking,
+                    status,
+                    calendarUrl: data.data.googleCalendarUrl ?? selectedBooking.calendarUrl,
+                    meetUrl: data.data.googleMeetUrl ?? selectedBooking.meetUrl,
+                  }
+                : null
+            );
           }
           return true;
         }
@@ -518,6 +528,42 @@ export function BookingsTab({ onPendingCountChange }: BookingsTabProps) {
               <DetailField label="Date" value={formatDate(selectedBooking.date)} />
               <DetailField label="Time" value={selectedBooking.time} />
               <DetailField label="Timezone" value={selectedBooking.timezone} />
+              <DetailField
+                label="Google Meet"
+                value={
+                  selectedBooking.meetUrl ? (
+                    <a
+                      href={selectedBooking.meetUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1 text-[#2563EB] hover:text-[#1D4ED8]"
+                    >
+                      Join meeting
+                      <ExternalLink className="h-3.5 w-3.5" />
+                    </a>
+                  ) : (
+                    'Not created yet'
+                  )
+                }
+              />
+              <DetailField
+                label="Calendar Event"
+                value={
+                  selectedBooking.calendarUrl ? (
+                    <a
+                      href={selectedBooking.calendarUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1 text-[#2563EB] hover:text-[#1D4ED8]"
+                    >
+                      Open event
+                      <ExternalLink className="h-3.5 w-3.5" />
+                    </a>
+                  ) : (
+                    'Not created yet'
+                  )
+                }
+              />
             </div>
             {selectedBooking.notes && (
               <div

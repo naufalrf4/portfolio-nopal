@@ -58,5 +58,7 @@ export interface BookingStatusUpdateData {
   time: string;
   duration: number;
   message?: string;
+  calendarUrl?: string | null;
+  meetUrl?: string | null;
   status: 'confirmed' | 'rejected';
 }

@@ -22,6 +22,8 @@ export const updateBookingSettingsSchema = z.object({
       { message: 'Invalid timezone' }
     )
     .optional(),
+  googleCalendarCalendarId: z.string().nullable().optional().or(z.literal('')),
+  googleCalendarCalendarName: z.string().nullable().optional().or(z.literal('')),
 });
 
 export type UpdateBookingSettingsInput = z.infer<typeof updateBookingSettingsSchema>;

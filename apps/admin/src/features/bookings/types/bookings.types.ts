@@ -11,6 +11,8 @@ export interface Booking {
   time: string;
   timezone: string;
   notes: string | null;
+  calendarUrl?: string | null;
+  meetUrl?: string | null;
   status: BookingStatus;
   createdAt: string;
   updatedAt: string;
@@ -46,6 +48,20 @@ export interface BookingSettings {
   reminderDay?: number;
   reminderTime?: string;
   timezone: string;
+  googleCalendarRefreshToken?: string | null;
+  googleCalendarCalendarId?: string | null;
+  googleCalendarCalendarName?: string | null;
+  googleCalendarConnectedEmail?: string | null;
+  googleCalendarConnectedAt?: string | null;
+  googleCalendarGrantedScopes?: string[] | null;
+  googleCalendarConnected?: boolean;
+}
+
+export interface GoogleCalendarOption {
+  id: string;
+  summary: string;
+  primary: boolean;
+  accessRole: string | null;
 }
 
 export type FilterType = 'all' | BookingStatus;

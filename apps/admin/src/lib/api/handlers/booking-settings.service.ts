@@ -10,7 +10,15 @@ const DEFAULT_SETTINGS = {
   reminderDay: 6,
   reminderTime: '09:00',
   timezone: 'Asia/Jakarta',
+  googleCalendarRefreshToken: null,
+  googleCalendarCalendarId: null,
+  googleCalendarCalendarName: null,
+  googleCalendarConnectedEmail: null,
+  googleCalendarGrantedScopes: [] as string[],
+  googleCalendarConnectedAt: null,
 } as const;
+
+type BookingSettingsRecord = typeof bookingSettings.$inferSelect;
 
 type BookingSettingsUpdate = Partial<
   Pick<
@@ -20,12 +28,44 @@ type BookingSettingsUpdate = Partial<
     | 'reminderDay'
     | 'reminderTime'
     | 'timezone'
+    | 'googleCalendarRefreshToken'
+    | 'googleCalendarCalendarId'
+    | 'googleCalendarCalendarName'
+    | 'googleCalendarConnectedEmail'
+    | 'googleCalendarGrantedScopes'
+    | 'googleCalendarConnectedAt'
     | 'updatedAt'
   >
 >;
 
+function sanitizeBookingSettings(settings: BookingSettingsRecord) {
+  return {
+    ...settings,
+    googleCalendarRefreshToken: undefined,
+    googleCalendarGrantedScopes: settings.googleCalendarGrantedScopes ?? [],
+    googleCalendarConnected: Boolean(
+      settings.googleCalendarRefreshToken && settings.googleCalendarCalendarId
+    ),
+  };
+}
+
+function normalizeNullableText(value: string | null | undefined) {
+  if (typeof value !== 'string') {
+    return value ?? null;
+  }
+
+  const normalized = value.trim();
+  return normalized ? normalized : null;
+}
+
 export class BookingSettingsService {
   async get() {
+    const settings = await this.getInternal();
+
+    return sanitizeBookingSettings(settings);
+  }
+
+  async getInternal() {
     const result = await db.select().from(bookingSettings).limit(1);
     let settings = result[0];
 
@@ -37,6 +77,16 @@ export class BookingSettingsService {
   }
 
   async update(data: UpdateBookingSettingsInput) {
+    const updated = await this.updateInternal({
+      ...data,
+      googleCalendarCalendarId: normalizeNullableText(data.googleCalendarCalendarId),
+      googleCalendarCalendarName: normalizeNullableText(data.googleCalendarCalendarName),
+    });
+
+    return sanitizeBookingSettings(updated);
+  }
+
+  async updateInternal(data: BookingSettingsUpdate) {
     const existing = await db.select().from(bookingSettings).limit(1);
 
     if (!existing[0]) {
@@ -56,7 +106,7 @@ export class BookingSettingsService {
     return updated;
   }
 
-  private async create(data?: UpdateBookingSettingsInput) {
+  private async create(data?: BookingSettingsUpdate) {
     const now = new Date().toISOString();
     const [created] = await db
       .insert(bookingSettings)
@@ -67,6 +117,18 @@ export class BookingSettingsService {
         reminderDay: data?.reminderDay ?? DEFAULT_SETTINGS.reminderDay,
         reminderTime: data?.reminderTime ?? DEFAULT_SETTINGS.reminderTime,
         timezone: data?.timezone ?? DEFAULT_SETTINGS.timezone,
+        googleCalendarRefreshToken:
+          data?.googleCalendarRefreshToken ?? DEFAULT_SETTINGS.googleCalendarRefreshToken,
+        googleCalendarCalendarId:
+          data?.googleCalendarCalendarId ?? DEFAULT_SETTINGS.googleCalendarCalendarId,
+        googleCalendarCalendarName:
+          data?.googleCalendarCalendarName ?? DEFAULT_SETTINGS.googleCalendarCalendarName,
+        googleCalendarConnectedEmail:
+          data?.googleCalendarConnectedEmail ?? DEFAULT_SETTINGS.googleCalendarConnectedEmail,
+        googleCalendarGrantedScopes:
+          data?.googleCalendarGrantedScopes ?? DEFAULT_SETTINGS.googleCalendarGrantedScopes,
+        googleCalendarConnectedAt:
+          data?.googleCalendarConnectedAt ?? DEFAULT_SETTINGS.googleCalendarConnectedAt,
         createdAt: now,
         updatedAt: now,
       })

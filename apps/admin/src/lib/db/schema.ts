@@ -189,6 +189,15 @@ export const bookingSettings = pgTable('booking_settings', {
   reminderDay: integer().default(6).notNull(),
   reminderTime: text().default('09:00').notNull(),
   timezone: text().default('Asia/Jakarta').notNull(),
+  googleCalendarRefreshToken: text('google_calendar_refresh_token'),
+  googleCalendarCalendarId: text('google_calendar_calendar_id'),
+  googleCalendarCalendarName: text('google_calendar_calendar_name'),
+  googleCalendarConnectedEmail: text('google_calendar_connected_email'),
+  googleCalendarGrantedScopes: text('google_calendar_granted_scopes').array(),
+  googleCalendarConnectedAt: timestamp('google_calendar_connected_at', {
+    precision: 3,
+    mode: 'string',
+  }),
   createdAt: timestamp({ precision: 3, mode: 'string' })
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),

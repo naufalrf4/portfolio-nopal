@@ -11,6 +11,8 @@ import {
 } from '@/lib/api/responses';
 import { withAdminAuth } from '@/lib/api/middleware/auth';
 import { emailService } from '@/lib/services/emailService';
+import { googleCalendarService } from '@/lib/services/googleCalendarService';
+import { bookingSettingsService } from '@/lib/api/handlers/booking-settings.service';
 
 const updateBookingStatusSchema = z.object({
   status: z.enum(['CONFIRMED', 'CANCELLED', 'COMPLETED']),
@@ -21,7 +23,13 @@ type RouteContext = {
   params: Promise<{ id: string }>;
 };
 
-type BookingStatusUpdate = Partial<Pick<typeof bookings.$inferInsert, 'status' | 'updatedAt'>>;
+type BookingStatusUpdate = Partial<
+  Pick<typeof bookings.$inferInsert, 'status' | 'updatedAt' | 'metadata'>
+>;
+
+function readBookingMetadata(metadata: unknown) {
+  return metadata && typeof metadata === 'object' ? metadata : {};
+}
 
 export async function PUT(request: NextRequest, context: RouteContext) {
   return withAdminAuth(async () => {
@@ -44,7 +52,43 @@ export async function PUT(request: NextRequest, context: RouteContext) {
       }
 
       const now = new Date().toISOString();
-      const updateData: BookingStatusUpdate = { status: parsed.data.status, updatedAt: now };
+      const metadata = readBookingMetadata(bookingResult.metadata);
+      const bookingSettings = await bookingSettingsService.getInternal();
+      let calendarEvent: Awaited<ReturnType<typeof googleCalendarService.createBookingEvent>> =
+        null;
+
+      if (parsed.data.status === 'CONFIRMED' && bookingResult.bookingSlot) {
+        calendarEvent = await googleCalendarService.createBookingEvent({
+          booking: bookingResult,
+          slot: bookingResult.bookingSlot,
+          message: parsed.data.message,
+          settings: bookingSettings,
+        });
+      }
+
+      if (parsed.data.status === 'CANCELLED' && 'googleCalendarEventId' in metadata) {
+        const eventId = metadata.googleCalendarEventId;
+        if (typeof eventId === 'string' && eventId) {
+          await googleCalendarService.cancelBookingEvent(eventId, bookingSettings);
+        }
+      }
+
+      const nextMetadata = {
+        ...metadata,
+        ...(calendarEvent
+          ? {
+              googleCalendarEventId: calendarEvent.eventId,
+              googleCalendarUrl: calendarEvent.calendarUrl,
+              googleMeetUrl: calendarEvent.meetUrl,
+            }
+          : {}),
+      };
+
+      const updateData: BookingStatusUpdate = {
+        status: parsed.data.status,
+        updatedAt: now,
+        metadata: nextMetadata,
+      };
       const [updated] = await db
         .update(bookings)
         .set(updateData)
@@ -70,6 +114,8 @@ export async function PUT(request: NextRequest, context: RouteContext) {
             time: slot.time,
             duration: slot.duration,
             message: parsed.data.message || 'Your booking has been confirmed!',
+            calendarUrl: calendarEvent?.calendarUrl ?? null,
+            meetUrl: calendarEvent?.meetUrl ?? null,
             status: 'confirmed',
           });
         } else if (parsed.data.status === 'CANCELLED') {
@@ -93,6 +139,8 @@ export async function PUT(request: NextRequest, context: RouteContext) {
           status: updated.status,
           date: dateFormatted,
           time: slot.time,
+          googleCalendarUrl: calendarEvent?.calendarUrl ?? null,
+          googleMeetUrl: calendarEvent?.meetUrl ?? null,
         },
         `Booking ${parsed.data.status.toLowerCase()}`
       );

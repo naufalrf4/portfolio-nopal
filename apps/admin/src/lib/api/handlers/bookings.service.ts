@@ -75,6 +75,9 @@ export const bookingsService = {
 
     const transformedBookings = rows.map((booking) => {
       const slot = booking.slotId ? slotsMap[booking.slotId] : undefined;
+      const metadata =
+        booking.metadata && typeof booking.metadata === 'object' ? booking.metadata : null;
+
       return {
         id: booking.id,
         name: booking.name,
@@ -82,11 +85,11 @@ export const bookingsService = {
         phone: booking.phone,
         date: slot?.date || '',
         time: slot?.time || '',
-        timezone:
-          booking.metadata && typeof booking.metadata === 'object' && 'timezone' in booking.metadata
-            ? String(booking.metadata.timezone)
-            : 'Asia/Jakarta',
+        timezone: metadata && 'timezone' in metadata ? String(metadata.timezone) : 'Asia/Jakarta',
         notes: booking.notes,
+        calendarUrl:
+          metadata && 'googleCalendarUrl' in metadata ? String(metadata.googleCalendarUrl) : null,
+        meetUrl: metadata && 'googleMeetUrl' in metadata ? String(metadata.googleMeetUrl) : null,
         status: booking.status,
         createdAt: booking.createdAt,
         updatedAt: booking.updatedAt,

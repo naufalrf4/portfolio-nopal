@@ -11,7 +11,7 @@ import {
 import { emailLayout } from './layout';
 
 export function bookingConfirmedTemplate(data: BookingStatusUpdateData): string {
-  const { bookingId, date, time, duration, message } = data;
+  const { bookingId, date, time, duration, message, calendarUrl, meetUrl } = data;
 
   const content = `
     ${renderHeader('Booking confirmed', 'Your session is confirmed. Here is the latest schedule update from NaufalRF Portfolio.')}
@@ -22,6 +22,12 @@ export function bookingConfirmedTemplate(data: BookingStatusUpdateData): string 
           { label: 'Date', value: date },
           { label: 'Time', value: time },
           { label: 'Duration', value: formatDuration(duration) },
+          ...(meetUrl
+            ? [{ label: 'Google Meet', value: `<a href="${meetUrl}">${meetUrl}</a>` }]
+            : []),
+          ...(calendarUrl
+            ? [{ label: 'Calendar event', value: `<a href="${calendarUrl}">${calendarUrl}</a>` }]
+            : []),
           { label: 'Status', value: renderStatusBadge('Confirmed', 'success') },
         ])
       )}

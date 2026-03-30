@@ -1,10 +1,11 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import { Label } from '@/components/ui/label';
 
 interface DetailFieldProps {
   label: string;
-  value: string;
+  value: ReactNode;
 }
 
 export function DetailField({ label, value }: DetailFieldProps) {
