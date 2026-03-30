@@ -92,11 +92,19 @@ The FastAPI RAG service now:
 
 ### Canonical machine-readable site guidance
 
-The repo now keeps a **single canonical** machine-readable site file at:
+The repo now uses the public portfolio file as the **canonical format source**:
 
 - `apps/public-astro/public/llms.txt`
 
-Per-app `llms.txt` / `llms-full.txt` duplicates were intentionally removed from Links, NGL, RAG, and live-presence.
+Public-facing apps should expose their own `llms.txt` files using that same structure, but each file must be rewritten for the app’s real context and hostname.
+
+Current public `llms.txt` surfaces:
+
+- `apps/public-astro/public/llms.txt`
+- `apps/links-astro/public/llms.txt`
+- `apps/ngl-svelte/static/llms.txt`
+
+`llms-full.txt` remains intentionally removed.
 
 ### Shared presence UX across apps
 

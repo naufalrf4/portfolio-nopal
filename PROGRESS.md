@@ -4,6 +4,14 @@ Chronological timeline of meaningful project work, discoveries, decisions, and b
 
 ## Entries
 
+### 2026-03-30 22:20
+
+- Task: restore per-app llms.txt surfaces for public-facing apps
+- Mode: implementation
+- Files: `AGENTS.md`, `README.md`, `apps/links-astro/AGENTS.md`, `apps/links-astro/public/llms.txt`, `apps/ngl-svelte/AGENTS.md`, `apps/ngl-svelte/static/llms.txt`, `PROGRESS.md`
+- Status: done
+- Notes: Intentionally changed the repo rule from a single public-only `llms.txt` surface to a canonical-format model where every public-facing app keeps its own `llms.txt` using the public portfolio file as the section template. Added `apps/links-astro/public/llms.txt` for the compact links hub and `apps/ngl-svelte/static/llms.txt` for the anonymous-message surface, both aligned to the same machine-readable structure but rewritten for each app’s actual role and hostname. Updated root/app AGENTS plus README so future agents know that public-facing apps should keep app-specific `llms.txt` files while `llms-full.txt` remains removed. Verification passed with `apps/links-astro: bun run build`, `apps/ngl-svelte: bun run check`, `apps/ngl-svelte: bun run lint`, and `apps/ngl-svelte: bun run build`.
+
 ### 2026-03-30 21:24
 
 - Task: update public SEO descriptions and about-facing positioning without changing titles

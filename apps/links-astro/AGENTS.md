@@ -73,3 +73,4 @@ Authoritative AI control contract for this repository.
 - `src/pages/index.astro` defines the current visual shell and should stay aligned with the wider neumorphic baseline.
 - Social vs website link separation should use label/icon heuristics with normalized-URL deduplication rather than exact URL matching against `about.socialLinks`, because Admin link formatting can vary while still representing the same destination.
 - Links telemetry should stay same-origin through `src/pages/api/analytics.ts`; keep pageview and click tracking local to the app instead of sending browser traffic straight to the Admin domain.
+- `public/llms.txt` should follow the canonical section structure from `apps/public-astro/public/llms.txt`, but its content must stay specific to the links hub rather than duplicating the full portfolio narrative.
