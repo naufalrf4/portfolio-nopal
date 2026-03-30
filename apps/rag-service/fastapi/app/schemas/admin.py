@@ -3,9 +3,15 @@ from datetime import datetime
 from pydantic import BaseModel, Field
 
 
+class SkillItem(BaseModel):
+    name: str
+    level: int = 85
+    category: str = "Tools & Workflow"
+
+
 class AboutContent(BaseModel):
     bio: str = ""
-    skills: list[str] = Field(default_factory=list)
+    skills: list[str | SkillItem] = Field(default_factory=list)
     experience: list["ExperienceItem"] = Field(default_factory=list)
     freelance_profile: "FreelanceProfile | None" = Field(default=None, alias="freelanceProfile")
 

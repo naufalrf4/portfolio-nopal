@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.models import RagIngestionRun
-from app.schemas.admin import ContentExport, KnowledgeDocument, ProjectContent
+from app.schemas.admin import ContentExport, KnowledgeDocument, ProjectContent, SkillItem
 from app.schemas.ingest import IngestRequest, IngestResponse
 from app.services.admin_client import AdminApiClient
 from app.services.embedding_service import EmbeddingService
@@ -188,10 +188,11 @@ class IngestService:
     async def _ingest_about(self, export: ContentExport, run_id) -> IngestedSource:
         about = export.about_me
         experience_lines = [self._format_experience_item(item) for item in about.experience]
+        skill_names = self._normalize_skill_names(about.skills)
         sections = [
             "# About NaufalRF",
             f"## Bio\n{about.bio.strip()}" if about.bio else "",
-            "## Skills\n" + ", ".join(about.skills) if about.skills else "",
+            "## Skills\n" + ", ".join(skill_names) if skill_names else "",
             "## Experience\n" + "\n".join(f"- {item}" for item in experience_lines)
             if experience_lines
             else "",
@@ -209,6 +210,19 @@ class IngestService:
             tags=["about"],
             extra_metadata={"origin": "about-export"},
         )
+
+    @staticmethod
+    def _normalize_skill_names(skills: list[str | SkillItem]) -> list[str]:
+        normalized: list[str] = []
+        for skill in skills:
+            if isinstance(skill, str):
+                value = skill.strip()
+            else:
+                value = skill.name.strip()
+
+            if value:
+                normalized.append(value)
+        return normalized
 
     async def _ingest_text_document(
         self,
