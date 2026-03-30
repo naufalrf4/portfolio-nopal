@@ -12,6 +12,14 @@ Chronological timeline of meaningful project work, discoveries, decisions, and b
 - Status: in_progress
 - Notes: Added a dedicated Caddy route on the admin domain for `/webhooks/deploy`, routed through `host.docker.internal` to a localhost-only webhook listener, plus a locked deploy runner script that reuses the existing pull-based production flow (`git pull`, `docker-prod-up.sh`, `docker-prod-migrate.sh`). Server-side systemd/env provisioning and end-to-end webhook verification still need to be completed.
 
+### 2026-03-30 12:45
+
+- Task: remove leftover email transport drift and dead reminder code
+- Mode: implementation
+- Files: `apps/admin/src/lib/services/emailService.ts`, `apps/admin/src/lib/email/templates/index.ts`, `apps/admin/src/lib/email/types.ts`, `apps/admin/src/lib/email/templates/bookingReminder.ts`, `.env.docker.prod`, `PROGRESS.md`
+- Status: done
+- Notes: Confirmed the active Admin mailer is already SMTP/Nodemailer-only, then removed the unused booking reminder email path (`bookingReminderTemplate`, `BookingReminderData`, and `sendBookingReminder`) so the email stack no longer carries dead transport-adjacent code. Also aligned the Docker sender identity to `NaufalRF Portfolio <contact@naufalrf.my.id>`. Verification passed with `apps/admin: bun run lint`, `apps/admin: bun run typecheck`, `apps/admin: bun run build`, and repo grep showing no remaining active `Resend` references outside historical `PROGRESS.md` notes.
+
 ### 2026-03-21 05:05
 
 - Task: Finish final repo cleanup and quiet offline presence noise

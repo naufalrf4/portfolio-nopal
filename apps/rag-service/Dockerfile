@@ -12,6 +12,7 @@ RUN uv sync --frozen
 CMD ["sh", "-lc", "uv sync --frozen && uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 3005"]
 
 FROM base AS prod
+ENV UV_CACHE_DIR=/tmp/uv-cache
 WORKDIR /app/fastapi
 COPY fastapi/pyproject.toml fastapi/uv.lock ./
 RUN uv sync --frozen --no-dev

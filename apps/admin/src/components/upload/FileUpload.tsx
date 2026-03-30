@@ -49,6 +49,27 @@ function isDirectUrl(value: string): boolean {
   }
 }
 
+function isSignedStorageUrl(value: string): boolean {
+  try {
+    const url = new URL(value);
+    const queryKeys = Array.from(url.searchParams.keys()).map((key) => key.toLowerCase());
+    return queryKeys.some((key) =>
+      [
+        'x-goog-algorithm',
+        'x-goog-credential',
+        'x-goog-signature',
+        'googleaccessid',
+        'signature',
+        'expires',
+        'x-amz-algorithm',
+        'x-amz-signature',
+      ].includes(key)
+    );
+  } catch {
+    return false;
+  }
+}
+
 function formatFileSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
@@ -207,7 +228,12 @@ export function FileUpload({
 
         const uploadedUrl = data.data.url;
         const uploadedKey = data.data.key;
-        onChange(uploadedKey ?? uploadedUrl);
+
+        if (!uploadedKey) {
+          throw new Error('Upload finished without a durable storage key');
+        }
+
+        onChange(uploadedKey);
         setPreviewUrl(uploadedUrl);
         setUrlInput(uploadedUrl);
         setImageLoadError(false);
@@ -268,6 +294,13 @@ export function FileUpload({
     const trimmedUrl = urlInput.trim();
     if (!trimmedUrl) {
       toast.error('Please enter a URL');
+      return;
+    }
+
+    if (isSignedStorageUrl(trimmedUrl)) {
+      toast.error(
+        'Signed storage preview URLs cannot be saved. Please use the uploaded asset key instead.'
+      );
       return;
     }
 

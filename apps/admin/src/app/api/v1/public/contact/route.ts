@@ -10,6 +10,7 @@ import { db } from '@/lib/db';
 import { contactForms, contactSettings } from '@/lib/db/schema';
 import { z } from 'zod';
 import { emailService } from '@/lib/services/emailService';
+import { EMAIL_CONFIG } from '@/lib/email/config';
 import { checkRateLimit, getRateLimitHeaders } from '@/lib/services/rate-limiter';
 import { validateTurnstileToken } from '@/lib/services/turnstile';
 import { createId } from '@paralleldrive/cuid2';
@@ -131,7 +132,8 @@ export async function POST(request: NextRequest) {
             country: submissionContext.country,
             city: submissionContext.city,
           },
-          dashboardLink: `${process.env.NEXTAUTH_URL || 'http://localhost:3001'}/admin/contacts/${contact.id}`,
+          dashboardLink: `${EMAIL_CONFIG.adminDashboardUrl}/contacts/${contact.id}`,
+          replyLink: `${EMAIL_CONFIG.adminDashboardUrl}/contacts/${contact.id}`,
           receivedAt: new Date().toLocaleString('en-US', {
             dateStyle: 'full',
             timeStyle: 'short',

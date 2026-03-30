@@ -12,6 +12,7 @@ import {
 } from '@/lib/api/responses';
 import { validateTurnstileToken } from '@/lib/services/turnstile';
 import { emailService } from '@/lib/services/emailService';
+import { EMAIL_CONFIG } from '@/lib/email/config';
 import { createId } from '@paralleldrive/cuid2';
 import { getSubmissionContext } from '@/lib/api/submission-context';
 import { checkRateLimit, getRateLimitHeaders } from '@/lib/services/rate-limiter';
@@ -193,9 +194,9 @@ export async function POST(request: NextRequest) {
             time: slotResult.time,
             notes: booking.notes,
           },
-          dashboardLink: `${process.env.NEXTAUTH_URL || 'http://localhost:3001'}/admin/bookings/${booking.id}`,
-          acceptLink: `${process.env.NEXTAUTH_URL || 'http://localhost:3001'}/admin/bookings/${booking.id}?action=accept`,
-          rejectLink: `${process.env.NEXTAUTH_URL || 'http://localhost:3001'}/admin/bookings/${booking.id}?action=reject`,
+          dashboardLink: `${EMAIL_CONFIG.adminDashboardUrl}/bookings?bookingId=${booking.id}`,
+          acceptLink: `${EMAIL_CONFIG.adminDashboardUrl}/bookings?bookingId=${booking.id}&action=confirm`,
+          rejectLink: `${EMAIL_CONFIG.adminDashboardUrl}/bookings?bookingId=${booking.id}&action=cancel`,
         });
       }
     } catch (emailError) {

@@ -14,7 +14,7 @@ export function bookingConfirmedTemplate(data: BookingStatusUpdateData): string 
   const { bookingId, date, time, duration, message } = data;
 
   const content = `
-    ${renderHeader('Booking confirmed', 'Your session is confirmed. See the details below.')}
+    ${renderHeader('Booking confirmed', 'Your session is confirmed. Here is the latest schedule update from NaufalRF Portfolio.')}
     <div class="content">
       ${renderCard(
         renderDetailList([

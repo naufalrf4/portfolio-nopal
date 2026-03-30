@@ -4,6 +4,7 @@ import { achievements } from '@/lib/db/schema';
 import { eq, count, asc } from 'drizzle-orm';
 import { successResponse, serverErrorResponse } from '@/lib/api/responses';
 import { signStringArray } from '@/lib/utils/sign-urls';
+import { normalizeStoredAssetValue } from '@/lib/services/storage';
 
 const DEFAULT_LIMIT = 10;
 const MAX_LIMIT = 50;
@@ -42,12 +43,20 @@ export async function GET(req: NextRequest) {
     const signedAchievements = await Promise.all(
       achievementsList.map(async (achievement) => ({
         ...achievement,
-        photos: await signStringArray(achievement.photos || []),
+        photos: await signStringArray(
+          (achievement.photos || []).flatMap((photo) => {
+            const normalized = normalizeStoredAssetValue(photo);
+            return normalized ? [normalized] : [];
+          })
+        ),
       }))
     );
 
     return successResponse({ achievements: signedAchievements, meta: { total } });
-  } catch {
-    return serverErrorResponse();
+  } catch (error) {
+    console.error('Public achievements route failed', error);
+    return serverErrorResponse(
+      process.env.NODE_ENV === 'development' && error instanceof Error ? error.message : undefined
+    );
   }
 }

@@ -7,6 +7,7 @@ import {
   achievementQuerySchema,
 } from '@/lib/validations/achievement.schema';
 import { signStringArray } from '@/lib/utils/sign-urls';
+import { normalizeStoredAssetValue } from '@/lib/services/storage';
 
 async function handleGet(req: NextRequest) {
   try {
@@ -23,7 +24,12 @@ async function handleGet(req: NextRequest) {
     const signedAchievements = await Promise.all(
       achievements.map(async (achievement) => ({
         ...achievement,
-        photos: await signStringArray(achievement.photos ?? []),
+        photos: await signStringArray(
+          (achievement.photos ?? []).flatMap((photo) => {
+            const normalized = normalizeStoredAssetValue(photo);
+            return normalized ? [normalized] : [];
+          })
+        ),
       }))
     );
 
@@ -46,7 +52,12 @@ async function handlePost(req: NextRequest) {
 
     const signedAchievement = {
       ...achievement,
-      photos: await signStringArray(achievement.photos ?? []),
+      photos: await signStringArray(
+        (achievement.photos ?? []).flatMap((photo) => {
+          const normalized = normalizeStoredAssetValue(photo);
+          return normalized ? [normalized] : [];
+        })
+      ),
     };
 
     return successResponse(signedAchievement, 'Achievement created successfully');

@@ -5,6 +5,13 @@ export interface ContactForm {
   subject: string | null;
   message: string;
   ipHash: string;
+  metadata?: {
+    reply?: {
+      subject: string;
+      message: string;
+      repliedAt: string;
+    };
+  } | null;
   read: boolean;
   replied: boolean;
   createdAt: string;

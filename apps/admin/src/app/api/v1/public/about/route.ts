@@ -272,7 +272,10 @@ export async function GET() {
     });
 
     return successResponse(signedData);
-  } catch {
-    return serverErrorResponse();
+  } catch (error) {
+    console.error('Public about route failed', error);
+    return serverErrorResponse(
+      process.env.NODE_ENV === 'development' && error instanceof Error ? error.message : undefined
+    );
   }
 }

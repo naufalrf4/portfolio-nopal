@@ -13,7 +13,7 @@ import { withAdminAuth } from '@/lib/api/middleware/auth';
 import { emailService } from '@/lib/services/emailService';
 
 const updateBookingStatusSchema = z.object({
-  status: z.enum(['CONFIRMED', 'CANCELLED']),
+  status: z.enum(['CONFIRMED', 'CANCELLED', 'COMPLETED']),
   message: z.string().optional(),
 });
 
@@ -104,3 +104,5 @@ export async function PUT(request: NextRequest, context: RouteContext) {
     }
   })(request);
 }
+
+export const PATCH = PUT;
