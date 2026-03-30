@@ -7,6 +7,7 @@ import { createId } from '@paralleldrive/cuid2';
 import { PDFParse } from 'pdf-parse';
 import postgres from 'postgres';
 import type { InferInsertModel } from 'drizzle-orm';
+import { normalizeAboutSkills } from '../src/lib/about-skills';
 
 loadEnv({ path: '.env.local' });
 loadEnv();
@@ -146,7 +147,7 @@ const PUBLIC_PROFILE = {
   phone: '+62 859-7494-0903',
   location: 'Depok, Indonesia',
   availabilityStatus: 'available' as const,
-  skills: [
+  skills: normalizeAboutSkills([
     'Next.js',
     'React',
     'TypeScript',
@@ -172,7 +173,7 @@ const PUBLIC_PROFILE = {
     'Postman',
     'Git',
     'AWS S3',
-  ],
+  ]),
   experience: [
     {
       type: 'Work',
@@ -703,8 +704,18 @@ const PROFILE_LINKS: Array<
   },
 ];
 
-function uniqueStrings(values: string[]): string[] {
-  return [...new Set(values.map((value) => value.trim()).filter(Boolean))];
+function uniqueSkills(values: Array<{ name: string; level: number; category: string }>) {
+  const seen = new Set<string>();
+
+  return values.filter((skill) => {
+    const key = `${skill.category}:${skill.name.toLowerCase()}`;
+    if (seen.has(key)) {
+      return false;
+    }
+
+    seen.add(key);
+    return true;
+  });
 }
 
 function formatRange(startDate: string, endDate?: string | null): string {
@@ -739,7 +750,7 @@ function buildAboutRow(now: string): AboutInsert {
     avatarUrl: null,
     resumeUrl: null,
     availabilityStatus: PUBLIC_PROFILE.availabilityStatus,
-    skills: uniqueStrings(PUBLIC_PROFILE.skills),
+    skills: uniqueSkills(PUBLIC_PROFILE.skills),
     experience: PUBLIC_PROFILE.experience,
     freelanceProfile: PUBLIC_PROFILE.freelanceProfile,
     createdAt: now,

@@ -34,6 +34,12 @@ export interface FreelanceProfile {
   projectReferences?: FreelanceProjectReference[];
 }
 
+export interface AboutSkill {
+  name: string;
+  level: number;
+  category: string;
+}
+
 export interface AboutMeData {
   id: string;
   fullName: string;
@@ -46,7 +52,7 @@ export interface AboutMeData {
   location: string | null;
   avatarUrl: string | null;
   resumeUrl: string | null;
-  skills: string[];
+  skills: AboutSkill[];
   experience: ExperienceItem[] | null;
   freelanceProfile: FreelanceProfile | null;
   createdAt: string;
@@ -56,7 +62,7 @@ export interface AboutMeData {
 export interface UpdateAboutInput {
   fullName: string;
   email: string;
-  skills: string[];
+  skills: AboutSkill[];
   roles: string[];
   tagline?: string | null;
   shortBio?: string | null;

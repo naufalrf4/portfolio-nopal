@@ -40,6 +40,25 @@ export interface FreelanceProfileIntentContext {
   freelanceProfile: FreelanceProfile | null;
 }
 
+function normalizeRagSkills(value: unknown): string[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value.flatMap((skill) => {
+    if (typeof skill === 'string' && skill.trim().length > 0) {
+      return [skill.trim()];
+    }
+
+    if (typeof skill === 'object' && skill !== null && 'name' in skill) {
+      const name = skill.name;
+      return typeof name === 'string' && name.trim().length > 0 ? [name.trim()] : [];
+    }
+
+    return [];
+  });
+}
+
 function normalizeExperienceItems(value: unknown): ExperienceItem[] {
   if (!Array.isArray(value)) {
     return [];
@@ -177,7 +196,7 @@ export class ContentExportService {
 
     return {
       bio: about.bio || '',
-      skills: about.skills || [],
+      skills: normalizeRagSkills(about.skills),
       experience: normalizeExperienceItems(about.experience),
       freelanceProfile: normalizeFreelanceProfile(about.freelanceProfile),
     };

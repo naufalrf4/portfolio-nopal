@@ -738,7 +738,7 @@ export const aboutMe = pgTable('AboutMe', {
   avatarUrl: text(),
   resumeUrl: text(),
   availabilityStatus: text(),
-  skills: text().array(),
+  skills: jsonb().default(sql`'[]'::jsonb`),
   experience: jsonb(),
   socialLinks: jsonb(),
   freelanceProfile: jsonb(),

@@ -1,5 +1,6 @@
 import { successResponse, notFoundResponse, serverErrorResponse } from '@/lib/api/responses';
 import { signAssetUrls } from '@/lib/utils/sign-urls';
+import { normalizeAboutSkills } from '@/lib/about-skills';
 import { getAboutMeRecord } from '@/lib/api/handlers/about-read.service';
 import { profileLinksService } from '@/lib/api/handlers/profile-links.service';
 
@@ -89,76 +90,8 @@ function asString(value: unknown): string | null {
   return typeof value === 'string' && value.trim().length > 0 ? value.trim() : null;
 }
 
-function normalizeSkillCategory(skill: string): string {
-  const normalized = skill.toLowerCase();
-
-  if (
-    normalized.includes('react') ||
-    normalized.includes('next') ||
-    normalized.includes('tailwind') ||
-    normalized.includes('typescript') ||
-    normalized.includes('javascript')
-  ) {
-    return 'Web Development';
-  }
-
-  if (
-    normalized.includes('postgres') ||
-    normalized.includes('mysql') ||
-    normalized.includes('supabase')
-  ) {
-    return 'Data & Backend';
-  }
-
-  if (normalized.includes('iot') || normalized.includes('esp32') || normalized.includes('mqtt')) {
-    return 'IoT Systems';
-  }
-
-  if (
-    normalized.includes('rag') ||
-    normalized.includes('ai') ||
-    normalized.includes('langchain') ||
-    normalized.includes('openai')
-  ) {
-    return 'AI & Automation';
-  }
-
-  if (normalized.includes('docker') || normalized.includes('bash') || normalized.includes('aws')) {
-    return 'Cloud & DevOps';
-  }
-
-  return 'Tools & Workflow';
-}
-
 function normalizeSkills(value: unknown): Skill[] {
-  const parsed = parseJsonField<unknown[]>(value, []);
-
-  return parsed.flatMap((skill) => {
-    if (typeof skill === 'string') {
-      return [
-        {
-          name: skill,
-          level: 85,
-          category: normalizeSkillCategory(skill),
-        },
-      ];
-    }
-
-    if (typeof skill === 'object' && skill !== null) {
-      const raw = skill as Record<string, unknown>;
-      const name = asString(raw.name);
-      if (!name) {
-        return [];
-      }
-
-      const level = typeof raw.level === 'number' ? raw.level : 85;
-      const category = asString(raw.category) ?? normalizeSkillCategory(name);
-
-      return [{ name, level, category }];
-    }
-
-    return [];
-  });
+  return normalizeAboutSkills(parseJsonField<unknown[]>(value, []));
 }
 
 function normalizeExperience(value: unknown): Experience[] {

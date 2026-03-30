@@ -14,7 +14,7 @@ export interface AboutMeRecord {
   avatarUrl: string | null;
   resumeUrl: string | null;
   availabilityStatus: string | null;
-  skills: string[] | null;
+  skills: unknown;
   experience: unknown;
   freelanceProfile: unknown;
   createdAt: string;

@@ -4,6 +4,7 @@ import { eq } from 'drizzle-orm';
 import type { UpdateAboutInput } from '@/lib/validations/about.schema';
 import { createId } from '@paralleldrive/cuid2';
 import { getAboutMeRecord } from '@/lib/api/handlers/about-read.service';
+import { normalizeAboutSkills } from '@/lib/about-skills';
 import { normalizeStoredAssetValue } from '@/lib/services/storage';
 
 type AboutInsert = typeof aboutMe.$inferInsert;
@@ -135,7 +136,7 @@ export class AboutService {
       location: data.location ?? null,
       avatarUrl: sanitizeAssetValue(data.avatarUrl),
       resumeUrl: sanitizeAssetValue(data.resumeUrl),
-      skills: data.skills,
+      skills: normalizeAboutSkills(data.skills),
       experience: normalizeExperienceItems(data.experience),
       freelanceProfile: normalizeFreelanceProfile(data.freelanceProfile),
     };

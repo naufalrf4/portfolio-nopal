@@ -6,13 +6,18 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
+import type { AboutSkill } from '../types/about.types';
 import { useAbout } from '../hooks/useAbout';
+
+const DEFAULT_LEVEL = 85;
+const DEFAULT_CATEGORY = 'Tools & Workflow';
 
 export function SkillsTab() {
   const { data, updateAbout, saving } = useAbout();
 
-  const [skills, setSkills] = useState<string[]>([]);
-  const [skillInput, setSkillInput] = useState('');
+  const [skills, setSkills] = useState<AboutSkill[]>([]);
+  const [skillNameInput, setSkillNameInput] = useState('');
+  const [skillCategoryInput, setSkillCategoryInput] = useState(DEFAULT_CATEGORY);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   useEffect(() => {
@@ -23,17 +28,25 @@ export function SkillsTab() {
   }, [data]);
 
   const addSkill = () => {
-    const trimmedSkill = skillInput.trim();
-    if (trimmedSkill && !skills.includes(trimmedSkill)) {
-      const newSkills = [...skills, trimmedSkill];
+    const trimmedSkill = skillNameInput.trim();
+    const trimmedCategory = skillCategoryInput.trim() || DEFAULT_CATEGORY;
+
+    if (
+      trimmedSkill &&
+      !skills.some((skill) => skill.name.toLowerCase() === trimmedSkill.toLowerCase())
+    ) {
+      const newSkills = [
+        ...skills,
+        { name: trimmedSkill, category: trimmedCategory, level: DEFAULT_LEVEL },
+      ];
       setSkills(newSkills);
-      setSkillInput('');
+      setSkillNameInput('');
       setHasUnsavedChanges(true);
     }
   };
 
   const removeSkill = (skillToRemove: string) => {
-    const newSkills = skills.filter((s) => s !== skillToRemove);
+    const newSkills = skills.filter((skill) => skill.name !== skillToRemove);
     setSkills(newSkills);
     setHasUnsavedChanges(true);
   };
@@ -94,20 +107,25 @@ export function SkillsTab() {
         </div>
         <div className="space-y-2">
           <Label htmlFor="skillInput">Add Skill</Label>
-          <div className="flex gap-2">
+          <div className="grid gap-2 md:grid-cols-[minmax(0,1fr)_200px_auto]">
             <Input
               id="skillInput"
-              value={skillInput}
-              onChange={(e) => setSkillInput(e.target.value)}
+              value={skillNameInput}
+              onChange={(e) => setSkillNameInput(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
                   e.preventDefault();
                   addSkill();
                 }
               }}
-              placeholder="Type and press Enter to add"
+              placeholder="Type a skill name"
             />
-            <Button onClick={addSkill} disabled={!skillInput.trim()}>
+            <Input
+              value={skillCategoryInput}
+              onChange={(e) => setSkillCategoryInput(e.target.value)}
+              placeholder="Category"
+            />
+            <Button onClick={addSkill} disabled={!skillNameInput.trim()}>
               <Plus className="h-4 w-4" />
             </Button>
           </div>
@@ -119,14 +137,15 @@ export function SkillsTab() {
             <div className="flex flex-wrap gap-2 mt-2">
               {skills.map((skill) => (
                 <div
-                  key={skill}
+                  key={`${skill.category}-${skill.name}`}
                   className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#E0E5EC] text-[#3D4852] text-sm shadow-[3px_3px_6px_rgba(163,177,198,0.6),-3px_-3px_6px_rgba(255,255,255,0.5)]"
                 >
-                  {skill}
+                  <span className="font-medium">{skill.name}</span>
+                  <span className="text-xs text-[#6B7280]">{skill.category}</span>
                   <button
-                    onClick={() => removeSkill(skill)}
+                    onClick={() => removeSkill(skill.name)}
                     className="text-[#6B7280] hover:text-red-500 transition-colors"
-                    aria-label={`Remove ${skill}`}
+                    aria-label={`Remove ${skill.name}`}
                   >
                     <X className="h-3 w-3" />
                   </button>
