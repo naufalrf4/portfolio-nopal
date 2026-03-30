@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import ClassVar
 
 from pydantic import BaseModel, Field
 
@@ -22,7 +23,7 @@ class FreelanceFeaturePrice(BaseModel):
     notes: str = ""
     related_project_slugs: list[str] = Field(default_factory=list, alias="relatedProjectSlugs")
 
-    model_config = {"populate_by_name": True}
+    model_config: ClassVar[dict[str, bool]] = {"populate_by_name": True}
 
 
 class FreelanceProjectReference(BaseModel):
@@ -43,7 +44,7 @@ class FreelanceProfile(BaseModel):
         default_factory=list, alias="projectReferences"
     )
 
-    model_config = {"populate_by_name": True}
+    model_config: ClassVar[dict[str, bool]] = {"populate_by_name": True}
 
 
 class ExperienceItem(BaseModel):
@@ -56,7 +57,7 @@ class ExperienceItem(BaseModel):
     description: str | None = None
     logo_url: str | None = Field(default=None, alias="logoUrl")
 
-    model_config = {"populate_by_name": True}
+    model_config: ClassVar[dict[str, bool]] = {"populate_by_name": True}
 
 
 class ProjectContext(BaseModel):
@@ -73,7 +74,7 @@ class ProjectContent(BaseModel):
     tech_stack: list[str] = Field(default_factory=list, alias="techStack")
     contexts: list[ProjectContext] = Field(default_factory=list)
 
-    model_config = {"populate_by_name": True}
+    model_config: ClassVar[dict[str, bool]] = {"populate_by_name": True}
 
 
 class KnowledgeDocument(BaseModel):
@@ -88,13 +89,13 @@ class ContentExport(BaseModel):
     projects: list[ProjectContent] = Field(default_factory=list)
     knowledge_docs: list[KnowledgeDocument] = Field(default_factory=list, alias="knowledgeDocs")
 
-    model_config = {"populate_by_name": True}
+    model_config: ClassVar[dict[str, bool]] = {"populate_by_name": True}
 
 
 class FreelanceIntentContext(BaseModel):
     freelance_profile: FreelanceProfile | None = Field(default=None, alias="freelanceProfile")
 
-    model_config = {"populate_by_name": True}
+    model_config: ClassVar[dict[str, bool]] = {"populate_by_name": True}
 
 
 class ChatLogMessageMetadata(BaseModel):

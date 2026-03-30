@@ -19,17 +19,17 @@ from app.services.embedding_service import EmbeddingService
 from app.services.errors import RagServiceError
 from app.services.llm_service import LlmService
 from app.services.prompt_builder import (
+    build_abstention_response,
     build_chat_prompt,
     build_query_analysis_prompt,
     fallback_query_plan,
     format_context,
     format_history,
 )
-from app.services.repository import RagRepository
+from app.services.repository import RagRepository, RetrievedChunk
 from app.services.tool_service import ToolService
 
 logger = logging.getLogger(__name__)
-MIN_RETRIEVAL_CONFIDENCE = 0.45
 ABOUT_FALLBACK_ACTION = SuggestedAction(
     type="open_page",
     target="/about",
@@ -37,7 +37,21 @@ ABOUT_FALLBACK_ACTION = SuggestedAction(
 )
 
 
+def _string_or_none(value: object) -> str | None:
+    if value is None:
+        return None
+    text = str(value).strip()
+    return text or None
+
+
 class ChatService:
+    session: AsyncSession
+    admin_client: AdminApiClient
+    embedding_service: EmbeddingService
+    llm_service: LlmService
+    repository: RagRepository
+    tool_service: ToolService
+
     def __init__(self, session: AsyncSession) -> None:
         self.session = session
         self.admin_client = AdminApiClient()
@@ -68,9 +82,7 @@ class ChatService:
         tool_name = self._resolve_tool_name(
             query_plan.intent, query_plan.workflow, query_plan.tool_name
         )
-        tool_arguments = await self._build_tool_arguments(
-            query_plan.intent, tool_name, query_plan.tool_arguments
-        )
+        tool_arguments = await self._build_tool_arguments(tool_name, query_plan.tool_arguments)
         tool_result = None
         if query_plan.workflow in {"tool", "hybrid"} and tool_name:
             tool_result = self.tool_service.execute(
@@ -80,7 +92,7 @@ class ChatService:
                 query_plan.answer_language,
             )
 
-        retrieved_chunks = []
+        retrieved_chunks: list[RetrievedChunk] = []
         seen_chunks: set[tuple[str, str]] = set()
         if query_plan.workflow != "tool" and query_plan.needs_portfolio_context:
             try:
@@ -116,7 +128,9 @@ class ChatService:
         retrieval_confidence = max((chunk.score for chunk in retrieved_chunks), default=0.0)
         abstained = False
 
-        if tool_result is not None:
+        minimum_confidence = self._minimum_retrieval_confidence(query_plan.intent)
+
+        if tool_result is not None and query_plan.workflow == "tool":
             final_text = tool_result.text
             tokens = {
                 "analysisPrompt": query_plan.prompt_tokens,
@@ -124,10 +138,22 @@ class ChatService:
                 "prompt": 0,
                 "completion": 0,
             }
-        elif query_plan.needs_portfolio_context and retrieval_confidence < MIN_RETRIEVAL_CONFIDENCE:
+        elif tool_result is not None and query_plan.workflow == "hybrid" and not retrieved_chunks:
+            final_text = tool_result.text
+            tokens = {
+                "analysisPrompt": query_plan.prompt_tokens,
+                "analysisCompletion": query_plan.completion_tokens,
+                "prompt": 0,
+                "completion": 0,
+            }
+        elif query_plan.needs_portfolio_context and retrieval_confidence < minimum_confidence:
             abstained = True
-            final_text = self._build_abstention_message(query_plan.answer_language)
-            suggested_actions = [ABOUT_FALLBACK_ACTION]
+            final_text = build_abstention_response(
+                query_plan.answer_language,
+                query_plan.portfolio_areas,
+                reason="no_data" if not retrieved_chunks else "low_confidence",
+            )
+            suggested_actions = self._build_abstention_actions(query_plan.portfolio_areas)
             tokens = {
                 "analysisPrompt": query_plan.prompt_tokens,
                 "analysisCompletion": query_plan.completion_tokens,
@@ -224,15 +250,16 @@ class ChatService:
             return tool_name
         if intent == "freelance_quote" and workflow in {"tool", "hybrid"}:
             return "feature_pricing_quote"
+        if intent == "freelance_services" and workflow in {"tool", "hybrid"}:
+            return "freelance_profile_lookup"
         return None
 
     async def _build_tool_arguments(
         self,
-        intent: str,
         tool_name: str | None,
         tool_arguments: dict[str, object],
     ) -> dict[str, object]:
-        if tool_name != "feature_pricing_quote" or intent != "freelance_quote":
+        if tool_name not in {"feature_pricing_quote", "freelance_profile_lookup"}:
             return dict(tool_arguments)
 
         enriched_arguments = dict(tool_arguments)
@@ -245,34 +272,25 @@ class ChatService:
         return enriched_arguments
 
     @staticmethod
-    def _build_citations(retrieved_chunks: list[object]) -> list[ChatCitation]:
+    def _build_citations(retrieved_chunks: list[RetrievedChunk]) -> list[ChatCitation]:
         citations: list[ChatCitation] = []
         seen: set[tuple[str, str | None]] = set()
         for chunk in retrieved_chunks:
-            metadata = getattr(chunk, "metadata", {})
-            if not isinstance(metadata, dict):
-                continue
-            source = getattr(chunk, "source", "")
-            route = metadata.get("route")
-            key = (str(source), str(route) if route is not None else None)
+            metadata = chunk.metadata
+            route = _string_or_none(metadata.get("route"))
+            key = (chunk.source, route)
             if key in seen:
                 continue
             seen.add(key)
             citations.append(
                 ChatCitation(
-                    source=str(source),
-                    title=str(metadata.get("title")) if metadata.get("title") else None,
-                    route=str(route) if route else None,
-                    routeLabel=str(metadata.get("route_label"))
-                    if metadata.get("route_label")
-                    else None,
-                    sourceType=str(metadata.get("source_type"))
-                    if metadata.get("source_type")
-                    else None,
-                    sourceRef=str(metadata.get("source_ref"))
-                    if metadata.get("source_ref")
-                    else None,
-                    section=str(metadata.get("section")) if metadata.get("section") else None,
+                    source=chunk.source,
+                    title=_string_or_none(metadata.get("title")),
+                    route=route,
+                    routeLabel=_string_or_none(metadata.get("route_label")),
+                    sourceType=_string_or_none(metadata.get("source_type")),
+                    sourceRef=_string_or_none(metadata.get("source_ref")),
+                    section=_string_or_none(metadata.get("section")),
                 )
             )
         return citations
@@ -299,18 +317,37 @@ class ChatService:
         ]
 
     @staticmethod
-    def _build_abstention_message(answer_language: str) -> str:
-        if answer_language == "id":
-            return (
-                "Saya belum menemukan bukti portofolio yang cukup kuat untuk menjawab itu "
-                "dengan yakin. Coba arahkan saya ke proyek, pengalaman, atau area tertentu "
-                "agar saya bisa menjawab lebih akurat."
-            )
-        return (
-            "I haven't found enough strong portfolio evidence to answer that confidently. "
-            "Try pointing me to a specific project, experience, or area so I can answer "
-            "more accurately."
-        )
+    def _minimum_retrieval_confidence(intent: str) -> float:
+        if intent in {
+            "skills_question",
+            "experience_question",
+            "personal_profile",
+            "contact_question",
+        }:
+            return 0.22
+        if intent == "general_portfolio":
+            return 0.3
+        return 0.45
+
+    @staticmethod
+    def _build_abstention_actions(portfolio_areas: list[str]) -> list[SuggestedAction]:
+        if "contact" in portfolio_areas:
+            return [
+                SuggestedAction(
+                    type="open_page",
+                    target="/contact",
+                    label="Open contact page",
+                )
+            ]
+        if "projects" in portfolio_areas:
+            return [
+                SuggestedAction(
+                    type="open_page",
+                    target="/projects",
+                    label="View projects",
+                )
+            ]
+        return [ABOUT_FALLBACK_ACTION]
 
     def _message_to_payload(self, message: ChatLogMessage) -> dict[str, object]:
         timestamp_value = message.timestamp

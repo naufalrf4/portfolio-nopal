@@ -224,7 +224,7 @@ async def test_chat_service_abstains_in_indonesian_for_low_confidence_results() 
 
     response = await ChatService.chat(service, ChatRequest(message="Bagaimana skill AI saya?"))
 
-    assert "Saya belum menemukan bukti portofolio" in response.message
+    assert "Saya belum punya informasi yang cukup kuat" in response.message
     confidence = response.metadata.retrieval_confidence
     assert admin_client.content_export_calls == 0
     assert admin_client.freelance_context_calls == 0
@@ -236,6 +236,38 @@ async def test_chat_service_abstains_in_indonesian_for_low_confidence_results() 
     assert len(response.suggested_actions) == 1
     assert response.suggested_actions[0].target == "/about"
     assert response.suggested_actions[0].label == "Open about page"
+
+
+async def test_chat_service_uses_generic_no_data_fallback_when_nothing_is_retrieved() -> None:
+    service = ChatService.__new__(ChatService)
+    admin_client = StubAdminClient()
+    llm_service = StubLlmService(
+        QueryPlan(
+            workflow="rag",
+            intent="personal_profile",
+            query_language="en",
+            answer_language="en",
+            needs_portfolio_context=True,
+            tool_name=None,
+            tool_arguments={},
+            retrieval_queries=["Naufal background"],
+            portfolio_areas=["about", "skills"],
+            suggested_actions=[],
+            prompt_tokens=4,
+            completion_tokens=2,
+        )
+    )
+    service.admin_client = admin_client
+    service.embedding_service = StubEmbeddingService()
+    service.repository = StubRepository([])
+    service.tool_service = StubToolService()
+    service.llm_service = llm_service
+
+    response = await ChatService.chat(service, ChatRequest(message="Tell me about Naufal"))
+
+    assert "I don't have enough data" in response.message
+    assert response.metadata.abstained is True
+    assert response.suggested_actions[0].target == "/about"
 
 
 async def test_chat_service_loads_tool_context_only_for_matching_intent() -> None:
@@ -410,3 +442,63 @@ async def test_chat_service_loads_freelance_context_for_hybrid_indonesian_intent
         "retrievalConfidence": 0.0,
         "abstained": False,
     }
+
+
+async def test_chat_service_routes_freelance_service_questions_to_profile_lookup_tool() -> None:
+    service = ChatService.__new__(ChatService)
+    admin_client = StubAdminClient(
+        ContentExport.model_validate(
+            {
+                "aboutMe": {
+                    "bio": "",
+                    "skills": [],
+                    "experience": [],
+                    "freelanceProfile": {
+                        "hourlyRate": 200000,
+                        "currency": "IDR",
+                        "completedProjects": 11,
+                    },
+                },
+                "projects": [],
+                "knowledgeDocs": [],
+            }
+        )
+    )
+    tool_service = StubToolService(
+        ToolExecutionResult(
+            tool_name="freelance_profile_lookup",
+            text="Freelance profile summary",
+            context="Profile tool context",
+            metadata={"status": "completed", "mode": "profile_lookup"},
+        )
+    )
+    llm_service = StubLlmService(
+        QueryPlan(
+            workflow="tool",
+            intent="freelance_services",
+            query_language="en",
+            answer_language="en",
+            needs_portfolio_context=False,
+            tool_name="freelance_profile_lookup",
+            tool_arguments={},
+            retrieval_queries=[],
+            portfolio_areas=["contact"],
+            suggested_actions=[],
+            prompt_tokens=3,
+            completion_tokens=1,
+        )
+    )
+    service.admin_client = admin_client
+    service.embedding_service = StubEmbeddingService()
+    service.repository = StubRepository([])
+    service.tool_service = tool_service
+    service.llm_service = llm_service
+
+    response = await ChatService.chat(
+        service,
+        ChatRequest(message="What freelance services do you offer?"),
+    )
+
+    assert response.message == "Freelance profile summary"
+    assert admin_client.freelance_context_calls == 1
+    assert tool_service.execute_calls[0]["tool_name"] == "freelance_profile_lookup"

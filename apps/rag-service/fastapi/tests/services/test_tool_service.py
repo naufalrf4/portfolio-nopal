@@ -106,3 +106,38 @@ def test_feature_pricing_quote_returns_indonesian_output() -> None:
 
     assert "Rincian penawaran fitur freelance" in result.text
     assert "Item referensi yang cocok" in result.text
+
+
+def test_freelance_profile_lookup_returns_structured_summary() -> None:
+    service = ToolService()
+
+    result = service.execute(
+        "freelance_profile_lookup",
+        {
+            "freelanceProfile": {
+                "hourlyRate": 200000,
+                "currency": "IDR",
+                "completedProjects": 9,
+                "pricingNotes": "Prefer scoped feature delivery.",
+                "featurePricing": [
+                    {
+                        "feature": "Authentication dashboard",
+                        "price": 1500000,
+                    }
+                ],
+                "projectReferences": [
+                    {
+                        "slug": "ops-portal",
+                        "title": "Ops Portal",
+                    }
+                ],
+            }
+        },
+        "What freelance services do you offer?",
+    )
+
+    assert result.metadata["status"] == "completed"
+    assert result.metadata["mode"] == "profile_lookup"
+    assert "Freelance profile summary" in result.text
+    assert "Hourly rate" in result.text
+    assert "Ops Portal" in result.text

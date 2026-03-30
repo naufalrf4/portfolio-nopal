@@ -1,3 +1,4 @@
+from typing import ClassVar
 from uuid import UUID
 
 from pydantic import BaseModel, Field
@@ -7,7 +8,7 @@ class ChatRequest(BaseModel):
     message: str = Field(min_length=1, max_length=2000)
     session_id: UUID | None = Field(default=None, alias="sessionId")
 
-    model_config = {"populate_by_name": True}
+    model_config: ClassVar[dict[str, bool]] = {"populate_by_name": True}
 
 
 class ChatCitation(BaseModel):
@@ -19,7 +20,7 @@ class ChatCitation(BaseModel):
     source_ref: str | None = Field(default=None, alias="sourceRef")
     section: str | None = None
 
-    model_config = {"populate_by_name": True}
+    model_config: ClassVar[dict[str, bool]] = {"populate_by_name": True}
 
 
 class SuggestedAction(BaseModel):
@@ -36,7 +37,7 @@ class ChatPublicMetadata(BaseModel):
     retrieval_confidence: float = Field(alias="retrievalConfidence")
     abstained: bool
 
-    model_config = {"populate_by_name": True}
+    model_config: ClassVar[dict[str, bool]] = {"populate_by_name": True}
 
 
 class ChatResponse(BaseModel):
@@ -47,4 +48,4 @@ class ChatResponse(BaseModel):
     suggested_actions: list[SuggestedAction] = Field(default_factory=list, alias="suggestedActions")
     metadata: ChatPublicMetadata
 
-    model_config = {"populate_by_name": True}
+    model_config: ClassVar[dict[str, bool]] = {"populate_by_name": True}

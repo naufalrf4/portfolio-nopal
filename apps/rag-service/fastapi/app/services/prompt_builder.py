@@ -1,6 +1,7 @@
 import json
 from collections import defaultdict
 from collections.abc import Iterable
+from typing import cast
 
 from app.schemas.admin import ChatLogMessage
 
@@ -19,6 +20,8 @@ def normalize_intent(value: str) -> str:
     aliases = {
         "pricing_quote": "freelance_quote",
         "portfolio_question": "general_portfolio",
+        "freelance_service": "freelance_services",
+        "personal_question": "personal_profile",
     }
     normalized = aliases.get(normalized, normalized)
     return normalized or "general_portfolio"
@@ -90,19 +93,44 @@ def build_grounded_actions(
     return []
 
 
-def build_abstention_response(answer_language: str, portfolio_areas: list[str]) -> str:
+def build_abstention_response(
+    answer_language: str, portfolio_areas: list[str], reason: str = "low_confidence"
+) -> str:
     area_list = ", ".join(portfolio_areas) if portfolio_areas else "relevant portfolio areas"
     if answer_language == "id":
+        if reason == "no_data":
+            return (
+                "Saya belum punya data yang cukup untuk menjawab itu dengan akurat. "
+                f"Coba arahkan pertanyaan ke area yang lebih spesifik: {area_list}."
+            )
         return (
-            "Saya belum menemukan bukti portofolio yang cukup kuat untuk menjawab itu "
-            "dengan yakin. Coba mulai dari halaman About agar saya punya konteks yang lebih aman, "
-            f"lalu arahkan saya ke area berikut bila perlu: {area_list}."
+            "Saya belum punya informasi yang cukup kuat untuk menjawab itu dengan yakin. "
+            f"Kalau mau, arahkan saya ke area yang lebih spesifik: {area_list}."
+        )
+    if reason == "no_data":
+        return (
+            "I don't have enough data to answer that accurately yet. "
+            f"Try narrowing it to a more specific area: {area_list}."
         )
     return (
-        "I haven't found enough strong portfolio evidence to answer that confidently. "
-        "Start with the About page so I have a safer baseline, then point me toward these areas "
-        f"if needed: {area_list}."
+        "I don't have enough reliable information to answer that confidently. "
+        f"Try narrowing it to a more specific area: {area_list}."
     )
+
+
+def _unique_queries(*queries: str) -> list[str]:
+    unique: list[str] = []
+    seen: set[str] = set()
+    for query in queries:
+        normalized = query.strip()
+        if not normalized:
+            continue
+        key = normalized.lower()
+        if key in seen:
+            continue
+        seen.add(key)
+        unique.append(normalized)
+    return unique
 
 
 def format_history(messages: Iterable[ChatLogMessage], limit: int) -> str:
@@ -278,13 +306,16 @@ def build_query_analysis_prompt(
         json_shape,
         "",
         "Rules:",
-        "- Use workflow 'tool' for deterministic freelance pricing breakdowns that only need module/feature analysis",  # noqa: E501
-        "- Use workflow 'hybrid' when pricing depends on both module breakdown and portfolio context or experience",  # noqa: E501
+        "- Supported intents include general_assistance, general_portfolio, personal_profile, skills_question, experience_question, contact_question, project_question, freelance_quote, and freelance_services",  # noqa: E501
+        "- Use workflow 'tool' for deterministic freelance pricing breakdowns and freelance profile/service questions that can be answered from structured profile data",  # noqa: E501
+        "- Use workflow 'hybrid' when a tool answer should be combined with portfolio/project context or experience evidence",  # noqa: E501
         "- Use workflow 'rag' for portfolio knowledge questions and general chat",
         "- Set needsPortfolioContext to false for greetings, casual conversation, and general knowledge questions that do not require portfolio grounding",  # noqa: E501
         "- toolName must be empty when workflow is 'rag'",
+        "- toolName may be feature_pricing_quote or freelance_profile_lookup when a deterministic freelance tool is appropriate",  # noqa: E501
         "- toolArguments for feature_pricing_quote should describe module/feature breakdowns, reference prices, and currency for reference-based quoting",  # noqa: E501
         "- Only include referencePrices that are explicitly provided by the user or clearly established in prior context",  # noqa: E501
+        "- Questions about Naufal's personal background, skills, experience, and contact details should prefer personal_profile / skills_question / experience_question / contact_question instead of vague general_portfolio when possible",  # noqa: E501
         "- retrievalQueries may be empty when needsPortfolioContext is false; otherwise contain 1 to 3 concise search queries",  # noqa: E501
         "- Do not bias toward projects when the user asks for general knowledge or casual conversation",  # noqa: E501
         "- suggestedActions must be empty when no website action is useful",
@@ -331,6 +362,66 @@ def fallback_query_plan(question: str) -> dict[str, object]:
         "thank you",
         "siapa kamu",
         "who are you",
+    )
+    personal_keywords = (
+        "who is naufal",
+        "who is naufalrf",
+        "tentang naufal",
+        "about naufal",
+        "background",
+        "profil",
+        "profile",
+        "biodata",
+        "siapa naufal",
+        "siapa naufalrf",
+    )
+    skills_keywords = (
+        "skill",
+        "skills",
+        "tech stack",
+        "stack",
+        "teknologi",
+        "programming language",
+        "bahasa pemrograman",
+        "tools",
+        "tooling",
+    )
+    experience_keywords = (
+        "experience",
+        "pengalaman",
+        "career",
+        "karier",
+        "journey",
+        "riwayat",
+        "work history",
+        "pendidikan",
+        "education",
+    )
+    contact_keywords = (
+        "contact",
+        "hire",
+        "reach",
+        "email",
+        "linkedin",
+        "github",
+        "portfolio link",
+        "hubungi",
+        "kontak",
+        "jasa",
+    )
+    freelance_service_keywords = (
+        "hourly rate",
+        "rate card",
+        "pricing model",
+        "layanan freelance",
+        "freelance service",
+        "services do you offer",
+        "what services",
+        "what can you build",
+        "bisa bikin apa",
+        "offer freelance",
+        "freelance profile",
+        "pricing notes",
     )
     general_knowledge_keywords = (
         "what is",
@@ -385,7 +476,20 @@ def fallback_query_plan(question: str) -> dict[str, object]:
         "skill",
     )
 
-    if any(keyword in normalized for keyword in calculator_keywords):
+    is_freelance_service_question = any(
+        keyword in normalized for keyword in freelance_service_keywords
+    )
+
+    if is_freelance_service_question:
+        intent = "freelance_services"
+        workflow = "tool"
+        tool_name = "freelance_profile_lookup"
+        needs_portfolio_context = False
+        portfolio_areas = ["contact", "about"]
+        suggested_actions = [
+            {"type": "open_page", "target": "/contact", "label": "Open contact page"}
+        ]
+    elif any(keyword in normalized for keyword in calculator_keywords):
         intent = "freelance_quote"
         workflow = (
             "hybrid" if any(keyword in normalized for keyword in portfolio_keywords) else "tool"
@@ -394,13 +498,32 @@ def fallback_query_plan(question: str) -> dict[str, object]:
         if workflow == "tool":
             portfolio_areas = ["general"]
             suggested_actions = []
+    elif any(keyword in normalized for keyword in skills_keywords):
+        intent = "skills_question"
+        portfolio_areas = ["skills", "about"]
+        suggested_actions = [{"type": "open_page", "target": "/about", "label": "Open about page"}]
+    elif any(keyword in normalized for keyword in experience_keywords):
+        intent = "experience_question"
+        portfolio_areas = ["experience", "about"]
+        suggested_actions = [{"type": "open_page", "target": "/about", "label": "Open about page"}]
+    elif any(keyword in normalized for keyword in contact_keywords):
+        intent = "contact_question"
+        portfolio_areas = ["contact", "about"]
+        suggested_actions = [
+            {"type": "open_page", "target": "/contact", "label": "Open contact page"}
+        ]
+    elif any(keyword in normalized for keyword in personal_keywords):
+        intent = "personal_profile"
+        portfolio_areas = ["about", "experience", "skills"]
+        suggested_actions = [{"type": "open_page", "target": "/about", "label": "Open about page"}]
 
     is_general_chat = any(keyword in normalized for keyword in casual_keywords) or (
         any(keyword in normalized for keyword in general_knowledge_keywords)
         and not any(keyword in normalized for keyword in portfolio_keywords)
+        and not any(keyword in normalized for keyword in personal_keywords)
     )
 
-    if is_general_chat and tool_name == "":
+    if is_general_chat and tool_name == "" and intent == "general_portfolio":
         intent = "general_assistance"
         needs_portfolio_context = False
         portfolio_areas = ["general"]
@@ -409,17 +532,48 @@ def fallback_query_plan(question: str) -> dict[str, object]:
     if "toolarguments:" in normalized:
         raw_payload = question.split("toolArguments:", 1)[1].strip()
         try:
-            parsed_payload = json.loads(raw_payload)
+            parsed_payload = cast(object, json.loads(raw_payload))
         except json.JSONDecodeError:
             parsed_payload = {}
         if isinstance(parsed_payload, dict):
-            tool_arguments = parsed_payload
+            tool_arguments = cast(dict[str, object], parsed_payload)
             intent = "freelance_quote"
             tool_name = "feature_pricing_quote"
             workflow = "tool"
             portfolio_areas = ["general"]
             suggested_actions = []
             needs_portfolio_context = False
+
+    retrieval_queries: list[str] = []
+    if needs_portfolio_context and workflow != "tool":
+        if intent == "skills_question":
+            retrieval_queries = _unique_queries(
+                question,
+                "Naufal Rizqullah Firdaus skills tech stack tools programming languages",
+                "About NaufalRF skills experience",
+            )
+        elif intent == "experience_question":
+            retrieval_queries = _unique_queries(
+                question,
+                "Naufal Rizqullah Firdaus experience education background career",
+                "About NaufalRF experience",
+            )
+        elif intent == "personal_profile":
+            retrieval_queries = _unique_queries(
+                question,
+                "Naufal Rizqullah Firdaus profile background experience skills",
+                "About NaufalRF",
+            )
+        elif intent == "contact_question":
+            retrieval_queries = _unique_queries(
+                question,
+                "NaufalRF contact hire collaboration email social links",
+                "Contact NaufalRF",
+            )
+        elif intent == "project_question":
+            retrieval_queries = _unique_queries(question, "NaufalRF projects portfolio")
+        else:
+            retrieval_queries = _unique_queries(question)
 
     return {
         "workflow": workflow,
@@ -429,9 +583,7 @@ def fallback_query_plan(question: str) -> dict[str, object]:
         "needsPortfolioContext": needs_portfolio_context and workflow != "tool",
         "toolName": tool_name,
         "toolArguments": tool_arguments,
-        "retrievalQueries": [question.strip()]
-        if needs_portfolio_context and workflow != "tool"
-        else [],
+        "retrievalQueries": retrieval_queries,
         "portfolioAreas": portfolio_areas,
         "suggestedActions": suggested_actions,
     }

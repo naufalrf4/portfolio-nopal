@@ -106,9 +106,15 @@ def test_normalize_intent_collapses_aliases() -> None:
 def test_build_abstention_response_uses_requested_language() -> None:
     response = build_abstention_response("id", ["projects", "skills"])
 
-    assert "Saya belum menemukan bukti portofolio" in response
-    assert "halaman About" in response
+    assert "Saya belum punya informasi yang cukup kuat" in response
     assert "projects, skills" in response
+
+
+def test_build_abstention_response_can_report_no_data_generically() -> None:
+    response = build_abstention_response("en", ["about", "skills"], reason="no_data")
+
+    assert "I don't have enough data" in response
+    assert "about, skills" in response
 
 
 def test_fallback_query_plan_allows_general_chat_without_portfolio_context() -> None:
@@ -117,6 +123,23 @@ def test_fallback_query_plan_allows_general_chat_without_portfolio_context() -> 
     assert plan["intent"] == "general_assistance"
     assert plan["needsPortfolioContext"] is False
     assert plan["retrievalQueries"] == []
+
+
+def test_fallback_query_plan_detects_personal_profile_questions() -> None:
+    plan = fallback_query_plan("Tell me about Naufal Rizqullah Firdaus and his background")
+
+    assert plan["intent"] == "personal_profile"
+    assert plan["needsPortfolioContext"] is True
+    assert len(plan["retrievalQueries"]) >= 2
+
+
+def test_fallback_query_plan_routes_freelance_service_questions_to_profile_tool() -> None:
+    plan = fallback_query_plan("What freelance services do you offer and what is your hourly rate?")
+
+    assert plan["intent"] == "freelance_services"
+    assert plan["workflow"] == "tool"
+    assert plan["toolName"] == "freelance_profile_lookup"
+    assert plan["needsPortfolioContext"] is False
 
 
 def test_build_chat_prompt_for_general_chat_avoids_forcing_portfolio_context() -> None:

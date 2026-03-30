@@ -1,4 +1,4 @@
-from typing import Any
+from typing import cast
 
 import httpx
 
@@ -14,6 +14,9 @@ from app.services.errors import RagServiceError
 
 
 class AdminApiClient:
+    base_url: str
+    timeout: httpx.Timeout
+
     def __init__(self) -> None:
         self.base_url = settings.admin_api_url.rstrip("/")
         self.timeout = httpx.Timeout(settings.admin_api_timeout_ms / 1000)
@@ -33,7 +36,9 @@ class AdminApiClient:
             "X-Service-Token": admin_internal_api_token,
         }
 
-    async def _request(self, method: str, path: str, json: dict[str, Any] | None = None) -> Any:
+    async def _request(
+        self, method: str, path: str, json: dict[str, object] | None = None
+    ) -> object:
         url = f"{self.base_url}{path}"
         try:
             async with httpx.AsyncClient(timeout=self.timeout) as client:
@@ -51,18 +56,23 @@ class AdminApiClient:
                 502,
             ) from exc
 
-        payload = response.json() if response.content else {}
+        payload: object = response.json() if response.content else {}
         if not response.is_success:
-            message = payload.get("error", {}).get("message") if isinstance(payload, dict) else None
-            code = payload.get("error", {}).get("code") if isinstance(payload, dict) else None
+            payload_dict = cast(dict[str, object], payload) if isinstance(payload, dict) else None
+            error_obj = payload_dict.get("error") if payload_dict is not None else None
+            error_dict = cast(dict[str, object], error_obj) if isinstance(error_obj, dict) else {}
+            message_obj = error_dict.get("message")
+            code_obj = error_dict.get("code")
             raise RagServiceError(
-                message or f"Admin API returned {response.status_code} for {path}.",
-                code or "ADMIN_API_ERROR",
+                str(message_obj)
+                if isinstance(message_obj, str) and message_obj
+                else f"Admin API returned {response.status_code} for {path}.",
+                str(code_obj) if isinstance(code_obj, str) and code_obj else "ADMIN_API_ERROR",
                 response.status_code,
             )
 
         if isinstance(payload, dict) and "data" in payload:
-            return payload["data"]
+            return cast(dict[str, object], payload)["data"]
 
         return payload
 
@@ -80,6 +90,8 @@ class AdminApiClient:
 
     async def get_knowledge_docs(self) -> list[KnowledgeDocument]:
         payload = await self._request("GET", "/api/v1/internal/knowledge")
+        if not isinstance(payload, list):
+            return []
         return [KnowledgeDocument.model_validate(item) for item in payload]
 
     async def mark_knowledge_doc_indexed(self, document_id: str) -> None:
