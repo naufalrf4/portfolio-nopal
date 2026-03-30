@@ -14,7 +14,7 @@ export function bookingRejectedTemplate(data: BookingStatusUpdateData): string {
   const { bookingId, date, time, message } = data;
 
   const content = `
-    ${renderHeader('Booking update', 'That slot is no longer available, so this request could not be confirmed.')}
+    ${renderHeader('Booking update', 'That specific slot is no longer available, so this request could not be confirmed.')}
     <div class="content">
       ${renderCard(
         renderDetailList([

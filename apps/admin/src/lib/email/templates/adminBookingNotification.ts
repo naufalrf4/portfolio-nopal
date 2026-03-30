@@ -28,9 +28,9 @@ export function adminBookingNotificationTemplate(data: AdminBookingNotificationD
       )}
       ${booking.notes ? renderMessageBlock('Client note', booking.notes) : ''}
       ${renderButtonGroup([
-        renderButton(acceptLink, 'Accept booking'),
-        renderButton(rejectLink, 'Decline booking', 'danger'),
-        renderButton(dashboardLink, 'Open dashboard', 'neutral'),
+        renderButton(acceptLink, 'Open confirm flow'),
+        renderButton(rejectLink, 'Open decline flow', 'danger'),
+        renderButton(dashboardLink, 'Open booking board', 'neutral'),
       ])}
     </div>
   `;
