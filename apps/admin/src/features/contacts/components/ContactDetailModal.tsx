@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import {
   EyeOff,
   Trash2,
@@ -10,11 +11,13 @@ import {
   MessageSquare,
   CheckCircle2,
   Circle,
+  Reply,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ResponsiveModal } from '@/components/ui/responsive-modal';
 import type { ContactForm } from '../types/contacts.types';
+import { ContactReplyComposer } from './ContactReplyComposer';
 
 interface ContactDetailModalProps {
   open: boolean;
@@ -23,6 +26,7 @@ interface ContactDetailModalProps {
   loading?: boolean;
   onToggleRead: (contact: ContactForm) => void;
   onDelete: (contact: ContactForm) => void;
+  onReply: (contact: ContactForm, subject: string, message: string) => Promise<boolean>;
 }
 
 export function ContactDetailModal({
@@ -32,7 +36,13 @@ export function ContactDetailModal({
   loading = false,
   onToggleRead,
   onDelete,
+  onReply,
 }: ContactDetailModalProps) {
+  const [isReplyModalOpen, setIsReplyModalOpen] = useState(false);
+  const [sendingReply, setSendingReply] = useState(false);
+  const [replySubject, setReplySubject] = useState('Re: Your message to NaufalRF Portfolio');
+  const [replyMessage, setReplyMessage] = useState('');
+
   const handleToggleRead = () => {
     if (contact) {
       onToggleRead(contact);
@@ -42,6 +52,23 @@ export function ContactDetailModal({
   const handleDelete = () => {
     if (contact) {
       onDelete(contact);
+    }
+  };
+
+  const handleReply = async () => {
+    if (!contact || !replyMessage.trim()) {
+      return;
+    }
+
+    setSendingReply(true);
+    try {
+      const success = await onReply(contact, replySubject, replyMessage);
+      if (success) {
+        setIsReplyModalOpen(false);
+        setReplyMessage('');
+      }
+    } finally {
+      setSendingReply(false);
     }
   };
 
@@ -70,6 +97,10 @@ export function ContactDetailModal({
                   Mark Read
                 </>
               )}
+            </Button>
+            <Button variant="outline" onClick={() => setIsReplyModalOpen(true)}>
+              <Reply className="h-4 w-4 mr-2" />
+              Reply
             </Button>
             <Button variant="destructive" onClick={handleDelete}>
               <Trash2 className="h-4 w-4 mr-2" />
@@ -193,6 +224,35 @@ export function ContactDetailModal({
           </div>
         </div>
       ) : null}
+
+      <ResponsiveModal
+        open={isReplyModalOpen}
+        onOpenChange={setIsReplyModalOpen}
+        title="Reply to Contact"
+        description={contact ? `Reply directly to ${contact.name} from the dashboard.` : undefined}
+        footer={
+          <>
+            <Button variant="outline" onClick={() => setIsReplyModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              variant="primary"
+              onClick={handleReply}
+              disabled={sendingReply || !replyMessage.trim()}
+            >
+              {sendingReply ? 'Sending...' : 'Send Reply'}
+            </Button>
+          </>
+        }
+      >
+        <ContactReplyComposer
+          subject={replySubject}
+          message={replyMessage}
+          onSubjectChange={setReplySubject}
+          onMessageChange={setReplyMessage}
+          disabled={sendingReply}
+        />
+      </ResponsiveModal>
     </ResponsiveModal>
   );
 }

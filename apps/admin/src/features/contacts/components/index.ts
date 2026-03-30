@@ -2,6 +2,7 @@ export { BulkActionModal } from './BulkActionModal';
 export { ContactDetailModal } from './ContactDetailModal';
 export { ContactDetailView } from './ContactDetailView';
 export { ContactInfoSection } from './ContactInfoSection';
+export { ContactReplyComposer } from './ContactReplyComposer';
 export { ContactsTab } from './ContactsTab';
 export { ContactTable } from './ContactTable';
 export { DeleteConfirmModal } from './DeleteConfirmModal';

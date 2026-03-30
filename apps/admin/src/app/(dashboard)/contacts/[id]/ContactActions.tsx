@@ -5,8 +5,7 @@ import { useRouter } from 'next/navigation';
 import { CheckCircle2, Mail, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ResponsiveModal } from '@/components/ui/responsive-modal';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { ContactReplyComposer } from '@/features/contacts/components';
 import { toast } from 'sonner';
 
 interface ContactActionsProps {
@@ -160,21 +159,13 @@ export function ContactActions({ contactId, replied }: ContactActionsProps) {
           </>
         }
       >
-        <div className="space-y-4 py-2">
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-[#3D4852]">Subject</label>
-            <Input value={replySubject} onChange={(event) => setReplySubject(event.target.value)} />
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-[#3D4852]">Reply message</label>
-            <Textarea
-              value={replyMessage}
-              onChange={(event) => setReplyMessage(event.target.value)}
-              rows={8}
-              placeholder="Write a helpful, user-centered reply..."
-            />
-          </div>
-        </div>
+        <ContactReplyComposer
+          subject={replySubject}
+          message={replyMessage}
+          onSubjectChange={setReplySubject}
+          onMessageChange={setReplyMessage}
+          disabled={sendingReply}
+        />
       </ResponsiveModal>
 
       <ResponsiveModal

@@ -26,6 +26,7 @@ export function ContactsTab() {
     setFilterMode,
     setPage,
     getContact,
+    updateContact,
     deleteContact,
     toggleReadStatus,
     bulkAction,
@@ -109,6 +110,14 @@ export function ContactsTab() {
 
   async function handleToggleReadStatus(contact: ContactForm) {
     await toggleReadStatus(contact);
+  }
+
+  async function handleReply(contact: ContactForm, subject: string, message: string) {
+    return updateContact(contact.id, {
+      replied: true,
+      replySubject: subject,
+      replyMessage: message,
+    } as Partial<ContactForm>);
   }
 
   function openDeleteDialog(contact: ContactForm) {
@@ -261,6 +270,7 @@ export function ContactsTab() {
         onOpenChange={setIsDetailModalOpen}
         onToggleRead={handleToggleReadStatus}
         onDelete={openDeleteDialog}
+        onReply={handleReply}
       />
 
       <BulkActionModal

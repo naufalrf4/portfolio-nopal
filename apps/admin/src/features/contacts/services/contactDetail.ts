@@ -1,18 +1,36 @@
 import type { ContactForm } from '@/features/contacts/types/contacts.types';
+import { contactsService } from '@/lib/api/handlers/contacts.service';
+
+function normalizeContact(
+  contact: Awaited<ReturnType<typeof contactsService.getById>>
+): ContactForm | null {
+  if (!contact) {
+    return null;
+  }
+
+  const metadata =
+    contact.metadata && typeof contact.metadata === 'object' && !Array.isArray(contact.metadata)
+      ? (contact.metadata as ContactForm['metadata'])
+      : null;
+
+  return {
+    id: contact.id,
+    name: contact.name,
+    email: contact.email,
+    subject: contact.subject,
+    message: contact.message,
+    ipHash: contact.ipHash,
+    metadata,
+    read: contact.read,
+    replied: contact.replied,
+    createdAt: contact.createdAt,
+    updatedAt: contact.updatedAt,
+  };
+}
 
 export async function getContactById(id: string): Promise<ContactForm | null> {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-    const response = await fetch(`${baseUrl}/api/v1/admin/contacts/${id}`, {
-      cache: 'no-store',
-    });
-
-    if (!response.ok) {
-      return null;
-    }
-
-    const data = await response.json();
-    return data.success ? data.data : null;
+    return normalizeContact(await contactsService.getById(id));
   } catch {
     return null;
   }
@@ -20,13 +38,7 @@ export async function getContactById(id: string): Promise<ContactForm | null> {
 
 export async function markContactAsRead(id: string): Promise<void> {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-    await fetch(`${baseUrl}/api/v1/admin/contacts/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ read: true }),
-      cache: 'no-store',
-    });
+    await contactsService.markAsRead(id);
   } catch {
     return;
   }
