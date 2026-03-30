@@ -1,0 +1,36 @@
+# NaufalRF Links Hub — Full LLM Context
+
+## Overview
+
+This Astro app is the dedicated links/profile hub for the portfolio ecosystem. It is intentionally narrower than the main public portfolio site: one page, fast loading, profile-first presentation, and a clean split between social icons and destination buttons.
+
+## Core responsibilities
+
+- Render a compact but expressive profile header.
+- Show true social/profile destinations as icon links.
+- Show website/general destinations as larger action buttons.
+- Keep the page resilient when Admin data is slow or temporarily unavailable.
+- Track pageviews and clicks via same-origin analytics proxy routes.
+
+## Architecture
+
+- Framework: Astro 5 with React support available but minimal island usage.
+- Styling: Tailwind CSS 4 with CSS-first theme tokens and a light-neumorphic visual shell.
+- Data source: Admin public APIs through `src/lib/api.ts`.
+- Telemetry: same-origin `src/pages/api/analytics.ts` proxy.
+
+## Key files
+
+- `src/pages/index.astro` — page composition and data loading.
+- `src/lib/api.ts` — fetches about/profile-links data from Admin public APIs.
+- `src/lib/link-classification.ts` — normalized URL-aware classification for social vs website links.
+- `src/components/ProfileHeader.astro` — profile/avatar/name/bio block.
+- `src/components/SocialIcons.astro` — social icon rendering with supported platform detection.
+- `src/components/LinkButtons.astro` — non-social destination buttons.
+
+## Constraints
+
+- Never bypass Admin for links/about data.
+- Do not collapse social icons and website buttons into one undifferentiated list.
+- Preserve the fast-loading single-page nature of the app.
+- Keep the page visually consistent with the broader portfolio ecosystem while remaining denser and more profile-card-like.

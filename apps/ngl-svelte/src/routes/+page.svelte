@@ -171,7 +171,11 @@
 	$effect(() => {
 		if (message.trim().length > 0 && !hasTrackedCompose.value) {
 			hasTrackedCompose.value = true;
-			trackInteraction('message_compose', 'anonymous_message', 'Started composing anonymous message');
+			trackInteraction(
+				'message_compose',
+				'anonymous_message',
+				'Started composing anonymous message'
+			);
 		}
 
 		if (message.trim().length === 0) {

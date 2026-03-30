@@ -9,9 +9,6 @@
 	const ogDescription =
 		'An open space to share feedback or questions anonymously with Naufal Rizqullah Firdaus to support transparency and continuous improvement.';
 	const gaMeasurementId = env.PUBLIC_GA_MEASUREMENT_ID ?? '';
-	const gaInlineScript = gaMeasurementId
-		? `window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', ${JSON.stringify(gaMeasurementId)}, { send_page_view: false });`
-		: '';
 
 	let { children } = $props();
 </script>
@@ -46,7 +43,11 @@
 	/>
 	{#if gaMeasurementId}
 		<script async src={`https://www.googletagmanager.com/gtag/js?id=${gaMeasurementId}`}></script>
-		{@html `<script>${gaInlineScript}<\/script>`}
+		<script>
+			{
+				`window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', ${JSON.stringify(gaMeasurementId)}, { send_page_view: false });`;
+			}
+		</script>
 	{/if}
 </svelte:head>
 

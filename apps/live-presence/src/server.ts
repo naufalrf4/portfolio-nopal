@@ -3,6 +3,53 @@ const ROOM_ID = 'public-home';
 const IDLE_TTL_MS = 15000;
 const CLEANUP_INTERVAL_MS = 5000;
 
+const LLMS_TXT = `# NaufalRF Live Presence Service
+
+> Lightweight Bun websocket service that powers the playful live cursor and online-presence layer for the public portfolio. It keeps all state ephemeral and never persists history.
+
+## What this service does
+
+- Exposes \`GET /health\` and websocket upgrades at \`/ws\`.
+- Tracks room-local participants plus a global overview across connected rooms.
+- Broadcasts welcome, state, and overview events to connected clients.
+- Keeps presence state memory-only with short idle cleanup.
+
+## Important behavior
+
+- No database, no Admin API dependency, no durable history.
+- Rooms are page-aware, while overview participants are global.
+- Websocket upgrades enforce an explicit browser-origin allowlist.
+
+## Related docs
+
+- /llms-full.txt - deeper implementation context for the presence service
+`;
+
+const LLMS_FULL_TXT = `# NaufalRF Live Presence Service — Full LLM Context
+
+## Overview
+
+This Bun service provides the realtime cursor/presence layer for the public portfolio. It is intentionally tiny and ephemeral: a websocket server, room-aware participant maps, overview broadcasts, and idle cleanup. It does not persist any state and does not depend on Admin or the database.
+
+## Core responsibilities
+
+- Accept websocket upgrades on \`/ws\`.
+- Track participants by room and across the entire service.
+- Broadcast room-local \`state\` payloads and global \`overview\` payloads.
+- Drop idle participants quickly and degrade gracefully when clients disconnect.
+
+## Event contract
+
+- Client events: \`join\`, \`move\`, \`ping\`, \`leave\`
+- Server events: \`welcome\`, \`state\`, \`overview\`
+
+## Constraints
+
+- Keep all presence state in memory only.
+- Do not turn this service into a chat or persistence layer.
+- Preserve the explicit origin allowlist for websocket upgrades.
+`;
+
 const isProduction = process.env.NODE_ENV === 'production';
 const configuredAllowedOrigins = (process.env.ALLOWED_ORIGINS || '')
   .split(',')
@@ -283,6 +330,22 @@ const server = Bun.serve<ConnectionData>({
 
     if (url.pathname === '/health') {
       return Response.json({ ok: true, roomCount: roomParticipants.size, port: PORT });
+    }
+
+    if (url.pathname === '/llms.txt') {
+      return new Response(LLMS_TXT, {
+        headers: {
+          'Content-Type': 'text/plain; charset=utf-8',
+        },
+      });
+    }
+
+    if (url.pathname === '/llms-full.txt') {
+      return new Response(LLMS_FULL_TXT, {
+        headers: {
+          'Content-Type': 'text/plain; charset=utf-8',
+        },
+      });
     }
 
     if (url.pathname === '/ws') {

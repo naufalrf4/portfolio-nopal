@@ -1,0 +1,32 @@
+# NaufalRF Anonymous Message App — Full LLM Context
+
+## Overview
+
+This SvelteKit app provides the anonymous-message experience for the portfolio ecosystem. It is intentionally narrow: one form-driven surface, Turnstile-protected delivery, same-origin analytics, and no direct persistence or admin logic in the app itself.
+
+## Core responsibilities
+
+- Render the anonymous message form and submission states.
+- Enforce Turnstile validation before allowing submission.
+- Forward accepted submissions to Admin public APIs.
+- Track pageviews and submission-related interactions through a same-origin analytics proxy.
+
+## Architecture
+
+- Framework: SvelteKit 2.
+- Styling: Tailwind CSS 4 and the same light-neumorphic design family as the rest of the portfolio.
+- Submission boundary: browser form -> SvelteKit action in `src/routes/+page.server.ts` -> Admin public API.
+- Analytics boundary: browser -> `src/routes/api/analytics/+server.ts` -> Admin analytics endpoint.
+
+## Key files
+
+- `src/routes/+page.svelte` — main anonymous message UI, Turnstile mounting, analytics events.
+- `src/routes/+page.server.ts` — form action and server-side submission proxy.
+- `src/routes/api/analytics/+server.ts` — same-origin analytics proxy.
+- `src/lib/api.ts` — Admin-facing submission helper.
+
+## Constraints
+
+- Never bypass Turnstile when it is configured.
+- Never bypass Admin APIs for persistence.
+- Keep the app focused and anonymous; it is not a general chat or contact surface.

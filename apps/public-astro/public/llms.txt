@@ -1,0 +1,50 @@
+# NaufalRF Public Portfolio
+
+> Public marketing and portfolio site for NaufalRF. It presents projects, writing, about information, contact/booking flows, guestbook interactions, and the main AI assistant entrypoint.
+
+## What this app does
+
+- Renders the main public portfolio experience.
+- Reads content from Admin public APIs only.
+- Hosts the public AI assistant page and same-origin chat proxy to the RAG service.
+- Serves project, blog, about, contact, booking, and guestbook experiences.
+- Preserves SEO metadata, structured data, and sitemap/robots discoverability.
+
+## Important behavior
+
+- This app must stay API-only; it never talks directly to the database.
+- Public content reads are centralized in `src/lib/api.ts`.
+- Contact, booking, analytics, guestbook auth, and chat all go through local Astro API routes.
+- Public social links intentionally exclude generic website links; website-style links stay in the dedicated Links app.
+- The AI assistant is a general/personal assistant with portfolio grounding when needed, not a projects-only bot.
+
+## Key routes
+
+- [/](https://naufalrf.tech/) - homepage with hero, expertise, projects, guestbook preview, and AI/chat entry
+- [/about](https://naufalrf.tech/about) - personal profile, experience, achievements, and skills
+- [/projects](https://naufalrf.tech/projects) - project index and case-study discovery
+- [/blogs](https://naufalrf.tech/blogs) - writing and mentions index
+- [/contact](https://naufalrf.tech/contact) - general inquiries, collaboration, and booking flow
+- [/guestbook](https://naufalrf.tech/guestbook) - full guestbook timeline
+- [/ai-chatbot](https://naufalrf.tech/ai-chatbot) - dedicated AI assistant page
+
+## Integration surfaces
+
+- [src/lib/api.ts](./src/lib/api.ts) - public Admin API client and guestbook/contact/project/blog helpers
+- [src/pages/api/rag/chat.ts](./src/pages/api/rag/chat.ts) - same-origin chat proxy to the RAG service
+- [src/pages/api/contact.ts](./src/pages/api/contact.ts) - contact submission proxy
+- [src/pages/api/bookings.ts](./src/pages/api/bookings.ts) - booking submission proxy
+- [src/pages/api/bookings/available.ts](./src/pages/api/bookings/available.ts) - booking availability proxy
+- [src/pages/api/guestbook.ts](./src/pages/api/guestbook.ts) - guestbook read/write proxy
+- [src/pages/api/auth/guestbook-start.ts](./src/pages/api/auth/guestbook-start.ts) - guestbook auth handoff
+
+## Design and UX notes
+
+- Uses the legacy light-neumorphic portfolio design language.
+- Mobile navigation is bottom-bar driven, with secondary destinations in an "Other" panel.
+- Guestbook has two modes: homepage preview and dedicated full-page reading.
+- Chat widget floats on desktop and redirects to `/ai-chatbot` on mobile.
+
+## Related docs
+
+- [/llms-full.txt](./llms-full.txt) - deeper implementation-oriented context for this app
