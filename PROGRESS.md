@@ -4,6 +4,38 @@ Chronological timeline of meaningful project work, discoveries, decisions, and b
 
 ## Entries
 
+### 2026-03-21 05:05
+
+- Task: Finish final repo cleanup and quiet offline presence noise
+- Mode: implementation
+- Files: `apps/public-astro/src/components/home/useLiveCursorPresence.ts`, `apps/ngl-svelte/src/routes/+layout.svelte`, `apps/admin/src/lib/db/schema.ts.backup`, `apps/admin/src/components/projects/ProjectModal.tsx.backup`, `PROGRESS.md`
+- Status: done
+- Notes: Added a live-presence health-check gate before the public websocket hook opens a socket so local offline runs stop spamming immediate connection-refused noise, removed stale backup and preview-log artifacts, and cleaned the NGL root layout so analytics bootstrap no longer uses `{@html}`. Verification passed with `apps/public-astro: bun run build`, `apps/ngl-svelte: bun run lint`, `apps/ngl-svelte: bun run check`, `apps/ngl-svelte: bun run build`, plus a final artifact glob confirming `.backup` and preview-log files were removed.
+
+### 2026-03-21 04:25
+
+- Task: Roll out app-specific llms docs across the non-admin apps
+- Mode: implementation
+- Files: `apps/public-astro/public/llms.txt`, `apps/public-astro/public/llms-full.txt`, `apps/links-astro/public/llms.txt`, `apps/links-astro/public/llms-full.txt`, `apps/ngl-svelte/static/llms.txt`, `apps/ngl-svelte/static/llms-full.txt`, `apps/rag-service/fastapi/app/main.py`, `apps/live-presence/src/server.ts`, `PROGRESS.md`
+- Status: done
+- Notes: Added capability-first `llms.txt` and `llms-full.txt` surfaces for the public Astro site, the links Astro site, and the NGL SvelteKit app using their static asset pipelines. Added explicit root text endpoints for the FastAPI RAG service and the Bun live-presence service so every non-admin app now exposes machine-readable app descriptions at `/llms.txt` and `/llms-full.txt`. Verification passed with `apps/public-astro: bun run build`, `apps/links-astro: bun run build`, `apps/ngl-svelte: bun run check`, `apps/ngl-svelte: bun run build`, `apps/rag-service: bun run typecheck`, `apps/rag-service: bun run build`, `apps/rag-service/fastapi: uv run ruff check .`, and `apps/live-presence: bun run start` reaching a listening state. `apps/ngl-svelte: bun run lint` still reports pre-existing repository-wide Prettier drift in untouched files.
+
+### 2026-03-21 04:02
+
+- Task: Add structured skill categories across admin, public, and RAG export paths
+- Mode: implementation
+- Files: `apps/admin/src/lib/about-skills.ts`, `apps/admin/src/lib/db/schema.ts`, `apps/admin/drizzle/0008_talented_skill_categories.sql`, `apps/admin/src/features/about/components/SkillsTab.tsx`, `apps/admin/src/features/about/types/about.types.ts`, `apps/admin/src/lib/validations/about.schema.ts`, `apps/admin/src/lib/api/handlers/about.service.ts`, `apps/admin/src/lib/api/handlers/about-read.service.ts`, `apps/admin/src/app/api/v1/public/about/route.ts`, `apps/admin/src/lib/api/handlers/content-export.service.ts`, `apps/admin/scripts/seed.ts`, `apps/public-astro/src/types/index.ts`, `PROGRESS.md`
+- Status: done
+- Notes: Replaced the old flat `AboutMe.skills` `text[]` model with a compatibility-aware JSONB shape that supports `{ name, level, category }` skills end to end. Added a real migration to backfill existing arrays into categorized skill objects, upgraded Admin validation/types/editor state, kept the public about route backward compatible through `normalizeAboutSkills()`, and normalized RAG export back to plain names so downstream prompt consumers continue working during the transition. Verification passed with `apps/admin: bun run lint`, `apps/admin: bun run typecheck`, `apps/admin: bun run build`, and `apps/public-astro: bun run build`.
+
+### 2026-03-21 03:30
+
+- Task: Complete public UX revision phase and backend correctness hardening
+- Mode: implementation
+- Files: `apps/public-astro/src/components/home/Guestbook.tsx`, `apps/public-astro/src/components/about/AboutContent.tsx`, `apps/public-astro/src/components/home/HeroSection.tsx`, `apps/public-astro/src/components/layout/Footer.astro`, `apps/public-astro/src/lib/social-links.ts`, `apps/admin/src/lib/services/geoIpService.ts`, `apps/admin/src/lib/api/submission-context.ts`, `apps/admin/src/lib/services/storage.ts`, `apps/admin/src/features/dashboard/components/AnalyticsSummaryCard.tsx`, `apps/rag-service/fastapi/app/services/prompt_builder.py`, `apps/rag-service/fastapi/app/services/chat_service.py`, `apps/rag-service/fastapi/tests/services/test_prompt_builder.py`, `apps/public-astro/src/components/home/useLiveCursorPresence.ts`, `PROGRESS.md`
+- Status: done
+- Notes: Finished the public-phase guestbook/social/about revisions by removing duplicate inner guestbook copy on `/guestbook`, moving the homepage guestbook route CTA into the action area for both signed-in and signed-out states, filtering non-social website links out of public surfaces, and adding a mobile-only About/Skills shell with a correct no-skills fallback. Then hardened the backend layer by prioritizing CDN-aware country signals before `geoip-lite`, preventing signed GCS URLs from being re-persisted as object names, replacing the dashboard analytics placeholder with live summary data, reducing project-overprojection in the RAG prompt/planner path, and switching the public online-count badge to prefer the global presence overview. Verification passed with browser QA for the public guestbook/about/social behaviors, `apps/public-astro: bun run build`, `apps/admin: bun run lint`, `apps/admin: bun run typecheck`, `apps/admin: bun run build`, `apps/rag-service/fastapi: uv run ruff check .`, `apps/rag-service/fastapi: uv run pytest tests/services/test_prompt_builder.py tests/services/test_chat_service.py`, `apps/rag-service: bun run build`, and `apps/live-presence` smoke-start. The only recurring runtime noise remains the pre-existing local `ws://localhost:3006/ws` refusal when live presence is offline.
+
 ### 2026-03-21 01:15
 
 - Task: Close follow-up fixes for chat overlay interaction and profile link classification
