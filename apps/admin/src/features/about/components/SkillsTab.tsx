@@ -12,43 +12,124 @@ import { useAbout } from '../hooks/useAbout';
 const DEFAULT_LEVEL = 85;
 const DEFAULT_CATEGORY = 'Tools & Workflow';
 
+type SkillGroupDraft = {
+  category: string;
+  skillsText: string;
+};
+
 export function SkillsTab() {
   const { data, updateAbout, saving } = useAbout();
 
   const [skills, setSkills] = useState<AboutSkill[]>([]);
-  const [skillNameInput, setSkillNameInput] = useState('');
-  const [skillCategoryInput, setSkillCategoryInput] = useState(DEFAULT_CATEGORY);
+  const [skillGroups, setSkillGroups] = useState<SkillGroupDraft[]>([
+    { category: DEFAULT_CATEGORY, skillsText: '' },
+  ]);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   useEffect(() => {
     if (data) {
       setSkills(data.skills || []);
+      const grouped = (data.skills || []).reduce<Record<string, string[]>>((acc, skill) => {
+        const category = skill.category || DEFAULT_CATEGORY;
+        if (!acc[category]) {
+          acc[category] = [];
+        }
+        acc[category].push(skill.name);
+        return acc;
+      }, {});
+
+      const drafts = Object.entries(grouped).map(([category, groupedSkills]) => ({
+        category,
+        skillsText: groupedSkills.join(', '),
+      }));
+
+      setSkillGroups(drafts.length > 0 ? drafts : [{ category: DEFAULT_CATEGORY, skillsText: '' }]);
       setHasUnsavedChanges(false);
     }
   }, [data]);
 
-  const addSkill = () => {
-    const trimmedSkill = skillNameInput.trim();
-    const trimmedCategory = skillCategoryInput.trim() || DEFAULT_CATEGORY;
+  const syncSkillsFromGroups = (groups: SkillGroupDraft[]) => {
+    const nextSkills: AboutSkill[] = [];
+    const seen = new Set<string>();
 
-    if (
-      trimmedSkill &&
-      !skills.some((skill) => skill.name.toLowerCase() === trimmedSkill.toLowerCase())
-    ) {
-      const newSkills = [
-        ...skills,
-        { name: trimmedSkill, category: trimmedCategory, level: DEFAULT_LEVEL },
-      ];
-      setSkills(newSkills);
-      setSkillNameInput('');
-      setHasUnsavedChanges(true);
+    for (const group of groups) {
+      const category = group.category.trim() || DEFAULT_CATEGORY;
+      const parsedSkills = group.skillsText
+        .split(',')
+        .map((skill) => skill.trim())
+        .filter(Boolean);
+
+      for (const skillName of parsedSkills) {
+        const key = skillName.toLowerCase();
+        if (seen.has(key)) {
+          continue;
+        }
+
+        seen.add(key);
+        nextSkills.push({
+          name: skillName,
+          category,
+          level: DEFAULT_LEVEL,
+        });
+      }
     }
+
+    setSkills(nextSkills);
+    setHasUnsavedChanges(true);
   };
 
-  const removeSkill = (skillToRemove: string) => {
-    const newSkills = skills.filter((skill) => skill.name !== skillToRemove);
-    setSkills(newSkills);
+  const updateGroup = (index: number, patch: Partial<SkillGroupDraft>) => {
+    const nextGroups = skillGroups.map((group, groupIndex) =>
+      groupIndex === index ? { ...group, ...patch } : group
+    );
+    setSkillGroups(nextGroups);
+    syncSkillsFromGroups(nextGroups);
+  };
+
+  const addGroup = () => {
+    setSkillGroups((current) => [...current, { category: '', skillsText: '' }]);
     setHasUnsavedChanges(true);
+  };
+
+  const removeGroup = (index: number) => {
+    const nextGroups = skillGroups.filter((_, groupIndex) => groupIndex !== index);
+    const normalizedGroups =
+      nextGroups.length > 0 ? nextGroups : [{ category: DEFAULT_CATEGORY, skillsText: '' }];
+    setSkillGroups(normalizedGroups);
+    syncSkillsFromGroups(normalizedGroups);
+  };
+
+  const groupedSkills = skills.reduce<Record<string, AboutSkill[]>>((acc, skill) => {
+    const category = skill.category || DEFAULT_CATEGORY;
+    if (!acc[category]) {
+      acc[category] = [];
+    }
+    acc[category].push(skill);
+    return acc;
+  }, {});
+
+  const groupedCategories = Object.keys(groupedSkills).sort();
+
+  const removeSkill = (skillToRemove: string, category: string) => {
+    const nextGroups = skillGroups.map((group) => {
+      if ((group.category.trim() || DEFAULT_CATEGORY) !== category) {
+        return group;
+      }
+
+      const nextSkillsText = group.skillsText
+        .split(',')
+        .map((skill) => skill.trim())
+        .filter((skill) => skill && skill.toLowerCase() !== skillToRemove.toLowerCase())
+        .join(', ');
+
+      return {
+        ...group,
+        skillsText: nextSkillsText,
+      };
+    });
+
+    setSkillGroups(nextGroups);
+    syncSkillsFromGroups(nextGroups);
   };
 
   const handleSave = async () => {
@@ -106,49 +187,72 @@ export function SkillsTab() {
           </div>
         </div>
         <div className="space-y-2">
-          <Label htmlFor="skillInput">Add Skill</Label>
-          <div className="grid gap-2 md:grid-cols-[minmax(0,1fr)_200px_auto]">
-            <Input
-              id="skillInput"
-              value={skillNameInput}
-              onChange={(e) => setSkillNameInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  addSkill();
-                }
-              }}
-              placeholder="Type a skill name"
-            />
-            <Input
-              value={skillCategoryInput}
-              onChange={(e) => setSkillCategoryInput(e.target.value)}
-              placeholder="Category"
-            />
-            <Button onClick={addSkill} disabled={!skillNameInput.trim()}>
-              <Plus className="h-4 w-4" />
+          <div className="flex items-center justify-between">
+            <Label>Skill Groups</Label>
+            <Button variant="outline" size="sm" onClick={addGroup}>
+              <Plus className="h-4 w-4 mr-2" />
+              Add Group
             </Button>
+          </div>
+          <p className="text-xs text-[#6B7280]">
+            Add a category label, then list skills separated by commas. Example: React, Next.js,
+            TypeScript.
+          </p>
+          <div className="space-y-3">
+            {skillGroups.map((group, index) => (
+              <div
+                key={`${group.category || 'group'}-${index}`}
+                className="grid gap-3 rounded-2xl border border-[#A3B1C6]/15 bg-[#E0E5EC]/70 p-4 md:grid-cols-[220px_minmax(0,1fr)_auto]"
+              >
+                <Input
+                  value={group.category}
+                  onChange={(event) => updateGroup(index, { category: event.target.value })}
+                  placeholder="Category label"
+                />
+                <Input
+                  value={group.skillsText}
+                  onChange={(event) => updateGroup(index, { skillsText: event.target.value })}
+                  placeholder="skill1, skill2, skill3"
+                />
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => removeGroup(index)}
+                  aria-label={`Remove ${group.category || 'skill group'}`}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            ))}
           </div>
         </div>
 
         {skills.length > 0 && (
           <div>
             <Label>Your Skills ({skills.length})</Label>
-            <div className="flex flex-wrap gap-2 mt-2">
-              {skills.map((skill) => (
-                <div
-                  key={`${skill.category}-${skill.name}`}
-                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#E0E5EC] text-[#3D4852] text-sm shadow-[3px_3px_6px_rgba(163,177,198,0.6),-3px_-3px_6px_rgba(255,255,255,0.5)]"
-                >
-                  <span className="font-medium">{skill.name}</span>
-                  <span className="text-xs text-[#6B7280]">{skill.category}</span>
-                  <button
-                    onClick={() => removeSkill(skill.name)}
-                    className="text-[#6B7280] hover:text-red-500 transition-colors"
-                    aria-label={`Remove ${skill.name}`}
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
+            <div className="space-y-4 mt-3">
+              {groupedCategories.map((category) => (
+                <div key={category} className="space-y-2">
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#6B7280]">
+                    {category}
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {groupedSkills[category].map((skill) => (
+                      <div
+                        key={`${skill.category}-${skill.name}`}
+                        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#E0E5EC] text-[#3D4852] text-sm shadow-[3px_3px_6px_rgba(163,177,198,0.6),-3px_-3px_6px_rgba(255,255,255,0.5)]"
+                      >
+                        <span className="font-medium">{skill.name}</span>
+                        <button
+                          onClick={() => removeSkill(skill.name, category)}
+                          className="text-[#6B7280] hover:text-red-500 transition-colors"
+                          aria-label={`Remove ${skill.name}`}
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               ))}
             </div>
