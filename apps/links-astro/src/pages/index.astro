@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ErrorState from '../components/ErrorState.astro';
+import { LivePresencePill } from '../components/LivePresencePill';
 import ProfileHeader from '../components/ProfileHeader.astro';
 import LinkButtons from '../components/LinkButtons.astro';
 import SocialIcons from '../components/SocialIcons.astro';
@@ -50,6 +51,8 @@ const socialLinkUrls = new Set(allSocialLinks.map((link) => normalizeUrl(link.ur
 const websiteLinks = links.filter(
   (link) => !isSocialProfileLink(link) && !socialLinkUrls.has(normalizeUrl(link.url))
 );
+const presenceSocketUrl =
+  process.env.PUBLIC_CURSOR_WS_URL?.trim() || import.meta.env.PUBLIC_CURSOR_WS_URL?.trim() || 'ws://localhost:3006/ws';
 ---
 
 <BaseLayout
@@ -73,6 +76,7 @@ const websiteLinks = links.filter(
       })}
     />
   </Fragment>
+  <LivePresencePill client:load socketUrl={presenceSocketUrl} pagePath="/links" pageLabel="Links" />
   <main class="relative min-h-screen overflow-hidden bg-background px-4 py-10 sm:px-5 sm:py-12">
     <div class="pointer-events-none absolute inset-0">
       <div class="absolute left-[-6rem] top-10 h-48 w-48 rounded-full bg-[radial-gradient(circle,rgba(59,130,246,0.18),transparent_68%)] blur-2xl"></div>
@@ -80,7 +84,7 @@ const websiteLinks = links.filter(
       <div class="absolute bottom-[-3rem] left-1/2 h-64 w-64 -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(20,184,166,0.12),transparent_70%)] blur-3xl"></div>
     </div>
 
-    <section class="relative mx-auto flex w-full max-w-3xl flex-col gap-7 rounded-[34px] bg-[linear-gradient(145deg,rgba(233,239,246,0.96),rgba(220,228,238,0.94))] px-5 py-8 shadow-neu-extruded sm:px-7 sm:py-9 lg:max-w-4xl lg:px-8">
+    <section class="relative mx-auto flex w-full max-w-[44rem] flex-col gap-7 rounded-[34px] bg-[linear-gradient(145deg,rgba(233,239,246,0.96),rgba(220,228,238,0.94))] px-5 py-8 shadow-neu-extruded sm:px-7 sm:py-9 lg:max-w-[50rem] lg:px-8">
       {errorMessage ? (
         <ErrorState message={errorMessage} />
       ) : (
