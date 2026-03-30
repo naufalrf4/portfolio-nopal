@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { env } from '$env/dynamic/public';
+	import LivePresenceBadge from '$lib/LivePresenceBadge.svelte';
 	import '../app.css';
 
 	const title = 'Anonymous Message - NaufalRF Portfolio';
@@ -9,6 +10,7 @@
 	const ogDescription =
 		'An open space to share feedback or questions anonymously with Naufal Rizqullah Firdaus to support transparency and continuous improvement.';
 	const gaMeasurementId = env.PUBLIC_GA_MEASUREMENT_ID ?? '';
+	const livePresenceSocketUrl = env.PUBLIC_CURSOR_WS_URL ?? 'ws://localhost:3006/ws';
 
 	let { children } = $props();
 </script>
@@ -52,5 +54,6 @@
 </svelte:head>
 
 <div class="ngl-root">
+	<LivePresenceBadge socketUrl={livePresenceSocketUrl} />
 	{@render children()}
 </div>

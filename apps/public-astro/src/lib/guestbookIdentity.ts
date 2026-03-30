@@ -14,7 +14,8 @@ export interface LiveCursorIdentity {
 }
 
 export const GUESTBOOK_STORAGE_KEY = 'public-guestbook-user';
-const LIVE_CURSOR_GUEST_KEY = 'public-live-cursor-guest';
+export const LIVE_CURSOR_GUEST_KEY = 'portfolio-live-presence-guest';
+const LEGACY_LIVE_CURSOR_GUEST_KEY = 'public-live-cursor-guest';
 
 function hashString(value: string): number {
   return Array.from(value).reduce((acc, char) => (acc * 31 + char.charCodeAt(0)) >>> 0, 7);
@@ -95,10 +96,15 @@ export function resolveLiveCursorIdentity(): LiveCursorIdentity {
     };
   }
 
-  const storedGuest = getStoredValue<{ id: string; name: string; color: string }>(
-    LIVE_CURSOR_GUEST_KEY
-  );
+  const storedGuest =
+    getStoredValue<{ id: string; name: string; color: string }>(LIVE_CURSOR_GUEST_KEY) ||
+    getStoredValue<{ id: string; name: string; color: string }>(LEGACY_LIVE_CURSOR_GUEST_KEY);
   if (storedGuest?.id && storedGuest?.name && storedGuest?.color) {
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem(LIVE_CURSOR_GUEST_KEY, JSON.stringify(storedGuest));
+      window.localStorage.removeItem(LEGACY_LIVE_CURSOR_GUEST_KEY);
+    }
+
     return {
       id: storedGuest.id,
       name: storedGuest.name,
@@ -116,6 +122,7 @@ export function resolveLiveCursorIdentity(): LiveCursorIdentity {
 
   if (typeof window !== 'undefined') {
     window.localStorage.setItem(LIVE_CURSOR_GUEST_KEY, JSON.stringify(guestIdentity));
+    window.localStorage.removeItem(LEGACY_LIVE_CURSOR_GUEST_KEY);
   }
 
   return {
