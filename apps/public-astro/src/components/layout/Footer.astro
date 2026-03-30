@@ -1,6 +1,7 @@
 ---
 import { Github, Linkedin, Twitter, Mail, Globe, Instagram, Youtube } from 'lucide-react';
 import { getAbout } from '@/lib/api';
+import { filterPublicSocialLinks } from '@/lib/social-links';
 
 const currentYear = new Date().getFullYear();
 const about = await getAbout();
@@ -16,7 +17,7 @@ const iconMap = {
   website: Globe,
 } as const;
 
-const socialLinks = (about.socialLinks || []).map((link) => ({
+const socialLinks = filterPublicSocialLinks(about.socialLinks).map((link) => ({
   href: link.url,
   label: link.platform,
   icon: iconMap[link.platform.toLowerCase() as keyof typeof iconMap] || Globe,

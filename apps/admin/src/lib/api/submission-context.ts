@@ -1,5 +1,5 @@
 import type { NextRequest } from 'next/server';
-import { getIpLocation } from '@/lib/services/geoIpService';
+import { getCountryNameFromCode, getIpLocation } from '@/lib/services/geoIpService';
 import { hashIp } from '@/lib/utils/hash';
 
 export interface SubmissionMetadata {
@@ -37,6 +37,8 @@ function normalizeHeaderValue(value: string | null, maxLength: number): string |
 
 function getClientIp(request: NextRequest): string {
   const candidates = [
+    request.headers.get('true-client-ip'),
+    request.headers.get('cf-connecting-ip'),
     request.headers.get('x-real-ip'),
     request.headers.get('x-vercel-forwarded-for'),
     request.headers.get('x-forwarded-for'),
@@ -58,6 +60,50 @@ function getClientIp(request: NextRequest): string {
   }
 
   return 'unknown';
+}
+
+function getCountryCodeFromHeaders(request: NextRequest): string | null {
+  const candidates = [
+    request.headers.get('cf-ipcountry'),
+    request.headers.get('x-vercel-ip-country'),
+    request.headers.get('x-appengine-country'),
+  ];
+
+  for (const candidate of candidates) {
+    const normalized = normalizeHeaderValue(candidate, 2)?.toUpperCase();
+    if (normalized && /^[A-Z]{2}$/.test(normalized)) {
+      return normalized;
+    }
+  }
+
+  return null;
+}
+
+function getCityFromHeaders(request: NextRequest): string | null {
+  return (
+    normalizeHeaderValue(request.headers.get('x-vercel-ip-city'), 100) ||
+    normalizeHeaderValue(request.headers.get('x-appengine-city'), 100)
+  );
+}
+
+function getRegionFromHeaders(request: NextRequest): string | null {
+  return (
+    normalizeHeaderValue(request.headers.get('x-vercel-ip-country-region'), 100) ||
+    normalizeHeaderValue(request.headers.get('x-appengine-region'), 100)
+  );
+}
+
+function inferCountryCodeFromTimezone(timezone: string | null): string | null {
+  if (!timezone) {
+    return null;
+  }
+
+  const normalized = timezone.trim();
+  if (['Asia/Jakarta', 'Asia/Makassar', 'Asia/Jayapura', 'Asia/Pontianak'].includes(normalized)) {
+    return 'ID';
+  }
+
+  return null;
 }
 
 function getReferrerDomain(referrer: string | null): string | null {
@@ -84,16 +130,26 @@ function getLanguage(request: NextRequest): string | null {
 
 export function getSubmissionContext(request: NextRequest): SubmissionContext {
   const clientIp = getClientIp(request);
-  const geoLocation = clientIp === 'unknown' ? null : getIpLocation(clientIp);
   const referrer = normalizeHeaderValue(request.headers.get('referer'), 512);
+  const timezone = normalizeHeaderValue(request.headers.get('x-portfolio-timezone'), 100);
+  const headerCountryCode = getCountryCodeFromHeaders(request);
+  const geoLocation = clientIp === 'unknown' ? null : getIpLocation(clientIp);
+  const timezoneCountryCode = inferCountryCodeFromTimezone(timezone);
+  const effectiveCountryCode =
+    headerCountryCode ||
+    (timezoneCountryCode && (!geoLocation?.countryCode || geoLocation.countryCode === 'SG')
+      ? timezoneCountryCode
+      : null) ||
+    geoLocation?.countryCode ||
+    null;
 
   return {
     ipHash: hashIp(clientIp),
     ipAddress: clientIp === 'unknown' ? null : clientIp,
-    countryCode: geoLocation?.countryCode ?? null,
-    country: geoLocation?.country ?? null,
-    city: geoLocation?.city ?? null,
-    region: geoLocation?.region ?? null,
+    countryCode: effectiveCountryCode,
+    country: getCountryNameFromCode(effectiveCountryCode) || geoLocation?.country || null,
+    city: getCityFromHeaders(request) || geoLocation?.city || null,
+    region: getRegionFromHeaders(request) || geoLocation?.region || null,
     metadata: {
       sourceApp: normalizeHeaderValue(request.headers.get('x-portfolio-source-app'), 64),
       sourcePath: normalizeHeaderValue(request.headers.get('x-portfolio-source-path'), 255),
@@ -101,7 +157,7 @@ export function getSubmissionContext(request: NextRequest): SubmissionContext {
       language: getLanguage(request),
       referrer,
       referrerDomain: getReferrerDomain(referrer),
-      timezone: normalizeHeaderValue(request.headers.get('x-portfolio-timezone'), 100),
+      timezone,
     },
   };
 }

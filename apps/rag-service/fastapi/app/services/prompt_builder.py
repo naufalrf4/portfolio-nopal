@@ -173,11 +173,39 @@ def build_chat_prompt(
     history: str,
     context: str,
     preferred_language: str | None = None,
+    *,
+    needs_portfolio_context: bool = True,
 ) -> str:
     response_language = infer_response_language(question, preferred_language)
+    if not needs_portfolio_context:
+        sections = [
+            (
+                "You are Nau AI, NaufalRF's personal assistant. You can answer general knowledge "
+                "questions, chat casually, and discuss the portfolio when relevant."
+            ),
+            (
+                "Do not force projects, portfolio links, or work examples into every answer. "
+                "them only when the user asks or when they clearly help."
+            ),
+            (
+                "Be natural, concise, and human. Use markdown formatting only when it genuinely "
+                "readability."
+            ),
+            f"Respond in {response_language}. Keep technical terms natural in that language.",
+            "",
+            "Conversation history:",
+            history,
+            "",
+            f"User question: {question}",
+            "",
+            "Return only the final answer text.",
+        ]
+        return "\n".join(sections)
+
     sections = [
         (
-            "You are NaufalRF portfolio guide running an Agentic Contextual RAG workflow. "
+            "You are Nau AI, NaufalRF's personal assistant, using an Agentic Contextual RAG "
+            "when portfolio grounding is required. "
             "Answer only from the supplied context. "
             "Prioritize factual precision over sounding confident."
         ),
@@ -251,11 +279,13 @@ def build_query_analysis_prompt(
         "Rules:",
         "- Use workflow 'tool' for deterministic freelance pricing breakdowns that only need module/feature analysis",  # noqa: E501
         "- Use workflow 'hybrid' when pricing depends on both module breakdown and portfolio context or experience",  # noqa: E501
-        "- Use workflow 'rag' for portfolio knowledge questions",
+        "- Use workflow 'rag' for portfolio knowledge questions and general chat",
+        "- Set needsPortfolioContext to false for greetings, casual conversation, and general knowledge questions that do not require portfolio grounding",  # noqa: E501
         "- toolName must be empty when workflow is 'rag'",
         "- toolArguments for feature_pricing_quote should describe module/feature breakdowns, reference prices, and currency for reference-based quoting",  # noqa: E501
         "- Only include referencePrices that are explicitly provided by the user or clearly established in prior context",  # noqa: E501
-        "- retrievalQueries must contain 1 to 3 distinct concise search queries",
+        "- retrievalQueries may be empty when needsPortfolioContext is false; otherwise contain 1 to 3 concise search queries",  # noqa: E501
+        "- Do not bias toward projects when the user asks for general knowledge or casual conversation",  # noqa: E501
         "- suggestedActions must be empty when no website action is useful",
         "- target should be a route like /projects, /about, /blogs, /contact, /ai-chatbot or a section anchor like #featured-projects",  # noqa: E501
         "- Preserve the user's language or produce multilingual-friendly retrieval queries when helpful",  # noqa: E501
@@ -283,6 +313,33 @@ def fallback_query_plan(question: str) -> dict[str, object]:
     tool_name = ""
     tool_arguments: dict[str, object] = {}
     intent = "general_portfolio"
+    needs_portfolio_context = True
+
+    casual_keywords = (
+        "hello",
+        "hi",
+        "hey",
+        "yo",
+        "apa kabar",
+        "halo",
+        "bisa bantu",
+        "how are you",
+        "what's up",
+        "thanks",
+        "makasih",
+        "thank you",
+        "siapa kamu",
+        "who are you",
+    )
+    general_knowledge_keywords = (
+        "what is",
+        "jelaskan",
+        "explain",
+        "how does",
+        "why is",
+        "kenapa",
+        "apa itu",
+    )
 
     route_map = [
         (
@@ -337,6 +394,17 @@ def fallback_query_plan(question: str) -> dict[str, object]:
             portfolio_areas = ["general"]
             suggested_actions = []
 
+    is_general_chat = any(keyword in normalized for keyword in casual_keywords) or (
+        any(keyword in normalized for keyword in general_knowledge_keywords)
+        and not any(keyword in normalized for keyword in portfolio_keywords)
+    )
+
+    if is_general_chat and tool_name == "":
+        intent = "general_assistance"
+        needs_portfolio_context = False
+        portfolio_areas = ["general"]
+        suggested_actions = []
+
     if "toolarguments:" in normalized:
         raw_payload = question.split("toolArguments:", 1)[1].strip()
         try:
@@ -350,16 +418,19 @@ def fallback_query_plan(question: str) -> dict[str, object]:
             workflow = "tool"
             portfolio_areas = ["general"]
             suggested_actions = []
+            needs_portfolio_context = False
 
     return {
         "workflow": workflow,
         "intent": intent,
         "queryLanguage": query_language,
         "answerLanguage": answer_language,
-        "needsPortfolioContext": workflow != "tool",
+        "needsPortfolioContext": needs_portfolio_context and workflow != "tool",
         "toolName": tool_name,
         "toolArguments": tool_arguments,
-        "retrievalQueries": [question.strip()],
+        "retrievalQueries": [question.strip()]
+        if needs_portfolio_context and workflow != "tool"
+        else [],
         "portfolioAreas": portfolio_areas,
         "suggestedActions": suggested_actions,
     }

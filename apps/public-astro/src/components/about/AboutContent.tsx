@@ -1,4 +1,4 @@
-import type { FC, ComponentType } from 'react';
+import { useState, type FC, type ComponentType } from 'react';
 import { NeuCard } from '../shared/NeuCard';
 import { NeuButton } from '../shared/NeuButton';
 import { ExperienceTabs } from './ExperienceTabs';
@@ -15,6 +15,7 @@ import {
   Youtube,
 } from 'lucide-react';
 import type { AboutData } from '../../types';
+import { filterPublicSocialLinks } from '@/lib/social-links';
 
 interface AboutContentProps {
   about: AboutData;
@@ -32,7 +33,9 @@ const socialIcons: Record<string, ComponentType<{ size?: number; className?: str
 
 export const AboutContent: FC<AboutContentProps> = ({ about, achievements }) => {
   const fullName = about.fullName?.trim() || 'NaufalRF';
-  const socialLinksList = about.socialLinks || [];
+  const socialLinksList = filterPublicSocialLinks(about.socialLinks);
+  const [mobileTab, setMobileTab] = useState<'about' | 'skills'>('about');
+  const hasSkills = Boolean(about.skills && about.skills.length > 0);
 
   return (
     <div className="animate-fade-in space-y-12">
@@ -114,17 +117,77 @@ export const AboutContent: FC<AboutContentProps> = ({ about, achievements }) => 
             </div>
           </NeuCard>
 
-          <NeuCard className="p-6 md:p-8 stagger-item">
-            <h2 className="text-xl font-bold text-foreground mb-4">About Me</h2>
-            <p className="text-muted-foreground leading-relaxed whitespace-pre-line">{about.bio}</p>
-          </NeuCard>
+          <div className="lg:hidden">
+            {hasSkills ? (
+              <NeuCard className="p-4 stagger-item">
+                <div className="grid grid-cols-2 gap-2 rounded-2xl bg-[#E0E5EC]/70 p-2 shadow-[inset_4px_4px_8px_rgba(163,177,198,0.32),inset_-4px_-4px_8px_rgba(255,255,255,0.45)]">
+                  <button
+                    type="button"
+                    onClick={() => setMobileTab('about')}
+                    className={`rounded-xl px-4 py-3 text-sm font-semibold transition-all ${
+                      mobileTab === 'about'
+                        ? 'bg-[#E0E5EC] text-[#3B82F6] shadow-[6px_6px_12px_rgba(163,177,198,0.45),-6px_-6px_12px_rgba(255,255,255,0.55)]'
+                        : 'text-muted-foreground hover:text-[#3B82F6]'
+                    }`}
+                  >
+                    About Me
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setMobileTab('skills')}
+                    className={`rounded-xl px-4 py-3 text-sm font-semibold transition-all ${
+                      mobileTab === 'skills'
+                        ? 'bg-[#E0E5EC] text-[#3B82F6] shadow-[6px_6px_12px_rgba(163,177,198,0.45),-6px_-6px_12px_rgba(255,255,255,0.55)]'
+                        : 'text-muted-foreground hover:text-[#3B82F6]'
+                    }`}
+                  >
+                    Skills
+                  </button>
+                </div>
 
-          {about.skills && about.skills.length > 0 && (
+                <div className="mt-5">
+                  {mobileTab === 'about' ? (
+                    <div>
+                      <h2 className="text-xl font-bold text-foreground mb-4">About Me</h2>
+                      <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
+                        {about.bio}
+                      </p>
+                    </div>
+                  ) : (
+                    <div>
+                      <h2 className="text-xl font-bold text-foreground mb-6">
+                        Skills & Technologies
+                      </h2>
+                      <SkillBadges skills={about.skills} />
+                    </div>
+                  )}
+                </div>
+              </NeuCard>
+            ) : (
+              <NeuCard className="p-6 md:p-8 stagger-item">
+                <h2 className="text-xl font-bold text-foreground mb-4">About Me</h2>
+                <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
+                  {about.bio}
+                </p>
+              </NeuCard>
+            )}
+          </div>
+
+          <div className="hidden lg:block space-y-6">
             <NeuCard className="p-6 md:p-8 stagger-item">
-              <h2 className="text-xl font-bold text-foreground mb-6">Skills & Technologies</h2>
-              <SkillBadges skills={about.skills} />
+              <h2 className="text-xl font-bold text-foreground mb-4">About Me</h2>
+              <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
+                {about.bio}
+              </p>
             </NeuCard>
-          )}
+
+            {hasSkills && (
+              <NeuCard className="p-6 md:p-8 stagger-item">
+                <h2 className="text-xl font-bold text-foreground mb-6">Skills & Technologies</h2>
+                <SkillBadges skills={about.skills} />
+              </NeuCard>
+            )}
+          </div>
         </div>
 
         <div className="lg:col-span-7">

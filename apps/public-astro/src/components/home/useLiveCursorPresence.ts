@@ -24,9 +24,24 @@ type PresenceMessage =
 
 const HEARTBEAT_MS = 5000;
 const SEND_INTERVAL_MS = 60;
+const RECONNECT_DELAY_MS = 5000;
+const HEALTHCHECK_TIMEOUT_MS = 1500;
 
 function getSocketUrl(socketUrl: string): string {
   return socketUrl.trim() || 'ws://localhost:3006/ws';
+}
+
+function getHealthUrl(socketUrl: string): string | null {
+  try {
+    const url = new URL(getSocketUrl(socketUrl));
+    url.protocol = url.protocol === 'wss:' ? 'https:' : 'http:';
+    url.pathname = '/health';
+    url.search = '';
+    url.hash = '';
+    return url.toString();
+  } catch {
+    return null;
+  }
 }
 
 function resolveRoomId(currentPath: string): string {
@@ -51,6 +66,21 @@ export function useLiveCursorPresence(currentPath: string, socketUrl: string) {
   const rafRef = useRef<number | null>(null);
   const lastSentAtRef = useRef(0);
   const roomId = resolveRoomId(currentPath);
+
+  const scheduleReconnect = useCallback(
+    (activeIdentity: LiveCursorIdentity) => {
+      clearTimers();
+      if (!shouldReconnectRef.current || reconnectTimeoutRef.current) {
+        return;
+      }
+
+      reconnectTimeoutRef.current = window.setTimeout(() => {
+        reconnectTimeoutRef.current = null;
+        void connect(activeIdentity);
+      }, RECONNECT_DELAY_MS);
+    },
+    [clearTimers]
+  );
 
   const clearTimers = useCallback(() => {
     if (heartbeatRef.current) {
@@ -119,13 +149,39 @@ export function useLiveCursorPresence(currentPath: string, socketUrl: string) {
   );
 
   const connect = useCallback(
-    (activeIdentity: LiveCursorIdentity) => {
+    async (activeIdentity: LiveCursorIdentity) => {
       clearTimers();
       shouldReconnectRef.current = true;
       setStatus('connecting');
       setParticipants([]);
       setOverviewParticipants([]);
       setSelfId(null);
+
+      const healthUrl = getHealthUrl(socketUrl);
+      if (healthUrl) {
+        const controller = new AbortController();
+        const timeout = window.setTimeout(() => controller.abort(), HEALTHCHECK_TIMEOUT_MS);
+
+        try {
+          const response = await fetch(healthUrl, {
+            method: 'GET',
+            signal: controller.signal,
+            cache: 'no-store',
+          });
+
+          if (!response.ok) {
+            throw new Error(`Presence health check failed with status ${response.status}`);
+          }
+        } catch {
+          if (shouldReconnectRef.current) {
+            setStatus('disconnected');
+            scheduleReconnect(activeIdentity);
+          }
+          return;
+        } finally {
+          window.clearTimeout(timeout);
+        }
+      }
 
       const socket = new WebSocket(getSocketUrl(socketUrl));
       socketRef.current = socket;
@@ -193,9 +249,7 @@ export function useLiveCursorPresence(currentPath: string, socketUrl: string) {
           return;
         }
 
-        reconnectTimeoutRef.current = window.setTimeout(() => {
-          connect(activeIdentity);
-        }, 1500);
+        scheduleReconnect(activeIdentity);
       });
 
       socket.addEventListener('error', () => {
@@ -204,7 +258,7 @@ export function useLiveCursorPresence(currentPath: string, socketUrl: string) {
         }
       });
     },
-    [clearTimers, currentPath, pageLabel, roomId, sendMessage, socketUrl]
+    [clearTimers, currentPath, pageLabel, roomId, scheduleReconnect, sendMessage, socketUrl]
   );
 
   useEffect(() => {
@@ -221,7 +275,7 @@ export function useLiveCursorPresence(currentPath: string, socketUrl: string) {
       return;
     }
 
-    connect(identity);
+    void connect(identity);
 
     return () => {
       shouldReconnectRef.current = false;
@@ -253,7 +307,7 @@ export function useLiveCursorPresence(currentPath: string, socketUrl: string) {
     self,
     others,
     overviewParticipants,
-    totalParticipants: participants.length,
+    totalParticipants: overviewParticipants.length || participants.length,
     sendMove,
   };
 }

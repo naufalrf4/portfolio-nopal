@@ -67,6 +67,19 @@ function getCountryName(code: string): string {
   return COUNTRY_NAMES[code] || code;
 }
 
+export function getCountryNameFromCode(code: string | null | undefined): string | null {
+  if (!code) {
+    return null;
+  }
+
+  const normalized = code.trim().toUpperCase();
+  if (!normalized) {
+    return null;
+  }
+
+  return getCountryName(normalized);
+}
+
 export function getIpLocation(ip: string): GeoLocation | null {
   try {
     const result = geoip.lookup(ip);

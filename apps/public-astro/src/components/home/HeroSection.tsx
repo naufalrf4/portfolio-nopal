@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
+import { filterPublicSocialLinks } from '@/lib/social-links';
 import { Github, Linkedin, Twitter, Mail, Download, ArrowRight } from 'lucide-react';
 import { NeuButton } from '@/components/shared/NeuButton';
 import type { AboutData } from '@/types';
@@ -44,7 +45,7 @@ export function HeroSection({ about }: HeroSectionProps) {
   const [isGreetingVisible, setIsGreetingVisible] = useState(true);
 
   const roles = about.roles || ['Full-Stack Engineer'];
-  const socialLinks = about.socialLinks ?? [];
+  const socialLinks = filterPublicSocialLinks(about.socialLinks);
   const heroBio = about.shortBio?.trim() || about.bio;
   const fullName = about.fullName?.trim() || 'NaufalRF';
   const firstName = fullName.split(' ')[0];

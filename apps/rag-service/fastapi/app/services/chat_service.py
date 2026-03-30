@@ -147,7 +147,13 @@ class ChatService:
                 ]
             )
             context = format_context(context_sections)
-            prompt = build_chat_prompt(request.message, history_text, context, preferred_language)
+            prompt = build_chat_prompt(
+                request.message,
+                history_text,
+                context,
+                preferred_language,
+                needs_portfolio_context=query_plan.needs_portfolio_context,
+            )
             generated = await self.llm_service.answer_question(prompt)
             final_text = generated.text
             tokens = {

@@ -57,6 +57,17 @@ function normalizePublicBaseUrl(value: string | undefined): string | null {
   return trimmed.replace(/\/+$/, '');
 }
 
+function isLikelySignedStorageUrl(url: URL): boolean {
+  return [
+    'X-Goog-Algorithm',
+    'X-Goog-Credential',
+    'X-Goog-Signature',
+    'GoogleAccessId',
+    'Expires',
+    'Signature',
+  ].some((key) => url.searchParams.has(key));
+}
+
 function extractStorageKeyFromUrl(value: string): string | null {
   try {
     const parsedUrl = new URL(value);
@@ -101,7 +112,21 @@ export function normalizeStoredAssetValue(value: AssetValue): string | null {
     return trimmedValue;
   }
 
-  return extractStorageKeyFromUrl(trimmedValue) ?? trimmedValue;
+  const extractedKey = extractStorageKeyFromUrl(trimmedValue);
+  if (extractedKey) {
+    return extractedKey;
+  }
+
+  try {
+    const parsedUrl = new URL(trimmedValue);
+    if (isLikelySignedStorageUrl(parsedUrl)) {
+      return null;
+    }
+  } catch {
+    return null;
+  }
+
+  return trimmedValue;
 }
 
 export type UploadFolder = 'projects' | 'about' | 'achievements' | 'resumes';
@@ -191,7 +216,7 @@ export class StorageService {
 
   private generateKey(filename: string, folder: UploadFolder): string {
     const timestamp = Date.now();
-    const sanitizedFilename = filename.replace(/[^a-zA-Z0-9.-]/g, '_');
+    const sanitizedFilename = filename.replace(/[^a-zA-Z0-9.-]/g, '_').slice(-180);
     return `${folder}/${timestamp}-${sanitizedFilename}`;
   }
 

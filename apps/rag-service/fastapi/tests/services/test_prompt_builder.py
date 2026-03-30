@@ -1,5 +1,6 @@
 from app.services.prompt_builder import (
     build_abstention_response,
+    build_chat_prompt,
     build_grounded_actions,
     build_source_metadata,
     fallback_query_plan,
@@ -107,3 +108,24 @@ def test_build_abstention_response_uses_requested_language() -> None:
 
     assert "Saya belum menemukan bukti portofolio" in response
     assert "projects, skills" in response
+
+
+def test_fallback_query_plan_allows_general_chat_without_portfolio_context() -> None:
+    plan = fallback_query_plan("Hey, can you explain what a vector database is?")
+
+    assert plan["intent"] == "general_assistance"
+    assert plan["needsPortfolioContext"] is False
+    assert plan["retrievalQueries"] == []
+
+
+def test_build_chat_prompt_for_general_chat_avoids_forcing_portfolio_context() -> None:
+    prompt = build_chat_prompt(
+        "What is a vector database?",
+        "No prior conversation available.",
+        "No relevant information found in the knowledge base.",
+        "en",
+        needs_portfolio_context=False,
+    )
+
+    assert "Do not force projects" in prompt
+    assert "Answer only from the supplied context" not in prompt

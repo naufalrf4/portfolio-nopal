@@ -136,14 +136,12 @@ export function Guestbook({
           animation-play-state: paused;
         }
       `}</style>
-      <SectionHeader
-        title="Guestbook"
-        subtitle={
-          isPageMode
-            ? 'Read full notes from visitors, collaborators, and friends, or leave your own once you sign in with Google.'
-            : 'A few words from people who stopped by. Leave a short message once you sign in with Google.'
-        }
-      />
+      {!isPageMode ? (
+        <SectionHeader
+          title="Guestbook"
+          subtitle="A few words from people who stopped by. Leave a short message once you sign in with Google."
+        />
+      ) : null}
 
       <motion.div
         className="mx-auto max-w-4xl space-y-6"
@@ -195,7 +193,7 @@ export function Guestbook({
               </motion.div>
 
               <motion.div
-                className="flex justify-center"
+                className="flex flex-col items-center gap-3"
                 initial={{ opacity: 0, y: 18 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.8 }}
@@ -213,6 +211,16 @@ export function Guestbook({
                   <Plus size={18} className="mr-2" />
                   Leave a message
                 </NeuButton>
+
+                {!isPageMode ? (
+                  <a
+                    href="/guestbook"
+                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-transparent px-5 py-2.5 text-sm font-medium text-[#3D4852] transition-all duration-200 hover:bg-[#E0E5EC]/50 hover:text-[#3B82F6] hover:shadow-[6px_6px_12px_rgba(163,177,198,0.6),-6px_-6px_12px_rgba(255,255,255,0.5)]"
+                  >
+                    Read full guestbook
+                    <ArrowRight size={16} />
+                  </a>
+                ) : null}
               </motion.div>
             </div>
           ) : (
@@ -221,7 +229,7 @@ export function Guestbook({
                 Sign in with Google before posting to the guestbook.
               </p>
               <motion.div
-                className="flex justify-center"
+                className="flex flex-wrap items-center justify-center gap-3"
                 initial={{ opacity: 0, y: 18 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.8 }}
@@ -239,23 +247,21 @@ export function Guestbook({
                   <LogIn size={18} className="mr-2" />
                   Sign in to guestbook
                 </NeuButton>
+
+                {!isPageMode ? (
+                  <a
+                    href="/guestbook"
+                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-transparent px-5 py-3 text-sm font-medium text-[#3D4852] transition-all duration-200 hover:bg-[#E0E5EC]/50 hover:text-[#3B82F6] hover:shadow-[6px_6px_12px_rgba(163,177,198,0.6),-6px_-6px_12px_rgba(255,255,255,0.5)]"
+                  >
+                    Read full guestbook
+                    <ArrowRight size={16} />
+                  </a>
+                ) : null}
               </motion.div>
             </div>
           )}
 
           {success ? <p className="mt-4 text-sm text-emerald-600">{success}</p> : null}
-
-          {!isPageMode ? (
-            <div className="mt-5 flex justify-center">
-              <a
-                href="/guestbook"
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-transparent px-6 py-3 text-base font-medium text-[#3D4852] transition-all duration-200 hover:bg-[#E0E5EC]/50 hover:text-[#3B82F6] hover:shadow-[6px_6px_12px_rgba(163,177,198,0.6),-6px_-6px_12px_rgba(255,255,255,0.5)]"
-              >
-                Read full guestbook
-                <ArrowRight size={16} />
-              </a>
-            </div>
-          ) : null}
         </NeuCard>
 
         {error ? (
