@@ -60,8 +60,8 @@ const AchievementCard: FC<AchievementCardProps> = ({ achievement, onClick }) => 
   return (
     <div className="flex w-[248px] flex-shrink-0 flex-col items-center sm:w-[272px] md:w-[286px]">
       <button onClick={onClick} className="group block w-full cursor-pointer text-left">
-        <div className="flex h-full min-h-[272px] flex-col overflow-hidden rounded-[28px] bg-[linear-gradient(180deg,rgba(251,252,255,0.98),rgba(244,247,251,0.98))] shadow-[10px_10px_22px_rgba(183,194,208,0.16),-10px_-10px_22px_rgba(255,255,255,0.78)] transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-[14px_14px_26px_rgba(183,194,208,0.18),-14px_-14px_26px_rgba(255,255,255,0.82)]">
-          <div className="relative aspect-[16/10] w-full overflow-hidden rounded-b-[20px] bg-[linear-gradient(145deg,rgba(250,252,255,0.98),rgba(243,247,251,0.94))] shadow-[inset_4px_4px_10px_rgba(188,200,214,0.16),inset_-4px_-4px_10px_rgba(255,255,255,0.62)]">
+        <div className="flex h-full min-h-[272px] flex-col overflow-hidden rounded-[28px] bg-[linear-gradient(180deg,rgba(246,249,252,0.98),rgba(235,241,247,0.96))] shadow-[12px_12px_24px_rgba(163,177,198,0.26),-12px_-12px_24px_rgba(255,255,255,0.62)] transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-[15px_15px_28px_rgba(163,177,198,0.28),-15px_-15px_28px_rgba(255,255,255,0.68)]">
+          <div className="relative aspect-[16/10] w-full overflow-hidden rounded-b-[20px] bg-[linear-gradient(145deg,rgba(248,251,254,0.98),rgba(233,239,246,0.94))] shadow-[inset_4px_4px_10px_rgba(163,177,198,0.18),inset_-4px_-4px_10px_rgba(255,255,255,0.58)]">
             {firstPhoto ? (
               <img
                 src={firstPhoto}
@@ -88,8 +88,8 @@ const AchievementCard: FC<AchievementCardProps> = ({ achievement, onClick }) => 
       </button>
 
       <div className="relative z-10 mt-3">
-        <div className="flex h-[18px] w-[18px] items-center justify-center rounded-full bg-[radial-gradient(circle_at_35%_35%,#ffffff_0%,#eef2f7_44%,#cbd5e1_78%,#94a3b8_100%)] shadow-[0_0_0_4px_rgba(248,250,252,0.95),0_8px_18px_rgba(148,163,184,0.18)]">
-          <div className="h-2 w-2 rounded-full bg-[#64748B]/70" />
+        <div className="flex h-[18px] w-[18px] items-center justify-center rounded-full bg-[radial-gradient(circle_at_35%_35%,#ffffff_0%,#e7edf4_44%,#b9c6d8_78%,#8aa0b8_100%)] shadow-[0_0_0_4px_rgba(244,247,250,0.92),0_10px_22px_rgba(148,163,184,0.22)]">
+          <div className="h-2 w-2 rounded-full bg-[#5B6B7E]/80" />
         </div>
       </div>
     </div>
@@ -300,9 +300,9 @@ export const AchievementsDisplay: FC<AchievementsDisplayProps> = ({ achievements
 
   return (
     <>
-      <div className="rounded-[30px] bg-[linear-gradient(180deg,rgba(251,252,255,0.98),rgba(244,247,251,0.98))] px-4 py-5 shadow-[14px_14px_30px_rgba(188,200,214,0.14),-14px_-14px_30px_rgba(255,255,255,0.8)] md:px-5 md:py-6">
+      <div className="rounded-[30px] bg-[linear-gradient(180deg,rgba(245,249,252,0.98),rgba(234,240,246,0.96))] px-4 py-5 shadow-[16px_16px_30px_rgba(163,177,198,0.22),-16px_-16px_30px_rgba(255,255,255,0.66)] md:px-5 md:py-6">
         <div className="mb-5 flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[linear-gradient(145deg,rgba(252,253,255,0.98),rgba(245,248,251,0.96))] shadow-[6px_6px_12px_rgba(188,200,214,0.14),-6px_-6px_12px_rgba(255,255,255,0.7)]">
+          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[linear-gradient(145deg,rgba(248,251,254,0.98),rgba(235,241,247,0.95))] shadow-[7px_7px_13px_rgba(163,177,198,0.18),-7px_-7px_13px_rgba(255,255,255,0.64)]">
             <Award className="h-5 w-5 text-[#64748B]" />
           </div>
           <div className="flex-1">
@@ -331,7 +331,7 @@ export const AchievementsDisplay: FC<AchievementsDisplayProps> = ({ achievements
             </div>
           </div>
 
-          <div className="absolute bottom-[6px] left-0 right-0 h-[3px] rounded-full bg-[linear-gradient(90deg,rgba(203,213,225,0)_0%,rgba(203,213,225,0.7)_24%,rgba(148,163,184,0.92)_50%,rgba(203,213,225,0.7)_76%,rgba(203,213,225,0)_100%)] shadow-[0_0_14px_rgba(148,163,184,0.14)]" />
+          <div className="absolute bottom-[6px] left-0 right-0 h-[3px] rounded-full bg-[linear-gradient(90deg,rgba(203,213,225,0)_0%,rgba(176,190,206,0.66)_24%,rgba(125,144,166,0.88)_50%,rgba(176,190,206,0.66)_76%,rgba(203,213,225,0)_100%)] shadow-[0_0_16px_rgba(125,144,166,0.2)]" />
         </div>
       </div>
 
