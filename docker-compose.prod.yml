@@ -17,6 +17,8 @@ services:
       - ./docker/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy-data:/data
       - caddy-config:/config
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
     depends_on:
       admin:
         condition: service_started

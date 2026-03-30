@@ -4,6 +4,14 @@ Chronological timeline of meaningful project work, discoveries, decisions, and b
 
 ## Entries
 
+### 2026-03-30 11:05
+
+- Task: add secure webhook-triggered production auto-deploy path
+- Mode: implementation
+- Files: `docker/caddy/Caddyfile`, `docker-compose.prod.yml`, `scripts/github-webhook-deploy.sh`, `scripts/github_webhook_server.py`, `PROGRESS.md`
+- Status: in_progress
+- Notes: Added a dedicated Caddy route on the admin domain for `/webhooks/deploy`, routed through `host.docker.internal` to a localhost-only webhook listener, plus a locked deploy runner script that reuses the existing pull-based production flow (`git pull`, `docker-prod-up.sh`, `docker-prod-migrate.sh`). Server-side systemd/env provisioning and end-to-end webhook verification still need to be completed.
+
 ### 2026-03-21 05:05
 
 - Task: Finish final repo cleanup and quiet offline presence noise

@@ -30,6 +30,10 @@
 	import security_headers
 	encode zstd gzip
 
+	handle_path /webhooks/deploy* {
+		reverse_proxy host.docker.internal:9010
+	}
+
 	reverse_proxy admin:3001 {
 		header_up Host {host}
 		header_up X-Forwarded-Host {host}
