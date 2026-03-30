@@ -213,8 +213,8 @@
 				<span
 					class={`h-2.5 w-2.5 rounded-full ${status === 'connected' ? 'bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.75)]' : status === 'connecting' ? 'bg-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.65)]' : 'bg-slate-300 shadow-none'}`}
 				></span>
-				<span class="md:hidden">{participants.length} online</span>
-				<span class="hidden md:inline">{participants.length} live across the portfolio</span>
+				<span class="md:hidden">{participants.length} Online</span>
+				<span class="hidden md:inline">{participants.length} Online</span>
 			</span>
 		</button>
 
