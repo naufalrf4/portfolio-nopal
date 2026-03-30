@@ -246,10 +246,8 @@ export function LiveCursorBand({ currentPath, socketUrl }: LiveCursorBandProps) 
                 className={`h-2.5 w-2.5 rounded-full ${status === 'connected' ? 'bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.75)]' : status === 'connecting' ? 'bg-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.65)]' : 'bg-slate-300 shadow-none'}`}
               />
               <Activity size={11} className="hidden text-[#3B82F6] md:block" />
-              <span className="md:hidden">{totalParticipants} online</span>
-              <span className="hidden md:inline">
-                Online as {self?.name || identity?.name || 'Resolving...'}
-              </span>
+              <span className="md:hidden">{totalParticipants} Online</span>
+              <span className="hidden md:inline">{totalParticipants} Online</span>
             </span>
           </button>
 

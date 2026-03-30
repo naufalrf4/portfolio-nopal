@@ -9,7 +9,7 @@ const { blogs } = await getBlogs();
 
 const title = 'Blog & Articles';
 const description =
-  'Browse writing I have published myself plus references, interviews, and external posts connected to my work.';
+  'Browse writing, technical notes, and system-design insights from Naufal Rizqullah Firdaus on automation, IoT, cloud-backed software, AI workflows, and practical engineering in Indonesia.';
 ---
 
 <PageLayout title={title} description={description}>
@@ -18,7 +18,7 @@ const description =
       <PageHero
         icon={NotebookPen}
         title="Writing & Mentions"
-        description="A mixed shelf of articles I have written, technical notes I have published, and a few places where my work or perspective is featured."
+        description="A mixed shelf of engineering notes, practical tutorials, and system-thinking writeups around automation, IoT, cloud systems, and AI integration."
       />
 
       <BlogsContent initialBlogs={blogs} client:load />

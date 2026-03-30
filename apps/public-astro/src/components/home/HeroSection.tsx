@@ -57,7 +57,8 @@ export function HeroSection({ about }: HeroSectionProps) {
 
   const roles = about.roles || ['Full-Stack Engineer'];
   const socialLinks = filterPublicSocialLinks(about.socialLinks);
-  const heroBio = about.shortBio?.trim() || about.bio;
+  const heroBio =
+    about.shortBio?.trim() || 'Building digital experiences with purpose and precision.';
   const fullName = about.fullName?.trim() || 'NaufalRF';
   const firstName = fullName.split(' ')[0];
   const { scrollYProgress } = useScroll({

@@ -9,7 +9,7 @@ import { PageHero } from '@/components/shared';
 const { projects } = await getProjects();
 
 const title = "Projects";
-const description = 'Explore case studies focused on real product goals, delivery tradeoffs, and the problems each build was meant to solve.';
+const description = 'Explore integrated system projects by Naufal Rizqullah Firdaus across automation engineering, IoT development, cloud-backed software, and AI workflows shaped by real operational constraints.';
 
 ---
 
@@ -23,7 +23,7 @@ const description = 'Explore case studies focused on real product goals, deliver
       <PageHero
         icon={FolderKanban}
         title={title}
-        description="A collection of product, platform, and automation work shaped by real constraints, real users, and practical engineering tradeoffs."
+        description="A collection of real-world system builds covering software, infrastructure, data flow, automation, and connected devices shaped by practical engineering tradeoffs."
       />
 
       <ProjectsGrid client:load projects={projects} />

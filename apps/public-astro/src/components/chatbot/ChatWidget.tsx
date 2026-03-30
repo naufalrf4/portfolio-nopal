@@ -2,13 +2,33 @@ import { useState, useCallback, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { MessageCircle, X } from 'lucide-react';
 import { ChatWindow } from './ChatWindow';
+import { useAstroPathname } from '@/lib/useAstroPathname';
 
 const WIDGET_STATE_KEY = 'portfolio-chat-widget-open';
 
-export function ChatWidget() {
+interface ChatWidgetProps {
+  currentPath: string;
+}
+
+export function ChatWidget({ currentPath }: ChatWidgetProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
+  const pathname = useAstroPathname(currentPath);
+
+  useEffect(() => {
+    if (pathname !== '/ai-chatbot') {
+      return;
+    }
+
+    setIsOpen(false);
+    setIsExpanded(false);
+    sessionStorage.removeItem(WIDGET_STATE_KEY);
+  }, [pathname]);
+
+  if (pathname === '/ai-chatbot') {
+    return null;
+  }
 
   useEffect(() => {
     if (window.innerWidth < 768) {
