@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import {
   Calendar,
   Eye,
@@ -27,6 +28,9 @@ interface BookingsTabProps {
 }
 
 export function BookingsTab({ onPendingCountChange }: BookingsTabProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<FilterType>('all');
@@ -36,9 +40,17 @@ export function BookingsTab({ onPendingCountChange }: BookingsTabProps) {
   const [deletingBooking, setDeletingBooking] = useState<Booking | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
+  const lastActionKeyRef = useRef<string | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
 
   const limit = 20;
+  const requestedBookingId = searchParams.get('bookingId');
+  const requestedAction = searchParams.get('action');
+  const requestedStatus = useMemo<Booking['status'] | null>(() => {
+    if (requestedAction === 'confirm') return 'CONFIRMED';
+    if (requestedAction === 'cancel') return 'CANCELLED';
+    return null;
+  }, [requestedAction]);
 
   const fetchBookings = useCallback(async () => {
     try {
@@ -121,33 +133,87 @@ export function BookingsTab({ onPendingCountChange }: BookingsTabProps) {
     }
   }
 
-  async function updateStatus(id: string, status: Booking['status']) {
-    try {
-      const response = await fetch(`/api/v1/admin/bookings/${id}/status`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status }),
-      });
+  const updateStatus = useCallback(
+    async (id: string, status: Booking['status']): Promise<boolean> => {
+      try {
+        const response = await fetch(`/api/v1/admin/bookings/${id}/status`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status }),
+        });
 
-      const data = await response.json();
+        const data = await response.json();
 
-      if (data.success) {
-        toast.success('Status updated successfully');
-        fetchBookings();
-        if (isDetailModalOpen) {
-          setSelectedBooking({ ...selectedBooking!, status });
+        if (data.success) {
+          toast.success('Status updated successfully');
+          fetchBookings();
+          if (isDetailModalOpen) {
+            setSelectedBooking({ ...selectedBooking!, status });
+          }
+          return true;
         }
-      } else {
+
         const errorMsg =
           typeof data.error === 'string'
             ? data.error
             : data.error?.message || 'Failed to update status';
         toast.error(errorMsg);
+        return false;
+      } catch {
+        toast.error('Failed to update status');
+        return false;
       }
-    } catch {
-      toast.error('Failed to update status');
+    },
+    [fetchBookings, isDetailModalOpen, selectedBooking]
+  );
+
+  useEffect(() => {
+    if (!requestedBookingId) {
+      return;
     }
-  }
+
+    const booking = bookings.find((item) => item.id === requestedBookingId);
+    if (!booking) {
+      return;
+    }
+
+    setSelectedBooking(booking);
+    setIsDetailModalOpen(true);
+
+    if (!requestedStatus) {
+      return;
+    }
+
+    const actionKey = `${requestedBookingId}:${requestedStatus}`;
+    if (lastActionKeyRef.current === actionKey) {
+      return;
+    }
+
+    lastActionKeyRef.current = actionKey;
+
+    if (booking.status === requestedStatus) {
+      toast.success(`Booking already ${requestedStatus.toLowerCase()}`);
+      const nextParams = new URLSearchParams(searchParams.toString());
+      nextParams.delete('action');
+      router.replace(nextParams.toString() ? `${pathname}?${nextParams}` : pathname, {
+        scroll: false,
+      });
+      return;
+    }
+
+    void updateStatus(requestedBookingId, requestedStatus).then((success) => {
+      if (!success) {
+        lastActionKeyRef.current = null;
+        return;
+      }
+
+      const nextParams = new URLSearchParams(searchParams.toString());
+      nextParams.delete('action');
+      router.replace(nextParams.toString() ? `${pathname}?${nextParams}` : pathname, {
+        scroll: false,
+      });
+    });
+  }, [bookings, pathname, requestedBookingId, requestedStatus, router, searchParams, updateStatus]);
 
   function getStatusBadgeVariant(
     status: Booking['status']
