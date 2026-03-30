@@ -71,6 +71,7 @@ Authoritative AI control contract for this repository.
 - Root `README.md` must not describe RAG as API-only; RAG is a direct database actor plus an Admin internal API consumer.
 - Public, Links, and NGL are standalone apps, but they are not allowed to bypass Admin for database access.
 - Legacy phase2 is the visual baseline until the user explicitly replaces it.
+- Canonical machine-readable site guidance now lives only at `apps/public-astro/public/llms.txt`; do not recreate per-app `llms.txt` / `llms-full.txt` surfaces unless the architecture intentionally changes.
 - Root now has local orchestration scripts: `bun run dev:all` starts all apps, and `bun run reset:seed` resets Admin + RAG data, seeds Admin from `data/`, then triggers proper Admin -> RAG ingest.
 - Root hook/tooling is Bun-aligned; remove stale pnpm lockfiles and pnpm-only root docs when updating repo shell docs.
 - Root deployment automation now includes interactive `deploy.py` (run via `uv run deploy.py`) for single-host Paramiko SSH deploys; keep it pull-based on the server and do not turn it into a push-to-server file sync workflow unless the deployment architecture is intentionally changed.
