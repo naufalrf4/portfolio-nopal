@@ -67,21 +67,6 @@ export function useLiveCursorPresence(currentPath: string, socketUrl: string) {
   const lastSentAtRef = useRef(0);
   const roomId = resolveRoomId(currentPath);
 
-  const scheduleReconnect = useCallback(
-    (activeIdentity: LiveCursorIdentity) => {
-      clearTimers();
-      if (!shouldReconnectRef.current || reconnectTimeoutRef.current) {
-        return;
-      }
-
-      reconnectTimeoutRef.current = window.setTimeout(() => {
-        reconnectTimeoutRef.current = null;
-        void connect(activeIdentity);
-      }, RECONNECT_DELAY_MS);
-    },
-    [clearTimers]
-  );
-
   const clearTimers = useCallback(() => {
     if (heartbeatRef.current) {
       window.clearInterval(heartbeatRef.current);
@@ -96,6 +81,21 @@ export function useLiveCursorPresence(currentPath: string, socketUrl: string) {
       rafRef.current = null;
     }
   }, []);
+
+  const scheduleReconnect = useCallback(
+    (activeIdentity: LiveCursorIdentity) => {
+      clearTimers();
+      if (!shouldReconnectRef.current || reconnectTimeoutRef.current) {
+        return;
+      }
+
+      reconnectTimeoutRef.current = window.setTimeout(() => {
+        reconnectTimeoutRef.current = null;
+        void connect(activeIdentity);
+      }, RECONNECT_DELAY_MS);
+    },
+    [clearTimers]
+  );
 
   const sendMessage = useCallback((message: object) => {
     const socket = socketRef.current;
