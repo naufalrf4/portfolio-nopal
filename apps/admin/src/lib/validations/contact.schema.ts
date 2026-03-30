@@ -17,6 +17,9 @@ export const createContactSchema = z.object({
 export const updateContactSchema = z.object({
   read: z.boolean().optional(),
   replied: z.boolean().optional(),
+  metadata: z.record(z.string(), z.unknown()).optional(),
+  replySubject: z.string().max(200).optional(),
+  replyMessage: z.string().max(5000).optional(),
 });
 
 export const contactQuerySchema = z.object({

@@ -12,7 +12,7 @@ export function emailLayout({ preheader, content }: EmailLayoutOptions): string 
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NaufalRF</title>
+  <title>NaufalRF Portfolio</title>
   <style>
     body {
       margin: 0;
@@ -220,8 +220,8 @@ export function emailLayout({ preheader, content }: EmailLayoutOptions): string 
       ${content}
       <div class="footer">
         <div class="footer-card">
-          <strong>NaufalRF</strong><br />
-          Full-Stack Engineer<br />
+          <strong>NaufalRF Portfolio</strong><br />
+          Booking updates, inbox replies, and portfolio support<br />
           <a href="https://naufalrf.tech">naufalrf.tech</a>
         </div>
       </div>

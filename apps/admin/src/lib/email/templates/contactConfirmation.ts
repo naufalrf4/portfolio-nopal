@@ -5,7 +5,10 @@ import { emailLayout } from './layout';
 
 export function contactConfirmationTemplate(data: ContactConfirmationData): string {
   const content = `
-    ${renderHeader('Message received', 'Thanks for reaching out. I have your message and will review it soon.')}
+    ${renderHeader(
+      'Message received',
+      `Thanks for reaching out, ${data.name}. Your message is in the queue and you will get a reply soon.`
+    )}
     <div class="content">
       ${renderCard(
         renderDetailList([
@@ -14,7 +17,7 @@ export function contactConfirmationTemplate(data: ContactConfirmationData): stri
           { label: 'Subject', value: data.subject || 'General inquiry' },
         ])
       )}
-      ${renderMeta('You will usually get a reply within 1-2 business days.')}
+      ${renderMeta('Most replies land within 1-2 business days. If your request changes, simply reply with more context.')}
     </div>
   `;
 

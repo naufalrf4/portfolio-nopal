@@ -11,7 +11,7 @@ import {
 import { emailLayout } from './layout';
 
 export function adminContactNotificationTemplate(data: AdminContactNotificationData): string {
-  const { contact, dashboardLink, receivedAt } = data;
+  const { contact, dashboardLink, replyLink, receivedAt } = data;
   const location = [contact.city, contact.country].filter(Boolean).join(', ');
 
   const content = `
@@ -27,7 +27,10 @@ export function adminContactNotificationTemplate(data: AdminContactNotificationD
         ])
       )}
       ${renderMessageBlock('Message', contact.message)}
-      ${renderButtonGroup([renderButton(dashboardLink, 'Open in dashboard')])}
+      ${renderButtonGroup([
+        renderButton(replyLink, 'Reply from dashboard'),
+        renderButton(dashboardLink, 'Open contact record', 'neutral'),
+      ])}
     </div>
   `;
 

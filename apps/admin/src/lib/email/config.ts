@@ -17,7 +17,7 @@ function parseSmtpSecure(): boolean {
 let cachedTransporter: Transporter | null | undefined;
 
 export const EMAIL_CONFIG = {
-  from: process.env.EMAIL_FROM?.trim() || 'NaufalRF <noreply@naufalrf.tech>',
+  from: process.env.EMAIL_FROM?.trim() || 'NaufalRF Portfolio <noreply@naufalrf.tech>',
   adminDashboardUrl: process.env.NEXTAUTH_URL || 'http://localhost:3001',
   publicSiteUrl:
     process.env.PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_SITE_URL || 'https://naufalrf.tech',
@@ -26,10 +26,10 @@ export const EMAIL_CONFIG = {
 export function isEmailConfigured(): boolean {
   return Boolean(
     process.env.SMTP_HOST?.trim() &&
-      parseSmtpPort() &&
-      process.env.SMTP_USER?.trim() &&
-      process.env.SMTP_PASS?.trim() &&
-      process.env.EMAIL_FROM?.trim()
+    parseSmtpPort() &&
+    process.env.SMTP_USER?.trim() &&
+    process.env.SMTP_PASS?.trim() &&
+    process.env.EMAIL_FROM?.trim()
   );
 }
 

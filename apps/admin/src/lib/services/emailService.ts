@@ -1,20 +1,20 @@
 import { EMAIL_CONFIG, getEmailTransporter, isEmailConfigured } from '@/lib/email/config';
 import {
   contactConfirmationTemplate,
+  contactReplyTemplate,
   adminContactNotificationTemplate,
   bookingConfirmationTemplate,
   adminBookingNotificationTemplate,
   bookingConfirmedTemplate,
   bookingRejectedTemplate,
-  bookingReminderTemplate,
 } from '@/lib/email/templates';
 import type {
   ContactConfirmationData,
+  ContactReplyData,
   AdminContactNotificationData,
   BookingConfirmationData,
   AdminBookingNotificationData,
   BookingStatusUpdateData,
-  BookingReminderData,
 } from '@/lib/email/types';
 
 class EmailServiceError extends Error {
@@ -78,6 +78,16 @@ export class EmailService {
     }
   }
 
+  async sendContactReply(to: string, data: ContactReplyData): Promise<void> {
+    try {
+      await this.sendEmail(to, data.replySubject, contactReplyTemplate(data));
+      console.log(`[EmailService] Contact reply sent to ${to}`);
+    } catch (error) {
+      console.error('[EmailService] Failed to send contact reply:', error);
+      throw new EmailServiceError('Failed to send contact reply email', error);
+    }
+  }
+
   async sendBookingConfirmation(to: string, data: BookingConfirmationData): Promise<void> {
     try {
       await this.sendEmail(to, 'Booking request received', bookingConfirmationTemplate(data));
@@ -122,16 +132,6 @@ export class EmailService {
     } catch (error) {
       console.error('[EmailService] Failed to send booking rejected email:', error);
       throw new EmailServiceError('Failed to send booking rejected email', error);
-    }
-  }
-
-  async sendBookingReminder(to: string, data: BookingReminderData): Promise<void> {
-    try {
-      await this.sendEmail(to, 'Booking reminder', bookingReminderTemplate(data));
-      console.log(`[EmailService] Booking reminder sent to ${to}`);
-    } catch (error) {
-      console.error('[EmailService] Failed to send booking reminder:', error);
-      throw new EmailServiceError('Failed to send booking reminder email', error);
     }
   }
 }

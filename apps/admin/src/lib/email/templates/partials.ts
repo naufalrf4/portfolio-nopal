@@ -24,7 +24,7 @@ const statusToneStyles: Record<StatusTone, string> = {
 export function renderHeader(title: string, intro: string): string {
   return `
     <div class="hero">
-      <p class="eyebrow">NaufalRF</p>
+      <p class="eyebrow">NaufalRF Portfolio</p>
       <h1>${escapeHtml(title)}</h1>
       <p class="hero-copy">${escapeHtml(intro)}</p>
     </div>

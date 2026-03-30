@@ -2,9 +2,11 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { CheckCircle2, Trash2 } from 'lucide-react';
+import { CheckCircle2, Mail, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ResponsiveModal } from '@/components/ui/responsive-modal';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 
 interface ContactActionsProps {
@@ -15,14 +17,18 @@ interface ContactActionsProps {
 export function ContactActions({ contactId, replied }: ContactActionsProps) {
   const router = useRouter();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isReplyModalOpen, setIsReplyModalOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [markingReplied, setMarkingReplied] = useState(false);
+  const [sendingReply, setSendingReply] = useState(false);
+  const [replySubject, setReplySubject] = useState('Re: Your message to NaufalRF Portfolio');
+  const [replyMessage, setReplyMessage] = useState('');
 
   async function handleMarkAsReplied() {
     setMarkingReplied(true);
     try {
       const response = await fetch(`/api/v1/admin/contacts/${contactId}`, {
-        method: 'PUT',
+        method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ replied: true }),
       });
@@ -72,9 +78,47 @@ export function ContactActions({ contactId, replied }: ContactActionsProps) {
     }
   }
 
+  async function handleSendReply() {
+    setSendingReply(true);
+    try {
+      const response = await fetch(`/api/v1/admin/contacts/${contactId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          replied: true,
+          replySubject,
+          replyMessage,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast.success('Reply sent successfully');
+        setIsReplyModalOpen(false);
+        setReplyMessage('');
+        router.refresh();
+      } else {
+        const errorMsg =
+          typeof data.error === 'string'
+            ? data.error
+            : data.error?.message || 'Failed to send reply';
+        toast.error(errorMsg);
+      }
+    } catch {
+      toast.error('Failed to send reply');
+    } finally {
+      setSendingReply(false);
+    }
+  }
+
   return (
     <>
       <div className="flex items-center gap-2 w-full">
+        <Button variant="outline" onClick={() => setIsReplyModalOpen(true)} className="flex-1">
+          <Mail className="h-4 w-4 mr-2" />
+          Reply via Email
+        </Button>
         {!replied && (
           <Button
             variant="default"
@@ -95,6 +139,43 @@ export function ContactActions({ contactId, replied }: ContactActionsProps) {
           Delete
         </Button>
       </div>
+
+      <ResponsiveModal
+        open={isReplyModalOpen}
+        onOpenChange={setIsReplyModalOpen}
+        title="Reply to Contact"
+        description="Send a direct reply from the dashboard using the portfolio SMTP sender."
+        footer={
+          <>
+            <Button variant="outline" onClick={() => setIsReplyModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              variant="primary"
+              onClick={handleSendReply}
+              disabled={sendingReply || !replyMessage.trim()}
+            >
+              {sendingReply ? 'Sending...' : 'Send Reply'}
+            </Button>
+          </>
+        }
+      >
+        <div className="space-y-4 py-2">
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-[#3D4852]">Subject</label>
+            <Input value={replySubject} onChange={(event) => setReplySubject(event.target.value)} />
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-[#3D4852]">Reply message</label>
+            <Textarea
+              value={replyMessage}
+              onChange={(event) => setReplyMessage(event.target.value)}
+              rows={8}
+              placeholder="Write a helpful, user-centered reply..."
+            />
+          </div>
+        </div>
+      </ResponsiveModal>
 
       <ResponsiveModal
         open={isDeleteModalOpen}

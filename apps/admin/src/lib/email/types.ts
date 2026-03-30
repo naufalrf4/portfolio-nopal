@@ -16,7 +16,16 @@ export interface AdminContactNotificationData {
     city?: string | null;
   };
   dashboardLink: string;
+  replyLink: string;
   receivedAt: string;
+}
+
+export interface ContactReplyData {
+  name: string;
+  replySubject: string;
+  replyMessage: string;
+  originalMessage: string;
+  dashboardLink: string;
 }
 
 export interface BookingConfirmationData {
@@ -50,13 +59,4 @@ export interface BookingStatusUpdateData {
   duration: number;
   message?: string;
   status: 'confirmed' | 'rejected';
-}
-
-export interface BookingReminderData {
-  bookingId: string;
-  name: string;
-  date: string;
-  time: string;
-  duration: number;
-  hoursUntil: number;
 }
