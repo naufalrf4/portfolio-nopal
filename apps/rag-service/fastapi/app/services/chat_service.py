@@ -30,6 +30,11 @@ from app.services.tool_service import ToolService
 
 logger = logging.getLogger(__name__)
 MIN_RETRIEVAL_CONFIDENCE = 0.45
+ABOUT_FALLBACK_ACTION = SuggestedAction(
+    type="open_page",
+    target="/about",
+    label="Open about page",
+)
 
 
 class ChatService:
@@ -122,6 +127,7 @@ class ChatService:
         elif query_plan.needs_portfolio_context and retrieval_confidence < MIN_RETRIEVAL_CONFIDENCE:
             abstained = True
             final_text = self._build_abstention_message(query_plan.answer_language)
+            suggested_actions = [ABOUT_FALLBACK_ACTION]
             tokens = {
                 "analysisPrompt": query_plan.prompt_tokens,
                 "analysisCompletion": query_plan.completion_tokens,

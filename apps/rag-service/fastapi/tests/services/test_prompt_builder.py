@@ -107,6 +107,7 @@ def test_build_abstention_response_uses_requested_language() -> None:
     response = build_abstention_response("id", ["projects", "skills"])
 
     assert "Saya belum menemukan bukti portofolio" in response
+    assert "halaman About" in response
     assert "projects, skills" in response
 
 

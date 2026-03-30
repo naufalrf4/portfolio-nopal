@@ -233,6 +233,9 @@ async def test_chat_service_abstains_in_indonesian_for_low_confidence_results() 
     assert response.metadata.abstained is True
     assert confidence < 0.45
     assert llm_service.answer_calls == 0
+    assert len(response.suggested_actions) == 1
+    assert response.suggested_actions[0].target == "/about"
+    assert response.suggested_actions[0].label == "Open about page"
 
 
 async def test_chat_service_loads_tool_context_only_for_matching_intent() -> None:

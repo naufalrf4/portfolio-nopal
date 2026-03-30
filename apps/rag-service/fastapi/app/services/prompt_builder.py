@@ -95,12 +95,13 @@ def build_abstention_response(answer_language: str, portfolio_areas: list[str]) 
     if answer_language == "id":
         return (
             "Saya belum menemukan bukti portofolio yang cukup kuat untuk menjawab itu "
-            "dengan yakin. "
-            f"Coba arahkan saya ke area berikut: {area_list}."
+            "dengan yakin. Coba mulai dari halaman About agar saya punya konteks yang lebih aman, "
+            f"lalu arahkan saya ke area berikut bila perlu: {area_list}."
         )
     return (
         "I haven't found enough strong portfolio evidence to answer that confidently. "
-        f"Try pointing me to these areas: {area_list}."
+        "Start with the About page so I have a safer baseline, then point me toward these areas "
+        f"if needed: {area_list}."
     )
 
 
