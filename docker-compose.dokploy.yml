@@ -1,22 +1,4 @@
 services:
-  db:
-    image: pgvector/pgvector:pg16
-    restart: unless-stopped
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    volumes:
-      - db-data-prod:/var/lib/postgresql/data
-      - ./docker/postgres/init:/docker-entrypoint-initdb.d:ro
-    healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB']
-      interval: 10s
-      timeout: 5s
-      retries: 10
-    networks:
-      - internal
-
   admin:
     build:
       context: ./apps/admin
@@ -27,8 +9,8 @@ services:
         NEXT_PUBLIC_GA_MEASUREMENT_ID: ${ADMIN_NEXT_PUBLIC_GA_MEASUREMENT_ID}
     restart: unless-stopped
     environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
-      DIRECT_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres-hack-auxiliary-card-zar6e4:5432/${POSTGRES_DB}
+      DIRECT_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres-hack-auxiliary-card-zar6e4:5432/${POSTGRES_DB}
       AUTH_TRUST_HOST: ${ADMIN_AUTH_TRUST_HOST:-true}
       NEXTAUTH_SECRET: ${ADMIN_NEXTAUTH_SECRET}
       NEXTAUTH_URL: ${ADMIN_PUBLIC_URL}
@@ -68,9 +50,6 @@ services:
       - no-new-privileges:true
     cap_drop:
       - ALL
-    depends_on:
-      db:
-        condition: service_healthy
     networks:
       - internal
       - dokploy-network
@@ -85,8 +64,8 @@ services:
         NEXT_PUBLIC_GA_MEASUREMENT_ID: ${ADMIN_NEXT_PUBLIC_GA_MEASUREMENT_ID}
     command: ['bun', 'run', 'db:migrate']
     environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
-      DIRECT_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres-hack-auxiliary-card-zar6e4:5432/${POSTGRES_DB}
+      DIRECT_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres-hack-auxiliary-card-zar6e4:5432/${POSTGRES_DB}
       AUTH_TRUST_HOST: ${ADMIN_AUTH_TRUST_HOST:-true}
       NEXTAUTH_SECRET: ${ADMIN_NEXTAUTH_SECRET}
       NEXTAUTH_URL: ${ADMIN_PUBLIC_URL}
@@ -117,11 +96,8 @@ services:
       GOOGLE_REFRESH_TOKEN: ${ADMIN_GOOGLE_REFRESH_TOKEN}
       GA_PROPERTY_ID: ${ADMIN_GA_PROPERTY_ID}
       GA_SERVICE_ACCOUNT: ${ADMIN_GA_SERVICE_ACCOUNT}
-    depends_on:
-      db:
-        condition: service_healthy
     networks:
-      - internal
+      - dokploy-network
 
   rag:
     build:
@@ -134,7 +110,7 @@ services:
       HOST: 0.0.0.0
       PORT: 3005
       LOG_LEVEL: ${RAG_LOG_LEVEL}
-      RAG_DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      RAG_DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres-hack-auxiliary-card-zar6e4:5432/${POSTGRES_DB}
       ADMIN_API_URL: http://admin:3001
       ADMIN_INTERNAL_API_TOKEN: ${ADMIN_INTERNAL_API_TOKEN}
       RAG_INGEST_SERVICE_TOKEN: ${RAG_INGEST_SERVICE_TOKEN}
@@ -160,12 +136,11 @@ services:
     cap_drop:
       - ALL
     depends_on:
-      db:
-        condition: service_healthy
       admin:
         condition: service_started
     networks:
       - internal
+      - dokploy-network
 
   rag-bootstrap:
     build:
@@ -178,7 +153,7 @@ services:
       HOST: 0.0.0.0
       PORT: 3005
       LOG_LEVEL: ${RAG_LOG_LEVEL}
-      RAG_DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      RAG_DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres-hack-auxiliary-card-zar6e4:5432/${POSTGRES_DB}
       ADMIN_API_URL: http://admin:3001
       ADMIN_INTERNAL_API_TOKEN: ${ADMIN_INTERNAL_API_TOKEN}
       RAG_INGEST_SERVICE_TOKEN: ${RAG_INGEST_SERVICE_TOKEN}
@@ -194,12 +169,9 @@ services:
       INGESTION_BATCH_SIZE: ${RAG_INGESTION_BATCH_SIZE}
       RETRIEVAL_LIMIT: ${RAG_RETRIEVAL_LIMIT}
       CHAT_HISTORY_LIMIT: ${RAG_CHAT_HISTORY_LIMIT}
-    depends_on:
-      db:
-        condition: service_healthy
     profiles: ['ops']
     networks:
-      - internal
+      - dokploy-network
 
   public:
     build:
@@ -328,6 +300,3 @@ networks:
     driver: bridge
   dokploy-network:
     external: true
-
-volumes:
-  db-data-prod:
