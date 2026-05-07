@@ -50,6 +50,11 @@ services:
       - no-new-privileges:true
     cap_drop:
       - ALL
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+          cpus: "1.0"
     networks:
       - internal
       - dokploy-network
@@ -135,6 +140,11 @@ services:
       - no-new-privileges:true
     cap_drop:
       - ALL
+    deploy:
+      resources:
+        limits:
+          memory: 384m
+          cpus: "0.5"
     depends_on:
       admin:
         condition: service_started
@@ -196,6 +206,11 @@ services:
       - no-new-privileges:true
     cap_drop:
       - ALL
+    deploy:
+      resources:
+        limits:
+          memory: 256m
+          cpus: "0.5"
     depends_on:
       admin:
         condition: service_started
@@ -227,6 +242,11 @@ services:
       - no-new-privileges:true
     cap_drop:
       - ALL
+    deploy:
+      resources:
+        limits:
+          memory: 128m
+          cpus: "0.25"
     depends_on:
       admin:
         condition: service_started
@@ -255,6 +275,11 @@ services:
       - no-new-privileges:true
     cap_drop:
       - ALL
+    deploy:
+      resources:
+        limits:
+          memory: 128m
+          cpus: "0.25"
     depends_on:
       admin:
         condition: service_started
@@ -291,6 +316,11 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
+    deploy:
+      resources:
+        limits:
+          memory: 64m
+          cpus: "0.25"
     networks:
       - internal
       - dokploy-network
