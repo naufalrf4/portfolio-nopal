@@ -7,35 +7,35 @@ Authoritative AI control contract for this repository.
 - **Name:** `naufalrf-portfolio`
 - **Purpose:** coordinate five standalone apps that together power the portfolio ecosystem
 - **Architecture:** root repository shell with independent app runtimes under `apps/*`
-- **Execution Model:** each app installs and runs from its own directory; root stores shared steering docs and lightweight tooling only
+- **Execution Model:** Bun workspace monorepo — root `package.json` declares `"workspaces": ["apps/*","packages/*"]`; all apps + shared packages (`packages/tsconfig`, `packages/design-tokens`, `packages/http`, `packages/contracts`) install together into a single root `bun.lock`.
 - **Critical Domains:** Admin API authority, centralized Neon/Postgres ownership, legacy phase2 design parity, cross-app service boundaries, security hardening
 
 ## 2. Technology Baseline
 
-- **Framework:** root coordination shell for Next.js 16, Astro 5 + React, SvelteKit 2, and FastAPI apps
-- **Runtime:** Node `>=22.0.0` at root; Bun per JS app; Python 3.12+ for `apps/rag-service/fastapi`
-- **Language:** TypeScript across frontend/admin apps; Python in the FastAPI RAG service
-- **Styling:** Tailwind CSS 4 plus legacy phase2 light-neumorphic UI patterns
-- **Package Manager:** no workspace package manager at root; use each app's own manifest and lockfile
+- **Framework:** root workspace shell for Next.js 16, Astro 5 + React, SvelteKit 2, and a TypeScript Bun + Hono RAG service
+- **Runtime:** Node `>=22.0.0` at root; Bun per JS app and for `apps/rag-service`
+- **Language:** TypeScript across all apps and packages (the RAG service is TypeScript on Bun; the old Python/FastAPI service was removed)
+- **Styling:** Tailwind CSS 4 with shared dark-first design tokens from `@naufalrf/design-tokens`
+- **Package Manager:** Bun workspaces at root — a single root `bun.lock` is the only lockfile (app-level `bun.lock` files were removed). Install everything with `bun install` from the root.
 - **Version Policy:** use versions resolved from manifests and lockfiles; never guess from memory
 - **State Management:** framework-native data fetching and app-local state; no shared root state layer
-- **Database / ORM:** centralized Neon/Postgres; Drizzle + `postgres` in Admin, SQLAlchemy async + pgvector in RAG
-- **Testing Stack:** app-local build/type/lint commands only; pytest and ruff in RAG; no unified root CI or test runner evidenced
+- **Database / ORM:** centralized Neon/Postgres; Drizzle + `postgres` in Admin, `postgres` (postgres.js) + pgvector in the TS RAG service
+- **Testing Stack:** app-local build/type/lint commands plus `bun test` in the RAG service and shared packages; no unified root CI or test runner evidenced
 
 ## 3. Architecture and Structure Rules
 
-- Root is a coordination layer, not a shared runtime package or workspace app.
+- Root is a Bun workspace shell; shared code lives only in the four `packages/*` (tsconfig, design-tokens, http, contracts). No component library / `packages/ui`.
 - `apps/admin` is the primary content and API authority.
 - `apps/public-astro`, `apps/links-astro`, and `apps/ngl-svelte` must stay API-only consumers and must not bypass Admin for database access.
 - `apps/rag-service` may connect directly to the centralized database for approved RAG responsibilities and may call Admin internal APIs for coordination.
 
 ## 4. Operational Command Set
 
-- **Install:** root has no single install command; use `cd apps/admin && bun install`, `cd apps/public-astro && bun install`, `cd apps/links-astro && bun install`, `cd apps/ngl-svelte && bun install`, or `cd apps/rag-service/fastapi && uv sync`
+- **Install:** `bun install` at the root installs all workspace apps + packages into the single root `bun.lock`. Per-app installs are unnecessary.
 - **Dev:** root supports `bun run dev:all` for local multi-app startup via `./start-dev.sh`; app-local alternatives remain `cd apps/admin && bun run dev`, `cd apps/public-astro && bun run dev`, `cd apps/links-astro && bun run dev`, `cd apps/ngl-svelte && bun run dev`, or `cd apps/rag-service && bun run dev`
 - **Build:** root has no single build command; use `cd apps/admin && bun run build`, `cd apps/public-astro && bun run build`, `cd apps/links-astro && bun run build`, `cd apps/ngl-svelte && bun run build`, or `cd apps/rag-service && bun run build`
-- **Test:** root supports `bun run reset:seed` for the local reset + reseed + RAG ingest workflow via `./reset-seed-rag.sh`; for app tests use `cd apps/rag-service/fastapi && uv run pytest` where tests exist and do not invent missing app test commands
-- **Lint:** root has no single lint command; use `cd apps/admin && bun run lint`, `cd apps/ngl-svelte && bun run lint`, or `cd apps/rag-service/fastapi && uv run ruff check .`
+- **Test:** root supports `bun run reset:seed` for the local reset + reseed + RAG ingest workflow via `./reset-seed-rag.sh`; for app tests use `cd apps/rag-service && bun test`, `cd packages/http && bun test`, or `cd packages/contracts && bun test`. Do not invent missing app test commands.
+- **Lint:** use `cd apps/admin && bun run lint` or `cd apps/ngl-svelte && bun run lint` (ngl also `bun run check`). Typecheck via `cd apps/admin && bun run typecheck` and `cd apps/rag-service && bun x tsc --noEmit`.
 
 ## 5. Git Workflow Rules
 
@@ -75,3 +75,16 @@ Authoritative AI control contract for this repository.
 - Root now has local orchestration scripts: `bun run dev:all` starts all apps, and `bun run reset:seed` resets Admin + RAG data, seeds Admin from `data/`, then triggers proper Admin -> RAG ingest.
 - Root hook/tooling is Bun-aligned; remove stale pnpm lockfiles and pnpm-only root docs when updating repo shell docs.
 - Root deployment automation now includes interactive `deploy.py` (run via `uv run deploy.py`) for single-host Paramiko SSH deploys; keep it pull-based on the server and do not turn it into a push-to-server file sync workflow unless the deployment architecture is intentionally changed.
+
+## graphify
+
+This project has a knowledge graph at graphify-out/ with god nodes, community structure, and cross-file relationships.
+
+When the user types `/graphify`, use the installed graphify skill or instructions before doing anything else.
+
+Rules:
+- For codebase questions, first run `graphify query "<question>"` when graphify-out/graph.json exists. Use `graphify path "<A>" "<B>"` for relationships and `graphify explain "<concept>"` for focused concepts. These return a scoped subgraph, usually much smaller than GRAPH_REPORT.md or raw grep output.
+- Dirty graphify-out/ files are expected after hooks or incremental updates; dirty graph files are not a reason to skip graphify. Only skip graphify if the task is about stale or incorrect graph output, or the user explicitly says not to use it.
+- If graphify-out/wiki/index.md exists, use it for broad navigation instead of raw source browsing.
+- Read graphify-out/GRAPH_REPORT.md only for broad architecture review or when query/path/explain do not surface enough context.
+- After modifying code, run `graphify update .` to keep the graph current (AST-only, no API cost).

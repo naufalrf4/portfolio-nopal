@@ -2,12 +2,12 @@
 
 ## Style
 
-Repository shell for independent app repos under `apps/*`, with shared project truth documented at the root.
+Bun workspace monorepo for independent app repos under `apps/*` and shared packages under `packages/*`, with shared project truth documented at the root.
 
 ## Execution model
 
-- Root contains metadata, shared linting hooks, and steering docs.
-- Each app owns its own dependencies, scripts, runtime, and environment file.
+- Root is a Bun workspace shell. A single `bun install` installs all apps and shared packages.
+- Each app owns its own scripts, runtime, and environment file.
 - Cross-app communication happens through HTTP APIs and service tokens, except for the direct database actors and websocket presence service documented below.
 
 ## App boundaries
@@ -36,8 +36,8 @@ Repository shell for independent app repos under `apps/*`, with shared project t
   - Supplies ephemeral room-based cursor presence for the public site.
   - Must not connect to the database or route presence traffic through Admin APIs.
 - `apps/rag-service`
-  - Bun wrapper around `fastapi/`.
-  - FastAPI app uses its own Python environment and direct Postgres access for the `rag` schema with pgvector.
+  - TypeScript Bun + Hono service.
+  - Uses `postgres` (postgres.js) with direct Postgres access for the `rag` schema with pgvector.
   - Also calls Admin internal APIs using `X-Service-Token` for coordination such as chat log persistence.
 
 ## Database ownership

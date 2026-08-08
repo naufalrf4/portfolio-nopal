@@ -520,3 +520,74 @@ Chronological timeline of meaningful project work, discoveries, decisions, and b
 - Verification evidence: grep across `apps/admin/src` shows `socialLinks` only in the public about response contract and assignment; grep across `apps/admin/scripts` shows zero `socialLinks` references; LSP diagnostics clean on all modified files; `apps/admin` passes lint, typecheck, and build.
 - Residual risk: external or future code outside Admin that still assumes `about.socialLinks` is writable or populated by Admin -- within the audited Admin boundary this risk is retired. If `profile_links` records are absent or all hidden, public socials will correctly return empty since no fallback exists.
 - Rule for later phases: do not reintroduce any write path or fallback tied to `about.socialLinks`; do not store signed or preview URLs into content fields.
+
+### 2026-07-26 -- Home redesign phase 1: core tokens + dark-first Home (public-astro)
+
+- Task: Apply DESIGN.md redesign — core design tokens globally, full Home page restyle with Three.js hero
+- Mode: implementation
+- Files: `apps/public-astro/src/styles/globals.css`, `src/layouts/BaseLayout.astro`, `src/components/layout/Navbar.astro`, `src/components/layout/Footer.astro`, `src/components/shared/{NeuCard,NeuButton,NeuBadge,NeuInput,NeuTextarea,Section,SectionHeader,PageHero}.tsx`, `src/components/home/{HeroSection,HeroNodeGraph,TechnicalExpertise,FeaturedProjects,LatestArticles,Guestbook}.tsx`, `package.json` (added `three` + `@types/three`)
+- Status: done
+- Notes: Replaced the light-neumorphic system with the DESIGN.md dark-first token set (`--bg`/`--bg-elevated`/`--bg-card`/`--border`/`--teal`/`--amber`, light-mode overrides under `[data-theme='light']`). Fonts switched to Space Grotesk / Inter / JetBrains Mono. All Neu* shared components rewritten to border-card style (APIs unchanged), legacy neu utilities flattened to border fallbacks so unmigrated pages stay readable. Theme toggle (sun/moon morph, localStorage, no-flash inline script, survives astro:after-swap), navbar shrink-on-scroll, IntersectionObserver one-shot scroll-reveal (`[data-reveal]`), alternating section tones. Hero has a Three.js node graph (4 domain clusters, ~52 nodes, 2 draw calls, dynamic import, mouse-follow + continuous scroll parallax, paused off-viewport/hidden-tab, disabled on mobile and prefers-reduced-motion with static gradient fallback). FloatingBlobs removed. Guestbook home entries now a compact horizontal scroll strip; all data fetching, sign-in, and submission logic untouched. Verified with `bun run build` and rendered-page checks on `/`, `/about`, `/projects`, `/blogs`, `/contact`, `/guestbook` (all 200, dark theme applied). Remaining for later phases: LiveCursorBand, MobileBottomNav, ScrollToTopButton, ChatWidget, GuestbookModal, and page-level content components still carry old hardcoded colors.
+
+### 2026-07-26 -- Home redesign phase 1 QA follow-up
+
+- Task: Close QA findings from qa-reviewer pass on Home redesign
+- Mode: implementation
+- Files: `apps/public-astro/src/components/shared/ResponsiveModal.tsx`, `src/components/home/GuestbookModal.tsx`, `src/components/home/{HeroSection,TechnicalExpertise,FeaturedProjects,LatestArticles,Guestbook}.tsx`
+- Status: done
+- Notes: (1) All new Framer Motion entrance animations now gated with `useReducedMotion()` (`initial={false}` when reduced) and HeroSection scroll-parallax MotionValues bypassed under reduced motion, closing the prefers-reduced-motion gap. (2) ResponsiveModal + GuestbookModal migrated off the old light glassmorphic palette to DESIGN.md tokens (dark card, border, teal accents; reduced-motion variants in modal). (3) Fixed `React.MouseEvent` usage without React import in FeaturedProjects (now `type MouseEvent` import). Verified: `bun run build` passes; `bunx tsc --noEmit` reports errors only in three pre-existing untouched files (`PublicSignInForm.tsx`, `ProjectArticle.tsx`, `ProjectDetail.tsx` — framer-motion ease typing + SyncedUser token), none introduced by this change.
+
+### 2026-07-26 -- Global components token migration (public-astro)
+
+- Task: Migrate remaining global/floating components off legacy light-neumorphic palette to DESIGN.md tokens
+- Mode: implementation
+- Files: `apps/public-astro/src/components/shared/{ScrollToTopButton,TurnstileWidget}.tsx`, `src/components/layout/MobileBottomNav.tsx`, `src/components/home/LiveCursorBand.tsx`, `src/components/chatbot/{ChatWidget,ChatWindow,ChatHeader,ChatInput,MessageBubble,MessageList,SourcesList,MarkdownMessage}.tsx`
+- Status: done
+- Notes: All floating/global UI now uses token classes (bg-bg-card/elevated, border-line, teal/amber accents, mono labels): scroll-to-top button, mobile bottom nav + Other sheet, live cursor presence pill/panel/labels (status dot now teal/amber, participant cursor keeps server-assigned color), chat launcher (teal), chat window/header/input/bubbles/empty state/sources, Turnstile fallback container. Also fixed pre-existing empty-state bug where MessageCircle icon was text-white on a light container (now teal on teal-soft). No logic touched. Verified `bun run build` passes; `bunx tsc --noEmit` unchanged (same 3 pre-existing error files only). Remaining hardcoded legacy colors now live only in page-level content components (about/, projects/, blogs/, contact/, project-detail/, auth/, guestbook page wrapper) — next phases.
+
+### 2026-07-26 -- Home redesign phase 2: bolder layouts + upgraded 3D + scroll choreography
+
+- Task: Address feedback that phase 1 was too conservative (sections barely changed, 3D and animations underwhelming)
+- Mode: implementation
+- Files: `apps/public-astro/src/components/home/{HeroNodeGraph,HeroSection,TechnicalExpertise,FeaturedProjects,LatestArticles}.tsx`, `src/layouts/BaseLayout.astro`
+- Status: done
+- Notes: Hero rebuilt as asymmetric left-aligned composition (min-h-100dvh, giant Space Grotesk name with per-letter staggered reveal, mono rotating greeting, avatar shrunk to 48px chip beside live-status pill). Node graph upgraded: 88 nodes / 4 clusters, additive blending, 14 data packets traveling along edges, breathing scale, stronger mouse-follow, camera dolly + z-rotation tied to scroll; perf guards unchanged (pause off-viewport/hidden, no mount on mobile/reduced-motion). Technical Expertise: sticky left heading + full-width hover rows (replaces 3-equal-cards). Featured Projects: sticky-stack scroll (cards pin below navbar, scale down as next stacks over, framer useScroll per-container) with wide screenshot+meta split cards. Latest Articles: horizontal snap-scroll strip with edge fades and header-inline View All link. Global thin teal scroll-progress bar (rAF-throttled, plain DOM). Section layout families now all distinct. All new motion gated by useReducedMotion. Fixed sticky-vs-overflow conflict via overflow-x-visible on the expertise Section and overflow-hidden on its row wrapper. Verified: build passes, tsc unchanged (3 pre-existing files), preview SSR smoke on :4321 renders hero/status/progress/expertise/projects; Latest Articles empty locally due to no blog data from Admin API (renders in production).
+
+### 2026-07-26 -- Home phase 3: calm hero background + per-section 3D accents (user-directed)
+
+- Task: Iterate per user feedback: hero 3D too busy; wanted simple animated dot-gradient hero, centered hero layout as before, no sticky between sections, and small 3D components per section instead
+- Mode: implementation
+- Files: `apps/public-astro/src/components/home/{HeroScene,HeroSection,FloatShape,GhostHeading,TechnicalExpertise,FeaturedProjects,LatestArticles,Guestbook}.tsx`, `src/components/shared/Tilt.tsx`, `src/styles/globals.css`, `src/pages/index.astro`, `src/components/shared/Section.tsx` (denser padding)
+- Status: done
+- Notes: HeroNodeGraph deleted. HeroScene now pure CSS: static dot grid (26px, radial mask) + two slow-drifting blurred glows (teal/amber, 26s/32s keyframes, disabled under reduced motion); scroll effect on hero limited to content fade. Hero layout reverted to centered phase-1 composition (avatar top, greeting+name one line, role rotator, bio, socials, status+CTA). All sticky pinning removed (hero curtain, expertise sticky heading, project sticky-stack) per user. New FloatShape component: small lazy-loaded Three.js canvas (IntersectionObserver-gated import, pause offscreen, desktop-only, reduced-motion-off, theme-reactive) rendering one slow-rotating wireframe primitive whose roll follows section scroll position; per user-selected scheme: Expertise=icosahedron, Projects=torus knot (240px), Articles=octahedron (190px), Guestbook=amber ring (180px). Projects now alternating image-side wide cards with internal image parallax (useScroll y drift) + Tilt. Shared Tilt component (hover-only, reduced-motion/touch guarded) applied to project cards, article cards, guestbook form card. GhostHeading parallax outline words (EXPERTISE/PROJECTS/WRITING) behind section headings. Content curtain kept as visual overlap (rounded-t-3xl, -mt-10vh, shadow) without sticky. Verified: build passes, tsc unchanged (3 pre-existing), preview SSR smoke renders dot grid/glows/ghost words/progress bar.
+
+## 2026-07-26 — Neu system fully removed (public-astro)
+- Renamed shared components: NeuCard→Card, NeuButton→Button, NeuBadge→Badge, NeuInput→Input, NeuTextarea→Textarea (git mv, all imports updated across 20+ files).
+- Replaced remaining `.neu-*` class usage (AboutContent avatar/socials, 404.astro, projects/[slug].astro fallback) with token classes (card-base, border-line, bg-bg-card).
+- Deleted legacy `.neu-*` utilities, `--neu-*` vars, and `--shadow-neu-*` theme mappings from globals.css.
+- Zero case-insensitive "neu" references left in src. Build passes; tsc errors unchanged (3 pre-existing files only).
+
+## 2026-07-26 — Projects/Contact/About token consistency sweep (public-astro)
+- Bulk-migrated all remaining hardcoded neumorphic styling to design tokens: hex colors (#E0E5EC/#3B82F6/#6B7280/slate family), rgba(163,177,198) dual shadows, light gradients, red/emerald status colors — across projects/, contact/, about/, blogs/, auth/, project-detail/, chatbot/.
+- Unified segmented-control tab pattern (ProjectsGrid, ContactContent, ExperienceTabs, AboutContent): rounded-xl bg-bg-elevated container, active = teal-soft + border-teal/30, inactive = transparent + hover teal.
+- Normalized legacy radii (rounded-[18..32px] → rounded-lg/xl); status colors now use --error / teal tokens (incl. ContactInfo availability dot).
+- Deleted dead FloatingBlobs.astro. QA-reviewer verdict: Ready. Build passes; tsc unchanged (3 pre-existing files).
+
+## 2026-08-02 — GlobalScene circuit+flow fidelity pass (public-astro)
+- Task: `E-fidelity-r2-circuit-flow`. Surgically upgraded only the `circuit` and `flow` states of `apps/public-astro/src/components/shared/GlobalScene.tsx` toward high-end PCB / liquid-ribbon visuals; terrain/signal untouched.
+- Circuit rework: replaced random 90°/45° L-traces with an organized PCB bus topology — 6 horizontal bus rows at distinct Z (`[-6, -3.75, -1.5, 0.75, 3, 5.25]`), 35 traces total, 50% pure-horizontal (20% with a one-grid-step Z wobble), 50% L-routes dropping vertically to the adjacent bus row. Trace bounds tightened to ±7. Amber pulse heads brightened (tail 0.75× / head 3.2×), pad particles enlarged (0.22 size, 0.9 opacity) for via-like weight.
+- Critical bug caught mid-pass: the bus-topology rewrite dropped the `initCircuitTraces();` invocation, leaving all trace arrays zero → circuit rendered blank. Restored the call; verified via browser that director state = circuit, canvas 1280×800, WebGL active.
+- Flow rework: FLOW_PTS 10→16 and FLOW_RIBBONS 30→21 (1890 verts, within the 2000-vertex LINE_FLOATS budget — FLOW_PTS=20/RIBBONS=24 would overflow at 2736). Halved curl advection step (0.8→0.4) so points pack tighter → ribbons read as smooth continuous strips instead of stubby square tiles. Amber accent every 6th ribbon instead of every 3rd for teal-dominant balance.
+- Vision review API (`ai.naufalrf.net/v1`) returned inconsistent verdicts (JSON/terse format, intermittently claiming the scene is blank when it clearly renders; one transient Cloudflare connect timeout). Used direct screenshot inspection instead as ground truth: circuit shows organized horizontal buses + vertical drops + amber pulses; flow shows thick teal/amber ribbons with real width and no scattered dots.
+- Verification: `cd apps/public-astro && bun run build` exit 0 on every iteration. Console errors on /projects and /blogs are pre-existing environmental noise (`localhost:3006/health` ERR_CONNECTION_REFUSED — live-presence service not running locally).
+- Ledger screenshots: `.omo/start-work/r2-circuit.png`, `.omo/start-work/r2-flow.png`.
+
+### 2026-08-04 — Home landing revamp: glass CTA, guestbook marquee rewrite, richer expertise (public-astro)
+- Task: Multi-section landing polish — glass CTA, guestbook layout/cards/buttons, drop "Index" article label, richer technical expertise, green availability dots, motion consistency.
+- Files: `apps/public-astro/src/components/home/{Guestbook,TechnicalExpertise,LatestArticles,HeroSection}.tsx`, `src/components/contact/ContactInfo.tsx`, `src/pages/{index,guestbook}.astro`, `src/styles/globals.css`, `packages/design-tokens/tokens.css`.
+- Design tokens: added `--green` (#4ade80 dark / #16a34a light) + `--color-green` both themes; availability dots in HeroSection + ContactInfo switched bg-teal → bg-green.
+- LatestArticles: removed "Index" header label (arrow link to /blogs only). index.astro CTA now uses `.glass-cta` class; globals.css gained `.glass-cta`, `.homepage-reveal-blur` + keyframes, wired into reduced-motion block.
+- TechnicalExpertise rewritten: 4 skill groups (Web & App Engineering, AI & Agentic Systems, IoT & Embedded, Cloud & Tooling), 3 badge tones, 20 IconCloud icons (Rust, Tauri, AI agents, n8n).
+- Guestbook.tsx fully rewritten (275 lines): `buildRows()` even-distributes entries into ≤3 rows, `repeatForRow()` guarantees seamless marquee loop (repeat ≥4), per-row alternating direction (idx%2), edge fades, `SYNC_KEYS` tuple for guestbook_* query-param sync. Redundant "Add yours"/"View Archive" pill row under the marquee removed per user feedback — compose/sign-in actions live only in the composer card (right column) with BorderBeam. Unused ArrowRight import dropped.
+- Motion: verified BlurFade is the single scroll-reveal primitive site-wide and prefers-reduced-motion is globally handled (globals.css 378-406); count-up deliberately skipped — no numeric stats exist anywhere in the app (YAGNI).
+- Verification: `cd apps/public-astro && bun run build` exit 0 after JSX orphan-bracket fix left by the button-block removal. No lint/test script in this app. Per user request no Playwright — user verifies manually.

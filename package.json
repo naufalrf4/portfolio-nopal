@@ -14,7 +14,11 @@
     "docker:prod:migrate": "bash ./scripts/docker-prod-migrate.sh",
     "docker:prod:bootstrap": "bash ./scripts/docker-prod-bootstrap.sh",
     "lint-staged": "lint-staged",
-    "commitlint": "commitlint"
+    "commitlint": "commitlint",
+    "dev": "bash ./start-dev.sh",
+    "build": "NODE_OPTIONS=--max-old-space-size=4096 bun run --filter admin build && bun run --filter public-astro build && bun run --filter links-astro build && bun run --filter ngl-svelte build",
+    "lint": "bun run --filter admin lint && bun run --filter ngl-svelte lint",
+    "typecheck": "bun run --filter admin typecheck"
   },
   "devDependencies": {
     "@commitlint/cli": "^20.1.0",
@@ -31,5 +35,9 @@
   },
   "engines": {
     "node": ">=22.0.0"
-  }
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ]
 }

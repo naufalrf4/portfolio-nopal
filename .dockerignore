@@ -1,25 +1,46 @@
-.git
-.gitignore
-.agents
-.agent-workspace
-.agent-review
-.evals
-.reviews
-.opencode
-.context
-node_modules
+# Dependencies (installed from lockfile inside images)
 **/node_modules
-**/.next
+
+# Build output
 **/dist
-**/build
+**/.next
 **/.astro
 **/.svelte-kit
-**/.venv
-**/.pytest_cache
-**/.ruff_cache
-**/.turbo
-**/coverage
-**/*.log
-Dockerfile*
+**/build
+
+# Environment secrets
+.env
+.env.*
+!.env.example
+
+# Git
+.git
+.gitignore
+
+# Data (operational seed/ingest)
+data/
+
+# Graphify output
+graphify-out/
+
+# Agent workspace artifacts
+.omo/
+.agents/
+.agent-workspace/
+.agent-review/
+.evals/
+.reviews/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker (don't include compose files or Docker config in itself)
+.docker
 docker-compose*.yml
-.env*
+Dockerfile*
+docker/

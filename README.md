@@ -1,9 +1,9 @@
 # NaufalRF Portfolio Platform
 
-> Multi-app portfolio platform with Admin as the content authority, Astro/Svelte consumer apps, a FastAPI RAG service, and realtime presence.
+> Multi-app portfolio platform with Admin as the content authority, Astro/Svelte consumer apps, a TypeScript RAG service, and realtime presence.
 
 ![Apps](https://img.shields.io/badge/apps-6-0f172a?style=for-the-badge)
-![Runtime](https://img.shields.io/badge/runtime-Bun%20%2B%20Python%203.12-2563eb?style=for-the-badge)
+![Runtime](https://img.shields.io/badge/runtime-Bun%20Workspace-2563eb?style=for-the-badge)
 ![Frontend](https://img.shields.io/badge/frontend-Next.js%2016%20%7C%20Astro%205%20%7C%20SvelteKit%202-0ea5e9?style=for-the-badge)
 ![Database](https://img.shields.io/badge/database-Neon%20Postgres-14b8a6?style=for-the-badge)
 ![AI](https://img.shields.io/badge/AI-RAG%20%2B%20Realtime-f97316?style=for-the-badge)
@@ -16,10 +16,10 @@ This repository coordinates the full NaufalRF portfolio ecosystem:
 - `apps/public-astro` — the main public portfolio and AI chat entrypoint
 - `apps/links-astro` — the link-in-bio style profile surface
 - `apps/ngl-svelte` — the anonymous message experience
-- `apps/rag-service/fastapi` — retrieval, embeddings, grounding, and AI workflows
+- `apps/rag-service` — TypeScript (Bun + Hono) RAG service: retrieval, embeddings, grounding, and AI workflows
 - `apps/live-presence` — realtime presence and cursor state
 
-The root repository is intentionally lightweight. It is **not** a workspace runtime. Each app owns its own dependencies, scripts, and runtime boundaries.
+The root is a Bun workspace monorepo. A single `bun install` at the root installs all apps and shared packages.
 
 ## Architecture
 
@@ -30,7 +30,7 @@ flowchart LR
     NGL[NGL App\napps/ngl-svelte]
     Admin[Admin CMS + Public/Internal APIs\napps/admin]
     Presence[Realtime Presence\napps/live-presence]
-    RAG[RAG Service\napps/rag-service/fastapi]
+    RAG[RAG Service\napps/rag-service]
     DB[(Neon Postgres)]
 
     Public --> Admin
@@ -53,7 +53,7 @@ flowchart LR
 | Admin            | `apps/admin`               | Next.js 16            | `3001`       | CMS, content authority, dashboard, public/internal APIs |
 | Links            | `apps/links-astro`         | Astro 5 + React       | `3002`       | Compact links/profile surface                           |
 | NGL              | `apps/ngl-svelte`          | SvelteKit 2           | `3003`       | Anonymous messaging                                     |
-| RAG service      | `apps/rag-service/fastapi` | FastAPI + pgvector    | `3005`       | Retrieval, grounding, AI workflows                      |
+| RAG service      | `apps/rag-service`         | Bun + Hono + pgvector   | `3005`       | Retrieval, grounding, AI workflows                      |
 | Live presence    | `apps/live-presence`       | Bun WebSocket service | `3006`       | Realtime presence and cursor state                      |
 
 ## Non-Negotiable Platform Rules
@@ -83,7 +83,7 @@ Important: the migration for the new `booking_settings` Google columns must be a
 
 ### RAG fallback and intent handling were upgraded
 
-The FastAPI RAG service now:
+The TypeScript RAG service now:
 
 - handles personal/profile/contact/skills questions more accurately
 - uses a generic no-data / low-confidence fallback instead of portfolio-specific dead ends
@@ -116,13 +116,6 @@ Public, Links, and NGL now share the same cross-app presence direction using the
 
 ```bash
 bun install
-cd apps/admin && bun install
-cd apps/public-astro && bun install
-cd apps/links-astro && bun install
-cd apps/ngl-svelte && bun install
-cd apps/live-presence && bun install
-cd apps/rag-service && bun install
-cd apps/rag-service/fastapi && uv sync
 ```
 
 ### 2. Create environment files
@@ -133,7 +126,7 @@ cp apps/public-astro/.env.example apps/public-astro/.env
 cp apps/links-astro/.env.example apps/links-astro/.env
 cp apps/ngl-svelte/.env.example apps/ngl-svelte/.env
 cp apps/live-presence/.env.example apps/live-presence/.env
-cp apps/rag-service/fastapi/.env.example apps/rag-service/fastapi/.env
+cp apps/rag-service/.env.example apps/rag-service/.env
 ```
 
 ### 3. Run the local stack
@@ -180,7 +173,7 @@ cd apps/admin && bun run lint && bun run typecheck && bun run build
 cd apps/public-astro && bun run build
 cd apps/links-astro && bun run build
 cd apps/ngl-svelte && bun run lint && bun run check && bun run build
-cd apps/rag-service/fastapi && uv run ruff check . && uv run pytest
+cd apps/rag-service && bun x tsc --noEmit && bun test
 cd apps/rag-service && bun run build
 ```
 
@@ -238,7 +231,12 @@ apps/
   links-astro/      Compact links/profile surface
   ngl-svelte/       Anonymous message app
   live-presence/    Bun realtime presence service
-  rag-service/      Bun wrapper + FastAPI RAG runtime
+  rag-service/      TypeScript Bun + Hono RAG service
+packages/
+  tsconfig/        Shared TypeScript config
+  design-tokens/    Shared design tokens
+  http/             Shared HTTP utilities
+  contracts/        Shared API contracts
 .context/           Shared repo context and architecture notes
 start-dev.sh        Multi-app local development launcher
 reset-seed-rag.sh   Reset, seed, and ingest workflow
@@ -248,7 +246,7 @@ scripts/            Docker/dev/prod orchestration helpers
 ## Operational Notes
 
 - Root hook/tooling uses Bun.
-- JavaScript apps use Bun; the FastAPI app uses `uv` for Python dependencies.
+- All apps use Bun workspaces; the RAG service is TypeScript on Bun (the Python/FastAPI service was removed).
 - `data/` is operational seed/ingest content and should stay local unless you intentionally version fixtures.
 - Secrets in `.env*` files must stay placeholders only.
 - For meaningful repo behavior, always check `PROGRESS.md` and the nearest `AGENTS.md` before changing architecture or workflows.

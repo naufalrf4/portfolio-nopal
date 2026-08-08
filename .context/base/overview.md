@@ -1,6 +1,6 @@
 # Overview
 
-`naufalrf-portfolio` is a repository shell for six standalone applications that together form a portfolio ecosystem: a public portfolio site, an admin dashboard and API authority, a links page, an anonymous message app, a realtime cursor-presence service, and a FastAPI RAG service.
+`naufalrf-portfolio` is a Bun workspace monorepo coordinating six applications that together form a portfolio ecosystem: a public portfolio site, an admin dashboard and API authority, a links page, an anonymous message app, a realtime cursor-presence service, and a TypeScript (Bun + Hono) RAG service.
 
 The current repository is unfinished. The immediate goal is not to invent a new product direction, but to finish this multi-app ecosystem with durable architecture rules, stronger security defaults, and page/component/design parity with the legacy reference at `../naufalrf-portfolio-phase2`.
 
@@ -14,6 +14,6 @@ Core value:
 
 Explicit non-goals:
 
-- This root is not a unified app runtime or package workspace.
-- Future agents should not invent shared root install, build, or test commands that the repo does not define.
+- This root is a Bun workspace monorepo. Shared code lives in `packages/*`.
+- A single `bun install` at the root installs all apps and shared packages. Do not invent missing root build or test commands.
 - Initialization work should not rewrite application behavior unless a repo truth contradiction must be corrected.

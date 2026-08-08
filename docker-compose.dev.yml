@@ -18,9 +18,10 @@ services:
 
   admin:
     build:
-      context: ./apps/admin
+      context: .
+      dockerfile: apps/admin/Dockerfile
       target: dev
-    working_dir: /app
+    working_dir: /app/apps/admin
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
       DIRECT_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
@@ -56,8 +57,8 @@ services:
     ports:
       - '${ADMIN_PORT:-3001}:3001'
     volumes:
-      - ./apps/admin:/app
-      - admin-node-modules:/app/node_modules
+      - .:/app
+      - root-node-modules:/app/node_modules
     depends_on:
       db:
         condition: service_healthy
@@ -137,9 +138,10 @@ services:
 
   public:
     build:
-      context: ./apps/public-astro
+      context: .
+      dockerfile: apps/public-astro/Dockerfile
       target: dev
-    working_dir: /app
+    working_dir: /app/apps/public-astro
     environment:
       ADMIN_API_URL: http://admin:3001
       PUBLIC_SITE_URL: ${PUBLIC_SITE_URL}
@@ -150,8 +152,8 @@ services:
     ports:
       - '${PUBLIC_PORT:-3000}:3000'
     volumes:
-      - ./apps/public-astro:/app
-      - public-node-modules:/app/node_modules
+      - .:/app
+      - root-node-modules:/app/node_modules
     depends_on:
       admin:
         condition: service_started
@@ -162,26 +164,28 @@ services:
 
   links:
     build:
-      context: ./apps/links-astro
+      context: .
+      dockerfile: apps/links-astro/Dockerfile
       target: dev
-    working_dir: /app
+    working_dir: /app/apps/links-astro
     environment:
       ADMIN_API_URL: http://admin:3001
       SITE_URL: ${LINKS_SITE_URL}
     ports:
       - '${LINKS_PORT:-3002}:3002'
     volumes:
-      - ./apps/links-astro:/app
-      - links-node-modules:/app/node_modules
+      - .:/app
+      - root-node-modules:/app/node_modules
     depends_on:
       admin:
         condition: service_started
 
   ngl:
     build:
-      context: ./apps/ngl-svelte
+      context: .
+      dockerfile: apps/ngl-svelte/Dockerfile
       target: dev
-    working_dir: /app
+    working_dir: /app/apps/ngl-svelte
     environment:
       ADMIN_API_URL: http://admin:3001
       PUBLIC_TURNSTILE_SITE_KEY: ${NGL_PUBLIC_TURNSTILE_SITE_KEY}
@@ -191,17 +195,18 @@ services:
     ports:
       - '${NGL_PORT:-3003}:3003'
     volumes:
-      - ./apps/ngl-svelte:/app
-      - ngl-node-modules:/app/node_modules
+      - .:/app
+      - root-node-modules:/app/node_modules
     depends_on:
       admin:
         condition: service_started
 
   live-presence:
     build:
-      context: ./apps/live-presence
+      context: .
+      dockerfile: apps/live-presence/Dockerfile
       target: dev
-    working_dir: /app
+    working_dir: /app/apps/live-presence
     environment:
       NODE_ENV: development
       PORT: 3006
@@ -209,14 +214,10 @@ services:
     ports:
       - '${PRESENCE_PORT:-3006}:3006'
     volumes:
-      - ./apps/live-presence:/app
-      - live-presence-node-modules:/app/node_modules
+      - .:/app
+      - root-node-modules:/app/node_modules
 
 volumes:
   db-data-dev:
-  admin-node-modules:
-  public-node-modules:
-  links-node-modules:
-  ngl-node-modules:
-  live-presence-node-modules:
+  root-node-modules:
   rag-venv-dev:
