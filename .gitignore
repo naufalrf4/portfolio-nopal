@@ -52,3 +52,10 @@ coverage
 .evals/
 .reviews/
 .opencode/
+.omo/
+
+# Playwright MCP QA cache
+.playwright-mcp/
+
+# Playwright MCP QA cache
+.playwright-mcp/
