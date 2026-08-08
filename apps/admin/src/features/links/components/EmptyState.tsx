@@ -14,24 +14,23 @@ export function EmptyState({
 }: EmptyStateProps) {
   return (
     <div
-      className="flex flex-col items-center justify-center py-16 rounded-[32px] bg-[#E0E5EC]"
+      className="flex flex-col items-center justify-center py-16 rounded-[var(--radius-container)] bg-[var(--bg-elevated)]"
       style={{
-        boxShadow: '9px 9px 16px rgba(163,177,198,0.6), -9px -9px 16px rgba(255,255,255,0.5)',
+        boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
       }}
     >
       <div
         className="w-20 h-20 rounded-2xl flex items-center justify-center mb-6"
         style={{
-          boxShadow:
-            'inset 10px 10px 20px rgba(163,177,198,0.7), inset -10px -10px 20px rgba(255,255,255,0.6)',
+          boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
         }}
       >
-        <Link2 className="h-10 w-10 text-[#6B7280]" />
+        <Link2 className="h-10 w-10 text-[var(--text-secondary)]" />
       </div>
-      <h3 className="font-display text-xl font-bold text-[#3D4852] mb-2">
+      <h3 className="font-display text-xl font-bold text-[var(--text-primary)] mb-2">
         {hasSearchQuery ? 'No links found' : 'No profile links yet'}
       </h3>
-      <p className="text-[#6B7280] mb-6 text-center max-w-md">
+      <p className="text-[var(--text-secondary)] mb-6 text-center max-w-md">
         {hasSearchQuery
           ? 'Try adjusting your search or filter criteria'
           : 'Create your first link to connect your social profiles'}

@@ -43,7 +43,7 @@ export function GuestbookPanel({ showHeader = false }: GuestbookPanelProps) {
       ) : null}
 
       <div
-        className="rounded-[24px] p-2 mb-8 inline-flex gap-2"
+        className="rounded-[var(--radius-base)] p-2 mb-8 inline-flex gap-2"
         style={{
           background: NEUMORPHIC_STYLES.background,
           boxShadow: NEUMORPHIC_STYLES.shadows.inset,
@@ -66,7 +66,7 @@ export function GuestbookPanel({ showHeader = false }: GuestbookPanelProps) {
               style={{
                 background:
                   filter === btn.key
-                    ? 'linear-gradient(135deg, #3B82F6 0%, #38B2AC 100%)'
+                    ? 'linear-gradient(135deg, var(--teal) 0%, var(--teal) 100%)'
                     : 'rgba(107, 114, 128, 0.2)',
                 color: filter === btn.key ? 'white' : NEUMORPHIC_STYLES.muted,
               }}

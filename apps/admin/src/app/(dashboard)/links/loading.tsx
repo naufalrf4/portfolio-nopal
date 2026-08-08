@@ -1,8 +1,8 @@
 import { PageWrapper } from '@/components/layout/PageWrapper';
 
 const NEUMORPHIC_SHADOWS = {
-  extruded: '9px 9px 16px rgba(163,177,198,0.6), -9px -9px 16px rgba(255,255,255, 0.5)',
-  inset: 'inset 6px 6px 10px rgba(163,177,198,0.6), inset -6px -6px 10px rgba(255,255,255, 0.5)',
+  extruded: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
+  inset: 'inset 0 1px 4px rgba(0, 0, 0, 0.25)',
 };
 
 export default function LinksLoading() {
@@ -13,14 +13,14 @@ export default function LinksLoading() {
           <div
             className="h-9 w-48 rounded-2xl animate-pulse"
             style={{
-              backgroundColor: '#E0E5EC',
+              backgroundColor: 'var(--bg-elevated)',
               boxShadow: NEUMORPHIC_SHADOWS.inset,
             }}
           />
           <div
             className="h-5 w-64 rounded-xl mt-2 animate-pulse"
             style={{
-              backgroundColor: '#E0E5EC',
+              backgroundColor: 'var(--bg-elevated)',
               boxShadow: NEUMORPHIC_SHADOWS.inset,
             }}
           />
@@ -30,9 +30,9 @@ export default function LinksLoading() {
         {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
           <div
             key={i}
-            className="rounded-[32px] p-6"
+            className="rounded-[var(--radius-container)] p-6"
             style={{
-              backgroundColor: '#E0E5EC',
+              backgroundColor: 'var(--bg-elevated)',
               boxShadow: NEUMORPHIC_SHADOWS.extruded,
             }}
           >

@@ -122,12 +122,12 @@ export function BulkAddModal({ isOpen, onClose, onSuccess, weekDates }: BulkAddM
                   key={index}
                   onClick={() => toggleDay(index)}
                   className={`px-4 py-2 rounded-xl font-medium transition-all ${
-                    isSelected ? 'bg-[#3B82F6] text-white' : 'bg-[#E0E5EC] text-[#6B7280]'
+                    isSelected ? 'bg-[var(--teal)] text-white' : 'bg-[var(--bg-elevated)] text-[var(--text-secondary)]'
                   }`}
                   style={{
                     boxShadow: isSelected
                       ? '0 4px 12px rgba(59, 130, 246, 0.3)'
-                      : '4px 4px 8px rgba(163,177,198,0.5), -4px -4px 8px rgba(255,255,255,0.5)',
+                      : '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
                   }}
                 >
                   <div className="text-xs">{SHORT_DAY_NAMES[date.getDay()]}</div>
@@ -148,12 +148,12 @@ export function BulkAddModal({ isOpen, onClose, onSuccess, weekDates }: BulkAddM
                   key={time}
                   onClick={() => toggleTime(time)}
                   className={`px-4 py-2 rounded-xl font-medium transition-all ${
-                    isSelected ? 'bg-[#3B82F6] text-white' : 'bg-[#E0E5EC] text-[#6B7280]'
+                    isSelected ? 'bg-[var(--teal)] text-white' : 'bg-[var(--bg-elevated)] text-[var(--text-secondary)]'
                   }`}
                   style={{
                     boxShadow: isSelected
                       ? '0 4px 12px rgba(59, 130, 246, 0.3)'
-                      : '4px 4px 8px rgba(163,177,198,0.5), -4px -4px 8px rgba(255,255,255,0.5)',
+                      : '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
                   }}
                 >
                   {time}
@@ -184,7 +184,7 @@ export function BulkAddModal({ isOpen, onClose, onSuccess, weekDates }: BulkAddM
                   <button
                     key={time}
                     onClick={() => toggleTime(time)}
-                    className="px-4 py-2 rounded-xl font-medium bg-[#3B82F6] text-white transition-all"
+                    className="px-4 py-2 rounded-xl font-medium bg-[var(--teal)] text-white transition-all"
                     style={{
                       boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)',
                     }}
@@ -198,19 +198,18 @@ export function BulkAddModal({ isOpen, onClose, onSuccess, weekDates }: BulkAddM
         </div>
 
         <div
-          className="rounded-xl p-4 bg-[#E0E5EC]"
+          className="rounded-xl p-4 bg-[var(--bg-elevated)]"
           style={{
-            boxShadow:
-              'inset 4px 4px 8px rgba(163,177,198,0.4), inset -4px -4px 8px rgba(255,255,255,0.4)',
+            boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
           }}
         >
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-[#6B7280]">Duration per slot</span>
-            <span className="text-sm font-medium text-[#3D4852]">60 minutes</span>
+            <span className="text-sm text-[var(--text-secondary)]">Duration per slot</span>
+            <span className="text-sm font-medium text-[var(--text-primary)]">60 minutes</span>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-sm text-[#6B7280]">Total slots to create</span>
-            <span className="text-sm font-semibold text-[#3B82F6]">
+            <span className="text-sm text-[var(--text-secondary)]">Total slots to create</span>
+            <span className="text-sm font-semibold text-[var(--teal)]">
               {selectedDays.length * selectedTimes.length}
             </span>
           </div>

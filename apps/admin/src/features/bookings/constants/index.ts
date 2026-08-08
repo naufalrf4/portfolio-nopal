@@ -59,44 +59,43 @@ export const FILTER_BUTTONS = [
 
 export const SLOT_STATUS_STYLES = {
   AVAILABLE: {
-    bg: 'bg-[#38B2AC]/10',
-    border: 'border-[#38B2AC]/30',
-    text: 'text-[#38B2AC]',
+    bg: 'bg-[var(--teal)]/10',
+    border: 'border-[var(--teal)]/30',
+    text: 'text-[var(--teal)]',
   },
   BOOKED: {
-    bg: 'bg-[#3B82F6]/10',
-    border: 'border-[#3B82F6]/30',
-    text: 'text-[#3B82F6]',
+    bg: 'bg-[var(--teal)]/10',
+    border: 'border-[var(--teal)]/30',
+    text: 'text-[var(--teal)]',
   },
   BLOCKED: {
-    bg: 'bg-[#6B7280]/10',
-    border: 'border-[#6B7280]/30',
-    text: 'text-[#6B7280]',
+    bg: 'bg-[var(--text-secondary)]/10',
+    border: 'border-[var(--text-secondary)]/30',
+    text: 'text-[var(--text-secondary)]',
   },
 } as const;
 
 export const NEUMORPHIC_STYLES = {
   card: {
-    background: '#E0E5EC',
-    boxShadow: '12px 12px 24px rgba(163, 177, 198, 0.6), -12px -12px 24px rgba(255, 255, 255, 0.5)',
+    background: 'var(--bg-elevated)',
+    boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
   },
   cardInset: {
-    boxShadow:
-      'inset 6px 6px 10px rgba(163,177,198,0.6), inset -6px -6px 10px rgba(255,255,255,0.5)',
+    boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
   },
   button: {
-    boxShadow: '6px 6px 12px rgba(163,177,198,0.6), -6px -6px 12px rgba(255,255,255,0.5)',
+    boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
   },
   buttonSmall: {
-    boxShadow: '4px 4px 8px rgba(163,177,198,0.5), -4px -4px 8px rgba(255,255,255,0.5)',
+    boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
   },
   buttonMicro: {
-    boxShadow: '2px 2px 4px rgba(163,177,198,0.4), -2px -2px 4px rgba(255,255,255,0.4)',
+    boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
   },
   inputInset: {
-    boxShadow: 'inset 3px 3px 6px rgba(163,177,198,0.4), inset -3px -3px 6px rgba(255,255,255,0.4)',
+    boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
   },
   iconContainer: {
-    boxShadow: '8px 8px 16px rgba(163, 177, 198, 0.5), -8px -8px 16px rgba(255, 255, 255, 0.5)',
+    boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
   },
 } as const;

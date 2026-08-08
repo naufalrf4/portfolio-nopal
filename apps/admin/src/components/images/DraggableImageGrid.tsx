@@ -67,8 +67,8 @@ function SortableImage({
       style={style}
       className={cn(
         'group relative rounded-[16px] overflow-hidden',
-        'bg-[#E0E5EC]',
-        'shadow-[6px_6px_12px_rgba(163,177,198,0.6),-6px_-6px_12px_rgba(255,255,255,0.5)]',
+        'bg-[var(--bg-elevated)]',
+        'shadow-neu-extruded',
         isDragging && 'opacity-50 z-50'
       )}
     >
@@ -84,20 +84,20 @@ function SortableImage({
           {...listeners}
           className={cn(
             'absolute top-2 left-2 p-2 rounded-full cursor-grab active:cursor-grabbing',
-            'bg-[#E0E5EC]/90 backdrop-blur-sm',
-            'shadow-[3px_3px_6px_rgba(163,177,198,0.6),-3px_-3px_6px_rgba(255,255,255,0.5)]',
+            'bg-[var(--bg-elevated)]/90 backdrop-blur-sm',
+            'shadow-neu-extruded',
             'opacity-0 group-hover:opacity-100 transition-opacity'
           )}
         >
-          <GripVertical className="h-4 w-4 text-[#6B7280]" />
+          <GripVertical className="h-4 w-4 text-[var(--text-secondary)]" />
         </div>
 
         {isThumbnail && (
           <div
             className={cn(
               'absolute top-2 right-2 p-2 rounded-full',
-              'bg-gradient-to-br from-[#3B82F6] to-[#60A5FA]',
-              'shadow-[3px_3px_6px_rgba(59,130,246,0.4),-2px_-2px_4px_rgba(96,165,250,0.3)]'
+              'bg-gradient-to-br from-[var(--teal)] to-[var(--amber)]',
+              'shadow-neu-extruded-sm'
             )}
           >
             <Star className="h-4 w-4 text-white fill-white" />
@@ -229,7 +229,7 @@ export function DraggableImageGrid({ images, projectId, onUpdate }: DraggableIma
   if (items.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className="text-[#6B7280]">No images yet. Upload some images to get started.</p>
+        <p className="text-[var(--text-secondary)]">No images yet. Upload some images to get started.</p>
       </div>
     );
   }

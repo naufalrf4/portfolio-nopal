@@ -88,18 +88,18 @@ function ProgressBar({ progress, state }: { progress: number; state: UploadState
             'font-medium',
             isError && 'text-red-500',
             isSuccess && 'text-emerald-500',
-            !isError && !isSuccess && 'text-[#3D4852]'
+            !isError && !isSuccess && 'text-[var(--text-primary)]'
           )}
         >
           {isError ? 'Upload failed' : isSuccess ? 'Upload complete' : 'Uploading...'}
         </span>
-        <span className="text-[#6B7280]">{Math.round(progress)}%</span>
+        <span className="text-[var(--text-secondary)]">{Math.round(progress)}%</span>
       </div>
       <div
         className={cn(
           'h-2 w-full rounded-full overflow-hidden',
-          'bg-[#E0E5EC]',
-          '[box-shadow:inset_3px_3px_6px_rgba(163,177,198,0.6),inset_-3px_-3px_6px_rgba(255,255,255,0.5)]'
+          'bg-[var(--bg-elevated)]',
+          'shadow-neu-inset'
         )}
       >
         <div
@@ -107,7 +107,7 @@ function ProgressBar({ progress, state }: { progress: number; state: UploadState
             'h-full rounded-full transition-all duration-300 ease-out',
             isError && 'bg-gradient-to-r from-red-500 to-red-400',
             isSuccess && 'bg-gradient-to-r from-emerald-500 to-emerald-400',
-            !isError && !isSuccess && 'bg-gradient-to-r from-[#3B82F6] to-[#60A5FA]'
+            !isError && !isSuccess && 'bg-gradient-to-r from-[var(--teal)] to-[var(--amber)]'
           )}
           style={{ width: `${progress}%` }}
         />
@@ -339,13 +339,13 @@ export function FileUpload({
 
   return (
     <div className={cn('w-full space-y-4', className)}>
-      {label && <Label className="text-base font-medium text-[#3D4852]">{label}</Label>}
+      {label && <Label className="text-base font-medium text-[var(--text-primary)]">{label}</Label>}
 
       <div
         className={cn(
-          'rounded-[24px] p-4',
-          'bg-[#E0E5EC]',
-          '[box-shadow:9px_9px_16px_rgba(163,177,198,0.6),-9px_-9px_16px_rgba(255,255,255,0.5)]',
+          'rounded-[var(--radius-base)] p-4',
+          'bg-[var(--bg-elevated)]',
+          'shadow-neu-extruded',
           'transition-all duration-300'
         )}
       >
@@ -354,7 +354,7 @@ export function FileUpload({
             <div
               className={cn(
                 'flex items-center gap-2 px-3 py-1.5 rounded-xl text-sm font-medium transition-colors duration-200',
-                mode === 'upload' ? 'text-[#3B82F6]' : 'text-[#6B7280]'
+                mode === 'upload' ? 'text-[var(--teal)]' : 'text-[var(--text-secondary)]'
               )}
             >
               <Upload className="h-4 w-4" />
@@ -371,7 +371,7 @@ export function FileUpload({
             <div
               className={cn(
                 'flex items-center gap-2 px-3 py-1.5 rounded-xl text-sm font-medium transition-colors duration-200',
-                mode === 'url' ? 'text-[#3B82F6]' : 'text-[#6B7280]'
+                mode === 'url' ? 'text-[var(--teal)]' : 'text-[var(--text-secondary)]'
               )}
             >
               <Link2 className="h-4 w-4" />
@@ -386,7 +386,7 @@ export function FileUpload({
               size="icon-sm"
               onClick={handleClear}
               disabled={disabled}
-              className="text-[#6B7280] hover:text-red-500"
+              className="text-[var(--text-secondary)] hover:text-red-500"
               aria-label="Clear file"
             >
               <X className="h-4 w-4" />
@@ -401,20 +401,20 @@ export function FileUpload({
               className={cn(
                 'relative rounded-[20px] border-2 border-dashed p-6 sm:p-8',
                 'transition-all duration-300 ease-out',
-                'bg-[#E0E5EC]',
-                '[box-shadow:inset_6px_6px_12px_rgba(163,177,198,0.5),inset_-6px_-6px_12px_rgba(255,255,255,0.4)]',
+                'bg-[var(--bg-elevated)]',
+                'shadow-neu-inset',
                 isDragActive &&
                   isDragAccept && [
-                    'border-[#3B82F6] bg-[#3B82F6]/5',
-                    '[box-shadow:inset_6px_6px_12px_rgba(59,130,246,0.15),inset_-6px_-6px_12px_rgba(255,255,255,0.4)]',
+                    'border-[var(--teal)] bg-[var(--teal)]/5',
+                    'shadow-neu-inset',
                     'scale-[1.01]',
                   ],
                 isDragActive &&
                   isDragReject && [
                     'border-red-500 bg-red-50/50',
-                    '[box-shadow:inset_6px_6px_12px_rgba(239,68,68,0.1),inset_-6px_-6px_12px_rgba(255,255,255,0.4)]',
+                    'shadow-neu-inset',
                   ],
-                !isDragActive && !hasError && 'border-[#6B7280]/20 hover:border-[#3B82F6]/40',
+                !isDragActive && !hasError && 'border-[var(--text-secondary)]/20 hover:border-[var(--teal)]/40',
                 hasError && 'border-red-400/60',
                 (disabled || isUploading) && 'opacity-60 cursor-not-allowed',
                 !disabled && !isUploading && 'cursor-pointer hover:scale-[1.005]'
@@ -428,11 +428,11 @@ export function FileUpload({
                     <div
                       className={cn(
                         'rounded-full p-4',
-                        'bg-[#E0E5EC]',
-                        '[box-shadow:6px_6px_12px_rgba(163,177,198,0.6),-6px_-6px_12px_rgba(255,255,255,0.5)]'
+                        'bg-[var(--bg-elevated)]',
+                        'shadow-neu-extruded'
                       )}
                     >
-                      <Loader2 className="h-8 w-8 animate-spin text-[#3B82F6]" />
+                      <Loader2 className="h-8 w-8 animate-spin text-[var(--teal)]" />
                     </div>
                     <div className="w-full max-w-xs">
                       <ProgressBar progress={uploadProgress} state={uploadState} />
@@ -443,15 +443,15 @@ export function FileUpload({
                     <div
                       className={cn(
                         'rounded-full p-4',
-                        'bg-[#E0E5EC]',
-                        '[box-shadow:6px_6px_12px_rgba(163,177,198,0.6),-6px_-6px_12px_rgba(255,255,255,0.5)]'
+                        'bg-[var(--bg-elevated)]',
+                        'shadow-neu-extruded'
                       )}
                     >
                       <AlertCircle className="h-8 w-8 text-red-500" />
                     </div>
                     <div className="space-y-2">
                       <p className="text-red-500 font-medium">Upload failed</p>
-                      {errorMessage && <p className="text-[#6B7280] text-sm">{errorMessage}</p>}
+                      {errorMessage && <p className="text-[var(--text-secondary)] text-sm">{errorMessage}</p>}
                       <Button
                         type="button"
                         variant="default"
@@ -472,8 +472,8 @@ export function FileUpload({
                     <div
                       className={cn(
                         'rounded-full p-4',
-                        'bg-[#E0E5EC]',
-                        '[box-shadow:6px_6px_12px_rgba(163,177,198,0.6),-6px_-6px_12px_rgba(255,255,255,0.5)]'
+                        'bg-[var(--bg-elevated)]',
+                        'shadow-neu-extruded'
                       )}
                     >
                       <CheckCircle2 className="h-8 w-8 text-emerald-500" />
@@ -485,31 +485,31 @@ export function FileUpload({
                     <div
                       className={cn(
                         'rounded-full p-4',
-                        'bg-[#E0E5EC]',
-                        '[box-shadow:6px_6px_12px_rgba(163,177,198,0.6),-6px_-6px_12px_rgba(255,255,255,0.5)]',
+                        'bg-[var(--bg-elevated)]',
+                        'shadow-neu-extruded',
                         'transition-all duration-300',
                         isDragActive &&
-                          'scale-110 [box-shadow:8px_8px_16px_rgba(163,177,198,0.7),-8px_-8px_16px_rgba(255,255,255,0.6)]'
+                          'scale-110 shadow-neu-extruded'
                       )}
                     >
                       <Upload
                         className={cn(
                           'h-8 w-8 transition-colors duration-200',
-                          isDragActive ? 'text-[#3B82F6]' : 'text-[#6B7280]'
+                          isDragActive ? 'text-[var(--teal)]' : 'text-[var(--text-secondary)]'
                         )}
                       />
                     </div>
                     <div>
-                      <p className="text-[#3D4852] font-medium mb-1">
+                      <p className="text-[var(--text-primary)] font-medium mb-1">
                         {isDragActive
                           ? isDragAccept
                             ? 'Drop file here'
                             : 'File type not accepted'
                           : 'Drag & drop or click to browse'}
                       </p>
-                      <p className="text-[#6B7280] text-sm">Max size: {formatFileSize(maxSize)}</p>
+                      <p className="text-[var(--text-secondary)] text-sm">Max size: {formatFileSize(maxSize)}</p>
                       {accept && (
-                        <p className="text-[#6B7280]/70 text-xs mt-1">
+                        <p className="text-[var(--text-secondary)]/70 text-xs mt-1">
                           {accept.includes('image') ? 'Images' : ''}
                           {accept.includes('pdf')
                             ? accept.includes('image')
@@ -550,26 +550,26 @@ export function FileUpload({
                 Set
               </Button>
             </div>
-            <p className="text-xs text-[#6B7280]">Enter a direct link to an image or file</p>
+            <p className="text-xs text-[var(--text-secondary)]">Enter a direct link to an image or file</p>
           </div>
         )}
       </div>
 
-      {helperText && <p className="text-sm text-[#6B7280] px-1">{helperText}</p>}
+      {helperText && <p className="text-sm text-[var(--text-secondary)] px-1">{helperText}</p>}
 
       {preview && previewUrl && (
         <div
           className={cn(
             'relative rounded-[20px] overflow-hidden',
-            'bg-[#E0E5EC]',
-            '[box-shadow:inset_6px_6px_12px_rgba(163,177,198,0.5),inset_-6px_-6px_12px_rgba(255,255,255,0.4)]',
+            'bg-[var(--bg-elevated)]',
+            'shadow-neu-inset',
             'p-3'
           )}
         >
           <div className="flex items-start gap-3">
             <div className="flex-1 min-w-0">
               {isImage(previewUrl) && !imageLoadError ? (
-                <div className="relative overflow-hidden rounded-[16px] bg-[#E0E5EC]">
+                <div className="relative overflow-hidden rounded-[16px] bg-[var(--bg-elevated)]">
                   <div className="relative aspect-video w-full">
                     <img
                       src={previewUrl}
@@ -586,22 +586,22 @@ export function FileUpload({
                 <div
                   className={cn(
                     'flex items-center gap-3 p-4 rounded-[16px]',
-                    'bg-[#E0E5EC]',
-                    '[box-shadow:6px_6px_12px_rgba(163,177,198,0.5),-6px_-6px_12px_rgba(255,255,255,0.4)]'
+                    'bg-[var(--bg-elevated)]',
+                    'shadow-neu-extruded'
                   )}
                 >
                   <div
                     className={cn(
                       'rounded-xl p-2.5',
-                      'bg-[#E0E5EC]',
-                      '[box-shadow:4px_4px_8px_rgba(163,177,198,0.5),-4px_-4px_8px_rgba(255,255,255,0.4)]'
+                      'bg-[var(--bg-elevated)]',
+                      'shadow-neu-extruded'
                     )}
                   >
                     <FileText className="h-6 w-6 text-red-500" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-[#3D4852]">PDF Document</p>
-                    <p className="text-xs text-[#6B7280] truncate" title={previewUrl}>
+                    <p className="text-sm font-medium text-[var(--text-primary)]">PDF Document</p>
+                    <p className="text-xs text-[var(--text-secondary)] truncate" title={previewUrl}>
                       {previewUrl.split('/').pop() || previewUrl}
                     </p>
                   </div>
@@ -610,28 +610,28 @@ export function FileUpload({
                 <div
                   className={cn(
                     'flex items-center gap-3 p-4 rounded-[16px]',
-                    'bg-[#E0E5EC]',
-                    '[box-shadow:6px_6px_12px_rgba(163,177,198,0.5),-6px_-6px_12px_rgba(255,255,255,0.4)]'
+                    'bg-[var(--bg-elevated)]',
+                    'shadow-neu-extruded'
                   )}
                 >
                   <div
                     className={cn(
                       'rounded-xl p-2.5',
-                      'bg-[#E0E5EC]',
-                      '[box-shadow:4px_4px_8px_rgba(163,177,198,0.5),-4px_-4px_8px_rgba(255,255,255,0.4)]'
+                      'bg-[var(--bg-elevated)]',
+                      'shadow-neu-extruded'
                     )}
                   >
                     {imageLoadError ? (
-                      <ImageIcon className="h-6 w-6 text-[#6B7280]" />
+                      <ImageIcon className="h-6 w-6 text-[var(--text-secondary)]" />
                     ) : (
-                      <Link2 className="h-6 w-6 text-[#3B82F6]" />
+                      <Link2 className="h-6 w-6 text-[var(--teal)]" />
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-[#3D4852]">
+                    <p className="text-sm font-medium text-[var(--text-primary)]">
                       {imageLoadError ? 'Image (preview unavailable)' : 'External URL'}
                     </p>
-                    <p className="text-xs text-[#6B7280] truncate" title={previewUrl}>
+                    <p className="text-xs text-[var(--text-secondary)] truncate" title={previewUrl}>
                       {previewUrl}
                     </p>
                   </div>
@@ -645,7 +645,7 @@ export function FileUpload({
               size="icon-sm"
               onClick={handleClear}
               disabled={disabled}
-              className="shrink-0 text-[#6B7280] hover:text-red-500 hover:bg-red-50/50"
+              className="shrink-0 text-[var(--text-secondary)] hover:text-red-500 hover:bg-red-50/50"
               aria-label="Remove file"
             >
               <X className="h-4 w-4" />
@@ -658,7 +658,7 @@ export function FileUpload({
               target="_blank"
               rel="noopener noreferrer"
               className={cn(
-                'mt-2 inline-flex items-center gap-1.5 text-xs text-[#3B82F6] hover:underline',
+                'mt-2 inline-flex items-center gap-1.5 text-xs text-[var(--teal)] hover:underline',
                 'transition-colors duration-200'
               )}
             >

@@ -21,9 +21,9 @@ export function OverviewCard({ icon, title, value, change }: StatCardProps) {
       className={cn(
         'p-6 transition-all duration-300 ease-out',
         'hover:-translate-y-1',
-        'bg-[#E0E5EC]',
-        'shadow-[9px_9px_16px_rgba(163,177,198,0.6),-9px_-9px_16px_rgba(255,255,255,0.5)]',
-        'hover:shadow-[12px_12px_20px_rgba(163,177,198,0.7),-12px_-12px_20px_rgba(255,255,255,0.6)]'
+        'bg-[var(--bg-elevated)]',
+        'shadow-neu-extruded',
+        'hover:shadow-neu-extruded'
       )}
     >
       <div className="flex items-start justify-between mb-4">
@@ -31,7 +31,7 @@ export function OverviewCard({ icon, title, value, change }: StatCardProps) {
           className={cn(
             'w-12 h-12 rounded-2xl flex items-center justify-center',
             'bg-gradient-to-br from-blue-400/20 to-cyan-500/20',
-            'shadow-[inset_5px_5px_10px_rgba(163,177,198,0.6),inset_-5px_-5px_10px_rgba(255,255,255,0.5)]'
+            'shadow-neu-extruded'
           )}
         >
           {icon}
@@ -50,8 +50,8 @@ export function OverviewCard({ icon, title, value, change }: StatCardProps) {
         )}
       </div>
 
-      <p className="text-sm font-medium text-[#6B7280] mb-1">{title}</p>
-      <p className="text-3xl font-bold text-[#3D4852] tracking-tight font-[family-name:var(--font-plus-jakarta)]">
+      <p className="text-sm font-medium text-[var(--text-secondary)] mb-1">{title}</p>
+      <p className="text-3xl font-bold text-[var(--text-primary)] tracking-tight font-[family-name:var(--font-plus-jakarta)]">
         {value}
       </p>
     </Card>
@@ -74,7 +74,7 @@ export function OverviewCards({ stats, loading }: OverviewCardsProps) {
         {[1, 2, 3].map((i) => (
           <Card
             key={i}
-            className="p-6 bg-[#E0E5EC] shadow-[9px_9px_16px_rgba(163,177,198,0.6),-9px_-9px_16px_rgba(255,255,255,0.5)]"
+            className="p-6 bg-[var(--bg-elevated)] shadow-neu-extruded"
           >
             <div className="space-y-4">
               <div className="w-12 h-12 rounded-2xl bg-[#D1D5DB]/50 animate-pulse" />

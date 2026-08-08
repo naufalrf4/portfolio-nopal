@@ -6,7 +6,7 @@ import { PageWrapper } from '@/components/layout/PageWrapper';
 
 const NEUMORPHIC_STYLES = {
   background: 'linear-gradient(145deg, #1a1d29 0%, #13151f 100%)',
-  accent: '#3B82F6',
+  accent: 'var(--teal)',
   muted: '#9CA3AF',
   shadows: {
     large:
@@ -29,7 +29,7 @@ export default function MessagesError({
     <PageWrapper>
       <div className="flex items-center justify-center min-h-[60vh]">
         <div
-          className="rounded-[32px] p-12 max-w-lg w-full text-center"
+          className="rounded-[var(--radius-container)] p-12 max-w-lg w-full text-center"
           style={{
             background: NEUMORPHIC_STYLES.background,
             boxShadow: NEUMORPHIC_STYLES.shadows.large,
@@ -79,7 +79,7 @@ export default function MessagesError({
             onClick={reset}
             className="px-8 py-4 rounded-[20px] font-medium transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] inline-flex items-center gap-3"
             style={{
-              background: 'linear-gradient(135deg, #3B82F6 0%, #2563EB 100%)',
+              background: 'linear-gradient(135deg, var(--teal) 0%, #2563EB 100%)',
               color: 'white',
               boxShadow:
                 '0 8px 16px rgba(59, 130, 246, 0.3), inset 0 2px 4px rgba(255, 255, 255, 0.2)',

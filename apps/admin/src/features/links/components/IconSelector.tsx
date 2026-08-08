@@ -37,7 +37,7 @@ export function IconSelector({ value, onChange, labelText, urlValue }: IconSelec
           })}
         </SelectContent>
       </Select>
-      <p className="text-xs text-[#6B7280]">
+      <p className="text-xs text-[var(--text-secondary)]">
         Choose a platform icon or leave empty for custom links
       </p>
 
@@ -45,16 +45,14 @@ export function IconSelector({ value, onChange, labelText, urlValue }: IconSelec
         <div
           className="flex items-center gap-4 p-4 rounded-2xl"
           style={{
-            boxShadow:
-              'inset 6px 6px 10px rgba(163,177,198,0.6), inset -6px -6px 10px rgba(255,255,255,0.5)',
+            boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
           }}
         >
           <div
             className="w-12 h-12 rounded-xl flex items-center justify-center"
             style={{
               background: `linear-gradient(135deg, ${getIconData(value).color} 0%, ${getIconData(value).color}CC 100%)`,
-              boxShadow:
-                '5px 5px 10px rgba(163,177,198,0.6), -5px -5px 10px rgba(255,255,255,0.5)',
+              boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
             }}
           >
             {(() => {
@@ -63,8 +61,8 @@ export function IconSelector({ value, onChange, labelText, urlValue }: IconSelec
             })()}
           </div>
           <div>
-            <p className="font-medium text-[#3D4852]">{labelText || 'Link Label'}</p>
-            <p className="text-sm text-[#6B7280] truncate max-w-[200px]">
+            <p className="font-medium text-[var(--text-primary)]">{labelText || 'Link Label'}</p>
+            <p className="text-sm text-[var(--text-secondary)] truncate max-w-[200px]">
               {urlValue || 'https://...'}
             </p>
           </div>

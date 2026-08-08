@@ -28,11 +28,11 @@ interface ResponsiveModalProps {
 }
 
 const neumorphicButtonShadow =
-  'shadow-[5px_5px_10px_rgba(163,177,198,0.6),-5px_-5px_10px_rgba(255,255,255,0.5)]';
+  'shadow-neu-extruded-sm';
 const neumorphicButtonHover =
-  'hover:shadow-[7px_7px_12px_rgba(163,177,198,0.65),-7px_-7px_12px_rgba(255,255,255,0.55)]';
+  'hover:shadow-neu-extruded';
 const neumorphicButtonActive =
-  'active:shadow-[inset_4px_4px_8px_rgba(163,177,198,0.6),inset_-4px_-4px_8px_rgba(255,255,255,0.5)]';
+  'active:shadow-neu-extruded';
 
 function ResponsiveModal({
   open,
@@ -53,7 +53,7 @@ function ResponsiveModal({
         <Drawer.Portal>
           <Drawer.Overlay
             className={cn(
-              'fixed inset-0 z-50 bg-[#E0E5EC]/80 backdrop-blur-md',
+              'fixed inset-0 z-50 bg-[var(--bg-elevated)]/80 backdrop-blur-md',
               'data-[state=open]:animate-in data-[state=closed]:animate-out',
               'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
               'duration-300'
@@ -62,8 +62,8 @@ function ResponsiveModal({
           <Drawer.Content
             className={cn(
               'fixed inset-x-0 bottom-0 z-50 flex max-h-[90vh] flex-col',
-              'bg-[#E0E5EC] rounded-t-[32px]',
-              'shadow-[0_-12px_24px_rgba(163,177,198,0.7),0_-24px_48px_rgba(255,255,255,0.3)]',
+              'bg-[var(--bg-elevated)] rounded-t-[32px]',
+              'shadow-neu-extruded',
               'focus:outline-none',
               className
             )}
@@ -72,18 +72,18 @@ function ResponsiveModal({
               className={cn(
                 'mx-auto mt-4 mb-2 h-1.5 w-16 rounded-full',
                 'bg-[#A3B1C6]/40',
-                'shadow-[inset_2px_2px_4px_rgba(163,177,198,0.4),inset_-2px_-2px_4px_rgba(255,255,255,0.3)]'
+                'shadow-neu-extruded'
               )}
               aria-hidden="true"
             />
 
             <div className="flex items-start justify-between px-6 pt-2 pb-4">
               <div className="flex flex-col gap-1.5 flex-1 pr-4">
-                <Drawer.Title className="font-display text-2xl font-bold tracking-tight text-[#3D4852]">
+                <Drawer.Title className="font-display text-2xl font-bold tracking-tight text-[var(--text-primary)]">
                   {title}
                 </Drawer.Title>
                 {description && (
-                  <Drawer.Description className="text-sm text-[#6B7280]">
+                  <Drawer.Description className="text-sm text-[var(--text-secondary)]">
                     {description}
                   </Drawer.Description>
                 )}
@@ -93,13 +93,13 @@ function ResponsiveModal({
                 <Drawer.Close
                   className={cn(
                     'h-10 w-10 rounded-xl shrink-0',
-                    'bg-[#E0E5EC] flex items-center justify-center',
+                    'bg-[var(--bg-elevated)] flex items-center justify-center',
                     neumorphicButtonShadow,
-                    'text-[#6B7280] transition-all duration-200',
+                    'text-[var(--text-secondary)] transition-all duration-200',
                     neumorphicButtonHover,
-                    'hover:text-[#3D4852]',
+                    'hover:text-[var(--text-primary)]',
                     neumorphicButtonActive,
-                    'focus:outline-none focus:ring-2 focus:ring-[#3B82F6]/30 focus:ring-offset-2 focus:ring-offset-[#E0E5EC]',
+                    'focus:outline-none focus:ring-2 focus:ring-[var(--teal)]/30 focus:ring-offset-2 focus:ring-offset-[var(--bg-elevated)]',
                     '[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg]:size-5'
                   )}
                 >
@@ -116,7 +116,7 @@ function ResponsiveModal({
                 className={cn(
                   'flex flex-col-reverse gap-3 px-6 py-4 sm:flex-row sm:justify-end',
                   'border-t border-[#A3B1C6]/20',
-                  'bg-[#E0E5EC]'
+                  'bg-[var(--bg-elevated)]'
                 )}
               >
                 {footer}

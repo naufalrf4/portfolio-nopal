@@ -82,7 +82,7 @@ export function InteractionLocationMap({
 
   if (loading) {
     return (
-      <Card className="p-6 space-y-4 bg-[#E0E5EC]">
+      <Card className="p-6 space-y-4 bg-[var(--bg-elevated)]">
         <div className="h-6 w-48 rounded bg-[#D1D5DB]/50 animate-pulse" />
         <div className="h-[420px] rounded-[28px] bg-[#D1D5DB]/30 animate-pulse" />
       </Card>
@@ -91,12 +91,12 @@ export function InteractionLocationMap({
 
   if (!mapboxToken) {
     return (
-      <Card className="p-6 bg-[#E0E5EC]">
-        <div className="flex h-[420px] flex-col items-center justify-center gap-3 rounded-[28px] neu-card-inset bg-[#E0E5EC] p-8 text-center">
-          <MapPin className="h-12 w-12 text-[#6B7280]" />
+      <Card className="p-6 bg-[var(--bg-elevated)]">
+        <div className="flex h-[420px] flex-col items-center justify-center gap-3 rounded-[28px] neu-card-inset bg-[var(--bg-elevated)] p-8 text-center">
+          <MapPin className="h-12 w-12 text-[var(--text-secondary)]" />
           <div>
-            <p className="text-sm font-medium text-[#3D4852]">Mapbox Access Token Required</p>
-            <p className="text-xs text-[#6B7280]">
+            <p className="text-sm font-medium text-[var(--text-primary)]">Mapbox Access Token Required</p>
+            <p className="text-xs text-[var(--text-secondary)]">
               Add `NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN` to view the interaction map.
             </p>
           </div>
@@ -106,25 +106,25 @@ export function InteractionLocationMap({
   }
 
   return (
-    <Card className="p-6 bg-[#E0E5EC] space-y-5">
+    <Card className="p-6 bg-[var(--bg-elevated)] space-y-5">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <h3 className="text-lg font-semibold text-[#3D4852]">Interaction Map</h3>
-          <p className="text-sm text-[#6B7280]">Submission origins grouped by country.</p>
+          <h3 className="text-lg font-semibold text-[var(--text-primary)]">Interaction Map</h3>
+          <p className="text-sm text-[var(--text-secondary)]">Submission origins grouped by country.</p>
         </div>
-        <div className="rounded-full bg-[#E0E5EC] px-4 py-2 text-xs font-semibold text-[#3D4852] shadow-[inset_4px_4px_8px_rgba(163,177,198,0.6),inset_-4px_-4px_8px_rgba(255,255,255,0.5)]">
+        <div className="rounded-full bg-[var(--bg-elevated)] px-4 py-2 text-xs font-semibold text-[var(--text-primary)] shadow-neu-extruded">
           {items.length.toLocaleString()} submissions
         </div>
       </div>
 
       {stats.length === 0 ? (
-        <div className="flex h-[420px] items-center justify-center rounded-[28px] neu-card-inset bg-[#E0E5EC] text-sm text-[#6B7280]">
+        <div className="flex h-[420px] items-center justify-center rounded-[28px] neu-card-inset bg-[var(--bg-elevated)] text-sm text-[var(--text-secondary)]">
           No submission location data yet.
         </div>
       ) : (
         <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_280px]">
-          <div className="relative overflow-hidden rounded-[28px] neu-card-inset bg-[#E0E5EC]">
-            <div className="absolute right-4 top-4 z-10 rounded-full bg-white/85 px-3 py-1.5 text-xs font-medium text-[#3D4852] shadow-sm">
+          <div className="relative overflow-hidden rounded-[28px] neu-card-inset bg-[var(--bg-elevated)]">
+            <div className="absolute right-4 top-4 z-10 rounded-full bg-white/85 px-3 py-1.5 text-xs font-medium text-[var(--text-primary)] shadow-sm">
               Country-level view
             </div>
             <MapboxMap
@@ -148,7 +148,7 @@ export function InteractionLocationMap({
                       type="button"
                       onClick={() => setSelected(item)}
                       className={cn(
-                        'rounded-full border-2 border-white bg-[#3B82F6] text-white shadow-lg transition-transform hover:scale-110',
+                        'rounded-full border-2 border-white bg-[var(--teal)] text-white shadow-lg transition-transform hover:scale-110',
                         'flex items-center justify-center font-bold'
                       )}
                       style={{ width: size, height: size }}
@@ -167,9 +167,9 @@ export function InteractionLocationMap({
                   closeOnClick={false}
                 >
                   <div className="p-1.5">
-                    <p className="font-semibold text-[#3D4852]">{selected.country}</p>
-                    {selected.city && <p className="text-xs text-[#6B7280]">{selected.city}</p>}
-                    <p className="mt-1 text-sm font-medium text-[#3B82F6]">
+                    <p className="font-semibold text-[var(--text-primary)]">{selected.country}</p>
+                    {selected.city && <p className="text-xs text-[var(--text-secondary)]">{selected.city}</p>}
+                    <p className="mt-1 text-sm font-medium text-[var(--teal)]">
                       {selected.count} submissions
                     </p>
                   </div>
@@ -187,14 +187,14 @@ export function InteractionLocationMap({
                   setSelected(item);
                   setViewState({ longitude: item.lng, latitude: item.lat, zoom: 4 });
                 }}
-                className="w-full rounded-2xl bg-[#E0E5EC] p-4 text-left shadow-[9px_9px_16px_rgba(163,177,198,0.6),-9px_-9px_16px_rgba(255,255,255,0.5)] transition-all hover:-translate-y-0.5"
+                className="w-full rounded-2xl bg-[var(--bg-elevated)] p-4 text-left shadow-neu-extruded transition-all hover:-translate-y-0.5"
               >
                 <div className="flex items-center justify-between gap-3">
                   <div>
-                    <p className="font-semibold text-[#3D4852]">{item.country}</p>
-                    {item.city && <p className="text-xs text-[#6B7280]">{item.city}</p>}
+                    <p className="font-semibold text-[var(--text-primary)]">{item.country}</p>
+                    {item.city && <p className="text-xs text-[var(--text-secondary)]">{item.city}</p>}
                   </div>
-                  <span className="rounded-full bg-[#3B82F6] px-3 py-1 text-xs font-bold text-white">
+                  <span className="rounded-full bg-[var(--teal)] px-3 py-1 text-xs font-bold text-white">
                     {item.count}
                   </span>
                 </div>

@@ -44,7 +44,7 @@ export function IngestButton({ docId, indexed, onIngest }: IngestButtonProps) {
             ) : success ? (
               <Check className="h-4 w-4" />
             ) : (
-              <Database className="h-4 w-4 text-[#3B82F6]" />
+              <Database className="h-4 w-4 text-[var(--teal)]" />
             )}
           </Button>
         </TooltipTrigger>

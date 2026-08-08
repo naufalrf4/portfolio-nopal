@@ -123,13 +123,13 @@ export function SettingsTab() {
   if (loading || bookingLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="text-[#6B7280]">Loading settings...</div>
+        <div className="text-[var(--text-secondary)]">Loading settings...</div>
       </div>
     );
   }
 
   if (!settings || !bookingSettings) {
-    return <div className="text-center text-[#6B7280]">Failed to load settings</div>;
+    return <div className="text-center text-[var(--text-secondary)]">Failed to load settings</div>;
   }
 
   const isGoogleConnected = Boolean(bookingSettings.googleCalendarConnected);
@@ -149,16 +149,15 @@ export function SettingsTab() {
                 <div
                   className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
                   style={{
-                    background: '#E0E5EC',
-                    boxShadow:
-                      '3px 3px 6px rgba(163,177,198,0.5), -3px -3px 6px rgba(255,255,255,0.5)',
+                    background: 'var(--bg-elevated)',
+                    boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
                   }}
                 >
-                  <Mail className="h-5 w-5 text-[#3B82F6]" />
+                  <Mail className="h-5 w-5 text-[var(--teal)]" />
                 </div>
                 <div className="flex-1 space-y-2">
                   <Label htmlFor="notificationEmail">Notification Email</Label>
-                  <p className="text-sm text-[#6B7280]">
+                  <p className="text-sm text-[var(--text-secondary)]">
                     Email address to receive form submission notifications
                   </p>
                   <Input
@@ -181,16 +180,15 @@ export function SettingsTab() {
                 <div
                   className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
                   style={{
-                    background: '#E0E5EC',
-                    boxShadow:
-                      '3px 3px 6px rgba(163,177,198,0.5), -3px -3px 6px rgba(255,255,255,0.5)',
+                    background: 'var(--bg-elevated)',
+                    boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
                   }}
                 >
                   <MessageSquare className="h-5 w-5 text-[#EF4444]" />
                 </div>
                 <div className="flex-1 space-y-2">
                   <Label htmlFor="blockedKeywords">Blocked Keywords</Label>
-                  <p className="text-sm text-[#6B7280]">
+                  <p className="text-sm text-[var(--text-secondary)]">
                     Messages containing these keywords will be blocked (spam filter)
                   </p>
                   <TagInput
@@ -223,8 +221,8 @@ export function SettingsTab() {
           <div className="rounded-2xl border border-[#A3B1C6]/25 bg-white/30 p-4">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div className="space-y-2">
-                <div className="flex items-center gap-2 text-[#3D4852]">
-                  <Calendar className="h-4 w-4 text-[#3B82F6]" />
+                <div className="flex items-center gap-2 text-[var(--text-primary)]">
+                  <Calendar className="h-4 w-4 text-[var(--teal)]" />
                   <span className="font-medium">Connection status</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm">
@@ -238,18 +236,18 @@ export function SettingsTab() {
                     {isGoogleConnected ? 'Connected' : 'Not connected'}
                   </span>
                   {bookingSettings.googleCalendarConnectedEmail && (
-                    <span className="text-[#6B7280]">
+                    <span className="text-[var(--text-secondary)]">
                       {bookingSettings.googleCalendarConnectedEmail}
                     </span>
                   )}
                 </div>
-                <p className="text-sm text-[#6B7280]">
+                <p className="text-sm text-[var(--text-secondary)]">
                   {isGoogleConnected
                     ? 'Approved bookings will create Calendar events and Google Meet links on the selected calendar.'
                     : 'Connect a Google account to enable automatic Calendar events and Google Meet links.'}
                 </p>
                 {bookingSettings.googleCalendarConnectedAt && (
-                  <p className="text-xs text-[#6B7280]">
+                  <p className="text-xs text-[var(--text-secondary)]">
                     Connected at{' '}
                     {new Date(bookingSettings.googleCalendarConnectedAt).toLocaleString('en-US', {
                       timeZone: 'Asia/Jakarta',
@@ -322,12 +320,12 @@ export function SettingsTab() {
                 ))}
               </SelectContent>
             </Select>
-            <p className="text-sm text-[#6B7280]">
+            <p className="text-sm text-[var(--text-secondary)]">
               The selected calendar is used when an admin confirms a booking and generates a Meet
               link.
             </p>
             {bookingSettings.googleCalendarCalendarName && (
-              <p className="text-xs text-[#6B7280]">
+              <p className="text-xs text-[var(--text-secondary)]">
                 Current selection: {bookingSettings.googleCalendarCalendarName}
               </p>
             )}

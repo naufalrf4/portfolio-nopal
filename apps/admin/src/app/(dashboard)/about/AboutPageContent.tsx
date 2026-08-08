@@ -15,7 +15,7 @@ export function AboutPageContent() {
     return (
       <PageWrapper>
         <div className="flex items-center justify-center h-64">
-          <Loader2 className="h-8 w-8 animate-spin text-[#3B82F6]" />
+          <Loader2 className="h-8 w-8 animate-spin text-[var(--teal)]" />
         </div>
       </PageWrapper>
     );

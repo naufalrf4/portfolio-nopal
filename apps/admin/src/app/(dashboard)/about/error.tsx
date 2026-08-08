@@ -19,10 +19,10 @@ export default function AboutError({
     <PageWrapper>
       <div className="flex items-center justify-center min-h-[60vh]">
         <div
-          className="rounded-[32px] p-8 max-w-lg w-full text-center"
+          className="rounded-[var(--radius-container)] p-8 max-w-lg w-full text-center"
           style={{
-            background: '#E0E5EC',
-            boxShadow: '9px 9px 16px rgb(163,177,198,0.6), -9px -9px 16px rgba(255,255,255,0.5)',
+            background: 'var(--bg-elevated)',
+            boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
           }}
         >
           {/* Icon well */}
@@ -30,9 +30,8 @@ export default function AboutError({
             <div
               className="rounded-2xl p-4 w-16 h-16 flex items-center justify-center"
               style={{
-                background: '#E0E5EC',
-                boxShadow:
-                  'inset 10px 10px 20px rgb(163,177,198,0.7), inset -10px -10px 20px rgba(255,255,255,0.6)',
+                background: 'var(--bg-elevated)',
+                boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
               }}
             >
               <AlertCircle className="h-8 w-8 text-[#EF4444]" />
@@ -43,7 +42,7 @@ export default function AboutError({
           <h2
             className="text-2xl font-bold mb-2"
             style={{
-              color: '#3D4852',
+              color: 'var(--text-primary)',
             }}
           >
             Something went wrong
@@ -51,7 +50,7 @@ export default function AboutError({
           <p
             className="text-sm mb-6"
             style={{
-              color: '#6B7280',
+              color: 'var(--text-secondary)',
             }}
           >
             {error.message || 'An unexpected error occurred while loading the about page.'}
@@ -64,15 +63,15 @@ export default function AboutError({
             style={{
               background: '#6C63FF',
               color: '#FFFFFF',
-              boxShadow: '9px 9px 16px rgba(108,99,255,0.4), -9px -9px 16px rgba(255,255,255,0.5)',
+              boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.boxShadow =
-                '12px 12px 20px rgba(108,99,255,0.5), -12px -12px 20px rgba(255,255,255,0.6)';
+                '0 2px 8px -2px rgba(0, 0, 0, 0.3)';
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.boxShadow =
-                '9px 9px 16px rgba(108,99,255,0.4), -9px -9px 16px rgba(255,255,255,0.5)';
+                '0 2px 8px -2px rgba(0, 0, 0, 0.3)';
             }}
           >
             <RefreshCw className="h-5 w-5" />

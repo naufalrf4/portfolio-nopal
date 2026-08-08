@@ -12,7 +12,7 @@ export function InteractionTrendChart({
 }) {
   if (loading) {
     return (
-      <Card className="p-6 bg-[#E0E5EC]">
+      <Card className="p-6 bg-[var(--bg-elevated)]">
         <div className="space-y-6">
           <div className="h-6 w-44 rounded bg-[#D1D5DB]/50 animate-pulse" />
           <div className="h-64 rounded-[28px] bg-[#D1D5DB]/30 animate-pulse" />
@@ -24,21 +24,21 @@ export function InteractionTrendChart({
   const maxValue = Math.max(...data.map((item) => Math.max(item.submissions, item.clicks)), 1);
 
   return (
-    <Card className="p-6 bg-[#E0E5EC] space-y-5">
+    <Card className="p-6 bg-[var(--bg-elevated)] space-y-5">
       <div>
-        <h3 className="text-lg font-semibold text-[#3D4852]">Activity Trend</h3>
-        <p className="text-sm text-[#6B7280]">Daily submissions and tracked link clicks.</p>
+        <h3 className="text-lg font-semibold text-[var(--text-primary)]">Activity Trend</h3>
+        <p className="text-sm text-[var(--text-secondary)]">Daily submissions and tracked link clicks.</p>
       </div>
 
       {data.length === 0 ? (
-        <div className="flex h-64 items-center justify-center rounded-[28px] neu-card-inset bg-[#E0E5EC] text-sm text-[#6B7280]">
+        <div className="flex h-64 items-center justify-center rounded-[28px] neu-card-inset bg-[var(--bg-elevated)] text-sm text-[var(--text-secondary)]">
           No activity recorded in this range.
         </div>
       ) : (
         <div className="space-y-4">
-          <div className="flex items-center gap-4 text-xs text-[#6B7280]">
+          <div className="flex items-center gap-4 text-xs text-[var(--text-secondary)]">
             <span className="flex items-center gap-2">
-              <span className="h-2.5 w-2.5 rounded-full bg-[#3B82F6]" />
+              <span className="h-2.5 w-2.5 rounded-full bg-[var(--teal)]" />
               Submissions
             </span>
             <span className="flex items-center gap-2">
@@ -46,12 +46,12 @@ export function InteractionTrendChart({
               Clicks
             </span>
           </div>
-          <div className="grid h-64 grid-cols-[repeat(auto-fit,minmax(18px,1fr))] items-end gap-2 rounded-[28px] neu-card-inset bg-[#E0E5EC] p-4">
+          <div className="grid h-64 grid-cols-[repeat(auto-fit,minmax(18px,1fr))] items-end gap-2 rounded-[28px] neu-card-inset bg-[var(--bg-elevated)] p-4">
             {data.map((item) => (
               <div key={item.date} className="flex h-full flex-col items-center justify-end gap-2">
                 <div className="flex w-full items-end justify-center gap-1">
                   <div
-                    className="w-2 rounded-full bg-[#3B82F6]"
+                    className="w-2 rounded-full bg-[var(--teal)]"
                     style={{
                       height: `${Math.max((item.submissions / maxValue) * 180, item.submissions > 0 ? 8 : 0)}px`,
                     }}
@@ -65,7 +65,7 @@ export function InteractionTrendChart({
                     title={`${item.clicks} clicks`}
                   />
                 </div>
-                <span className="text-[10px] text-[#6B7280] [writing-mode:vertical-rl] rotate-180">
+                <span className="text-[10px] text-[var(--text-secondary)] [writing-mode:vertical-rl] rotate-180">
                   {new Date(item.date).toLocaleDateString('en-US', {
                     month: 'short',
                     day: 'numeric',

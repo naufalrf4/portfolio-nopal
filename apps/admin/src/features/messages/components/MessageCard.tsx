@@ -15,7 +15,7 @@ export function MessageCard({ message, onSelect, onToggleRead, onDelete }: Messa
   return (
     <div
       onClick={onSelect}
-      className="rounded-[32px] p-6 cursor-pointer transition-all duration-200 hover:scale-[1.01] relative overflow-hidden group"
+      className="rounded-[var(--radius-container)] p-6 cursor-pointer transition-all duration-200 hover:scale-[1.01] relative overflow-hidden group"
       style={{
         backgroundColor: COLORS.background,
         boxShadow: NEUMORPHIC_SHADOWS.extruded,

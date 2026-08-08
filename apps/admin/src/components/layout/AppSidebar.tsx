@@ -53,8 +53,8 @@ function NeuBadge({ count }: { count: number }) {
       className={cn(
         'ml-auto flex h-5 min-w-5 items-center justify-center',
         'rounded-full px-1.5 text-xs font-bold text-white',
-        'bg-gradient-to-br from-[#3B82F6] to-[#60A5FA]',
-        'shadow-[2px_2px_4px_rgba(108,99,255,0.4),-1px_-1px_3px_rgba(139,132,255,0.3)]',
+        'bg-gradient-to-br from-[var(--teal)] to-[var(--amber)]',
+        'shadow-neu-extruded',
         'animate-pulse'
       )}
     >
@@ -79,8 +79,8 @@ function NeuAvatar({
 
   const insetShadow = cn(
     'rounded-full',
-    'shadow-[inset_4px_4px_8px_rgba(163,177,198,0.6),inset_-4px_-4px_8px_rgba(255,255,255,0.5)]',
-    'bg-[#E0E5EC]'
+    'shadow-neu-extruded',
+    'bg-[var(--bg-elevated)]'
   );
 
   if (image) {
@@ -97,7 +97,7 @@ function NeuAvatar({
         insetShadow,
         sizeClasses,
         'flex items-center justify-center',
-        'bg-gradient-to-br from-[#3B82F6] to-[#60A5FA]',
+        'bg-gradient-to-br from-[var(--teal)] to-[var(--amber)]',
         'text-white font-semibold',
         textSize
       )}
@@ -173,8 +173,8 @@ export function AppSidebar({ session }: AppSidebarProps) {
       <Sidebar
         collapsible="icon"
         className={cn(
-          'bg-[#E0E5EC] border-none',
-          'shadow-[4px_0_15px_rgba(163,177,198,0.3)]',
+          'bg-[var(--bg-elevated)] border-none',
+          'shadow-neu-extruded',
           'transition-all duration-300 ease-out',
           'overflow-hidden'
         )}
@@ -184,24 +184,24 @@ export function AppSidebar({ session }: AppSidebarProps) {
             <div
               className={cn(
                 'flex h-10 w-10 shrink-0 items-center justify-center rounded-full',
-                'bg-[#E0E5EC]',
-                'shadow-[inset_5px_5px_10px_rgba(163,177,198,0.6),inset_-5px_-5px_10px_rgba(255,255,255,0.5)]'
+                'bg-[var(--bg-elevated)]',
+                'shadow-neu-extruded'
               )}
             >
-              <Lock className="h-5 w-5 text-[#3B82F6]" />
+              <Lock className="h-5 w-5 text-[var(--teal)]" />
             </div>
 
             {!isCollapsed && (
               <div className="flex flex-col">
-                <h1 className="font-[family-name:var(--font-plus-jakarta)] text-lg font-bold text-[#3D4852] tracking-tight">
+                <h1 className="font-[family-name:var(--font-plus-jakarta)] text-lg font-bold text-[var(--text-primary)] tracking-tight">
                   NaufalRF Portfolio
                 </h1>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-[#6B7280] font-medium">Access Restricted</span>
+                  <span className="text-xs text-[var(--text-secondary)] font-medium">Access Restricted</span>
                   <span
                     className={cn(
                       'px-2 py-0.5 rounded-full text-[10px] font-semibold',
-                      'bg-gradient-to-r from-[#3B82F6] to-[#60A5FA]',
+                      'bg-gradient-to-r from-[var(--teal)] to-[var(--amber)]',
                       'text-white shadow-sm'
                     )}
                   >
@@ -235,17 +235,17 @@ export function AppSidebar({ session }: AppSidebarProps) {
                         isCollapsed && 'w-full flex items-center justify-center',
                         isActive
                           ? cn(
-                              'bg-[#E0E5EC]',
-                              'shadow-[inset_6px_6px_10px_rgba(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)]',
-                              'text-[#3B82F6] font-medium'
+                              'bg-[var(--bg-elevated)]',
+                              'shadow-neu-extruded',
+                              'text-[var(--teal)] font-medium'
                             )
                           : cn(
-                              'bg-transparent text-[#6B7280]',
-                              'hover:bg-[#E0E5EC]',
-                              'hover:shadow-[5px_5px_10px_rgba(163,177,198,0.6),-5px_-5px_10px_rgba(255,255,255,0.5)]',
-                              'hover:text-[#3D4852]',
+                              'bg-transparent text-[var(--text-secondary)]',
+                              'hover:bg-[var(--bg-elevated)]',
+                              'hover:shadow-neu-extruded-sm',
+                              'hover:text-[var(--text-primary)]',
                               'hover:scale-[1.02]',
-                              'active:shadow-[inset_4px_4px_8px_rgba(163,177,198,0.6),inset_-4px_-4px_8px_rgba(255,255,255,0.5)]',
+                              'active:shadow-neu-extruded',
                               'active:scale-[0.98]'
                             )
                       )}
@@ -260,7 +260,7 @@ export function AppSidebar({ session }: AppSidebarProps) {
                           <Icon
                             className={cn(
                               'h-5 w-5 shrink-0 transition-colors duration-300',
-                              isActive ? 'text-[#3B82F6]' : 'text-[#6B7280]'
+                              isActive ? 'text-[var(--teal)]' : 'text-[var(--text-secondary)]'
                             )}
                           />
                           {!isCollapsed && <span>{item.name}</span>}
@@ -279,8 +279,8 @@ export function AppSidebar({ session }: AppSidebarProps) {
                             className={cn(
                               'absolute right-0 top-0 flex h-4 w-4 items-center justify-center',
                               'rounded-full text-[10px] font-bold text-white',
-                              'bg-gradient-to-br from-[#3B82F6] to-[#60A5FA]',
-                              'shadow-[1px_1px_3px_rgba(108,99,255,0.4)]',
+                              'bg-gradient-to-br from-[var(--teal)] to-[var(--amber)]',
+                              'shadow-neu-extruded',
                               'animate-pulse'
                             )}
                           >
@@ -302,8 +302,8 @@ export function AppSidebar({ session }: AppSidebarProps) {
           <div
             className={cn(
               'rounded-2xl p-3',
-              'bg-[#E0E5EC]',
-              'shadow-[5px_5px_10px_rgba(163,177,198,0.5),-5px_-5px_10px_rgba(255,255,255,0.5)]'
+              'bg-[var(--bg-elevated)]',
+              'shadow-neu-extruded'
             )}
           >
             <div className={cn('flex items-center gap-3', isCollapsed && 'justify-center')}>
@@ -317,8 +317,8 @@ export function AppSidebar({ session }: AppSidebarProps) {
               {!isCollapsed && (
                 <>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-semibold text-[#3D4852]">{userName}</p>
-                    <p className="truncate text-xs text-[#6B7280]">{userEmail}</p>
+                    <p className="truncate text-sm font-semibold text-[var(--text-primary)]">{userName}</p>
+                    <p className="truncate text-xs text-[var(--text-secondary)]">{userEmail}</p>
                   </div>
 
                   <Tooltip>
@@ -327,18 +327,18 @@ export function AppSidebar({ session }: AppSidebarProps) {
                         onClick={handleSignOut}
                         className={cn(
                           'flex h-9 w-9 shrink-0 items-center justify-center rounded-xl',
-                          'bg-[#E0E5EC] text-[#6B7280]',
+                          'bg-[var(--bg-elevated)] text-[var(--text-secondary)]',
                           'transition-all duration-300 ease-out',
-                          'hover:shadow-[4px_4px_8px_rgba(163,177,198,0.6),-4px_-4px_8px_rgba(255,255,255,0.5)]',
+                          'hover:shadow-neu-extruded',
                           'hover:text-[#EF4444] hover:scale-105',
-                          'active:shadow-[inset_3px_3px_6px_rgba(163,177,198,0.6),inset_-3px_-3px_6px_rgba(255,255,255,0.5)]',
+                          'active:shadow-neu-extruded',
                           'active:scale-95'
                         )}
                       >
                         <LogOut className="h-4 w-4" />
                       </button>
                     </TooltipTrigger>
-                    <TooltipContent side="top" className="bg-[#3D4852] text-white border-none">
+                    <TooltipContent side="top" className="bg-[var(--text-primary)] text-white border-none">
                       Sign out
                     </TooltipContent>
                   </Tooltip>
@@ -353,17 +353,17 @@ export function AppSidebar({ session }: AppSidebarProps) {
                     onClick={handleSignOut}
                     className={cn(
                       'mt-3 flex h-8 w-full items-center justify-center rounded-xl',
-                      'bg-[#E0E5EC] text-[#6B7280]',
+                      'bg-[var(--bg-elevated)] text-[var(--text-secondary)]',
                       'transition-all duration-300 ease-out',
-                      'hover:shadow-[3px_3px_6px_rgba(163,177,198,0.6),-3px_-3px_6px_rgba(255,255,255,0.5)]',
+                      'hover:shadow-neu-extruded',
                       'hover:text-[#EF4444]',
-                      'active:shadow-[inset_3px_3px_6px_rgba(163,177,198,0.6),inset_-3px_-3px_6px_rgba(255,255,255,0.5)]'
+                      'active:shadow-neu-extruded'
                     )}
                   >
                     <LogOut className="h-4 w-4" />
                   </button>
                 </TooltipTrigger>
-                <TooltipContent side="right" className="bg-[#3D4852] text-white border-none">
+                <TooltipContent side="right" className="bg-[var(--text-primary)] text-white border-none">
                   Sign out
                 </TooltipContent>
               </Tooltip>

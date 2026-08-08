@@ -31,12 +31,12 @@ export function DayCard({
 
   return (
     <div
-      className={`rounded-2xl p-4 bg-[#E0E5EC] transition-all ${isToday ? 'ring-2 ring-[#3B82F6]/50' : ''}`}
+      className={`rounded-2xl p-4 bg-[var(--bg-elevated)] transition-all ${isToday ? 'ring-2 ring-[var(--teal)]/50' : ''}`}
       style={NEUMORPHIC_STYLES.cardInset}
     >
       <div className="flex items-center justify-between mb-3">
         <div>
-          <h3 className="font-semibold text-[#3D4852]">
+          <h3 className="font-semibold text-[var(--text-primary)]">
             {DAY_NAMES[dayIndex]}
             {isToday && (
               <Badge variant="primary" className="ml-2 text-xs">
@@ -44,7 +44,7 @@ export function DayCard({
               </Badge>
             )}
           </h3>
-          <p className="text-sm text-[#6B7280]">{formatDateShort(date)}</p>
+          <p className="text-sm text-[var(--text-secondary)]">{formatDateShort(date)}</p>
         </div>
         <Button variant="outline" size="sm" onClick={onAddSlot}>
           <Plus className="h-4 w-4" />
@@ -52,7 +52,7 @@ export function DayCard({
       </div>
 
       {slots.length === 0 ? (
-        <p className="text-sm text-[#6B7280] text-center py-4">No slots</p>
+        <p className="text-sm text-[var(--text-secondary)] text-center py-4">No slots</p>
       ) : (
         <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1">
           {slots.map((slot) => (

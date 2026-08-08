@@ -287,13 +287,13 @@ export function ExperienceModal({
               {skills.map((skill) => (
                 <div
                   key={skill}
-                  className="inline-flex items-center gap-2 rounded-xl bg-[#E0E5EC] px-3 py-1.5 text-sm text-[#3D4852] shadow-[3px_3px_6px_rgba(163,177,198,0.6),-3px_-3px_6px_rgba(255,255,255,0.5)]"
+                  className="inline-flex items-center gap-2 rounded-xl bg-[var(--bg-elevated)] px-3 py-1.5 text-sm text-[var(--text-primary)] shadow-neu-extruded"
                 >
                   {skill}
                   <button
                     type="button"
                     onClick={() => removeSkill(skill)}
-                    className="text-[#6B7280] transition-colors hover:text-red-500"
+                    className="text-[var(--text-secondary)] transition-colors hover:text-red-500"
                     aria-label={`Remove ${skill}`}
                   >
                     <X className="h-3 w-3" />

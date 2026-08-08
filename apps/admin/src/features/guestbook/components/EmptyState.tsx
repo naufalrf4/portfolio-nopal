@@ -19,7 +19,7 @@ export function EmptyState({ filter }: EmptyStateProps) {
 
   return (
     <div
-      className="rounded-[32px] p-12 text-center"
+      className="rounded-[var(--radius-container)] p-12 text-center"
       style={{
         background: NEUMORPHIC_STYLES.background,
         boxShadow: NEUMORPHIC_STYLES.shadows.extruded,

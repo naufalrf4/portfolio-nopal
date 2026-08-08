@@ -31,7 +31,7 @@ export function ProjectEditPageContent({ projectId }: ProjectEditPageContentProp
     return (
       <PageWrapper>
         <div className="flex items-center justify-center h-64">
-          <Loader2 className="h-8 w-8 animate-spin text-[#3B82F6]" />
+          <Loader2 className="h-8 w-8 animate-spin text-[var(--teal)]" />
         </div>
       </PageWrapper>
     );
@@ -63,7 +63,7 @@ export function ProjectEditPageContent({ projectId }: ProjectEditPageContentProp
             </TabsList>
             <button
               onClick={() => setIsMetadataModalOpen(true)}
-              className="p-2 rounded-xl bg-[#E0E5EC] text-[#6B7280] hover:text-[#3B82F6] shadow-[6px_6px_12px_rgba(163,177,198,0.4),-6px_-6px_12px_rgba(255,255,255,0.4)] hover:shadow-[inset_4px_4px_8px_rgba(163,177,198,0.4),inset_-4px_-4px_8px_rgba(255,255,255,0.4)] transition-all"
+              className="p-2 rounded-xl bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:text-[var(--teal)] shadow-neu-extruded-sm hover:shadow-neu-inset-sm transition-all"
               title="Edit Metadata"
             >
               <Settings className="h-5 w-5" />

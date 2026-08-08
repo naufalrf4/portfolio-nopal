@@ -6,12 +6,12 @@ import { SignOutButton } from '../../../components/common/SignOutButton';
 import type { Session } from 'next-auth';
 
 const neuStyles = {
-  background: '#E0E5EC',
-  foreground: '#3D4852',
-  muted: '#6B7280',
-  blue: '#3B82F6',
-  extruded: '6px 6px 12px rgba(163,177,198,0.6), -6px -6px 12px rgba(255,255,255,0.5)',
-  inset: 'inset 6px 6px 10px rgba(163,177,198,0.6), inset -6px -6px 10px rgba(255,255,255,0.5)',
+  background: 'var(--bg-elevated)',
+  foreground: 'var(--text-primary)',
+  muted: 'var(--text-secondary)',
+  blue: 'var(--teal)',
+  extruded: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
+  inset: 'inset 0 1px 4px rgba(0, 0, 0, 0.25)',
 };
 
 interface SettingsPageContentProps {

@@ -15,7 +15,7 @@ Authoritative AI control contract for this repository.
 - **Framework:** Next.js 16.1.1
 - **Runtime:** Bun for local scripts and the Next.js runtime for app execution
 - **Language:** TypeScript
-- **Styling:** Tailwind CSS 4, Radix UI, and existing light-neumorphic dashboard patterns
+- **Styling:** Tailwind CSS 4, Radix UI, dark-first design tokens from `@naufalrf/design-tokens`
 - **Package Manager:** Bun via `bun.lock`
 - **Version Policy:** use versions resolved from `package.json` and `bun.lock`; never guess from memory
 - **State Management:** server components, route handlers, and app-local client state only
@@ -27,7 +27,7 @@ Authoritative AI control contract for this repository.
 - Keep Admin as the primary content and API authority for the whole portfolio ecosystem.
 - Preserve public, admin, and internal API namespace boundaries rather than collapsing them into one route surface.
 - Keep direct database access in server-side code only.
-- Preserve the existing dashboard shell and legacy phase2 neumorphic design vocabulary unless the user replaces the design direction.
+- Preserve the simplified dark-first dashboard shell; legacy phase2 neumorphic design vocabulary was removed in the shared tokens migration.
 
 ## 4. Operational Command Set
 

@@ -3,13 +3,13 @@ import { NEUMORPHIC_STYLES } from '../constants/projects.constants';
 export function SkeletonCard() {
   return (
     <div
-      className="rounded-[32px] p-6 bg-[#E0E5EC] animate-pulse"
+      className="rounded-[var(--radius-container)] p-6 bg-[var(--bg-elevated)] animate-pulse"
       style={{
         boxShadow: NEUMORPHIC_STYLES.shadows.extruded,
       }}
     >
       <div
-        className="w-12 h-12 rounded-2xl bg-[#E0E5EC] mb-4"
+        className="w-12 h-12 rounded-2xl bg-[var(--bg-elevated)] mb-4"
         style={{
           boxShadow: NEUMORPHIC_STYLES.shadows.button,
         }}

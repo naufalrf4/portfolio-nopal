@@ -53,12 +53,11 @@ export function ContactDetailView({ contact }: ContactDetailViewProps) {
           />
 
           <div className="pt-4 border-t border-[#A3B1C6]/20">
-            <h3 className="text-sm font-semibold text-[#3D4852] mb-3">Message</h3>
+            <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-3">Message</h3>
             <div
-              className="p-4 rounded-2xl bg-[#E0E5EC] text-[#3D4852] whitespace-pre-wrap"
+              className="p-4 rounded-2xl bg-[var(--bg-elevated)] text-[var(--text-primary)] whitespace-pre-wrap"
               style={{
-                boxShadow:
-                  'inset 6px 6px 10px rgba(163,177,198,0.6), inset -6px -6px 10px rgba(255,255,255,0.5)',
+                boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
               }}
             >
               {contact.message}
@@ -67,15 +66,14 @@ export function ContactDetailView({ contact }: ContactDetailViewProps) {
 
           {reply ? (
             <div className="pt-4 border-t border-[#A3B1C6]/20">
-              <h3 className="text-sm font-semibold text-[#3D4852] mb-3">Latest Reply</h3>
+              <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-3">Latest Reply</h3>
               <div
                 className="p-4 rounded-2xl bg-[#E8F1FF] text-[#2C3E55] whitespace-pre-wrap"
                 style={{
-                  boxShadow:
-                    'inset 6px 6px 10px rgba(163,177,198,0.25), inset -6px -6px 10px rgba(255,255,255,0.5)',
+                  boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
                 }}
               >
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#3B82F6] mb-2">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--teal)] mb-2">
                   {reply.subject}
                 </p>
                 {reply.message}

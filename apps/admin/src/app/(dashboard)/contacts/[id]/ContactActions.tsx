@@ -185,7 +185,7 @@ export function ContactActions({ contactId, replied }: ContactActionsProps) {
         }
       >
         <div className="py-4">
-          <p className="text-[#6B7280]">
+          <p className="text-[var(--text-secondary)]">
             This will permanently delete the contact form submission and all associated data. This
             action cannot be undone.
           </p>

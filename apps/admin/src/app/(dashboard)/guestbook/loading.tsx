@@ -14,7 +14,7 @@ const NEUMORPHIC_STYLES = {
 function SkeletonCard({ index }: { index: number }) {
   return (
     <div
-      className="rounded-[24px] p-6 animate-pulse"
+      className="rounded-[var(--radius-base)] p-6 animate-pulse"
       style={{
         background: NEUMORPHIC_STYLES.background,
         boxShadow: NEUMORPHIC_STYLES.shadows.small,
@@ -94,7 +94,7 @@ export default function GuestbookLoading() {
       />
 
       <div
-        className="rounded-[24px] p-2 mb-8 inline-flex gap-2"
+        className="rounded-[var(--radius-base)] p-2 mb-8 inline-flex gap-2"
         style={{
           background: NEUMORPHIC_STYLES.background,
           boxShadow: NEUMORPHIC_STYLES.shadows.inset,

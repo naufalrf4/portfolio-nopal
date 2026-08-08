@@ -1,3 +1,5 @@
+export { getErrorMessage } from '@naufalrf/http';
+
 interface ApiClientOptions {
   url: string;
   method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
@@ -49,18 +51,11 @@ export async function apiClient<T = unknown>(options: ApiClientOptions): Promise
 }
 
 export function handleApiError(error: unknown): string {
-  if (error instanceof Error) {
-    if (error.name === 'AbortError') {
-      return 'Request was cancelled';
-    }
-    return error.message;
-  }
-  return 'An unexpected error occurred';
-}
-
-export function getErrorMessage(error: unknown, fallback: string = 'An error occurred'): string {
-  if (error instanceof Error) {
-    return error.message;
-  }
-  return fallback;
-}
+   if (error instanceof Error) {
+     if (error.name === 'AbortError') {
+       return 'Request was cancelled';
+     }
+     return error.message;
+   }
+   return 'An unexpected error occurred';
+ }

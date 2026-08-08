@@ -63,16 +63,15 @@ export function TagInput({
           {tags.map((keyword) => (
             <div
               key={keyword}
-              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#E0E5EC] text-sm"
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[var(--bg-elevated)] text-sm"
               style={{
-                boxShadow:
-                  'inset 3px 3px 6px rgba(163,177,198,0.4), inset -3px -3px 6px rgba(255,255,255,0.4)',
+                boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
               }}
             >
-              <span className="text-[#3D4852]">{keyword}</span>
+              <span className="text-[var(--text-primary)]">{keyword}</span>
               <button
                 onClick={() => handleRemoveKeyword(keyword)}
-                className="text-[#6B7280] hover:text-red-500 transition-colors"
+                className="text-[var(--text-secondary)] hover:text-red-500 transition-colors"
                 aria-label={`Remove ${keyword}`}
                 type="button"
               >

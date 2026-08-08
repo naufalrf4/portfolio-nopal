@@ -14,13 +14,13 @@ export function CountryDistribution({ data, loading }: CountryDistributionProps)
     return (
       <Card
         className={cn(
-          'p-6 bg-[#E0E5EC]',
-          'shadow-[9px_9px_16px_rgba(163,177,198,0.6),-9px_-9px_16px_rgba(255,255,255,0.5)]'
+          'p-6 bg-[var(--bg-elevated)]',
+          'shadow-neu-extruded'
         )}
       >
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-[#3D4852]">Geographic Distribution</h3>
+            <h3 className="text-lg font-semibold text-[var(--text-primary)]">Geographic Distribution</h3>
           </div>
           <div className="space-y-4">
             {[1, 2, 3, 4].map((i) => (
@@ -45,13 +45,13 @@ export function CountryDistribution({ data, loading }: CountryDistributionProps)
   return (
     <Card
       className={cn(
-        'p-6 bg-[#E0E5EC]',
-        'shadow-[9px_9px_16px_rgba(163,177,198,0.6),-9px_-9px_16px_rgba(255,255,255,0.5)]'
+        'p-6 bg-[var(--bg-elevated)]',
+        'shadow-neu-extruded'
       )}
     >
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-semibold text-[#3D4852]">Geographic Distribution</h3>
-        <Globe className="w-5 h-5 text-[#6B7280]" />
+        <h3 className="text-lg font-semibold text-[var(--text-primary)]">Geographic Distribution</h3>
+        <Globe className="w-5 h-5 text-[var(--text-secondary)]" />
       </div>
 
       {countriesData.length > 0 ? (
@@ -61,13 +61,13 @@ export function CountryDistribution({ data, loading }: CountryDistributionProps)
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="text-2xl">{getFlagEmoji(country.code)}</span>
-                  <span className="font-medium text-[#3D4852]">{country.country}</span>
+                  <span className="font-medium text-[var(--text-primary)]">{country.country}</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="text-sm font-semibold text-[#3D4852]">
+                  <span className="text-sm font-semibold text-[var(--text-primary)]">
                     {country.count.toLocaleString()}
                   </span>
-                  <span className="text-xs text-[#6B7280]">{country.percentage}%</span>
+                  <span className="text-xs text-[var(--text-secondary)]">{country.percentage}%</span>
                 </div>
               </div>
 
@@ -75,7 +75,7 @@ export function CountryDistribution({ data, loading }: CountryDistributionProps)
                 <div
                   className={cn(
                     'h-full rounded-full transition-all duration-500 ease-out',
-                    'bg-gradient-to-r from-[#3B82F6] to-[#60A5FA]'
+                    'bg-gradient-to-r from-[var(--teal)] to-[var(--amber)]'
                   )}
                   style={{ width: `${country.percentage}%` }}
                 />
@@ -86,7 +86,7 @@ export function CountryDistribution({ data, loading }: CountryDistributionProps)
       ) : (
         <div className="py-12 flex flex-col items-center justify-center">
           <Globe className="w-12 h-12 text-[#D1D5DB] mb-3" />
-          <p className="text-[#6B7280] text-sm">No geographic data available</p>
+          <p className="text-[var(--text-secondary)] text-sm">No geographic data available</p>
         </div>
       )}
     </Card>

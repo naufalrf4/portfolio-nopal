@@ -84,8 +84,8 @@ export function AnalyticsSummaryCard() {
             <TrendingUp className="w-6 h-6 text-blue-500" />
           </div>
           <div>
-            <p className="text-sm font-medium text-[#6B7280]">Analytics Overview</p>
-            <p className="text-2xl font-bold text-[#3D4852] font-[family-name:var(--font-plus-jakarta)]">
+            <p className="text-sm font-medium text-[var(--text-secondary)]">Analytics Overview</p>
+            <p className="text-2xl font-bold text-[var(--text-primary)] font-[family-name:var(--font-plus-jakarta)]">
               {loading ? 'Loading…' : 'Live data'}
             </p>
           </div>
@@ -97,13 +97,13 @@ export function AnalyticsSummaryCard() {
             return (
               <div
                 key={item.label}
-                className="rounded-2xl bg-white/60 px-4 py-3 shadow-[inset_4px_4px_8px_rgba(163,177,198,0.18),inset_-4px_-4px_8px_rgba(255,255,255,0.55)]"
+                className="rounded-2xl bg-white/60 px-4 py-3 shadow-neu-extruded"
               >
-                <div className="flex items-center gap-2 text-xs font-medium text-[#6B7280]">
+                <div className="flex items-center gap-2 text-xs font-medium text-[var(--text-secondary)]">
                   <Icon className={`h-4 w-4 ${item.color}`} />
                   <span>{item.label}</span>
                 </div>
-                <p className="mt-2 text-xl font-bold text-[#3D4852]">{item.value}</p>
+                <p className="mt-2 text-xl font-bold text-[var(--text-primary)]">{item.value}</p>
               </div>
             );
           })}

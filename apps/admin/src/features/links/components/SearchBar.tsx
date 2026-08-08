@@ -13,7 +13,7 @@ export function SearchBar({ searchQuery, onSearchChange, viewMode, onViewModeCha
   return (
     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div className="relative flex-1 max-w-md">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-[#6B7280]" />
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-[var(--text-secondary)]" />
         <Input
           placeholder="Search links..."
           value={searchQuery}
@@ -23,25 +23,24 @@ export function SearchBar({ searchQuery, onSearchChange, viewMode, onViewModeCha
         {searchQuery && (
           <button
             onClick={() => onSearchChange('')}
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-[#6B7280] hover:text-[#3D4852]"
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
           >
             <X className="h-4 w-4" />
           </button>
         )}
       </div>
       <div
-        className="flex gap-1 p-1 rounded-xl bg-[#E0E5EC]"
+        className="flex gap-1 p-1 rounded-xl bg-[var(--bg-elevated)]"
         style={{
-          boxShadow:
-            'inset 3px 3px 6px rgba(163,177,198,0.6), inset -3px -3px 6px rgba(255,255,255,0.5)',
+          boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
         }}
       >
         <button
           onClick={() => onViewModeChange('grid')}
           className={`p-2.5 rounded-lg transition-all duration-200 ${
             viewMode === 'grid'
-              ? 'bg-[#E0E5EC] shadow-[5px_5px_10px_rgba(163,177,198,0.6),-5px_-5px_10px_rgba(255,255,255,0.5)] text-[#3B82F6]'
-              : 'text-[#6B7280] hover:text-[#3D4852]'
+              ? 'bg-[var(--bg-elevated)] shadow-neu-extruded-sm text-[var(--teal)]'
+              : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
           }`}
         >
           <Grid3X3 className="h-5 w-5" />
@@ -50,8 +49,8 @@ export function SearchBar({ searchQuery, onSearchChange, viewMode, onViewModeCha
           onClick={() => onViewModeChange('table')}
           className={`p-2.5 rounded-lg transition-all duration-200 ${
             viewMode === 'table'
-              ? 'bg-[#E0E5EC] shadow-[5px_5px_10px_rgba(163,177,198,0.6),-5px_-5px_10px_rgba(255,255,255,0.5)] text-[#3B82F6]'
-              : 'text-[#6B7280] hover:text-[#3D4852]'
+              ? 'bg-[var(--bg-elevated)] shadow-neu-extruded-sm text-[var(--teal)]'
+              : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
           }`}
         >
           <List className="h-5 w-5" />

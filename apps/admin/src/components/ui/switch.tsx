@@ -11,13 +11,13 @@ function Switch({ className, ...props }: React.ComponentProps<typeof SwitchPrimi
       data-slot="switch"
       className={cn(
         'peer inline-flex h-7 w-14 shrink-0 items-center rounded-full',
-        'bg-[#E0E5EC]',
+        'bg-[var(--bg-elevated)]',
         'transition-all duration-300 ease-out',
         'outline-none',
-        '[box-shadow:inset_3px_3px_6px_rgba(163,177,198,0.6),inset_-3px_-3px_6px_rgba(255,255,255,0.5)]',
-        'data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-[#3B82F6] data-[state=checked]:to-[#60A5FA]',
-        'data-[state=checked]:[box-shadow:inset_2px_2px_4px_rgba(59,130,246,0.4),inset_-2px_-2px_4px_rgba(96,165,250,0.4)]',
-        'focus-visible:ring-2 focus-visible:ring-[#3B82F6]/30 focus-visible:ring-offset-2 focus-visible:ring-offset-[#E0E5EC]',
+        'shadow-neu-inset',
+        'data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-[var(--teal)] data-[state=checked]:to-[var(--amber)]',
+        'data-[state=checked]:shadow-neu-inset',
+        'focus-visible:ring-2 focus-visible:ring-[var(--teal)]/30 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-elevated)]',
         'disabled:cursor-not-allowed disabled:opacity-50',
         className
       )}
@@ -27,13 +27,13 @@ function Switch({ className, ...props }: React.ComponentProps<typeof SwitchPrimi
         data-slot="switch-thumb"
         className={cn(
           'pointer-events-none block h-5 w-5 rounded-full',
-          'bg-[#E0E5EC]',
+          'bg-[var(--bg-elevated)]',
           'transition-all duration-300 ease-out',
-          '[box-shadow:5px_5px_10px_rgba(163,177,198,0.6),-5px_-5px_10px_rgba(255,255,255,0.5)]',
+          'shadow-neu-extruded',
           'data-[state=unchecked]:translate-x-1',
           'data-[state=checked]:translate-x-8',
-          'data-[state=checked]:bg-[#E0E5EC]',
-          'data-[state=checked]:[box-shadow:3px_3px_8px_rgba(163,177,198,0.6),-3px_-3px_8px_rgba(255,255,255,0.5),0_0_12px_rgba(59,130,246,0.3)]',
+          'data-[state=checked]:bg-[var(--bg-elevated)]',
+          'data-[state=checked]:shadow-neu-extruded',
           'hover:scale-105'
         )}
       />

@@ -12,13 +12,13 @@ function Checkbox({ className, ...props }: React.ComponentProps<typeof CheckboxP
       data-slot="checkbox"
       className={cn(
         'peer h-5 w-5 shrink-0 rounded-lg',
-        'bg-[#E0E5EC]',
+        'bg-[var(--bg-elevated)]',
         'transition-all duration-300 ease-out',
         'outline-none',
-        '[box-shadow:inset_3px_3px_6px_rgba(163,177,198,0.6),inset_-3px_-3px_6px_rgba(255,255,255,0.5)]',
-        'data-[state=checked]:bg-gradient-to-br data-[state=checked]:from-[#3B82F6] data-[state=checked]:to-[#60A5FA]',
-        'data-[state=checked]:[box-shadow:3px_3px_6px_rgba(59,130,246,0.3),-3px_-3px_6px_rgba(96,165,250,0.2)]',
-        'focus-visible:ring-2 focus-visible:ring-[#3B82F6]/30 focus-visible:ring-offset-2 focus-visible:ring-offset-[#E0E5EC]',
+        'shadow-neu-inset',
+        'data-[state=checked]:bg-gradient-to-br data-[state=checked]:from-[var(--teal)] data-[state=checked]:to-[var(--amber)]',
+        'data-[state=checked]:shadow-neu-extruded',
+        'focus-visible:ring-2 focus-visible:ring-[var(--teal)]/30 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-elevated)]',
         'disabled:cursor-not-allowed disabled:opacity-50',
         className
       )}

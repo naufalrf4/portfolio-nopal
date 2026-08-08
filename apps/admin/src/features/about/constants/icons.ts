@@ -26,17 +26,17 @@ export const ICON_OPTIONS: IconOption[] = [
   { value: 'youtube', label: 'YouTube', icon: Youtube, color: '#FF0000' },
   { value: 'facebook', label: 'Facebook', icon: Facebook, color: '#1877F2' },
   { value: 'mail', label: 'Email', icon: Mail, color: '#EA4335' },
-  { value: 'globe', label: 'Website', icon: Globe, color: '#3B82F6' },
-  { value: 'link', label: 'Custom Link', icon: Link2, color: '#6B7280' },
+  { value: 'globe', label: 'Website', icon: Globe, color: 'var(--teal)' },
+  { value: 'link', label: 'Custom Link', icon: Link2, color: 'var(--text-secondary)' },
 ];
 
 export function getIconComponent(iconName: string | undefined): {
   icon: LucideIcon;
   color: string;
 } {
-  if (!iconName) return { icon: Link2, color: '#3B82F6' };
+  if (!iconName) return { icon: Link2, color: 'var(--teal)' };
   const iconOption = ICON_OPTIONS.find((opt) => opt.value === iconName);
   return iconOption
     ? { icon: iconOption.icon, color: iconOption.color }
-    : { icon: Link2, color: '#3B82F6' };
+    : { icon: Link2, color: 'var(--teal)' };
 }

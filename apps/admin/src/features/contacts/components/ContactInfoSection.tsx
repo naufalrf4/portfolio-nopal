@@ -19,29 +19,29 @@ export function ContactInfoSection({ email, createdAt, ipHash }: ContactInfoSect
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-1">
-          <div className="flex items-center gap-2 text-sm text-[#6B7280]">
+          <div className="flex items-center gap-2 text-sm text-[var(--text-secondary)]">
             <Mail className="h-4 w-4" />
             <span className="font-medium">Email</span>
           </div>
-          <a href={`mailto:${email}`} className="text-[#3B82F6] hover:underline block">
+          <a href={`mailto:${email}`} className="text-[var(--teal)] hover:underline block">
             {email}
           </a>
         </div>
         <div className="space-y-1">
-          <div className="flex items-center gap-2 text-sm text-[#6B7280]">
+          <div className="flex items-center gap-2 text-sm text-[var(--text-secondary)]">
             <Calendar className="h-4 w-4" />
             <span className="font-medium">Received</span>
           </div>
-          <p className="text-[#3D4852]">{formattedDate}</p>
+          <p className="text-[var(--text-primary)]">{formattedDate}</p>
         </div>
       </div>
 
       <div className="space-y-1">
-        <div className="flex items-center gap-2 text-sm text-[#6B7280]">
+        <div className="flex items-center gap-2 text-sm text-[var(--text-secondary)]">
           <Hash className="h-4 w-4" />
           <span className="font-medium">IP Hash</span>
         </div>
-        <p className="text-[#6B7280] text-sm font-mono">{ipHash}</p>
+        <p className="text-[var(--text-secondary)] text-sm font-mono">{ipHash}</p>
       </div>
     </div>
   );

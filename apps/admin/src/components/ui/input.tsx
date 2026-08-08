@@ -8,24 +8,24 @@ function Input({ className, type, ...props }: React.ComponentProps<'input'>) {
       type={type}
       data-slot="input"
       className={cn(
-        'h-12 w-full rounded-2xl bg-[#E0E5EC] px-4 py-3',
-        'text-base text-[#3D4852]',
+        'h-12 w-full rounded-2xl bg-[var(--bg-elevated)] px-4 py-3',
+        'text-base text-[var(--text-primary)]',
         'border-none outline-none',
         'transition-all duration-300 ease-out',
-        '[box-shadow:inset_10px_10px_20px_rgba(163,177,198,0.7),inset_-10px_-10px_20px_rgba(255,255,255,0.6)]',
-        'placeholder:text-[#6B7280] placeholder:opacity-70',
-        'focus:ring-2 focus:ring-[#3B82F6]/30 focus:ring-offset-2 focus:ring-offset-[#E0E5EC]',
-        'focus:[box-shadow:inset_10px_10px_20px_rgba(163,177,198,0.7),inset_-10px_-10px_20px_rgba(255,255,255,0.6)]',
-        'disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-[#E0E5EC]/80',
-        'file:border-none file:bg-transparent file:text-sm file:font-medium file:text-[#3D4852]',
+        'shadow-neu-inset',
+        'placeholder:text-[var(--text-secondary)] placeholder:opacity-70',
+        'focus:ring-2 focus:ring-[var(--teal)]/30 focus:ring-offset-2 focus:ring-offset-[var(--bg-elevated)]',
+        'focus:shadow-neu-inset',
+        'disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-[var(--bg-elevated)]/80',
+        'file:border-none file:bg-transparent file:text-sm file:font-medium file:text-[var(--text-primary)]',
         'file:mr-4 file:rounded-xl file:px-4 file:py-2',
         'file:transition-all file:duration-300',
         'file:hover:bg-[#D1D9E6]',
-        '[&:-webkit-autofill]:bg-[#E0E5EC]',
-        '[&:-webkit-autofill]:[-webkit-box-shadow:inset_10px_10px_20px_rgba(163,177,198,0.7),inset_-10px_-10px_20px_rgba(255,255,255,0.6),0_0_0_1000px_#E0E5EC_inset]',
-        '[&:-webkit-autofill]:[-webkit-text-fill-color:#3D4852]',
+        '[&:-webkit-autofill]:bg-[var(--bg-elevated)]',
+        '[&:-webkit-autofill]:[-webkit-box-shadow:0_0_0_1000px_var(--bg-elevated)_inset]',
+        '[&:-webkit-autofill]:[-webkit-text-fill-color:var(--text-primary)]',
         'aria-invalid:ring-2 aria-invalid:ring-red-500/30',
-        'selection:bg-[#3B82F6]/20 selection:text-[#3D4852]',
+        'selection:bg-[var(--teal)]/20 selection:text-[var(--text-primary)]',
         className
       )}
       {...props}

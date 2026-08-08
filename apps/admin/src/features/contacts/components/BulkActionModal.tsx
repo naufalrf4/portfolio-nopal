@@ -54,7 +54,7 @@ export function BulkActionModal({
       }
     >
       <div className="py-4">
-        <p className="text-[#6B7280]">
+        <p className="text-[var(--text-secondary)]">
           {isDelete
             ? 'This action cannot be undone. All selected contacts will be permanently deleted.'
             : `All selected contacts will be marked as ${action === 'markRead' ? 'read' : 'unread'}.`}

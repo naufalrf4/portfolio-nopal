@@ -126,7 +126,7 @@ export function DashboardPageContent() {
       </StatCardsSuspense>
 
       <div className="space-y-4">
-        <h2 className="text-lg font-semibold text-[#3D4852] font-[family-name:var(--font-plus-jakarta)]">
+        <h2 className="text-lg font-semibold text-[var(--text-primary)] font-[family-name:var(--font-plus-jakarta)]">
           Quick Actions
         </h2>
         <div className="flex flex-wrap gap-4">

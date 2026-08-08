@@ -1,6 +1,6 @@
 export const NEU_INSET_SHADOW =
-  'inset 10px 10px 20px rgba(163,177,198,0.7), inset -10px -10px 20px rgba(255,255,255,0.6)';
+  'inset 0 1px 4px rgba(0, 0, 0, 0.25)';
 export const NEU_BUTTON_SHADOW =
-  '6px 6px 12px rgba(163,177,198,0.5), -6px -6px 12px rgba(255,255,255,0.4)';
+  '0 2px 8px -2px rgba(0, 0, 0, 0.3)';
 export const NEU_BUTTON_PRESSED =
-  'inset 4px 4px 8px rgba(163,177,198,0.5), inset -4px -4px 8px rgba(255,255,255,0.4)';
+  'inset 0 1px 4px rgba(0, 0, 0, 0.25)';

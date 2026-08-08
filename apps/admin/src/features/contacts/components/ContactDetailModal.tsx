@@ -112,43 +112,41 @@ export function ContactDetailModal({
     >
       {loading ? (
         <div className="flex items-center justify-center py-8">
-          <div className="text-[#6B7280]">Loading...</div>
+          <div className="text-[var(--text-secondary)]">Loading...</div>
         </div>
       ) : contact ? (
         <div className="space-y-6 py-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div
-              className="p-4 rounded-2xl bg-[#E0E5EC]"
+              className="p-4 rounded-2xl bg-[var(--bg-elevated)]"
               style={{
-                boxShadow:
-                  'inset 3px 3px 6px rgba(163,177,198,0.4), inset -3px -3px 6px rgba(255,255,255,0.4)',
+                boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
               }}
             >
               <div className="flex items-center gap-2 mb-2">
-                <User className="h-4 w-4 text-[#6B7280]" />
-                <span className="text-xs font-medium text-[#6B7280] uppercase tracking-wider">
+                <User className="h-4 w-4 text-[var(--text-secondary)]" />
+                <span className="text-xs font-medium text-[var(--text-secondary)] uppercase tracking-wider">
                   Name
                 </span>
               </div>
-              <p className="text-[#3D4852] font-medium">{contact.name}</p>
+              <p className="text-[var(--text-primary)] font-medium">{contact.name}</p>
             </div>
 
             <div
-              className="p-4 rounded-2xl bg-[#E0E5EC]"
+              className="p-4 rounded-2xl bg-[var(--bg-elevated)]"
               style={{
-                boxShadow:
-                  'inset 3px 3px 6px rgba(163,177,198,0.4), inset -3px -3px 6px rgba(255,255,255,0.4)',
+                boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
               }}
             >
               <div className="flex items-center gap-2 mb-2">
-                <Mail className="h-4 w-4 text-[#6B7280]" />
-                <span className="text-xs font-medium text-[#6B7280] uppercase tracking-wider">
+                <Mail className="h-4 w-4 text-[var(--text-secondary)]" />
+                <span className="text-xs font-medium text-[var(--text-secondary)] uppercase tracking-wider">
                   Email
                 </span>
               </div>
               <a
                 href={`mailto:${contact.email}`}
-                className="text-[#3B82F6] hover:underline font-medium"
+                className="text-[var(--teal)] hover:underline font-medium"
               >
                 {contact.email}
               </a>
@@ -156,41 +154,39 @@ export function ContactDetailModal({
           </div>
 
           <div
-            className="p-4 rounded-2xl bg-[#E0E5EC]"
+            className="p-4 rounded-2xl bg-[var(--bg-elevated)]"
             style={{
-              boxShadow:
-                'inset 3px 3px 6px rgba(163,177,198,0.4), inset -3px -3px 6px rgba(255,255,255,0.4)',
+              boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
             }}
           >
             <div className="flex items-center gap-2 mb-2">
-              <MessageSquare className="h-4 w-4 text-[#6B7280]" />
-              <span className="text-xs font-medium text-[#6B7280] uppercase tracking-wider">
+              <MessageSquare className="h-4 w-4 text-[var(--text-secondary)]" />
+              <span className="text-xs font-medium text-[var(--text-secondary)] uppercase tracking-wider">
                 Subject
               </span>
             </div>
-            <p className="text-[#3D4852]">
-              {contact.subject || <span className="italic text-[#6B7280]">No subject</span>}
+            <p className="text-[var(--text-primary)]">
+              {contact.subject || <span className="italic text-[var(--text-secondary)]">No subject</span>}
             </p>
           </div>
 
           <div
-            className="p-4 rounded-2xl bg-[#E0E5EC]"
+            className="p-4 rounded-2xl bg-[var(--bg-elevated)]"
             style={{
-              boxShadow:
-                'inset 3px 3px 6px rgba(163,177,198,0.4), inset -3px -3px 6px rgba(255,255,255,0.4)',
+              boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
             }}
           >
             <div className="flex items-center gap-2 mb-2">
-              <MessageSquare className="h-4 w-4 text-[#6B7280]" />
-              <span className="text-xs font-medium text-[#6B7280] uppercase tracking-wider">
+              <MessageSquare className="h-4 w-4 text-[var(--text-secondary)]" />
+              <span className="text-xs font-medium text-[var(--text-secondary)] uppercase tracking-wider">
                 Message
               </span>
             </div>
-            <p className="text-[#3D4852] whitespace-pre-wrap">{contact.message}</p>
+            <p className="text-[var(--text-primary)] whitespace-pre-wrap">{contact.message}</p>
           </div>
 
           <div className="flex items-center justify-between pt-4 border-t border-[#A3B1C6]/20">
-            <div className="flex items-center gap-2 text-sm text-[#6B7280]">
+            <div className="flex items-center gap-2 text-sm text-[var(--text-secondary)]">
               <Clock className="h-4 w-4" />
               <span>
                 {new Date(contact.createdAt).toLocaleDateString('en-US', {

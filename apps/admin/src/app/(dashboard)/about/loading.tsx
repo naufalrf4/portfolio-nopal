@@ -19,9 +19,8 @@ export default function AboutLoading() {
               key={tab}
               className="h-10 px-4 rounded-2xl animate-pulse"
               style={{
-                background: '#E0E5EC',
-                boxShadow:
-                  'inset 3px 3px 6px rgb(163,177,198,0.6), inset -3px -3px 6px rgba(255,255,255,0.5)',
+                background: 'var(--bg-elevated)',
+                boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
               }}
             >
               <div className="h-full flex items-center">
@@ -38,10 +37,10 @@ export default function AboutLoading() {
 
         {/* Content card skeleton */}
         <div
-          className="rounded-[32px] p-8 animate-pulse"
+          className="rounded-[var(--radius-container)] p-8 animate-pulse"
           style={{
-            background: '#E0E5EC',
-            boxShadow: '9px 9px 16px rgb(163,177,198,0.6), -9px -9px 16px rgba(255,255,255,0.5)',
+            background: 'var(--bg-elevated)',
+            boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
           }}
         >
           <div className="space-y-6">
@@ -65,9 +64,8 @@ export default function AboutLoading() {
                 <div
                   className="h-12 w-full rounded-2xl"
                   style={{
-                    background: '#E0E5EC',
-                    boxShadow:
-                      'inset 6px 6px 10px rgb(163,177,198,0.6), inset -6px -6px 10px rgba(255,255,255,0.5)',
+                    background: 'var(--bg-elevated)',
+                    boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
                   }}
                 />
               </div>
@@ -78,8 +76,7 @@ export default function AboutLoading() {
               className="h-12 w-32 rounded-2xl"
               style={{
                 background: '#6C63FF',
-                boxShadow:
-                  '6px 6px 12px rgba(108,99,255,0.4), -6px -6px 12px rgba(255,255,255,0.5)',
+                boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
               }}
             />
           </div>

@@ -11,7 +11,7 @@ export function FileUploadExample() {
     <div className="space-y-8 max-w-2xl mx-auto p-8">
       <div>
         <h2 className="text-2xl font-bold mb-4">FileUpload Component Examples</h2>
-        <p className="text-[#6B7280] mb-8">
+        <p className="text-[var(--text-secondary)] mb-8">
           Upload files to R2/S3 or enter direct URLs. Both options are available in each upload
           field.
         </p>

@@ -51,11 +51,11 @@ export default function RootLayout({
           position="top-center"
           toastOptions={{
             style: {
-              background: '#E0E5EC',
-              color: '#3D4852',
-              border: 'none',
-              borderRadius: '16px',
-              boxShadow: '9px 9px 16px rgba(163,177,198,0.6), -9px -9px 16px rgba(255,255,255,0.5)',
+              background: 'var(--bg-elevated)',
+              color: 'var(--text-primary)',
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--radius-container)',
+              boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
             },
           }}
         />

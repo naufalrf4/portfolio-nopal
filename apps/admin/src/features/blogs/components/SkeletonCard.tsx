@@ -3,7 +3,7 @@ import { NEUMORPHIC_STYLES } from '../constants/blogs.constants';
 export function SkeletonCard() {
   return (
     <div
-      className="rounded-[32px] p-6 animate-pulse"
+      className="rounded-[var(--radius-container)] p-6 animate-pulse"
       style={{
         backgroundColor: NEUMORPHIC_STYLES.background,
         boxShadow: NEUMORPHIC_STYLES.shadows.inset,

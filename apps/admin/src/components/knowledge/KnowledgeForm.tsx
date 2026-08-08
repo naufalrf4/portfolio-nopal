@@ -117,7 +117,7 @@ export function KnowledgeForm({ doc, onSubmit, isSubmitting }: KnowledgeFormProp
       <CardContent>
         <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-6">
           <div className="space-y-2">
-            <label htmlFor="filename" className="block text-sm font-medium text-[#3D4852]">
+            <label htmlFor="filename" className="block text-sm font-medium text-[var(--text-primary)]">
               Filename
             </label>
             <Input
@@ -130,7 +130,7 @@ export function KnowledgeForm({ doc, onSubmit, isSubmitting }: KnowledgeFormProp
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="content" className="block text-sm font-medium text-[#3D4852]">
+            <label htmlFor="content" className="block text-sm font-medium text-[var(--text-primary)]">
               Content
             </label>
 
@@ -156,7 +156,7 @@ export function KnowledgeForm({ doc, onSubmit, isSubmitting }: KnowledgeFormProp
                 {errors.content && (
                   <p className="text-sm text-red-500 mt-2">{errors.content.message}</p>
                 )}
-                <p className="text-xs text-[#6B7280] mt-2">
+                <p className="text-xs text-[var(--text-secondary)] mt-2">
                   Supports plain text and markdown format. The content will be chunked and indexed
                   for RAG retrieval.
                 </p>
@@ -172,19 +172,19 @@ export function KnowledgeForm({ doc, onSubmit, isSubmitting }: KnowledgeFormProp
                       className="max-w-md mx-auto"
                     />
                     {file && (
-                      <div className="mt-4 p-3 bg-[#E0E5EC] rounded-lg inline-block">
-                        <p className="text-sm text-[#3D4852] font-medium">Selected: {file.name}</p>
-                        <p className="text-xs text-[#6B7280] mt-1">
+                      <div className="mt-4 p-3 bg-[var(--bg-elevated)] rounded-lg inline-block">
+                        <p className="text-sm text-[var(--text-primary)] font-medium">Selected: {file.name}</p>
+                        <p className="text-xs text-[var(--text-secondary)] mt-1">
                           Size: {(file.size / 1024).toFixed(2)} KB
                         </p>
                       </div>
                     )}
                   </div>
-                  <p className="text-xs text-[#6B7280]">
+                  <p className="text-xs text-[var(--text-secondary)]">
                     Supported formats: PDF, Markdown (.md), Word (.docx, .doc), Text (.txt), Rich
                     Text (.rtf), JSON (.json)
                   </p>
-                  <p className="text-xs text-[#6B7280]">
+                  <p className="text-xs text-[var(--text-secondary)]">
                     Raw files stay transient. Text is extracted in-browser, then you can review and
                     edit the content before saving or re-ingesting it.
                   </p>

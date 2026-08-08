@@ -3,7 +3,7 @@ import { NEUMORPHIC_SHADOWS, COLORS } from '../constants/messages.constants';
 export function SkeletonCard() {
   return (
     <div
-      className="rounded-[32px] p-6 animate-pulse"
+      className="rounded-[var(--radius-container)] p-6 animate-pulse"
       style={{
         backgroundColor: COLORS.background,
         boxShadow: NEUMORPHIC_SHADOWS.extruded,

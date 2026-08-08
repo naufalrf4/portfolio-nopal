@@ -30,7 +30,7 @@ function SheetOverlay({
     <SheetPrimitive.Overlay
       data-slot="sheet-overlay"
       className={cn(
-        'fixed inset-0 z-50 bg-[#E0E5EC]/80 backdrop-blur-sm',
+        'fixed inset-0 z-50 bg-[var(--bg-elevated)]/80 backdrop-blur-sm',
         'data-[state=open]:animate-in data-[state=closed]:animate-out',
         'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
         'duration-300',
@@ -55,17 +55,17 @@ function SheetContent({
       <SheetPrimitive.Content
         data-slot="sheet-content"
         className={cn(
-          'fixed z-50 flex flex-col gap-4 bg-[#E0E5EC] shadow-lg transition-all ease-out',
+          'fixed z-50 flex flex-col gap-4 bg-[var(--bg-elevated)] shadow-lg transition-all ease-out',
           'data-[state=open]:animate-in data-[state=closed]:animate-out',
           'data-[state=open]:duration-300 data-[state=closed]:duration-300',
           side === 'right' &&
-            'data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right inset-y-0 right-0 h-full w-3/4 border-l border-[#A3B1C6]/20 sm:max-w-sm rounded-l-[32px] shadow-[-12px_0_24px_rgba(163,177,198,0.7)]',
+            'data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right inset-y-0 right-0 h-full w-3/4 border-l border-[#A3B1C6]/20 sm:max-w-sm rounded-l-[32px] shadow-neu-extruded',
           side === 'left' &&
-            'data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left inset-y-0 left-0 h-full w-3/4 border-r border-[#A3B1C6]/20 sm:max-w-sm rounded-r-[32px] shadow-[12px_0_24px_rgba(163,177,198,0.7)]',
+            'data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left inset-y-0 left-0 h-full w-3/4 border-r border-[#A3B1C6]/20 sm:max-w-sm rounded-r-[32px] shadow-neu-extruded',
           side === 'top' &&
-            'data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top inset-x-0 top-0 h-auto border-b border-[#A3B1C6]/20 rounded-b-[32px] shadow-[0_12px_24px_rgba(163,177,198,0.7)]',
+            'data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top inset-x-0 top-0 h-auto border-b border-[#A3B1C6]/20 rounded-b-[32px] shadow-neu-extruded',
           side === 'bottom' &&
-            'data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom inset-x-0 bottom-0 h-auto border-t border-[#A3B1C6]/20 rounded-t-[32px] shadow-[0_-12px_24px_rgba(163,177,198,0.7)]',
+            'data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom inset-x-0 bottom-0 h-auto border-t border-[#A3B1C6]/20 rounded-t-[32px] shadow-neu-extruded',
           className
         )}
         {...props}
@@ -74,13 +74,13 @@ function SheetContent({
         <SheetPrimitive.Close
           className={cn(
             'absolute top-5 right-5 h-10 w-10 rounded-xl',
-            'bg-[#E0E5EC] flex items-center justify-center',
-            'shadow-[5px_5px_10px_rgba(163,177,198,0.6),-5px_-5px_10px_rgba(255,255,255,0.5)]',
-            'text-[#6B7280] transition-all duration-200 opacity-70 hover:opacity-100',
-            'hover:shadow-[7px_7px_12px_rgba(163,177,198,0.65),-7px_-7px_12px_rgba(255,255,255,0.55)]',
-            'hover:text-[#3D4852]',
-            'active:shadow-[inset_4px_4px_8px_rgba(163,177,198,0.6),inset_-4px_-4px_8px_rgba(255,255,255,0.5)]',
-            'focus:outline-none focus:ring-2 focus:ring-[#3B82F6]/30 focus:ring-offset-2 focus:ring-offset-[#E0E5EC]',
+            'bg-[var(--bg-elevated)] flex items-center justify-center',
+            'shadow-neu-extruded-sm',
+            'text-[var(--text-secondary)] transition-all duration-200 opacity-70 hover:opacity-100',
+            'hover:shadow-neu-extruded',
+            'hover:text-[var(--text-primary)]',
+            'active:shadow-neu-extruded',
+            'focus:outline-none focus:ring-2 focus:ring-[var(--teal)]/30 focus:ring-offset-2 focus:ring-offset-[var(--bg-elevated)]',
             'disabled:pointer-events-none',
             '[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg]:size-5'
           )}
@@ -117,7 +117,7 @@ function SheetTitle({ className, ...props }: React.ComponentProps<typeof SheetPr
   return (
     <SheetPrimitive.Title
       data-slot="sheet-title"
-      className={cn('font-display text-2xl font-bold tracking-tight text-[#3D4852]', className)}
+      className={cn('font-display text-2xl font-bold tracking-tight text-[var(--text-primary)]', className)}
       {...props}
     />
   );
@@ -130,7 +130,7 @@ function SheetDescription({
   return (
     <SheetPrimitive.Description
       data-slot="sheet-description"
-      className={cn('text-sm text-[#6B7280]', className)}
+      className={cn('text-sm text-[var(--text-secondary)]', className)}
       {...props}
     />
   );

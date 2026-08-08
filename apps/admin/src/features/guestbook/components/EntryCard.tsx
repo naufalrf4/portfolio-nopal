@@ -38,7 +38,7 @@ export function EntryCard({ entry, index, onToggleVisibility, onDelete }: EntryC
       `}</style>
 
       <div
-        className="rounded-[32px] p-6 transition-all duration-300 hover:-translate-y-1"
+        className="rounded-[var(--radius-container)] p-6 transition-all duration-300 hover:-translate-y-1"
         style={{
           background: NEUMORPHIC_STYLES.background,
           boxShadow: NEUMORPHIC_STYLES.shadows.extruded,
@@ -66,7 +66,7 @@ export function EntryCard({ entry, index, onToggleVisibility, onDelete }: EntryC
               <div
                 className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm"
                 style={{
-                  background: 'linear-gradient(135deg, #3B82F6 0%, #38B2AC 100%)',
+                  background: 'linear-gradient(135deg, var(--teal) 0%, var(--teal) 100%)',
                 }}
               >
                 {getInitials(entry.user.name, entry.user.email)}
@@ -104,7 +104,7 @@ export function EntryCard({ entry, index, onToggleVisibility, onDelete }: EntryC
         <div
           className="mt-4 pt-4 flex items-center justify-between"
           style={{
-            borderTop: '1px solid rgba(163,177,198,0.3)',
+            borderTop: '1px solid var(--border)',
           }}
         >
           <div className="flex items-center gap-3">
@@ -121,11 +121,11 @@ export function EntryCard({ entry, index, onToggleVisibility, onDelete }: EntryC
                 style={{
                   left: entry.visible ? '30px' : '4px',
                   background: entry.visible
-                    ? 'linear-gradient(135deg, #38B2AC 0%, #319795 100%)'
+                    ? 'linear-gradient(135deg, var(--teal) 0%, #319795 100%)'
                     : NEUMORPHIC_STYLES.background,
                   boxShadow: entry.visible
                     ? '3px 3px 8px rgba(56,178,172,0.4)'
-                    : '3px 3px 8px rgba(163,177,198,0.6), -3px -3px 8px rgba(255,255,255,0.5)',
+                    : '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
                 }}
               >
                 {entry.visible ? <EyeIcon /> : <EyeOffIcon />}

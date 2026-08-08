@@ -179,7 +179,7 @@ export function ExperienceTab() {
         </div>
 
         {items.length === 0 ? (
-          <p className="py-8 text-center text-sm text-[#6B7280]">{config.emptyLabel}</p>
+          <p className="py-8 text-center text-sm text-[var(--text-secondary)]">{config.emptyLabel}</p>
         ) : (
           <div className="space-y-3">
             {items.map(({ item, index }) => (
@@ -202,8 +202,8 @@ export function ExperienceTab() {
         <CardContent className="space-y-4">
           <div className="mb-4 flex items-center justify-between">
             <div>
-              <h3 className="text-lg font-semibold text-[#3D4852]">Experience</h3>
-              <p className="text-sm text-[#6B7280]">
+              <h3 className="text-lg font-semibold text-[var(--text-primary)]">Experience</h3>
+              <p className="text-sm text-[var(--text-secondary)]">
                 Add and manage your education, work, certifications, and organizational background.
                 Click &quot;Save Changes&quot; to save.
               </p>
@@ -216,7 +216,7 @@ export function ExperienceTab() {
                 onClick={handleSaveChanges}
                 disabled={!hasUnsavedChanges || saving}
                 size="sm"
-                className="bg-[#3B82F6] text-white hover:bg-[#2563EB] disabled:bg-gray-300 disabled:text-gray-500"
+                className="bg-[var(--teal)] text-white hover:bg-[#2563EB] disabled:bg-gray-300 disabled:text-gray-500"
               >
                 {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
                 {saving ? 'Saving...' : 'Save Changes'}

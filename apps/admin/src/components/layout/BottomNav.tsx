@@ -151,14 +151,14 @@ export function BottomNav() {
           'touch-manipulation cursor-pointer',
           isActive
             ? cn(
-                'bg-[#3B82F6]/10',
-                'shadow-[inset_3px_3px_6px_rgba(163,177,198,0.6),inset_-3px_-3px_6px_rgba(255,255,255,0.5)]'
+                'bg-[var(--teal)]/10',
+                'shadow-neu-extruded'
               )
             : cn(
                 'bg-transparent',
-                'hover:bg-[#E0E5EC]',
-                'hover:shadow-[3px_3px_6px_rgba(163,177,198,0.4),-3px_-3px_6px_rgba(255,255,255,0.4)]',
-                'active:shadow-[inset_2px_2px_4px_rgba(163,177,198,0.6),inset_-2px_-2px_4px_rgba(255,255,255,0.5)]'
+                'hover:bg-[var(--bg-elevated)]',
+                'hover:shadow-neu-extruded',
+                'active:shadow-neu-extruded'
               )
         )}
         aria-label={item.name}
@@ -168,7 +168,7 @@ export function BottomNav() {
           className={cn(
             isCompact ? 'h-[18px] w-[18px]' : 'h-5 w-5',
             'transition-colors duration-300',
-            isActive ? 'text-[#3B82F6]' : 'text-[#6B7280]'
+            isActive ? 'text-[var(--teal)]' : 'text-[var(--text-secondary)]'
           )}
         />
         {showBadge && (
@@ -178,8 +178,8 @@ export function BottomNav() {
               'flex h-5 min-w-5 items-center justify-center',
               'rounded-full px-1.5',
               'text-[10px] font-bold text-white',
-              'bg-gradient-to-br from-[#3B82F6] to-[#60A5FA]',
-              'shadow-[2px_2px_4px_rgba(108,99,255,0.4),-1px_-1px_3px_rgba(139,132,255,0.3)]',
+              'bg-gradient-to-br from-[var(--teal)] to-[var(--amber)]',
+              'shadow-neu-extruded',
               'animate-pulse'
             )}
           >
@@ -212,14 +212,14 @@ export function BottomNav() {
           'touch-manipulation cursor-pointer',
           isActive
             ? cn(
-                'bg-[#3B82F6]/10',
-                'shadow-[inset_3px_3px_6px_rgba(163,177,198,0.6),inset_-3px_-3px_6px_rgba(255,255,255,0.5)]'
+                'bg-[var(--teal)]/10',
+                'shadow-neu-extruded'
               )
             : cn(
-                'bg-[#E0E5EC]',
-                'shadow-[3px_3px_6px_rgba(163,177,198,0.4),-3px_-3px_6px_rgba(255,255,255,0.4)]',
-                'hover:shadow-[4px_4px_8px_rgba(163,177,198,0.5),-4px_-4px_8px_rgba(255,255,255,0.5)]',
-                'active:shadow-[inset_2px_2px_4px_rgba(163,177,198,0.6),inset_-2px_-2px_4px_rgba(255,255,255,0.5)]'
+                'bg-[var(--bg-elevated)]',
+                'shadow-neu-extruded',
+                'hover:shadow-neu-extruded',
+                'active:shadow-neu-extruded'
               )
         )}
         aria-label={item.name}
@@ -228,7 +228,7 @@ export function BottomNav() {
           <Icon
             className={cn(
               'h-5 w-5 transition-colors duration-300',
-              isActive ? 'text-[#3B82F6]' : 'text-[#6B7280]'
+              isActive ? 'text-[var(--teal)]' : 'text-[var(--text-secondary)]'
             )}
           />
           {showBadge && (
@@ -238,8 +238,8 @@ export function BottomNav() {
                 'flex h-4 min-w-4 items-center justify-center',
                 'rounded-full px-1',
                 'text-[9px] font-bold text-white',
-                'bg-gradient-to-br from-[#3B82F6] to-[#60A5FA]',
-                'shadow-[1px_1px_2px_rgba(108,99,255,0.4)]'
+                'bg-gradient-to-br from-[var(--teal)] to-[var(--amber)]',
+                'shadow-neu-extruded'
               )}
             >
               {item.badge && item.badge > 99 ? '99+' : item.badge}
@@ -249,7 +249,7 @@ export function BottomNav() {
         <span
           className={cn(
             'text-[10px] font-medium transition-colors duration-300',
-            isActive ? 'text-[#3B82F6]' : 'text-[#6B7280]'
+            isActive ? 'text-[var(--teal)]' : 'text-[var(--text-secondary)]'
           )}
         >
           {item.name}
@@ -277,7 +277,7 @@ export function BottomNav() {
             'relative mx-4 mb-20',
             'p-4 rounded-2xl',
             'bg-transparent backdrop-blur-md',
-            'shadow-[12px_12px_24px_rgba(163,177,198,0.6),-12px_-12px_24px_rgba(255,255,255,0.5)]',
+            'shadow-neu-extruded',
             'transition-all duration-300 ease-out',
             isMoreOpen ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
           )}
@@ -291,13 +291,13 @@ export function BottomNav() {
                 'flex items-center justify-center',
                 'h-8 w-8 rounded-full',
                 'transition-all duration-200',
-                'bg-[#E0E5EC]',
-                'shadow-[3px_3px_6px_rgba(163,177,198,0.4),-3px_-3px_6px_rgba(255,255,255,0.4)]',
-                'active:shadow-[inset_2px_2px_4px_rgba(163,177,198,0.6),inset_-2px_-2px_4px_rgba(255,255,255,0.5)]'
+                'bg-[var(--bg-elevated)]',
+                'shadow-neu-extruded',
+                'active:shadow-neu-extruded'
               )}
               aria-label="Close menu"
             >
-              <X className="h-4 w-4 text-[#6B7280]" />
+              <X className="h-4 w-4 text-[var(--text-secondary)]" />
             </button>
           </div>
 
@@ -315,8 +315,8 @@ export function BottomNav() {
             'mx-4 mb-2',
             'flex items-center justify-around gap-1',
             'px-2 py-2 rounded-full',
-            'bg-[#E0E5EC]',
-            'shadow-[9px_9px_16px_rgba(163,177,198,0.6),-9px_-9px_16px_rgba(255,255,255,0.5)]'
+            'bg-[var(--bg-elevated)]',
+            'shadow-neu-extruded'
           )}
         >
           {primaryItems.map((item) => renderNavButton(item))}
@@ -335,14 +335,14 @@ export function BottomNav() {
               'touch-manipulation cursor-pointer',
               isMoreOpen || isActiveInMoreMenu
                 ? cn(
-                    'bg-[#3B82F6]/10',
-                    'shadow-[inset_3px_3px_6px_rgba(163,177,198,0.6),inset_-3px_-3px_6px_rgba(255,255,255,0.5)]'
+                    'bg-[var(--teal)]/10',
+                    'shadow-neu-extruded'
                   )
                 : cn(
                     'bg-transparent',
-                    'hover:bg-[#E0E5EC]',
-                    'hover:shadow-[3px_3px_6px_rgba(163,177,198,0.4),-3px_-3px_6px_rgba(255,255,255,0.4)]',
-                    'active:shadow-[inset_2px_2px_4px_rgba(163,177,198,0.6),inset_-2px_-2px_4px_rgba(255,255,255,0.5)]'
+                    'hover:bg-[var(--bg-elevated)]',
+                    'hover:shadow-neu-extruded',
+                    'active:shadow-neu-extruded'
                   )
             )}
             aria-label="More options"
@@ -352,10 +352,10 @@ export function BottomNav() {
               className={cn(
                 'h-5 w-5 transition-all duration-300',
                 isMoreOpen
-                  ? 'text-[#3B82F6] rotate-90'
+                  ? 'text-[var(--teal)] rotate-90'
                   : isActiveInMoreMenu
-                    ? 'text-[#3B82F6]'
-                    : 'text-[#6B7280]'
+                    ? 'text-[var(--teal)]'
+                    : 'text-[var(--text-secondary)]'
               )}
             />
             {hasMoreBadges && !isMoreOpen && (
@@ -363,8 +363,8 @@ export function BottomNav() {
                 className={cn(
                   'absolute top-0 right-0',
                   'h-3 w-3 rounded-full',
-                  'bg-gradient-to-br from-[#3B82F6] to-[#60A5FA]',
-                  'shadow-[1px_1px_2px_rgba(108,99,255,0.4)]',
+                  'bg-gradient-to-br from-[var(--teal)] to-[var(--amber)]',
+                  'shadow-neu-extruded',
                   'animate-pulse'
                 )}
               />

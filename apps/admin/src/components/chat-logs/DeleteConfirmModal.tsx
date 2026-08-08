@@ -36,7 +36,7 @@ export function DeleteConfirmModal({
           <AlertTriangle className="h-8 w-8 text-red-500" />
         </div>
 
-        <p className="text-sm text-[#6B7280]">
+        <p className="text-sm text-[var(--text-secondary)]">
           This will permanently delete the conversation history and all messages.
         </p>
 

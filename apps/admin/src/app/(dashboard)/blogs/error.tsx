@@ -19,7 +19,7 @@ export default function BlogsError({
   return (
     <PageWrapper>
       <div
-        className="rounded-[32px] p-12 text-center max-w-2xl mx-auto"
+        className="rounded-[var(--radius-container)] p-12 text-center max-w-2xl mx-auto"
         style={{
           backgroundColor: NEUMORPHIC_STYLES.background,
           boxShadow: NEUMORPHIC_STYLES.shadows.extruded,

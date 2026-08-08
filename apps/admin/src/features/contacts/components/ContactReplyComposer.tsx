@@ -21,7 +21,7 @@ export function ContactReplyComposer({
   return (
     <div className="space-y-4 py-2">
       <div className="space-y-2">
-        <label className="text-sm font-medium text-[#3D4852]">Subject</label>
+        <label className="text-sm font-medium text-[var(--text-primary)]">Subject</label>
         <Input
           value={subject}
           onChange={(event) => onSubjectChange(event.target.value)}
@@ -29,7 +29,7 @@ export function ContactReplyComposer({
         />
       </div>
       <div className="space-y-2">
-        <label className="text-sm font-medium text-[#3D4852]">Reply message</label>
+        <label className="text-sm font-medium text-[var(--text-primary)]">Reply message</label>
         <Textarea
           value={message}
           onChange={(event) => onMessageChange(event.target.value)}

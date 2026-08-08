@@ -24,22 +24,22 @@ interface LinkTableProps {
 export function LinkTable({ links, onEdit, onDelete, onToggleVisibility }: LinkTableProps) {
   return (
     <div
-      className="rounded-[32px] bg-[#E0E5EC] overflow-hidden"
+      className="rounded-[var(--radius-container)] bg-[var(--bg-elevated)] overflow-hidden"
       style={{
-        boxShadow: '9px 9px 16px rgba(163,177,198,0.6), -9px -9px 16px rgba(255,255,255,0.5)',
+        boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
       }}
     >
       <Table>
         <TableHeader>
-          <TableRow className="border-b border-[#6B7280]/10">
-            <TableHead className="w-10 text-[#6B7280]">
+          <TableRow className="border-b border-[var(--text-secondary)]/10">
+            <TableHead className="w-10 text-[var(--text-secondary)]">
               <GripVertical className="h-4 w-4" />
             </TableHead>
-            <TableHead className="text-[#6B7280] font-medium">Platform</TableHead>
-            <TableHead className="text-[#6B7280] font-medium">Label</TableHead>
-            <TableHead className="text-[#6B7280] font-medium">URL</TableHead>
-            <TableHead className="text-[#6B7280] font-medium text-center">Visible</TableHead>
-            <TableHead className="text-[#6B7280] font-medium text-right">Actions</TableHead>
+            <TableHead className="text-[var(--text-secondary)] font-medium">Platform</TableHead>
+            <TableHead className="text-[var(--text-secondary)] font-medium">Label</TableHead>
+            <TableHead className="text-[var(--text-secondary)] font-medium">URL</TableHead>
+            <TableHead className="text-[var(--text-secondary)] font-medium text-center">Visible</TableHead>
+            <TableHead className="text-[var(--text-secondary)] font-medium text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -48,10 +48,10 @@ export function LinkTable({ links, onEdit, onDelete, onToggleVisibility }: LinkT
             return (
               <TableRow
                 key={link.id}
-                className="border-b border-[#6B7280]/10 hover:bg-[#E0E5EC]/50 transition-colors"
+                className="border-b border-[var(--text-secondary)]/10 hover:bg-[var(--bg-elevated)]/50 transition-colors"
               >
                 <TableCell>
-                  <GripVertical className="h-4 w-4 text-[#6B7280]/50 cursor-grab" />
+                  <GripVertical className="h-4 w-4 text-[var(--text-secondary)]/50 cursor-grab" />
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-3">
@@ -59,8 +59,7 @@ export function LinkTable({ links, onEdit, onDelete, onToggleVisibility }: LinkT
                       className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
                       style={{
                         background: `linear-gradient(135deg, ${color} 0%, ${color}CC 100%)`,
-                        boxShadow:
-                          '3px 3px 6px rgba(163,177,198,0.6), -3px -3px 6px rgba(255,255,255,0.5)',
+                        boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
                       }}
                     >
                       <IconComponent className="h-5 w-5 text-white" />
@@ -71,14 +70,14 @@ export function LinkTable({ links, onEdit, onDelete, onToggleVisibility }: LinkT
                   </div>
                 </TableCell>
                 <TableCell>
-                  <p className="font-medium text-[#3D4852]">{link.label}</p>
+                  <p className="font-medium text-[var(--text-primary)]">{link.label}</p>
                 </TableCell>
                 <TableCell>
                   <a
                     href={link.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm text-[#6B7280] hover:text-[#3B82F6] flex items-center gap-1 max-w-[200px] truncate"
+                    className="text-sm text-[var(--text-secondary)] hover:text-[var(--teal)] flex items-center gap-1 max-w-[200px] truncate"
                   >
                     {link.url}
                     <ExternalLink className="h-3 w-3 shrink-0" />

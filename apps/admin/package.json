@@ -76,7 +76,10 @@
     "tsx": "^4.21.0",
     "use-debounce": "^10.1.0",
     "vaul": "^1.1.2",
-    "zod": "^4.3.5"
+    "zod": "^4.3.5",
+    "@naufalrf/http": "workspace:*",
+    "@naufalrf/contracts": "workspace:*",
+    "@naufalrf/design-tokens": "workspace:*"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

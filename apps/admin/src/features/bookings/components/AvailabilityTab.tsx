@@ -273,34 +273,34 @@ export function AvailabilityTab() {
       />
 
       <div
-        className="rounded-[32px] p-6 bg-[#E0E5EC]"
+        className="rounded-[var(--radius-container)] p-6 bg-[var(--bg-elevated)]"
         style={{
           boxShadow:
-            '12px 12px 24px rgba(163, 177, 198, 0.6), -12px -12px 24px rgba(255, 255, 255, 0.5)',
+            '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
         }}
       >
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
           <div className="flex items-center gap-3">
             <button
               onClick={() => navigateWeek('prev')}
-              className="p-2 rounded-xl bg-[#E0E5EC] text-[#6B7280] hover:text-[#3B82F6] transition-colors"
+              className="p-2 rounded-xl bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:text-[var(--teal)] transition-colors"
               style={{
-                boxShadow: '4px 4px 8px rgba(163,177,198,0.5), -4px -4px 8px rgba(255,255,255,0.5)',
+                boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
               }}
             >
               <ChevronLeft className="h-5 w-5" />
             </button>
             <div className="text-center">
-              <h2 className="text-lg font-semibold text-[#3D4852]">
+              <h2 className="text-lg font-semibold text-[var(--text-primary)]">
                 {formatDateShort(weekData.start)} - {formatDateShort(weekData.end)},{' '}
                 {weekData.start.getFullYear()}
               </h2>
             </div>
             <button
               onClick={() => navigateWeek('next')}
-              className="p-2 rounded-xl bg-[#E0E5EC] text-[#6B7280] hover:text-[#3B82F6] transition-colors"
+              className="p-2 rounded-xl bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:text-[var(--teal)] transition-colors"
               style={{
-                boxShadow: '4px 4px 8px rgba(163,177,198,0.5), -4px -4px 8px rgba(255,255,255,0.5)',
+                boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
               }}
             >
               <ChevronRight className="h-5 w-5" />
@@ -331,7 +331,7 @@ export function AvailabilityTab() {
 
         {loading ? (
           <div className="flex items-center justify-center py-12">
-            <div className="text-[#6B7280]">Loading availability...</div>
+            <div className="text-[var(--text-secondary)]">Loading availability...</div>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -399,13 +399,13 @@ export function AvailabilityTab() {
         }
       >
         <div className="py-4">
-          <p className="text-[#6B7280]">This action cannot be undone.</p>
+          <p className="text-[var(--text-secondary)]">This action cannot be undone.</p>
         </div>
       </ResponsiveModal>
 
       <button
         onClick={() => openAddSlotModal()}
-        className="fixed bottom-6 right-6 md:hidden p-4 rounded-full bg-[#3B82F6] text-white shadow-lg hover:bg-[#2563EB] transition-colors z-50"
+        className="fixed bottom-6 right-6 md:hidden p-4 rounded-full bg-[var(--teal)] text-white shadow-lg hover:bg-[#2563EB] transition-colors z-50"
         style={{
           boxShadow: '0 8px 24px rgba(59, 130, 246, 0.4)',
         }}

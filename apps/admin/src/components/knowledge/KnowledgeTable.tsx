@@ -94,14 +94,14 @@ export function KnowledgeTable({ docs, loading, onDelete, onIngest }: KnowledgeT
         <div
           className={cn(
             'mx-auto w-16 h-16 rounded-full flex items-center justify-center mb-4',
-            'bg-[#E0E5EC]',
-            '[box-shadow:inset_6px_6px_10px_rgba(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)]'
+            'bg-[var(--bg-elevated)]',
+            'shadow-neu-inset'
           )}
         >
-          <FileText className="h-8 w-8 text-[#6B7280]" />
+          <FileText className="h-8 w-8 text-[var(--text-secondary)]" />
         </div>
-        <h3 className="text-lg font-semibold text-[#3D4852] mb-2">No Knowledge Documents</h3>
-        <p className="text-[#6B7280] mb-4">Get started by adding your first knowledge document.</p>
+        <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-2">No Knowledge Documents</h3>
+        <p className="text-[var(--text-secondary)] mb-4">Get started by adding your first knowledge document.</p>
         <Button variant="primary" asChild>
           <Link href="/knowledge/new">Add Document</Link>
         </Button>
@@ -115,22 +115,22 @@ export function KnowledgeTable({ docs, loading, onDelete, onIngest }: KnowledgeT
         <Table>
           <TableHeader>
             <TableRow className="border-b border-[#D1D9E6]">
-              <TableHead className="text-[#6B7280]">Filename</TableHead>
-              <TableHead className="text-[#6B7280]">Status</TableHead>
-              <TableHead className="text-[#6B7280] hidden md:table-cell">Content Preview</TableHead>
-              <TableHead className="text-[#6B7280]">Updated</TableHead>
-              <TableHead className="text-[#6B7280] text-right">Actions</TableHead>
+              <TableHead className="text-[var(--text-secondary)]">Filename</TableHead>
+              <TableHead className="text-[var(--text-secondary)]">Status</TableHead>
+              <TableHead className="text-[var(--text-secondary)] hidden md:table-cell">Content Preview</TableHead>
+              <TableHead className="text-[var(--text-secondary)]">Updated</TableHead>
+              <TableHead className="text-[var(--text-secondary)] text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {docs.map((doc) => (
               <TableRow
                 key={doc.id}
-                className="border-b border-[#D1D9E6]/50 hover:bg-[#E0E5EC]/50 transition-colors"
+                className="border-b border-[#D1D9E6]/50 hover:bg-[var(--bg-elevated)]/50 transition-colors"
               >
-                <TableCell className="font-medium text-[#3D4852]">
+                <TableCell className="font-medium text-[var(--text-primary)]">
                   <div className="flex items-center gap-2">
-                    <FileText className="h-4 w-4 text-[#3B82F6]" />
+                    <FileText className="h-4 w-4 text-[var(--teal)]" />
                     {doc.filename}
                   </div>
                 </TableCell>
@@ -139,10 +139,10 @@ export function KnowledgeTable({ docs, loading, onDelete, onIngest }: KnowledgeT
                     {doc.indexed ? 'Indexed' : 'Pending'}
                   </Badge>
                 </TableCell>
-                <TableCell className="text-[#6B7280] text-sm hidden md:table-cell">
+                <TableCell className="text-[var(--text-secondary)] text-sm hidden md:table-cell">
                   <div className="line-clamp-2 max-w-md">{doc.content}</div>
                 </TableCell>
-                <TableCell className="text-[#6B7280] text-sm whitespace-nowrap">
+                <TableCell className="text-[var(--text-secondary)] text-sm whitespace-nowrap">
                   {formatDate(doc.updatedAt)}
                 </TableCell>
                 <TableCell>

@@ -42,11 +42,11 @@ export function WelcomeCard({ delay = 0, userName }: WelcomeCardProps) {
           >
             <Sparkles className="w-5 h-5 text-blue-500" />
           </div>
-          <h2 className="text-2xl font-bold text-[#3D4852] font-[family-name:var(--font-plus-jakarta)]">
+          <h2 className="text-2xl font-bold text-[var(--text-primary)] font-[family-name:var(--font-plus-jakarta)]">
             {greeting}, {firstName}!
           </h2>
         </div>
-        <p className="text-[#6B7280] max-w-xl">
+        <p className="text-[var(--text-secondary)] max-w-xl">
           Welcome back to your admin dashboard. Here&apos;s an overview of your portfolio activity
           and recent interactions.
         </p>

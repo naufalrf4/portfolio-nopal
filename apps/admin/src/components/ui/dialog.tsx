@@ -30,7 +30,7 @@ function DialogOverlay({
     <DialogPrimitive.Overlay
       data-slot="dialog-overlay"
       className={cn(
-        'fixed inset-0 z-50 bg-[#E0E5EC]/80 backdrop-blur-md',
+        'fixed inset-0 z-50 bg-[var(--bg-elevated)]/80 backdrop-blur-md',
         'data-[state=open]:animate-in data-[state=closed]:animate-out',
         'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
         'duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]',
@@ -66,8 +66,8 @@ function DialogContent({
         data-slot="dialog-content"
         className={cn(
           'fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%]',
-          'bg-[#E0E5EC] rounded-[32px] p-0 outline-none',
-          'shadow-[12px_12px_24px_rgba(163,177,198,0.7),-12px_-12px_24px_rgba(255,255,255,0.6)]',
+          'bg-[var(--bg-elevated)] rounded-[var(--radius-container)] p-0 outline-none',
+          'shadow-neu-extruded',
           'data-[state=open]:animate-in data-[state=closed]:animate-out',
           'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
           'data-[state=open]:animate-modal-in data-[state=closed]:animate-modal-out',
@@ -83,13 +83,13 @@ function DialogContent({
             data-slot="dialog-close"
             className={cn(
               'absolute top-5 right-5 h-10 w-10 rounded-xl',
-              'bg-[#E0E5EC] flex items-center justify-center',
-              'shadow-[5px_5px_10px_rgba(163,177,198,0.6),-5px_-5px_10px_rgba(255,255,255,0.5)]',
-              'text-[#6B7280] transition-all duration-200',
-              'hover:shadow-[7px_7px_12px_rgba(163,177,198,0.65),-7px_-7px_12px_rgba(255,255,255,0.55)]',
-              'hover:text-[#3D4852]',
-              'active:shadow-[inset_4px_4px_8px_rgba(163,177,198,0.6),inset_-4px_-4px_8px_rgba(255,255,255,0.5)]',
-              'focus:outline-none focus:ring-2 focus:ring-[#3B82F6]/30 focus:ring-offset-2 focus:ring-offset-[#E0E5EC]',
+              'bg-[var(--bg-elevated)] flex items-center justify-center',
+              'shadow-neu-extruded-sm',
+              'text-[var(--text-secondary)] transition-all duration-200',
+              'hover:shadow-neu-extruded',
+              'hover:text-[var(--text-primary)]',
+              'active:shadow-neu-extruded',
+              'focus:outline-none focus:ring-2 focus:ring-[var(--teal)]/30 focus:ring-offset-2 focus:ring-offset-[var(--bg-elevated)]',
               'disabled:pointer-events-none disabled:opacity-50',
               '[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg]:size-5'
             )}
@@ -137,7 +137,7 @@ function DialogTitle({ className, ...props }: React.ComponentProps<typeof Dialog
   return (
     <DialogPrimitive.Title
       data-slot="dialog-title"
-      className={cn('font-display text-2xl font-bold tracking-tight text-[#3D4852]', className)}
+      className={cn('font-display text-2xl font-bold tracking-tight text-[var(--text-primary)]', className)}
       {...props}
     />
   );
@@ -150,7 +150,7 @@ function DialogDescription({
   return (
     <DialogPrimitive.Description
       data-slot="dialog-description"
-      className={cn('text-sm text-[#6B7280]', className)}
+      className={cn('text-sm text-[var(--text-secondary)]', className)}
       {...props}
     />
   );

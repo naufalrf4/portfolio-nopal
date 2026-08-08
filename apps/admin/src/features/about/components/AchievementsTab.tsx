@@ -36,9 +36,9 @@ interface Achievement {
 }
 
 const neumorphicInset =
-  'shadow-[inset_3px_3px_6px_rgba(163,177,198,0.6),inset_-3px_-3px_6px_rgba(255,255,255,0.5)]';
+  'shadow-neu-extruded';
 const neumorphicCard =
-  'shadow-[8px_8px_16px_rgba(163,177,198,0.6),-8px_-8px_16px_rgba(255,255,255,0.5)]';
+  'shadow-neu-extruded';
 
 interface AchievementFormData {
   name: string;
@@ -192,7 +192,7 @@ export function AchievementsTab() {
       <Button
         type="submit"
         form="achievement-form"
-        className="bg-[#3B82F6] hover:bg-[#2563EB] text-white"
+        className="bg-[var(--teal)] hover:bg-[#2563EB] text-white"
       >
         {editingId ? 'Update' : 'Create'}
       </Button>
@@ -206,11 +206,11 @@ export function AchievementsTab() {
   return (
     <div className="space-y-6 relative min-h-[400px]">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-[#3D4852]">Achievements</h2>
+        <h2 className="text-2xl font-bold text-[var(--text-primary)]">Achievements</h2>
         {/* Desktop: Show button in header */}
         <Button
           onClick={() => setIsModalOpen(true)}
-          className="hidden md:flex bg-[#3B82F6] hover:bg-[#2563EB] text-white"
+          className="hidden md:flex bg-[var(--teal)] hover:bg-[#2563EB] text-white"
         >
           <Plus className="w-4 h-4 mr-2" />
           Add Achievement
@@ -222,7 +222,7 @@ export function AchievementsTab() {
           <div
             key={achievement.id}
             className={cn(
-              'bg-[#E0E5EC] rounded-2xl overflow-hidden',
+              'bg-[var(--bg-elevated)] rounded-2xl overflow-hidden',
               neumorphicCard,
               'transition-all duration-200 hover:scale-[1.02] hover:-translate-y-1',
               !achievement.visible && 'opacity-60'
@@ -230,7 +230,7 @@ export function AchievementsTab() {
           >
             {/* Photo */}
             {achievement.photos.length > 0 && (
-              <div className="relative aspect-video bg-gradient-to-br from-[#3B82F6]/5 to-[#8B5CF6]/5">
+              <div className="relative aspect-video bg-gradient-to-br from-[var(--teal)]/5 to-[#8B5CF6]/5">
                 <Image
                   src={achievement.photos[0]}
                   alt={achievement.name}
@@ -239,7 +239,7 @@ export function AchievementsTab() {
                   sizes="(max-width: 768px) 100vw, 400px"
                 />
                 {achievement.photos.length > 1 && (
-                  <div className="absolute bottom-2 right-2 px-2 py-1 rounded-md bg-[#E0E5EC]/90 backdrop-blur-sm text-xs font-medium text-[#3D4852]">
+                  <div className="absolute bottom-2 right-2 px-2 py-1 rounded-md bg-[var(--bg-elevated)]/90 backdrop-blur-sm text-xs font-medium text-[var(--text-primary)]">
                     +{achievement.photos.length - 1} more
                   </div>
                 )}
@@ -251,20 +251,20 @@ export function AchievementsTab() {
               <div className="flex items-start justify-between gap-2 mb-2">
                 <div className="flex items-center gap-2">
                   <div className="cursor-grab">
-                    <GripVertical className="w-4 h-4 text-[#6B7280]" />
+                    <GripVertical className="w-4 h-4 text-[var(--text-secondary)]" />
                   </div>
-                  <h3 className="text-base font-semibold text-[#3D4852] line-clamp-1">
+                  <h3 className="text-base font-semibold text-[var(--text-primary)] line-clamp-1">
                     {achievement.name}
                   </h3>
                 </div>
               </div>
 
-              <p className="text-xs text-[#6B7280] mb-2">
+              <p className="text-xs text-[var(--text-secondary)] mb-2">
                 {achievement.location} • {achievement.monthYear}
               </p>
 
               {achievement.description && (
-                <p className="text-xs text-[#3D4852] line-clamp-2 mb-3">
+                <p className="text-xs text-[var(--text-primary)] line-clamp-2 mb-3">
                   {achievement.description}
                 </p>
               )}
@@ -280,7 +280,7 @@ export function AchievementsTab() {
                   )}
                   title="Preview"
                 >
-                  <Eye className="w-4 h-4 text-[#3B82F6]" />
+                  <Eye className="w-4 h-4 text-[var(--teal)]" />
                 </button>
                 <button
                   onClick={() => handleEdit(achievement)}
@@ -291,7 +291,7 @@ export function AchievementsTab() {
                   )}
                   title="Edit"
                 >
-                  <Pencil className="w-4 h-4 text-[#3B82F6]" />
+                  <Pencil className="w-4 h-4 text-[var(--teal)]" />
                 </button>
                 <button
                   onClick={() => handleDelete(achievement.id)}
@@ -311,17 +311,17 @@ export function AchievementsTab() {
 
         {achievements.length === 0 && (
           <div className="col-span-full">
-            <div className={cn('bg-[#E0E5EC] rounded-[32px] p-12 text-center', neumorphicCard)}>
+            <div className={cn('bg-[var(--bg-elevated)] rounded-[var(--radius-container)] p-12 text-center', neumorphicCard)}>
               <div
                 className={cn(
                   'w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center',
                   neumorphicInset
                 )}
               >
-                <Award className="w-10 h-10 text-[#6B7280]" />
+                <Award className="w-10 h-10 text-[var(--text-secondary)]" />
               </div>
-              <h3 className="text-xl font-bold text-[#3D4852] mb-2">No Achievements Yet</h3>
-              <p className="text-[#6B7280] max-w-md mx-auto">
+              <h3 className="text-xl font-bold text-[var(--text-primary)] mb-2">No Achievements Yet</h3>
+              <p className="text-[var(--text-secondary)] max-w-md mx-auto">
                 Start showcasing your accomplishments by adding your first achievement. Click the +
                 button to get started.
               </p>
@@ -335,9 +335,9 @@ export function AchievementsTab() {
         onClick={() => setIsModalOpen(true)}
         className={cn(
           'fixed bottom-20 right-6 w-14 h-14 rounded-full md:hidden',
-          'bg-gradient-to-br from-[#3B82F6] to-[#2563EB] text-white',
-          'shadow-lg shadow-[#3B82F6]/30',
-          'hover:shadow-xl hover:shadow-[#3B82F6]/40 hover:scale-105',
+          'bg-gradient-to-br from-[var(--teal)] to-[#2563EB] text-white',
+          'shadow-lg shadow-[var(--teal)]/30',
+          'hover:shadow-xl hover:shadow-[var(--teal)]/40 hover:scale-105',
           'active:scale-95 transition-all duration-200',
           'flex items-center justify-center z-50'
         )}
@@ -356,7 +356,7 @@ export function AchievementsTab() {
       >
         <form id="achievement-form" onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-[#3D4852] mb-2">
+            <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">
               Name <span className="text-red-500">*</span>
             </label>
             <input
@@ -365,8 +365,8 @@ export function AchievementsTab() {
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               required
               className={cn(
-                'w-full px-4 py-2.5 rounded-xl bg-[#E0E5EC] text-[#3D4852]',
-                'focus:outline-none focus:ring-2 focus:ring-[#3B82F6]/20',
+                'w-full px-4 py-2.5 rounded-xl bg-[var(--bg-elevated)] text-[var(--text-primary)]',
+                'focus:outline-none focus:ring-2 focus:ring-[var(--teal)]/20',
                 neumorphicInset
               )}
             />
@@ -374,7 +374,7 @@ export function AchievementsTab() {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-[#3D4852] mb-2">
+              <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">
                 Location <span className="text-red-500">*</span>
               </label>
               <input
@@ -383,15 +383,15 @@ export function AchievementsTab() {
                 onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                 required
                 className={cn(
-                  'w-full px-4 py-2.5 rounded-xl bg-[#E0E5EC] text-[#3D4852]',
-                  'focus:outline-none focus:ring-2 focus:ring-[#3B82F6]/20',
+                  'w-full px-4 py-2.5 rounded-xl bg-[var(--bg-elevated)] text-[var(--text-primary)]',
+                  'focus:outline-none focus:ring-2 focus:ring-[var(--teal)]/20',
                   neumorphicInset
                 )}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-[#3D4852] mb-2">
+              <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">
                 Month & Year <span className="text-red-500">*</span>
               </label>
               <input
@@ -401,8 +401,8 @@ export function AchievementsTab() {
                 placeholder="e.g., January 2024"
                 required
                 className={cn(
-                  'w-full px-4 py-2.5 rounded-xl bg-[#E0E5EC] text-[#3D4852]',
-                  'focus:outline-none focus:ring-2 focus:ring-[#3B82F6]/20',
+                  'w-full px-4 py-2.5 rounded-xl bg-[var(--bg-elevated)] text-[var(--text-primary)]',
+                  'focus:outline-none focus:ring-2 focus:ring-[var(--teal)]/20',
                   neumorphicInset
                 )}
               />
@@ -410,36 +410,36 @@ export function AchievementsTab() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-[#3D4852] mb-2">Description</label>
+            <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">Description</label>
             <textarea
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               rows={3}
               className={cn(
-                'w-full px-4 py-2.5 rounded-xl bg-[#E0E5EC] text-[#3D4852]',
-                'focus:outline-none focus:ring-2 focus:ring-[#3B82F6]/20 resize-none',
+                'w-full px-4 py-2.5 rounded-xl bg-[var(--bg-elevated)] text-[var(--text-primary)]',
+                'focus:outline-none focus:ring-2 focus:ring-[var(--teal)]/20 resize-none',
                 neumorphicInset
               )}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-[#3D4852] mb-2">External URL</label>
+            <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">External URL</label>
             <input
               type="url"
               value={formData.externalUrl}
               onChange={(e) => setFormData({ ...formData, externalUrl: e.target.value })}
               placeholder="https://..."
               className={cn(
-                'w-full px-4 py-2.5 rounded-xl bg-[#E0E5EC] text-[#3D4852]',
-                'focus:outline-none focus:ring-2 focus:ring-[#3B82F6]/20',
+                'w-full px-4 py-2.5 rounded-xl bg-[var(--bg-elevated)] text-[var(--text-primary)]',
+                'focus:outline-none focus:ring-2 focus:ring-[var(--teal)]/20',
                 neumorphicInset
               )}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-[#3D4852] mb-2">Photos</label>
+            <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">Photos</label>
             <div className="space-y-3">
               {formData.photos.map((photo, index) => (
                 <FileUpload
@@ -499,7 +499,7 @@ export function AchievementsTab() {
           <div className={cn('p-3 rounded-xl bg-red-100', neumorphicInset)}>
             <AlertTriangle className="w-6 h-6 text-red-500" />
           </div>
-          <p className="text-sm text-[#6B7280]">
+          <p className="text-sm text-[var(--text-secondary)]">
             This action cannot be undone. The achievement and all its photos will be permanently
             removed.
           </p>
@@ -525,7 +525,7 @@ export function AchievementsTab() {
               rel="noopener noreferrer"
               className="w-full"
             >
-              <Button className="w-full gap-2 bg-[#3B82F6] hover:bg-[#2563EB] text-white">
+              <Button className="w-full gap-2 bg-[var(--teal)] hover:bg-[#2563EB] text-white">
                 <ExternalLink className="w-4 h-4" />
                 View Certificate
               </Button>
@@ -563,7 +563,7 @@ export function AchievementsTab() {
                           )
                         }
                         className={cn(
-                          'absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-xl flex items-center justify-center bg-[#E0E5EC]/90 backdrop-blur-sm transition-all hover:scale-105',
+                          'absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-xl flex items-center justify-center bg-[var(--bg-elevated)]/90 backdrop-blur-sm transition-all hover:scale-105',
                           neumorphicCard
                         )}
                       >
@@ -576,14 +576,14 @@ export function AchievementsTab() {
                           )
                         }
                         className={cn(
-                          'absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-xl flex items-center justify-center bg-[#E0E5EC]/90 backdrop-blur-sm transition-all hover:scale-105',
+                          'absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-xl flex items-center justify-center bg-[var(--bg-elevated)]/90 backdrop-blur-sm transition-all hover:scale-105',
                           neumorphicCard
                         )}
                       >
                         <ChevronRight className="w-5 h-5" />
                       </button>
 
-                      <div className="absolute bottom-3 right-3 px-3 py-1.5 rounded-lg bg-[#E0E5EC]/90 backdrop-blur-sm text-sm font-medium">
+                      <div className="absolute bottom-3 right-3 px-3 py-1.5 rounded-lg bg-[var(--bg-elevated)]/90 backdrop-blur-sm text-sm font-medium">
                         {previewPhotoIndex + 1} / {previewAchievement.photos.length}
                       </div>
                     </>
@@ -600,7 +600,7 @@ export function AchievementsTab() {
                         className={cn(
                           'flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden transition-all',
                           idx === previewPhotoIndex
-                            ? 'ring-2 ring-[#3B82F6] scale-105'
+                            ? 'ring-2 ring-[var(--teal)] scale-105'
                             : 'opacity-60 hover:opacity-100'
                         )}
                       >
@@ -626,8 +626,8 @@ export function AchievementsTab() {
                   neumorphicInset
                 )}
               >
-                <MapPin className="w-4 h-4 text-[#3B82F6]" />
-                <span className="text-[#6B7280]">{previewAchievement.location}</span>
+                <MapPin className="w-4 h-4 text-[var(--teal)]" />
+                <span className="text-[var(--text-secondary)]">{previewAchievement.location}</span>
               </div>
               <div
                 className={cn(
@@ -635,15 +635,15 @@ export function AchievementsTab() {
                   neumorphicInset
                 )}
               >
-                <Calendar className="w-4 h-4 text-[#3B82F6]" />
-                <span className="text-[#6B7280]">{previewAchievement.monthYear}</span>
+                <Calendar className="w-4 h-4 text-[var(--teal)]" />
+                <span className="text-[var(--text-secondary)]">{previewAchievement.monthYear}</span>
               </div>
             </div>
 
             {/* Description */}
             {previewAchievement.description && (
               <div className={cn('rounded-xl p-4', neumorphicInset)}>
-                <p className="text-[#6B7280] leading-relaxed whitespace-pre-line">
+                <p className="text-[var(--text-secondary)] leading-relaxed whitespace-pre-line">
                   {previewAchievement.description}
                 </p>
               </div>

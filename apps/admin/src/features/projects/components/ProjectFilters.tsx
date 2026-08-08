@@ -36,8 +36,8 @@ export function ProjectFilters({
               onClick={() => setFilterMode(mode)}
               className={`px-4 py-2 rounded-2xl text-sm font-medium transition-all duration-200 ${
                 filterMode === mode
-                  ? 'bg-[#3B82F6] text-white shadow-[6px_6px_12px_rgba(59,130,246,0.4),-6px_-6px_12px_rgba(59,130,246,0.1)]'
-                  : 'bg-[#E0E5EC] text-[#3D4852] shadow-[6px_6px_12px_rgba(163,177,198,0.4),-6px_-6px_12px_rgba(255,255,255,0.4)] hover:shadow-[inset_6px_6px_12px_rgba(163,177,198,0.4),inset_-6px_-6px_12px_rgba(255,255,255,0.4)]'
+                  ? 'bg-[var(--teal)] text-white shadow-neu-extruded-sm'
+                  : 'bg-[var(--bg-elevated)] text-[var(--text-primary)] shadow-neu-extruded-sm hover:shadow-neu-inset'
               }`}
             >
               <span className="flex items-center gap-2">
@@ -53,14 +53,14 @@ export function ProjectFilters({
             onClick={() => setViewMode('grid')}
             className={`p-2 rounded-xl transition-all ${
               viewMode === 'grid'
-                ? 'bg-[#3B82F6] text-white'
-                : 'bg-[#E0E5EC] text-[#6B7280] hover:text-[#3B82F6]'
+                ? 'bg-[var(--teal)] text-white'
+                : 'bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:text-[var(--teal)]'
             }`}
             style={{
               boxShadow:
                 viewMode === 'grid'
-                  ? '6px 6px 12px rgba(59,130,246,0.4), -6px -6px 12px rgba(59,130,246,0.1)'
-                  : '6px 6px 12px rgba(163,177,198,0.4), -6px -6px 12px rgba(255,255,255,0.4)',
+                  ? '0 2px 8px -2px rgba(0, 0, 0, 0.3)'
+                  : '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
             }}
           >
             <Grid3x3 className="h-5 w-5" />
@@ -69,14 +69,14 @@ export function ProjectFilters({
             onClick={() => setViewMode('table')}
             className={`p-2 rounded-xl transition-all ${
               viewMode === 'table'
-                ? 'bg-[#3B82F6] text-white'
-                : 'bg-[#E0E5EC] text-[#6B7280] hover:text-[#3B82F6]'
+                ? 'bg-[var(--teal)] text-white'
+                : 'bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:text-[var(--teal)]'
             }`}
             style={{
               boxShadow:
                 viewMode === 'table'
-                  ? '6px 6px 12px rgba(59,130,246,0.4), -6px -6px 12px rgba(59,130,246,0.1)'
-                  : '6px 6px 12px rgba(163,177,198,0.4), -6px -6px 12px rgba(255,255,255,0.4)',
+                  ? '0 2px 8px -2px rgba(0, 0, 0, 0.3)'
+                  : '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
             }}
           >
             <List className="h-5 w-5" />
@@ -85,7 +85,7 @@ export function ProjectFilters({
       </div>
 
       <div className="relative">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-[#6B7280]" />
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-[var(--text-secondary)]" />
         <Input
           type="text"
           placeholder="Search projects..."

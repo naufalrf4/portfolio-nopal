@@ -19,9 +19,8 @@ export default function ContactsLoading() {
               key={tab}
               className="h-10 px-4 rounded-2xl animate-pulse"
               style={{
-                background: '#E0E5EC',
-                boxShadow:
-                  'inset 3px 3px 6px rgb(163,177,198,0.6), inset -3px -3px 6px rgba(255,255,255,0.5)',
+                background: 'var(--bg-elevated)',
+                boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
               }}
             >
               <div className="h-full flex items-center">
@@ -38,10 +37,10 @@ export default function ContactsLoading() {
 
         {/* Table/Card skeleton */}
         <div
-          className="rounded-[32px] p-6 animate-pulse"
+          className="rounded-[var(--radius-container)] p-6 animate-pulse"
           style={{
-            background: '#E0E5EC',
-            boxShadow: '9px 9px 16px rgb(163,177,198,0.6), -9px -9px 16px rgba(255,255,255,0.5)',
+            background: 'var(--bg-elevated)',
+            boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
           }}
         >
           <div className="space-y-4">
@@ -89,9 +88,8 @@ export default function ContactsLoading() {
                 key={i}
                 className="h-10 w-10 rounded-2xl"
                 style={{
-                  background: '#E0E5EC',
-                  boxShadow:
-                    '6px 6px 12px rgb(163,177,198,0.6), -6px -6px 12px rgba(255,255,255,0.5)',
+                  background: 'var(--bg-elevated)',
+                  boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
                 }}
               />
             ))}

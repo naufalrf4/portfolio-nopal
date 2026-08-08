@@ -7,7 +7,7 @@ interface SkeletonCardProps {
 export function SkeletonCard({ index }: SkeletonCardProps) {
   return (
     <div
-      className="rounded-[32px] p-6 animate-pulse"
+      className="rounded-[var(--radius-container)] p-6 animate-pulse"
       style={{
         background: NEUMORPHIC_STYLES.background,
         boxShadow: NEUMORPHIC_STYLES.shadows.extruded,

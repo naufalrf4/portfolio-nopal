@@ -12,18 +12,18 @@ import {
 } from 'lucide-react';
 
 export const NEUMORPHIC_STYLES = {
-  background: '#E0E5EC',
-  foreground: '#3D4852',
-  muted: '#6B7280',
-  accent: '#3B82F6',
-  accentLight: '#60A5FA',
-  success: '#38B2AC',
+  background: 'var(--bg-elevated)',
+  foreground: 'var(--text-primary)',
+  muted: 'var(--text-secondary)',
+  accent: 'var(--teal)',
+  accentLight: 'var(--amber)',
+  success: 'var(--teal)',
   shadows: {
-    extruded: '9px 9px 16px rgba(163,177,198,0.6), -9px -9px 16px rgba(255,255,255,0.5)',
-    inset: 'inset 6px 6px 10px rgba(163,177,198,0.6), inset -6px -6px 10px rgba(255,255,255,0.5)',
+    extruded: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
+    inset: 'inset 0 1px 4px rgba(0, 0, 0, 0.25)',
     insetDeep:
-      'inset 10px 10px 20px rgba(163,177,198,0.7), inset -10px -10px 20px rgba(255,255,255,0.6)',
-    small: '5px 5px 10px rgba(163,177,198,0.6), -5px -5px 10px rgba(255,255,255,0.5)',
+      'inset 0 1px 4px rgba(0, 0, 0, 0.25)',
+    small: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
   },
 };
 
@@ -32,7 +32,7 @@ export const ICON_OPTIONS: { value: string; label: string; icon: LucideIcon; col
   { value: 'twitter', label: 'Twitter', icon: Twitter, color: '#1DA1F2' },
   { value: 'linkedin', label: 'LinkedIn', icon: Linkedin, color: '#0A66C2' },
   { value: 'mail', label: 'Email', icon: Mail, color: '#EA4335' },
-  { value: 'globe', label: 'Website', icon: Globe, color: '#3B82F6' },
+  { value: 'globe', label: 'Website', icon: Globe, color: 'var(--teal)' },
   { value: 'facebook', label: 'Facebook', icon: Facebook, color: '#1877F2' },
   { value: 'instagram', label: 'Instagram', icon: Instagram, color: '#E4405F' },
   { value: 'youtube', label: 'YouTube', icon: Youtube, color: '#FF0000' },
@@ -44,4 +44,4 @@ export const INITIAL_FORM_DATA = {
   icon: '',
 };
 
-export const DEFAULT_ICON = { icon: Link2, color: '#3B82F6' };
+export const DEFAULT_ICON = { icon: Link2, color: 'var(--teal)' };

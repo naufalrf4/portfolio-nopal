@@ -23,15 +23,15 @@ interface SettingsCardProps {
 
 export function SettingsCard({ settings, onChange, onSave, saving }: SettingsCardProps) {
   return (
-    <div className="rounded-[32px] p-6 bg-[#E0E5EC]" style={NEUMORPHIC_STYLES.card}>
+    <div className="rounded-[var(--radius-container)] p-6 bg-[var(--bg-elevated)]" style={NEUMORPHIC_STYLES.card}>
       <div className="flex items-center gap-3 mb-6">
         <div
-          className="p-3 rounded-2xl bg-[#E0E5EC] text-[#3B82F6]"
+          className="p-3 rounded-2xl bg-[var(--bg-elevated)] text-[var(--teal)]"
           style={NEUMORPHIC_STYLES.iconContainer}
         >
           <SettingsIcon className="h-5 w-5" />
         </div>
-        <h2 className="text-xl font-semibold text-[#3D4852]">Booking Settings</h2>
+        <h2 className="text-xl font-semibold text-[var(--text-primary)]">Booking Settings</h2>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">

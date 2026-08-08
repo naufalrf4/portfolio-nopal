@@ -67,7 +67,7 @@ export function RichTextEditor({
       Link.configure({
         openOnClick: false,
         HTMLAttributes: {
-          class: 'text-[#3B82F6] underline hover:text-[#60A5FA]',
+          class: 'text-[var(--teal)] underline hover:text-[var(--amber)]',
         },
       }),
       Placeholder.configure({
@@ -85,7 +85,7 @@ export function RichTextEditor({
           'prose prose-lg max-w-none',
           'focus:outline-none',
           'min-h-[300px] p-4',
-          'text-[#3D4852]'
+          'text-[var(--text-primary)]'
         ),
       },
     },
@@ -131,9 +131,9 @@ export function RichTextEditor({
       {/* Toolbar */}
       <div
         className={cn(
-          'flex flex-wrap gap-1 p-2 rounded-[24px]',
-          'bg-[#E0E5EC]',
-          'shadow-[inset_3px_3px_6px_rgba(163,177,198,0.4),inset_-3px_-3px_6px_rgba(255,255,255,0.4)]'
+          'flex flex-wrap gap-1 p-2 rounded-[var(--radius-base)]',
+          'bg-[var(--bg-elevated)]',
+          'shadow-neu-extruded'
         )}
       >
         <Button
@@ -209,7 +209,7 @@ export function RichTextEditor({
           <Quote className="h-4 w-4" />
         </Button>
 
-        <div className="w-px h-6 bg-[#6B7280]/30 mx-1" />
+        <div className="w-px h-6 bg-[var(--text-secondary)]/30 mx-1" />
 
         <Button type="button" size="sm" variant="ghost" onClick={() => setImageDialogOpen(true)}>
           <ImageIcon className="h-4 w-4" />
@@ -218,7 +218,7 @@ export function RichTextEditor({
           <Link2 className="h-4 w-4" />
         </Button>
 
-        <div className="w-px h-6 bg-[#6B7280]/30 mx-1" />
+        <div className="w-px h-6 bg-[var(--text-secondary)]/30 mx-1" />
 
         <Button
           type="button"
@@ -243,9 +243,9 @@ export function RichTextEditor({
       {/* Editor */}
       <div
         className={cn(
-          'rounded-[24px] overflow-hidden',
-          'bg-[#E0E5EC]',
-          'shadow-[inset_6px_6px_12px_rgba(163,177,198,0.4),inset_-6px_-6px_12px_rgba(255,255,255,0.4)]'
+          'rounded-[var(--radius-base)] overflow-hidden',
+          'bg-[var(--bg-elevated)]',
+          'shadow-neu-inset'
         )}
       >
         <EditorContent editor={editor} />

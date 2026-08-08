@@ -76,8 +76,8 @@ export const SOCIAL_ICON_OPTIONS = [
   { value: 'youtube', label: 'YouTube', color: '#FF0000' },
   { value: 'facebook', label: 'Facebook', color: '#1877F2' },
   { value: 'mail', label: 'Email', color: '#EA4335' },
-  { value: 'globe', label: 'Website', color: '#3B82F6' },
-  { value: 'link', label: 'Custom Link', color: '#6B7280' },
+  { value: 'globe', label: 'Website', color: 'var(--teal)' },
+  { value: 'link', label: 'Custom Link', color: 'var(--text-secondary)' },
 ] as const;
 
 export const PAGINATION_DEFAULT = {

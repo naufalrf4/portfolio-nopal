@@ -18,10 +18,10 @@ export default function ContactDetailLoading() {
       <div className="space-y-6">
         {/* Header card skeleton */}
         <div
-          className="rounded-[32px] p-6 animate-pulse"
+          className="rounded-[var(--radius-container)] p-6 animate-pulse"
           style={{
-            background: '#E0E5EC',
-            boxShadow: '9px 9px 16px rgb(163,177,198,0.6), -9px -9px 16px rgba(255,255,255,0.5)',
+            background: 'var(--bg-elevated)',
+            boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
           }}
         >
           <div className="flex justify-between items-start mb-4">
@@ -69,10 +69,10 @@ export default function ContactDetailLoading() {
 
         {/* Message card skeleton */}
         <div
-          className="rounded-[32px] p-6 animate-pulse"
+          className="rounded-[var(--radius-container)] p-6 animate-pulse"
           style={{
-            background: '#E0E5EC',
-            boxShadow: '9px 9px 16px rgb(163,177,198,0.6), -9px -9px 16px rgba(255,255,255,0.5)',
+            background: 'var(--bg-elevated)',
+            boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
           }}
         >
           <div
@@ -103,8 +103,7 @@ export default function ContactDetailLoading() {
               className="h-10 w-32 rounded-2xl"
               style={{
                 background: '#6C63FF',
-                boxShadow:
-                  '6px 6px 12px rgba(108,99,255,0.4), -6px -6px 12px rgba(255,255,255,0.5)',
+                boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
               }}
             />
           ))}

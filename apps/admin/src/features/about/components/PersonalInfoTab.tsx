@@ -21,13 +21,13 @@ interface PreviewState {
 
 const neumorphicButton = cn(
   'h-9 w-9 rounded-xl shrink-0',
-  'bg-[#E0E5EC] flex items-center justify-center',
-  'shadow-[4px_4px_8px_rgba(163,177,198,0.5),-4px_-4px_8px_rgba(255,255,255,0.4)]',
-  'text-[#6B7280] transition-all duration-200',
-  'hover:shadow-[5px_5px_10px_rgba(163,177,198,0.55),-5px_-5px_10px_rgba(255,255,255,0.5)]',
-  'hover:text-[#3B82F6]',
-  'active:shadow-[inset_3px_3px_6px_rgba(163,177,198,0.5),inset_-3px_-3px_6px_rgba(255,255,255,0.4)]',
-  'focus:outline-none focus:ring-2 focus:ring-[#3B82F6]/30'
+  'bg-[var(--bg-elevated)] flex items-center justify-center',
+  'shadow-neu-extruded',
+  'text-[var(--text-secondary)] transition-all duration-200',
+  'hover:shadow-neu-extruded',
+  'hover:text-[var(--teal)]',
+  'active:shadow-neu-extruded',
+  'focus:outline-none focus:ring-2 focus:ring-[var(--teal)]/30'
 );
 
 export function PersonalInfoTab() {
@@ -236,7 +236,7 @@ export function PersonalInfoTab() {
           <Button
             onClick={handleSave}
             disabled={!hasUnsavedChanges || saving}
-            className="bg-[#3B82F6] hover:bg-[#2563EB] text-white disabled:bg-gray-300 disabled:text-gray-500"
+            className="bg-[var(--teal)] hover:bg-[#2563EB] text-white disabled:bg-gray-300 disabled:text-gray-500"
           >
             {saving && <Loader2 className="h-4 w-4 animate-spin" />}
             {saving ? 'Saving...' : 'Save Personal Info'}
@@ -253,11 +253,11 @@ export function PersonalInfoTab() {
       >
         <div className="flex items-center gap-2 mb-4">
           {preview?.type === 'image' ? (
-            <ImageIcon className="w-5 h-5 text-[#3B82F6]" />
+            <ImageIcon className="w-5 h-5 text-[var(--teal)]" />
           ) : (
-            <FileText className="w-5 h-5 text-[#3B82F6]" />
+            <FileText className="w-5 h-5 text-[var(--teal)]" />
           )}
-          <span className="text-sm text-[#6B7280]">
+          <span className="text-sm text-[var(--text-secondary)]">
             {preview?.type === 'image' ? 'Image' : 'PDF Document'}
           </span>
         </div>

@@ -163,27 +163,27 @@ export function LocationMap({
     return (
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h3 className="text-base font-semibold text-[#3D4852] flex items-center gap-2">
+          <h3 className="text-base font-semibold text-[var(--text-primary)] flex items-center gap-2">
             <MapPin className="h-5 w-5" />
             Message Locations
           </h3>
           {selectedCountry && (
-            <button onClick={handleClearFilter} className="text-sm text-[#3B82F6] hover:underline">
+            <button onClick={handleClearFilter} className="text-sm text-[var(--teal)] hover:underline">
               Clear Filter
             </button>
           )}
         </div>
         <div
-          className="neu-inset rounded-2xl bg-[#E0E5EC] flex items-center justify-center"
+          className="neu-inset rounded-2xl bg-[var(--bg-elevated)] flex items-center justify-center"
           style={{ height }}
         >
           <div className="flex flex-col items-center gap-3 p-8 text-center">
-            <MapPin className="h-12 w-12 text-[#6B7280]" />
+            <MapPin className="h-12 w-12 text-[var(--text-secondary)]" />
             <div>
-              <p className="text-sm font-medium text-[#3D4852] mb-1">
+              <p className="text-sm font-medium text-[var(--text-primary)] mb-1">
                 Mapbox Access Token Required
               </p>
-              <p className="text-xs text-[#6B7280]">
+              <p className="text-xs text-[var(--text-secondary)]">
                 Add NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN to your environment variables
               </p>
             </div>
@@ -196,12 +196,12 @@ export function LocationMap({
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-base font-semibold text-[#3D4852] flex items-center gap-2">
+        <h3 className="text-base font-semibold text-[var(--text-primary)] flex items-center gap-2">
           <MapPin className="h-5 w-5" />
           Message Locations
         </h3>
         {selectedCountry && (
-          <button onClick={handleClearFilter} className="text-sm text-[#3B82F6] hover:underline">
+          <button onClick={handleClearFilter} className="text-sm text-[var(--teal)] hover:underline">
             Clear Filter
           </button>
         )}
@@ -209,17 +209,17 @@ export function LocationMap({
 
       {loading ? (
         <div
-          className="neu-inset rounded-2xl bg-[#E0E5EC] flex items-center justify-center"
+          className="neu-inset rounded-2xl bg-[var(--bg-elevated)] flex items-center justify-center"
           style={{ height }}
         >
           <div className="flex flex-col items-center gap-3">
-            <Loader2 className="h-8 w-8 animate-spin text-[#3B82F6]" />
-            <span className="text-sm text-[#6B7280]">Loading map...</span>
+            <Loader2 className="h-8 w-8 animate-spin text-[var(--teal)]" />
+            <span className="text-sm text-[var(--text-secondary)]">Loading map...</span>
           </div>
         </div>
       ) : (
         <div
-          className="relative neu-inset rounded-2xl overflow-hidden bg-[#E0E5EC]"
+          className="relative neu-inset rounded-2xl overflow-hidden bg-[var(--bg-elevated)]"
           style={{ height }}
         >
           <Map
@@ -243,7 +243,7 @@ export function LocationMap({
                 }}
               >
                 <div
-                  className="cursor-pointer transform transition-transform hover:scale-110 rounded-full bg-[#3B82F6] flex items-center justify-center text-white text-xs font-bold shadow-lg border-2 border-white"
+                  className="cursor-pointer transform transition-transform hover:scale-110 rounded-full bg-[var(--teal)] flex items-center justify-center text-white text-xs font-bold shadow-lg border-2 border-white"
                   style={{
                     width: `${getMarkerSize(stat.count)}px`,
                     height: `${getMarkerSize(stat.count)}px`,
@@ -263,13 +263,13 @@ export function LocationMap({
                 closeOnClick={false}
               >
                 <div className="p-2">
-                  <p className="font-semibold text-[#3D4852]">
+                  <p className="font-semibold text-[var(--text-primary)]">
                     {getFlagEmoji(selectedLocation.countryCode)} {selectedLocation.country}
                   </p>
                   {selectedLocation.city && (
-                    <p className="text-xs text-[#6B7280]">{selectedLocation.city}</p>
+                    <p className="text-xs text-[var(--text-secondary)]">{selectedLocation.city}</p>
                   )}
-                  <p className="text-sm text-[#3B82F6] font-medium mt-1">
+                  <p className="text-sm text-[var(--teal)] font-medium mt-1">
                     {selectedLocation.count} message{selectedLocation.count !== 1 ? 's' : ''}
                   </p>
                 </div>
@@ -281,22 +281,22 @@ export function LocationMap({
 
       {locationStats.length > 0 && (
         <div className="space-y-2">
-          <h4 className="text-sm font-medium text-[#3D4852]">Top Locations</h4>
+          <h4 className="text-sm font-medium text-[var(--text-primary)]">Top Locations</h4>
           <div className="space-y-2">
             {locationStats.slice(0, 5).map((stat) => (
               <button
                 key={stat.countryCode}
                 onClick={() => handleMarkerClick(stat)}
-                className={`w-full neu-extruded rounded-xl p-3 flex items-center gap-3 transition-all duration-200 hover:-translate-y-[1px] hover:shadow-[12px_12px_20px_rgba(163,177,198,0.7),-12px_-12px_20px_rgba(255,255,255,0.6)] ${
-                  selectedCountry === stat.countryCode ? 'ring-2 ring-[#3B82F6]' : ''
+                className={`w-full neu-extruded rounded-xl p-3 flex items-center gap-3 transition-all duration-200 hover:-translate-y-[1px] hover:shadow-neu-extruded ${
+                  selectedCountry === stat.countryCode ? 'ring-2 ring-[var(--teal)]' : ''
                 }`}
               >
                 <span className="text-xl">{getFlagEmoji(stat.countryCode)}</span>
                 <div className="flex-1 text-left">
-                  <div className="text-sm font-medium text-[#3D4852]">{stat.country}</div>
-                  {stat.city && <div className="text-xs text-[#6B7280]">{stat.city}</div>}
+                  <div className="text-sm font-medium text-[var(--text-primary)]">{stat.country}</div>
+                  {stat.city && <div className="text-xs text-[var(--text-secondary)]">{stat.city}</div>}
                 </div>
-                <div className="rounded-full bg-[#3B82F6] text-white text-xs font-bold px-3 py-1">
+                <div className="rounded-full bg-[var(--teal)] text-white text-xs font-bold px-3 py-1">
                   {stat.count}
                 </div>
               </button>

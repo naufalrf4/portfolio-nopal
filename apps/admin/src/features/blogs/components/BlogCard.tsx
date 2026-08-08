@@ -15,7 +15,7 @@ interface BlogCardProps {
 export function BlogCard({ blogLink, onEdit, onDelete, onToggleVisibility }: BlogCardProps) {
   return (
     <div
-      className="group rounded-[32px] p-6 transition-all duration-300 hover:-translate-y-1"
+      className="group rounded-[var(--radius-container)] p-6 transition-all duration-300 hover:-translate-y-1"
       style={{
         backgroundColor: NEUMORPHIC_STYLES.background,
         boxShadow: NEUMORPHIC_STYLES.shadows.extruded,
@@ -25,7 +25,7 @@ export function BlogCard({ blogLink, onEdit, onDelete, onToggleVisibility }: Blo
         <div
           className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0"
           style={{
-            background: 'linear-gradient(135deg, #3B82F6, #60A5FA)',
+            background: 'linear-gradient(135deg, var(--teal), var(--amber))',
             boxShadow: NEUMORPHIC_STYLES.shadows.small,
           }}
         >

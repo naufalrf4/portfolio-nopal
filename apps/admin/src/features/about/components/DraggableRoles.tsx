@@ -64,13 +64,12 @@ export function DraggableRoles({
     <div className="space-y-4">
       {roles.length === 0 ? (
         <div
-          className="flex flex-col items-center justify-center py-8 rounded-2xl bg-[#E0E5EC]"
+          className="flex flex-col items-center justify-center py-8 rounded-2xl bg-[var(--bg-elevated)]"
           style={{
-            boxShadow:
-              'inset 4px 4px 8px rgba(163,177,198,0.5), inset -4px -4px 8px rgba(255,255,255,0.4)',
+            boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
           }}
         >
-          <p className="text-sm text-[#6B7280]">No roles added yet. Add your first role below.</p>
+          <p className="text-sm text-[var(--text-secondary)]">No roles added yet. Add your first role below.</p>
         </div>
       ) : (
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
@@ -135,10 +134,10 @@ function SortableRoleItem({ role, index, isPrimary, onRemove }: SortableRoleItem
       style={style}
       className={`
         group relative flex items-center gap-2 px-4 py-3 rounded-xl
-        bg-[#E0E5EC] cursor-grab active:cursor-grabbing
+        bg-[var(--bg-elevated)] cursor-grab active:cursor-grabbing
         transition-all duration-200
         ${isDragging ? 'scale-105 z-50' : 'hover:scale-[1.02]'}
-        ${isPrimary ? 'ring-2 ring-[#3B82F6] ring-offset-2 ring-offset-[#E0E5EC]' : ''}
+        ${isPrimary ? 'ring-2 ring-[var(--teal)] ring-offset-2 ring-offset-[var(--bg-elevated)]' : ''}
       `}
       {...attributes}
       {...listeners}
@@ -146,17 +145,17 @@ function SortableRoleItem({ role, index, isPrimary, onRemove }: SortableRoleItem
       <div
         className={`
           absolute inset-0 rounded-xl transition-all duration-200
-          ${isDragging ? 'shadow-[8px_8px_16px_rgba(163,177,198,0.7),-8px_-8px_16px_rgba(255,255,255,0.6)]' : 'shadow-[5px_5px_10px_rgba(163,177,198,0.6),-5px_-5px_10px_rgba(255,255,255,0.5)]'}
+          ${isDragging ? 'shadow-neu-extruded' : 'shadow-neu-extruded-sm'}
         `}
       />
 
       <div className="relative flex items-center gap-3">
-        <GripVertical className="h-4 w-4 text-[#6B7280] opacity-60 group-hover:opacity-100 transition-opacity" />
+        <GripVertical className="h-4 w-4 text-[var(--text-secondary)] opacity-60 group-hover:opacity-100 transition-opacity" />
 
         <div className="flex flex-col">
           <div className="flex items-center gap-2">
-            <span className="text-xs text-[#6B7280] font-medium">{index + 1}.</span>
-            <span className={`font-medium ${isPrimary ? 'text-[#3B82F6]' : 'text-[#3D4852]'}`}>
+            <span className="text-xs text-[var(--text-secondary)] font-medium">{index + 1}.</span>
+            <span className={`font-medium ${isPrimary ? 'text-[var(--teal)]' : 'text-[var(--text-primary)]'}`}>
               {role}
             </span>
           </div>
@@ -164,7 +163,7 @@ function SortableRoleItem({ role, index, isPrimary, onRemove }: SortableRoleItem
           {isPrimary && (
             <div className="flex items-center gap-1 mt-1">
               <Star className="h-3 w-3 text-amber-500 fill-amber-500" />
-              <span className="text-xs font-medium bg-gradient-to-r from-[#3B82F6] to-[#8B5CF6] bg-clip-text text-transparent">
+              <span className="text-xs font-medium bg-gradient-to-r from-[var(--teal)] to-[#8B5CF6] bg-clip-text text-transparent">
                 Primary
               </span>
             </div>
@@ -179,7 +178,7 @@ function SortableRoleItem({ role, index, isPrimary, onRemove }: SortableRoleItem
           className={`
             ml-2 p-1 rounded-lg transition-all duration-200
             opacity-0 group-hover:opacity-100
-            hover:bg-red-100 text-[#6B7280] hover:text-red-500
+            hover:bg-red-100 text-[var(--text-secondary)] hover:text-red-500
           `}
           aria-label={`Remove ${role}`}
         >

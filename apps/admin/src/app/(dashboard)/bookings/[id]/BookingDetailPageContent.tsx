@@ -142,15 +142,15 @@ export function BookingDetailPageContent({ initialBooking }: BookingDetailPageCo
       <div className="mb-6">
         <button
           onClick={() => router.push('/bookings')}
-          className="inline-flex items-center gap-2 text-[#6B7280] hover:text-[#3B82F6] transition-colors mb-4"
+          className="inline-flex items-center gap-2 text-[var(--text-secondary)] hover:text-[var(--teal)] transition-colors mb-4"
         >
           <ArrowLeft className="h-4 w-4" />
           Back to Bookings
         </button>
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-[#3D4852] mb-2">Booking Details</h1>
-            <p className="text-[#6B7280]">View and manage booking information</p>
+            <h1 className="text-3xl font-bold text-[var(--text-primary)] mb-2">Booking Details</h1>
+            <p className="text-[var(--text-secondary)]">View and manage booking information</p>
           </div>
           <div className="flex gap-2">
             <Button variant="outline" onClick={() => setIsStatusModalOpen(true)}>
@@ -165,78 +165,74 @@ export function BookingDetailPageContent({ initialBooking }: BookingDetailPageCo
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div
-          className="lg:col-span-2 rounded-[32px] p-8 bg-[#E0E5EC]"
+          className="lg:col-span-2 rounded-[var(--radius-container)] p-8 bg-[var(--bg-elevated)]"
           style={{
             boxShadow:
-              '12px 12px 24px rgba(163, 177, 198, 0.6), -12px -12px 24px rgba(255, 255, 255, 0.5)',
+              '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
           }}
         >
           <div className="flex items-start justify-between mb-6">
             <div>
-              <h2 className="text-2xl font-semibold text-[#3D4852] mb-2">{booking.name}</h2>
+              <h2 className="text-2xl font-semibold text-[var(--text-primary)] mb-2">{booking.name}</h2>
               <Badge variant={getStatusBadgeVariant(booking.status)}>{booking.status}</Badge>
             </div>
             <div
-              className="p-4 rounded-2xl bg-[#E0E5EC]"
+              className="p-4 rounded-2xl bg-[var(--bg-elevated)]"
               style={{
-                boxShadow:
-                  '6px 6px 12px rgba(163,177,198,0.5), -6px -6px 12px rgba(255,255,255,0.5)',
+                boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
               }}
             >
-              <Calendar className="h-8 w-8 text-[#3B82F6]" />
+              <Calendar className="h-8 w-8 text-[var(--teal)]" />
             </div>
           </div>
 
           <div className="space-y-6">
             <div>
-              <h3 className="text-sm font-semibold text-[#6B7280] uppercase tracking-wide mb-4">
+              <h3 className="text-sm font-semibold text-[var(--text-secondary)] uppercase tracking-wide mb-4">
                 Contact Information
               </h3>
               <div className="space-y-4">
                 <div className="flex items-center gap-4">
                   <div
-                    className="p-3 rounded-2xl bg-[#E0E5EC]"
+                    className="p-3 rounded-2xl bg-[var(--bg-elevated)]"
                     style={{
-                      boxShadow:
-                        'inset 4px 4px 8px rgba(163,177,198,0.5), inset -4px -4px 8px rgba(255,255,255,0.5)',
+                      boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
                     }}
                   >
-                    <User className="h-5 w-5 text-[#6B7280]" />
+                    <User className="h-5 w-5 text-[var(--text-secondary)]" />
                   </div>
                   <div>
-                    <p className="text-sm text-[#6B7280]">Name</p>
-                    <p className="font-medium text-[#3D4852]">{booking.name}</p>
+                    <p className="text-sm text-[var(--text-secondary)]">Name</p>
+                    <p className="font-medium text-[var(--text-primary)]">{booking.name}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
                   <div
-                    className="p-3 rounded-2xl bg-[#E0E5EC]"
+                    className="p-3 rounded-2xl bg-[var(--bg-elevated)]"
                     style={{
-                      boxShadow:
-                        'inset 4px 4px 8px rgba(163,177,198,0.5), inset -4px -4px 8px rgba(255,255,255,0.5)',
+                      boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
                     }}
                   >
-                    <Mail className="h-5 w-5 text-[#6B7280]" />
+                    <Mail className="h-5 w-5 text-[var(--text-secondary)]" />
                   </div>
                   <div>
-                    <p className="text-sm text-[#6B7280]">Email</p>
-                    <p className="font-medium text-[#3D4852]">{booking.email}</p>
+                    <p className="text-sm text-[var(--text-secondary)]">Email</p>
+                    <p className="font-medium text-[var(--text-primary)]">{booking.email}</p>
                   </div>
                 </div>
                 {booking.phone && (
                   <div className="flex items-center gap-4">
                     <div
-                      className="p-3 rounded-2xl bg-[#E0E5EC]"
+                      className="p-3 rounded-2xl bg-[var(--bg-elevated)]"
                       style={{
-                        boxShadow:
-                          'inset 4px 4px 8px rgba(163,177,198,0.5), inset -4px -4px 8px rgba(255,255,255,0.5)',
+                        boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
                       }}
                     >
-                      <Phone className="h-5 w-5 text-[#6B7280]" />
+                      <Phone className="h-5 w-5 text-[var(--text-secondary)]" />
                     </div>
                     <div>
-                      <p className="text-sm text-[#6B7280]">Phone</p>
-                      <p className="font-medium text-[#3D4852]">{booking.phone}</p>
+                      <p className="text-sm text-[var(--text-secondary)]">Phone</p>
+                      <p className="font-medium text-[var(--text-primary)]">{booking.phone}</p>
                     </div>
                   </div>
                 )}
@@ -244,53 +240,50 @@ export function BookingDetailPageContent({ initialBooking }: BookingDetailPageCo
             </div>
 
             <div>
-              <h3 className="text-sm font-semibold text-[#6B7280] uppercase tracking-wide mb-4">
+              <h3 className="text-sm font-semibold text-[var(--text-secondary)] uppercase tracking-wide mb-4">
                 Appointment Details
               </h3>
               <div className="space-y-4">
                 <div className="flex items-center gap-4">
                   <div
-                    className="p-3 rounded-2xl bg-[#E0E5EC]"
+                    className="p-3 rounded-2xl bg-[var(--bg-elevated)]"
                     style={{
-                      boxShadow:
-                        'inset 4px 4px 8px rgba(163,177,198,0.5), inset -4px -4px 8px rgba(255,255,255,0.5)',
+                      boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
                     }}
                   >
-                    <Calendar className="h-5 w-5 text-[#6B7280]" />
+                    <Calendar className="h-5 w-5 text-[var(--text-secondary)]" />
                   </div>
                   <div>
-                    <p className="text-sm text-[#6B7280]">Date</p>
-                    <p className="font-medium text-[#3D4852]">{formatDate(booking.date, 'long')}</p>
+                    <p className="text-sm text-[var(--text-secondary)]">Date</p>
+                    <p className="font-medium text-[var(--text-primary)]">{formatDate(booking.date, 'long')}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
                   <div
-                    className="p-3 rounded-2xl bg-[#E0E5EC]"
+                    className="p-3 rounded-2xl bg-[var(--bg-elevated)]"
                     style={{
-                      boxShadow:
-                        'inset 4px 4px 8px rgba(163,177,198,0.5), inset -4px -4px 8px rgba(255,255,255,0.5)',
+                      boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
                     }}
                   >
-                    <Clock className="h-5 w-5 text-[#6B7280]" />
+                    <Clock className="h-5 w-5 text-[var(--text-secondary)]" />
                   </div>
                   <div>
-                    <p className="text-sm text-[#6B7280]">Time</p>
-                    <p className="font-medium text-[#3D4852]">{booking.time}</p>
+                    <p className="text-sm text-[var(--text-secondary)]">Time</p>
+                    <p className="font-medium text-[var(--text-primary)]">{booking.time}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
                   <div
-                    className="p-3 rounded-2xl bg-[#E0E5EC]"
+                    className="p-3 rounded-2xl bg-[var(--bg-elevated)]"
                     style={{
-                      boxShadow:
-                        'inset 4px 4px 8px rgba(163,177,198,0.5), inset -4px -4px 8px rgba(255,255,255,0.5)',
+                      boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
                     }}
                   >
-                    <Globe className="h-5 w-5 text-[#6B7280]" />
+                    <Globe className="h-5 w-5 text-[var(--text-secondary)]" />
                   </div>
                   <div>
-                    <p className="text-sm text-[#6B7280]">Timezone</p>
-                    <p className="font-medium text-[#3D4852]">{booking.timezone}</p>
+                    <p className="text-sm text-[var(--text-secondary)]">Timezone</p>
+                    <p className="font-medium text-[var(--text-primary)]">{booking.timezone}</p>
                   </div>
                 </div>
               </div>
@@ -298,19 +291,18 @@ export function BookingDetailPageContent({ initialBooking }: BookingDetailPageCo
 
             {booking.notes && (
               <div>
-                <h3 className="text-sm font-semibold text-[#6B7280] uppercase tracking-wide mb-4">
+                <h3 className="text-sm font-semibold text-[var(--text-secondary)] uppercase tracking-wide mb-4">
                   Notes
                 </h3>
                 <div
-                  className="p-4 rounded-2xl bg-[#E0E5EC]"
+                  className="p-4 rounded-2xl bg-[var(--bg-elevated)]"
                   style={{
-                    boxShadow:
-                      'inset 4px 4px 8px rgba(163,177,198,0.5), inset -4px -4px 8px rgba(255,255,255,0.5)',
+                    boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
                   }}
                 >
                   <div className="flex items-start gap-3">
-                    <FileText className="h-5 w-5 text-[#6B7280] mt-0.5" />
-                    <p className="text-[#3D4852] leading-relaxed">{booking.notes}</p>
+                    <FileText className="h-5 w-5 text-[var(--text-secondary)] mt-0.5" />
+                    <p className="text-[var(--text-primary)] leading-relaxed">{booking.notes}</p>
                   </div>
                 </div>
               </div>
@@ -319,36 +311,36 @@ export function BookingDetailPageContent({ initialBooking }: BookingDetailPageCo
         </div>
 
         <div
-          className="rounded-[32px] p-8 bg-[#E0E5EC] h-fit"
+          className="rounded-[var(--radius-container)] p-8 bg-[var(--bg-elevated)] h-fit"
           style={{
             boxShadow:
-              '12px 12px 24px rgba(163, 177, 198, 0.6), -12px -12px 24px rgba(255, 255, 255, 0.5)',
+              '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
           }}
         >
-          <h3 className="text-sm font-semibold text-[#6B7280] uppercase tracking-wide mb-4">
+          <h3 className="text-sm font-semibold text-[var(--text-secondary)] uppercase tracking-wide mb-4">
             Booking Metadata
           </h3>
           <div className="space-y-4">
             <div>
-              <p className="text-sm text-[#6B7280] mb-1">Created</p>
-              <p className="text-sm font-medium text-[#3D4852]">
+              <p className="text-sm text-[var(--text-secondary)] mb-1">Created</p>
+              <p className="text-sm font-medium text-[var(--text-primary)]">
                 {formatDateTime(booking.createdAt)}
               </p>
             </div>
             <div>
-              <p className="text-sm text-[#6B7280] mb-1">Last Updated</p>
-              <p className="text-sm font-medium text-[#3D4852]">
+              <p className="text-sm text-[var(--text-secondary)] mb-1">Last Updated</p>
+              <p className="text-sm font-medium text-[var(--text-primary)]">
                 {formatDateTime(booking.updatedAt)}
               </p>
             </div>
             <div>
-              <p className="text-sm text-[#6B7280] mb-1">Booking ID</p>
-              <p className="text-xs font-mono text-[#3D4852] break-all">{booking.id}</p>
+              <p className="text-sm text-[var(--text-secondary)] mb-1">Booking ID</p>
+              <p className="text-xs font-mono text-[var(--text-primary)] break-all">{booking.id}</p>
             </div>
           </div>
 
           <div className="mt-6 pt-6 border-t border-[#A3B1C6]/20">
-            <h3 className="text-sm font-semibold text-[#6B7280] uppercase tracking-wide mb-3">
+            <h3 className="text-sm font-semibold text-[var(--text-secondary)] uppercase tracking-wide mb-3">
               Quick Actions
             </h3>
             <div className="space-y-2">
@@ -359,10 +351,9 @@ export function BookingDetailPageContent({ initialBooking }: BookingDetailPageCo
                       setSelectedStatus('CONFIRMED');
                       await handleUpdateStatus();
                     }}
-                    className="w-full py-2 px-4 rounded-2xl text-sm font-medium text-white bg-[#38B2AC] hover:bg-[#319795] transition-colors"
+                    className="w-full py-2 px-4 rounded-2xl text-sm font-medium text-white bg-[var(--teal)] hover:bg-[#319795] transition-colors"
                     style={{
-                      boxShadow:
-                        '6px 6px 12px rgba(163,177,198,0.6), -6px -6px 12px rgba(255,255,255,0.5)',
+                      boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
                     }}
                   >
                     Confirm Booking
@@ -374,8 +365,7 @@ export function BookingDetailPageContent({ initialBooking }: BookingDetailPageCo
                     }}
                     className="w-full py-2 px-4 rounded-2xl text-sm font-medium text-white bg-red-500 hover:bg-red-600 transition-colors"
                     style={{
-                      boxShadow:
-                        '6px 6px 12px rgba(163,177,198,0.6), -6px -6px 12px rgba(255,255,255,0.5)',
+                      boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
                     }}
                   >
                     Cancel Booking
@@ -388,10 +378,9 @@ export function BookingDetailPageContent({ initialBooking }: BookingDetailPageCo
                     setSelectedStatus('COMPLETED');
                     await handleUpdateStatus();
                   }}
-                  className="w-full py-2 px-4 rounded-2xl text-sm font-medium text-white bg-[#3B82F6] hover:bg-[#2563EB] transition-colors"
+                  className="w-full py-2 px-4 rounded-2xl text-sm font-medium text-white bg-[var(--teal)] hover:bg-[#2563EB] transition-colors"
                   style={{
-                    boxShadow:
-                      '6px 6px 12px rgba(163,177,198,0.6), -6px -6px 12px rgba(255,255,255,0.5)',
+                    boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
                   }}
                 >
                   Mark as Completed
@@ -420,14 +409,13 @@ export function BookingDetailPageContent({ initialBooking }: BookingDetailPageCo
       >
         <div className="space-y-4 py-4">
           <div>
-            <label className="block text-sm font-medium text-[#3D4852] mb-2">Status</label>
+            <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">Status</label>
             <select
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value as Booking['status'])}
-              className="w-full px-4 py-3 rounded-2xl bg-[#E0E5EC] text-[#3D4852] border-none focus:outline-none focus:ring-2 focus:ring-[#3B82F6]"
+              className="w-full px-4 py-3 rounded-2xl bg-[var(--bg-elevated)] text-[var(--text-primary)] border-none focus:outline-none focus:ring-2 focus:ring-[var(--teal)]"
               style={{
-                boxShadow:
-                  'inset 4px 4px 8px rgba(163,177,198,0.5), inset -4px -4px 8px rgba(255,255,255,0.5)',
+                boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
               }}
             >
               <option value="PENDING">Pending</option>
@@ -437,7 +425,7 @@ export function BookingDetailPageContent({ initialBooking }: BookingDetailPageCo
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-[#3D4852] mb-2">
+            <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">
               Notes (Optional)
             </label>
             <textarea
@@ -445,10 +433,9 @@ export function BookingDetailPageContent({ initialBooking }: BookingDetailPageCo
               onChange={(e) => setStatusNotes(e.target.value)}
               rows={4}
               placeholder="Add any notes about this status change..."
-              className="w-full px-4 py-3 rounded-2xl bg-[#E0E5EC] text-[#3D4852] border-none focus:outline-none focus:ring-2 focus:ring-[#3B82F6] resize-none"
+              className="w-full px-4 py-3 rounded-2xl bg-[var(--bg-elevated)] text-[var(--text-primary)] border-none focus:outline-none focus:ring-2 focus:ring-[var(--teal)] resize-none"
               style={{
-                boxShadow:
-                  'inset 4px 4px 8px rgba(163,177,198,0.5), inset -4px -4px 8px rgba(255,255,255,0.5)',
+                boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
               }}
             />
           </div>
@@ -472,7 +459,7 @@ export function BookingDetailPageContent({ initialBooking }: BookingDetailPageCo
         }
       >
         <div className="py-4">
-          <p className="text-[#6B7280]">
+          <p className="text-[var(--text-secondary)]">
             This will permanently delete the booking and all associated data.
           </p>
         </div>

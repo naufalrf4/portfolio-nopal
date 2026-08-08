@@ -151,8 +151,8 @@ export function ContactsTab() {
                   }}
                   className={`px-4 py-2 rounded-2xl text-sm font-medium transition-all duration-200 ${
                     filterMode === mode
-                      ? 'bg-[#3B82F6] text-white shadow-[6px_6px_12px_rgba(59,130,246,0.4),-6px_-6px_12px_rgba(59,130,246,0.1)]'
-                      : 'bg-[#E0E5EC] text-[#3D4852] shadow-[6px_6px_12px_rgba(163,177,198,0.4),-6px_-6px_12px_rgba(255,255,255,0.4)] hover:shadow-[inset_6px_6px_12px_rgba(163,177,198,0.4),inset_-6px_-6px_12px_rgba(255,255,255,0.4)]'
+                      ? 'bg-[var(--teal)] text-white shadow-neu-extruded-sm'
+                      : 'bg-[var(--bg-elevated)] text-[var(--text-primary)] shadow-neu-extruded-sm hover:shadow-neu-inset'
                   }`}
                 >
                   <span className="flex items-center gap-2">
@@ -182,7 +182,7 @@ export function ContactsTab() {
           </div>
 
           <div className="relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-[#6B7280]" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-[var(--text-secondary)]" />
             <Input
               type="text"
               placeholder="Search by name, email, subject, or message..."
@@ -195,28 +195,27 @@ export function ContactsTab() {
 
         {loading ? (
           <div className="flex items-center justify-center py-12">
-            <div className="text-[#6B7280]">Loading contacts...</div>
+            <div className="text-[var(--text-secondary)]">Loading contacts...</div>
           </div>
         ) : filteredContacts.length === 0 ? (
           <div
-            className="flex flex-col items-center justify-center py-16 rounded-[32px] bg-[#E0E5EC]"
+            className="flex flex-col items-center justify-center py-16 rounded-[var(--radius-container)] bg-[var(--bg-elevated)]"
             style={{
               boxShadow:
-                '12px 12px 24px rgba(163, 177, 198, 0.6), -12px -12px 24px rgba(255, 255, 255, 0.5)',
+                '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
             }}
           >
             <div
               className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
               style={{
-                background: '#E0E5EC',
-                boxShadow:
-                  'inset 6px 6px 12px rgba(163,177,198,0.5), inset -6px -6px 12px rgba(255,255,255,0.5)',
+                background: 'var(--bg-elevated)',
+                boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
               }}
             >
-              <Mail className="h-8 w-8 text-[#6B7280]" />
+              <Mail className="h-8 w-8 text-[var(--text-secondary)]" />
             </div>
-            <p className="text-[#6B7280] text-lg font-medium mb-1">No submissions found</p>
-            <p className="text-[#6B7280]/70 text-sm">
+            <p className="text-[var(--text-secondary)] text-lg font-medium mb-1">No submissions found</p>
+            <p className="text-[var(--text-secondary)]/70 text-sm">
               {searchQuery || filterMode !== 'all'
                 ? 'Try adjusting your filters or search query'
                 : 'Contact form submissions will appear here'}
@@ -236,7 +235,7 @@ export function ContactsTab() {
 
         {pagination.totalPages > 1 && (
           <div className="flex items-center justify-between mt-6">
-            <p className="text-sm text-[#6B7280]">
+            <p className="text-sm text-[var(--text-secondary)]">
               Showing {(pagination.page - 1) * pagination.limit + 1} to{' '}
               {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total}{' '}
               contacts

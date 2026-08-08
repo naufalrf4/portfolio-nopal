@@ -105,8 +105,8 @@ export function ChatLogDetailPageContent({ id }: ChatLogDetailPageContentProps) 
     return (
       <PageWrapper>
         <Card className="p-8 text-center">
-          <h2 className="text-xl font-semibold text-[#3D4852] mb-2">Chat Log Not Found</h2>
-          <p className="text-[#6B7280] mb-4">
+          <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-2">Chat Log Not Found</h2>
+          <p className="text-[var(--text-secondary)] mb-4">
             {error || 'The requested chat log could not be found.'}
           </p>
           <Button onClick={() => router.push('/chat-logs')}>Back to Chat Logs</Button>

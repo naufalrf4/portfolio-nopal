@@ -86,10 +86,10 @@ export function LinksPageContent({ embedded = false }: { embedded?: boolean }) {
     <TooltipProvider>
       <>
         {embedded ? (
-          <div className="mb-6 flex flex-col gap-4 rounded-[28px] bg-[#E7ECF2] p-5 shadow-[inset_4px_4px_10px_rgba(163,177,198,0.28),inset_-4px_-4px_10px_rgba(255,255,255,0.45)] md:flex-row md:items-center md:justify-between">
+          <div className="mb-6 flex flex-col gap-4 rounded-[28px] bg-[#E7ECF2] p-5 shadow-neu-extruded md:flex-row md:items-center md:justify-between">
             <div>
-              <h2 className="text-xl font-semibold text-[#3D4852]">Profile Links</h2>
-              <p className="mt-1 text-sm text-[#6B7280]">
+              <h2 className="text-xl font-semibold text-[var(--text-primary)]">Profile Links</h2>
+              <p className="mt-1 text-sm text-[var(--text-secondary)]">
                 Manage the single source of truth for socials, contact links, and public profile
                 destinations.
               </p>

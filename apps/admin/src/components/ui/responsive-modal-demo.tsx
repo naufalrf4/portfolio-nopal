@@ -9,8 +9,8 @@ export function ResponsiveModalDemo() {
 
   return (
     <div className="flex flex-col gap-4 p-8">
-      <h2 className="font-display text-2xl font-bold text-[#3D4852]">Responsive Modal Demo</h2>
-      <p className="text-[#6B7280]">
+      <h2 className="font-display text-2xl font-bold text-[var(--text-primary)]">Responsive Modal Demo</h2>
+      <p className="text-[var(--text-secondary)]">
         This modal becomes a bottom drawer on mobile (below 768px) and a centered dialog on desktop.
       </p>
 
@@ -39,18 +39,18 @@ export function ResponsiveModalDemo() {
         }
       >
         <div className="space-y-4">
-          <p className="text-[#3D4852]">
+          <p className="text-[var(--text-primary)]">
             This is the content of the responsive modal. On mobile devices (screens narrower than
             768px), this will appear as a bottom drawer that slides up from the bottom of the
             screen.
           </p>
-          <p className="text-[#6B7280]">
+          <p className="text-[var(--text-secondary)]">
             On desktop devices, it appears as a centered modal dialog with a backdrop. Both
             variations use smooth animations and neumorphic styling.
           </p>
           <div className="space-y-2">
-            <h3 className="font-semibold text-[#3D4852]">Features:</h3>
-            <ul className="list-disc list-inside space-y-1 text-[#6B7280]">
+            <h3 className="font-semibold text-[var(--text-primary)]">Features:</h3>
+            <ul className="list-disc list-inside space-y-1 text-[var(--text-secondary)]">
               <li>Automatically switches between dialog and drawer based on screen size</li>
               <li>Smooth spring-like animations</li>
               <li>Swipe-to-close on mobile</li>

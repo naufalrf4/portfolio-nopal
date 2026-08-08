@@ -14,18 +14,17 @@ interface FilterButtonsProps {
 export function FilterButtons({ filterMode, onFilterChange, stats }: FilterButtonsProps) {
   return (
     <div
-      className="flex flex-wrap gap-3 p-4 rounded-2xl bg-[#E0E5EC]"
+      className="flex flex-wrap gap-3 p-4 rounded-2xl bg-[var(--bg-elevated)]"
       style={{
-        boxShadow:
-          'inset 6px 6px 10px rgba(163,177,198,0.6), inset -6px -6px 10px rgba(255,255,255,0.5)',
+        boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
       }}
     >
       <button
         onClick={() => onFilterChange('all')}
         className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
           filterMode === 'all'
-            ? 'bg-[#E0E5EC] shadow-[5px_5px_10px_rgba(163,177,198,0.6),-5px_-5px_10px_rgba(255,255,255,0.5)] text-[#3B82F6]'
-            : 'text-[#6B7280] hover:text-[#3D4852]'
+            ? 'bg-[var(--bg-elevated)] shadow-neu-extruded-sm text-[var(--teal)]'
+            : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
         }`}
       >
         All ({stats.total})
@@ -34,8 +33,8 @@ export function FilterButtons({ filterMode, onFilterChange, stats }: FilterButto
         onClick={() => onFilterChange('visible')}
         className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
           filterMode === 'visible'
-            ? 'bg-[#E0E5EC] shadow-[5px_5px_10px_rgba(163,177,198,0.6),-5px_-5px_10px_rgba(255,255,255,0.5)] text-[#38B2AC]'
-            : 'text-[#6B7280] hover:text-[#3D4852]'
+            ? 'bg-[var(--bg-elevated)] shadow-neu-extruded-sm text-[var(--teal)]'
+            : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
         }`}
       >
         <Eye className="h-4 w-4" />
@@ -45,8 +44,8 @@ export function FilterButtons({ filterMode, onFilterChange, stats }: FilterButto
         onClick={() => onFilterChange('hidden')}
         className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
           filterMode === 'hidden'
-            ? 'bg-[#E0E5EC] shadow-[5px_5px_10px_rgba(163,177,198,0.6),-5px_-5px_10px_rgba(255,255,255,0.5)] text-[#6B7280]'
-            : 'text-[#6B7280] hover:text-[#3D4852]'
+            ? 'bg-[var(--bg-elevated)] shadow-neu-extruded-sm text-[var(--text-secondary)]'
+            : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
         }`}
       >
         <EyeOff className="h-4 w-4" />

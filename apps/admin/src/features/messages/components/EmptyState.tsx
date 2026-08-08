@@ -26,7 +26,7 @@ export function EmptyState({ activeTab }: EmptyStateProps) {
 
   return (
     <div
-      className="rounded-[32px] p-12 text-center"
+      className="rounded-[var(--radius-container)] p-12 text-center"
       style={{
         backgroundColor: COLORS.background,
         boxShadow: NEUMORPHIC_SHADOWS.extruded,

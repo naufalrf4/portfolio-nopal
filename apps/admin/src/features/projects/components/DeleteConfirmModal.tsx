@@ -34,7 +34,7 @@ export function DeleteConfirmModal({
       }
     >
       <div className="py-4">
-        <p className="text-[#6B7280]">
+        <p className="text-[var(--text-secondary)]">
           This will permanently delete the project and all associated data.
         </p>
       </div>

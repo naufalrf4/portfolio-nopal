@@ -245,11 +245,10 @@ export function BookingsTab({ onPendingCountChange }: BookingsTabProps) {
   return (
     <>
       <div
-        className="rounded-[24px] p-2 mb-8 inline-flex gap-2 flex-wrap"
+        className="rounded-[var(--radius-base)] p-2 mb-8 inline-flex gap-2 flex-wrap"
         style={{
-          background: '#E0E5EC',
-          boxShadow:
-            'inset 6px 6px 10px rgba(163,177,198,0.6), inset -6px -6px 10px rgba(255,255,255,0.5)',
+          background: 'var(--bg-elevated)',
+          boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
         }}
       >
         {FILTER_BUTTONS.map((btn) => (
@@ -261,11 +260,11 @@ export function BookingsTab({ onPendingCountChange }: BookingsTabProps) {
             }}
             className="px-6 py-3 rounded-[18px] font-medium transition-all duration-300"
             style={{
-              background: filter === btn.key ? '#E0E5EC' : 'transparent',
-              color: filter === btn.key ? '#3B82F6' : '#6B7280',
+              background: filter === btn.key ? 'var(--bg-elevated)' : 'transparent',
+              color: filter === btn.key ? 'var(--teal)' : 'var(--text-secondary)',
               boxShadow:
                 filter === btn.key
-                  ? '6px 6px 12px rgba(163,177,198,0.6), -6px -6px 12px rgba(255,255,255,0.5)'
+                  ? '0 2px 8px -2px rgba(0, 0, 0, 0.3)'
                   : 'none',
             }}
           >
@@ -276,28 +275,27 @@ export function BookingsTab({ onPendingCountChange }: BookingsTabProps) {
 
       {loading ? (
         <div className="flex items-center justify-center py-12">
-          <div className="text-[#6B7280]">Loading bookings...</div>
+          <div className="text-[var(--text-secondary)]">Loading bookings...</div>
         </div>
       ) : bookings.length === 0 ? (
         <div
-          className="rounded-[32px] p-12 text-center"
+          className="rounded-[var(--radius-container)] p-12 text-center"
           style={{
-            background: '#E0E5EC',
-            boxShadow: '9px 9px 16px rgba(163,177,198,0.6), -9px -9px 16px rgba(255,255,255,0.5)',
+            background: 'var(--bg-elevated)',
+            boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
           }}
         >
           <div
             className="w-24 h-24 rounded-full mx-auto mb-6 flex items-center justify-center"
             style={{
-              background: '#E0E5EC',
-              boxShadow:
-                'inset 6px 6px 10px rgba(163,177,198,0.6), inset -6px -6px 10px rgba(255,255,255,0.5)',
+              background: 'var(--bg-elevated)',
+              boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
             }}
           >
-            <Calendar className="w-12 h-12 text-[#6B7280]" />
+            <Calendar className="w-12 h-12 text-[var(--text-secondary)]" />
           </div>
-          <h3 className="text-xl font-semibold text-[#3D4852] mb-2">No bookings found</h3>
-          <p className="text-[#6B7280] max-w-md mx-auto">
+          <h3 className="text-xl font-semibold text-[var(--text-primary)] mb-2">No bookings found</h3>
+          <p className="text-[var(--text-secondary)] max-w-md mx-auto">
             {filter === 'all'
               ? 'No bookings have been made yet.'
               : `No ${filter.toLowerCase()} bookings found.`}
@@ -306,29 +304,29 @@ export function BookingsTab({ onPendingCountChange }: BookingsTabProps) {
       ) : (
         <>
           <div
-            className="rounded-[32px] overflow-hidden bg-[#E0E5EC] mb-6"
+            className="rounded-[var(--radius-container)] overflow-hidden bg-[var(--bg-elevated)] mb-6"
             style={{
               boxShadow:
-                '12px 12px 24px rgba(163, 177, 198, 0.6), -12px -12px 24px rgba(255, 255, 255, 0.5)',
+                '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
             }}
           >
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-[#A3B1C6]/20">
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-[#3D4852]">
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">
                       Name
                     </th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-[#3D4852]">
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">
                       Email
                     </th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-[#3D4852]">
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">
                       Date/Time
                     </th>
-                    <th className="px-6 py-4 text-center text-sm font-semibold text-[#3D4852]">
+                    <th className="px-6 py-4 text-center text-sm font-semibold text-[var(--text-primary)]">
                       Status
                     </th>
-                    <th className="px-6 py-4 text-center text-sm font-semibold text-[#3D4852]">
+                    <th className="px-6 py-4 text-center text-sm font-semibold text-[var(--text-primary)]">
                       Actions
                     </th>
                   </tr>
@@ -342,17 +340,17 @@ export function BookingsTab({ onPendingCountChange }: BookingsTabProps) {
                     >
                       <td className="px-6 py-4">
                         <div>
-                          <p className="font-medium text-[#3D4852]">{booking.name}</p>
+                          <p className="font-medium text-[var(--text-primary)]">{booking.name}</p>
                           {booking.phone && (
-                            <p className="text-sm text-[#6B7280]">{booking.phone}</p>
+                            <p className="text-sm text-[var(--text-secondary)]">{booking.phone}</p>
                           )}
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-sm text-[#6B7280]">{booking.email}</td>
+                      <td className="px-6 py-4 text-sm text-[var(--text-secondary)]">{booking.email}</td>
                       <td className="px-6 py-4">
                         <div>
-                          <p className="text-sm text-[#3D4852]">{formatDate(booking.date)}</p>
-                          <p className="text-xs text-[#6B7280]">
+                          <p className="text-sm text-[var(--text-primary)]">{formatDate(booking.date)}</p>
+                          <p className="text-xs text-[var(--text-secondary)]">
                             {booking.time} ({booking.timezone})
                           </p>
                         </div>
@@ -381,7 +379,7 @@ export function BookingsTab({ onPendingCountChange }: BookingsTabProps) {
                                 icon={<Check className="h-4 w-4" />}
                                 tooltip="Confirm"
                                 onClick={() => updateStatus(booking.id, 'CONFIRMED')}
-                                hoverColor="#38B2AC"
+                                hoverColor="var(--teal)"
                               />
                               <ActionButton
                                 icon={<X className="h-4 w-4" />}
@@ -397,7 +395,7 @@ export function BookingsTab({ onPendingCountChange }: BookingsTabProps) {
                               icon={<CheckCircle className="h-4 w-4" />}
                               tooltip="Complete"
                               onClick={() => updateStatus(booking.id, 'COMPLETED')}
-                              hoverColor="#3B82F6"
+                              hoverColor="var(--teal)"
                             />
                           )}
 
@@ -421,24 +419,22 @@ export function BookingsTab({ onPendingCountChange }: BookingsTabProps) {
               <button
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                 disabled={currentPage === 1}
-                className="p-3 rounded-2xl bg-[#E0E5EC] text-[#6B7280] hover:text-[#3B82F6] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="p-3 rounded-2xl bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:text-[var(--teal)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{
-                  boxShadow:
-                    '6px 6px 12px rgba(163,177,198,0.6), -6px -6px 12px rgba(255,255,255,0.5)',
+                  boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
                 }}
               >
                 <ChevronLeft className="h-5 w-5" />
               </button>
-              <span className="text-[#6B7280] font-medium">
+              <span className="text-[var(--text-secondary)] font-medium">
                 Page {currentPage} of {totalPages}
               </span>
               <button
                 onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                 disabled={currentPage === totalPages}
-                className="p-3 rounded-2xl bg-[#E0E5EC] text-[#6B7280] hover:text-[#3B82F6] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="p-3 rounded-2xl bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:text-[var(--teal)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{
-                  boxShadow:
-                    '6px 6px 12px rgba(163,177,198,0.6), -6px -6px 12px rgba(255,255,255,0.5)',
+                  boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
                 }}
               >
                 <ChevronRight className="h-5 w-5" />
@@ -465,7 +461,7 @@ export function BookingsTab({ onPendingCountChange }: BookingsTabProps) {
         }
       >
         <div className="py-4">
-          <p className="text-[#6B7280]">
+          <p className="text-[var(--text-secondary)]">
             This will permanently delete the booking and all associated data.
           </p>
         </div>
@@ -516,7 +512,7 @@ export function BookingsTab({ onPendingCountChange }: BookingsTabProps) {
         {selectedBooking && (
           <div className="py-4 space-y-4">
             <div className="flex items-center justify-between">
-              <span className="text-[#6B7280]">Status</span>
+              <span className="text-[var(--text-secondary)]">Status</span>
               <Badge variant={getStatusBadgeVariant(selectedBooking.status)}>
                 {selectedBooking.status}
               </Badge>
@@ -567,14 +563,13 @@ export function BookingsTab({ onPendingCountChange }: BookingsTabProps) {
             </div>
             {selectedBooking.notes && (
               <div
-                className="rounded-2xl p-4 bg-[#E0E5EC]"
+                className="rounded-2xl p-4 bg-[var(--bg-elevated)]"
                 style={{
-                  boxShadow:
-                    'inset 4px 4px 8px rgba(163,177,198,0.4), inset -4px -4px 8px rgba(255,255,255,0.4)',
+                  boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
                 }}
               >
-                <label className="text-[#6B7280] text-xs mb-2 block">Notes</label>
-                <p className="text-[#3D4852] text-sm">{selectedBooking.notes}</p>
+                <label className="text-[var(--text-secondary)] text-xs mb-2 block">Notes</label>
+                <p className="text-[var(--text-primary)] text-sm">{selectedBooking.notes}</p>
               </div>
             )}
           </div>

@@ -12,7 +12,7 @@ export function InteractionBreakdown({
 }) {
   if (loading) {
     return (
-      <Card className="p-6 bg-[#E0E5EC]">
+      <Card className="p-6 bg-[var(--bg-elevated)]">
         <div className="space-y-4">
           {[1, 2, 3, 4].map((item) => (
             <div key={item} className="space-y-2">
@@ -28,15 +28,15 @@ export function InteractionBreakdown({
   const total = data.reduce((sum, item) => sum + item.count, 0);
 
   return (
-    <Card className="p-6 bg-[#E0E5EC] space-y-5">
+    <Card className="p-6 bg-[var(--bg-elevated)] space-y-5">
       <div>
-        <h3 className="text-lg font-semibold text-[#3D4852]">Submission Types</h3>
-        <p className="text-sm text-[#6B7280]">
+        <h3 className="text-lg font-semibold text-[var(--text-primary)]">Submission Types</h3>
+        <p className="text-sm text-[var(--text-secondary)]">
           Normalized across contact, booking, guestbook, and NGL.
         </p>
       </div>
       {data.length === 0 ? (
-        <div className="rounded-[28px] neu-card-inset bg-[#E0E5EC] px-4 py-10 text-center text-sm text-[#6B7280]">
+        <div className="rounded-[28px] neu-card-inset bg-[var(--bg-elevated)] px-4 py-10 text-center text-sm text-[var(--text-secondary)]">
           No submissions yet.
         </div>
       ) : (
@@ -46,12 +46,12 @@ export function InteractionBreakdown({
             return (
               <div key={item.type} className="space-y-2">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="font-medium text-[#3D4852]">{item.label}</span>
-                  <span className="text-[#6B7280]">{item.count.toLocaleString()}</span>
+                  <span className="font-medium text-[var(--text-primary)]">{item.label}</span>
+                  <span className="text-[var(--text-secondary)]">{item.count.toLocaleString()}</span>
                 </div>
                 <div className="h-2 overflow-hidden rounded-full bg-[#D1D5DB]/30">
                   <div
-                    className="h-full rounded-full bg-gradient-to-r from-[#3B82F6] to-[#60A5FA]"
+                    className="h-full rounded-full bg-gradient-to-r from-[var(--teal)] to-[var(--amber)]"
                     style={{ width: `${percentage}%` }}
                   />
                 </div>

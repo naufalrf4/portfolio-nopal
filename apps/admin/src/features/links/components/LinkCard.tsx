@@ -17,9 +17,9 @@ export function LinkCard({ link, index, onEdit, onDelete, onToggleVisibility }: 
 
   return (
     <div
-      className="group relative rounded-[32px] bg-[#E0E5EC] p-6 transition-all duration-300 hover:-translate-y-1"
+      className="group relative rounded-[var(--radius-container)] bg-[var(--bg-elevated)] p-6 transition-all duration-300 hover:-translate-y-1"
       style={{
-        boxShadow: '9px 9px 16px rgba(163,177,198,0.6), -9px -9px 16px rgba(255,255,255,0.5)',
+        boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
         animationDelay: `${index * 50}ms`,
       }}
     >
@@ -28,7 +28,7 @@ export function LinkCard({ link, index, onEdit, onDelete, onToggleVisibility }: 
           className="w-14 h-14 rounded-2xl flex items-center justify-center"
           style={{
             background: `linear-gradient(135deg, ${color} 0%, ${color}CC 100%)`,
-            boxShadow: '5px 5px 10px rgba(163,177,198,0.6), -5px -5px 10px rgba(255,255,255,0.5)',
+            boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
           }}
         >
           <IconComponent className="h-7 w-7 text-white" />
@@ -38,7 +38,7 @@ export function LinkCard({ link, index, onEdit, onDelete, onToggleVisibility }: 
             <TooltipTrigger asChild>
               <button
                 onClick={onEdit}
-                className="p-2 rounded-xl bg-[#E0E5EC] text-[#6B7280] hover:text-[#3B82F6] transition-all duration-200 hover:shadow-[5px_5px_10px_rgba(163,177,198,0.6),-5px_-5px_10px_rgba(255,255,255,0.5)]"
+                className="p-2 rounded-xl bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:text-[var(--teal)] transition-all duration-200 hover:shadow-neu-extruded-sm"
               >
                 <Pencil className="h-4 w-4" />
               </button>
@@ -49,7 +49,7 @@ export function LinkCard({ link, index, onEdit, onDelete, onToggleVisibility }: 
             <TooltipTrigger asChild>
               <button
                 onClick={onDelete}
-                className="p-2 rounded-xl bg-[#E0E5EC] text-[#6B7280] hover:text-red-500 transition-all duration-200 hover:shadow-[5px_5px_10px_rgba(163,177,198,0.6),-5px_-5px_10px_rgba(255,255,255,0.5)]"
+                className="p-2 rounded-xl bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:text-red-500 transition-all duration-200 hover:shadow-neu-extruded-sm"
               >
                 <Trash2 className="h-4 w-4" />
               </button>
@@ -59,26 +59,26 @@ export function LinkCard({ link, index, onEdit, onDelete, onToggleVisibility }: 
         </div>
       </div>
 
-      <h3 className="font-display text-lg font-bold text-[#3D4852] mb-1">{link.label}</h3>
+      <h3 className="font-display text-lg font-bold text-[var(--text-primary)] mb-1">{link.label}</h3>
 
       <a
         href={link.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="text-sm text-[#6B7280] hover:text-[#3B82F6] flex items-center gap-1 mb-4 truncate"
+        className="text-sm text-[var(--text-secondary)] hover:text-[var(--teal)] flex items-center gap-1 mb-4 truncate"
       >
         <span className="truncate">{link.url}</span>
         <ExternalLink className="h-3 w-3 shrink-0" />
       </a>
 
-      <div className="flex items-center justify-between pt-4 border-t border-[#6B7280]/10">
+      <div className="flex items-center justify-between pt-4 border-t border-[var(--text-secondary)]/10">
         <div className="flex items-center gap-3">
           <Tooltip>
             <TooltipTrigger asChild>
               <button
                 onClick={onToggleVisibility}
                 className={`p-1.5 rounded-lg transition-colors ${
-                  link.visible ? 'text-[#38B2AC]' : 'text-[#6B7280]/40 hover:text-[#38B2AC]'
+                  link.visible ? 'text-[var(--teal)]' : 'text-[var(--text-secondary)]/40 hover:text-[var(--teal)]'
                 }`}
               >
                 {link.visible ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}

@@ -48,14 +48,14 @@ export function StatCard({
           >
             <div className={iconColor}>{icon}</div>
           </div>
-          <p className="text-2xl lg:hidden font-bold text-[#3D4852] tracking-tight font-[family-name:var(--font-plus-jakarta)]">
+          <p className="text-2xl lg:hidden font-bold text-[var(--text-primary)] tracking-tight font-[family-name:var(--font-plus-jakarta)]">
             {total}
           </p>
         </div>
 
         <div className="lg:flex-1 lg:min-w-0">
-          <p className="text-xs lg:text-sm font-medium text-[#6B7280] mb-1 lg:mb-1">{title}</p>
-          <p className="hidden lg:block text-3xl font-bold text-[#3D4852] tracking-tight font-[family-name:var(--font-plus-jakarta)]">
+          <p className="text-xs lg:text-sm font-medium text-[var(--text-secondary)] mb-1 lg:mb-1">{title}</p>
+          <p className="hidden lg:block text-3xl font-bold text-[var(--text-primary)] tracking-tight font-[family-name:var(--font-plus-jakarta)]">
             {total}
           </p>
 
@@ -65,8 +65,8 @@ export function StatCard({
                 <span
                   className={`w-1.5 h-1.5 lg:w-2 lg:h-2 rounded-full ${getVariantStyles(primaryStat.variant)}`}
                 />
-                <span className="text-xs text-[#6B7280]">
-                  <span className="font-semibold text-[#3D4852]">{primaryStat.value}</span>{' '}
+                <span className="text-xs text-[var(--text-secondary)]">
+                  <span className="font-semibold text-[var(--text-primary)]">{primaryStat.value}</span>{' '}
                   {primaryStat.label}
                 </span>
               </div>
@@ -75,8 +75,8 @@ export function StatCard({
                   <span
                     className={`w-2 h-2 rounded-full ${getVariantStyles(secondaryStat.variant)}`}
                   />
-                  <span className="text-xs text-[#6B7280]">
-                    <span className="font-semibold text-[#3D4852]">{secondaryStat.value}</span>{' '}
+                  <span className="text-xs text-[var(--text-secondary)]">
+                    <span className="font-semibold text-[var(--text-primary)]">{secondaryStat.value}</span>{' '}
                     {secondaryStat.label}
                   </span>
                 </div>

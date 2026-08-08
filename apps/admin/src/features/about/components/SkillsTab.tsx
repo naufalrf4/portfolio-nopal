@@ -145,8 +145,8 @@ export function SkillsTab() {
       <CardContent className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-semibold text-[#3D4852]">Skills</h3>
-            <p className="text-sm text-[#6B7280]">
+            <h3 className="text-lg font-semibold text-[var(--text-primary)]">Skills</h3>
+            <p className="text-sm text-[var(--text-secondary)]">
               Add your skills. Click &quot;Save Changes&quot; to save.
             </p>
           </div>
@@ -158,7 +158,7 @@ export function SkillsTab() {
               onClick={handleSave}
               disabled={!hasUnsavedChanges || saving}
               size="sm"
-              className="bg-[#3B82F6] hover:bg-[#2563EB] text-white disabled:bg-gray-300 disabled:text-gray-500"
+              className="bg-[var(--teal)] hover:bg-[#2563EB] text-white disabled:bg-gray-300 disabled:text-gray-500"
             >
               {saving && <Loader2 className="h-4 w-4 animate-spin" />}
               {saving ? 'Saving...' : 'Save Changes'}
@@ -173,7 +173,7 @@ export function SkillsTab() {
               Add Group
             </Button>
           </div>
-          <p className="text-xs text-[#6B7280]">
+          <p className="text-xs text-[var(--text-secondary)]">
             Add a category label, then list skills separated by commas. Example: React, Next.js,
             TypeScript.
           </p>
@@ -181,7 +181,7 @@ export function SkillsTab() {
             {skillGroups.map((group, index) => (
               <div
                 key={`${group.category || 'group'}-${index}`}
-                className="grid gap-3 rounded-2xl border border-[#A3B1C6]/15 bg-[#E0E5EC]/70 p-4 md:grid-cols-[220px_minmax(0,1fr)_auto]"
+                className="grid gap-3 rounded-2xl border border-[#A3B1C6]/15 bg-[var(--bg-elevated)]/70 p-4 md:grid-cols-[220px_minmax(0,1fr)_auto]"
               >
                 <Input
                   value={group.category}
@@ -212,19 +212,19 @@ export function SkillsTab() {
             <div className="space-y-4 mt-3">
               {groupedCategories.map((category) => (
                 <div key={category} className="space-y-2">
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#6B7280]">
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-secondary)]">
                     {category}
                   </p>
                   <div className="flex flex-wrap gap-2">
                     {groupedSkills[category].map((skill) => (
                       <div
                         key={`${skill.category}-${skill.name}`}
-                        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#E0E5EC] text-[#3D4852] text-sm shadow-[3px_3px_6px_rgba(163,177,198,0.6),-3px_-3px_6px_rgba(255,255,255,0.5)]"
+                        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[var(--bg-elevated)] text-[var(--text-primary)] text-sm shadow-neu-extruded"
                       >
                         <span className="font-medium">{skill.name}</span>
                         <button
                           onClick={() => removeSkill(skill.name, category)}
-                          className="text-[#6B7280] hover:text-red-500 transition-colors"
+                          className="text-[var(--text-secondary)] hover:text-red-500 transition-colors"
                           aria-label={`Remove ${skill.name}`}
                         >
                           <X className="h-3 w-3" />

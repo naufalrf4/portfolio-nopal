@@ -115,12 +115,12 @@ export function ImageUploader({
     <div className="w-full">
       <div
         className={cn(
-          'relative rounded-[32px] border-2 border-dashed p-8',
+          'relative rounded-[var(--radius-container)] border-2 border-dashed p-8',
           'transition-all duration-300',
-          'bg-[#E0E5EC]',
+          'bg-[var(--bg-elevated)]',
           dragActive
-            ? 'border-[#3B82F6] bg-[#3B82F6]/5'
-            : 'border-[#6B7280]/30 hover:border-[#3B82F6]/50',
+            ? 'border-[var(--teal)] bg-[var(--teal)]/5'
+            : 'border-[var(--text-secondary)]/30 hover:border-[var(--teal)]/50',
           (disabled || uploading) && 'opacity-50 cursor-not-allowed',
           !disabled && !uploading && 'cursor-pointer'
         )}
@@ -143,26 +143,26 @@ export function ImageUploader({
         <div className="flex flex-col items-center justify-center gap-4">
           {uploading ? (
             <>
-              <Loader2 className="h-12 w-12 animate-spin text-[#3B82F6]" />
-              <p className="text-[#3D4852] font-medium">Uploading...</p>
+              <Loader2 className="h-12 w-12 animate-spin text-[var(--teal)]" />
+              <p className="text-[var(--text-primary)] font-medium">Uploading...</p>
             </>
           ) : (
             <>
               <div
                 className={cn(
                   'rounded-full p-4',
-                  'bg-[#E0E5EC]',
-                  'shadow-[9px_9px_16px_rgba(163,177,198,0.6),-9px_-9px_16px_rgba(255,255,255,0.5)]'
+                  'bg-[var(--bg-elevated)]',
+                  'shadow-neu-extruded'
                 )}
               >
-                <Upload className="h-8 w-8 text-[#3B82F6]" />
+                <Upload className="h-8 w-8 text-[var(--teal)]" />
               </div>
               <div className="text-center">
-                <p className="text-[#3D4852] font-medium mb-1">
+                <p className="text-[var(--text-primary)] font-medium mb-1">
                   {multiple ? 'Upload images' : 'Upload image'}
                 </p>
-                <p className="text-[#6B7280] text-sm">Drag and drop or click to browse</p>
-                <p className="text-[#6B7280] text-xs mt-1">Max size: {maxSize / 1024 / 1024}MB</p>
+                <p className="text-[var(--text-secondary)] text-sm">Drag and drop or click to browse</p>
+                <p className="text-[var(--text-secondary)] text-xs mt-1">Max size: {maxSize / 1024 / 1024}MB</p>
               </div>
             </>
           )}

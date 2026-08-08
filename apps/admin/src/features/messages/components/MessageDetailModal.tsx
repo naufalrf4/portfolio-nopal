@@ -103,9 +103,9 @@ export function MessageDetailModal({
                 className="flex-1 sm:flex-auto"
               >
                 {isGenerating ? (
-                  <Loader2 className="h-4 w-4 sm:mr-2 text-[#3B82F6]" />
+                  <Loader2 className="h-4 w-4 sm:mr-2 text-[var(--teal)]" />
                 ) : (
-                  <Instagram className="h-4 w-4 sm:mr-2 text-[#3B82F6]" />
+                  <Instagram className="h-4 w-4 sm:mr-2 text-[var(--teal)]" />
                 )}
                 <span className="hidden sm:inline">Instagram</span>
               </Button>
@@ -116,9 +116,9 @@ export function MessageDetailModal({
                 className="flex-1 sm:flex-auto"
               >
                 {isGenerating ? (
-                  <Loader2 className="h-4 w-4 sm:mr-2 text-[#3B82F6]" />
+                  <Loader2 className="h-4 w-4 sm:mr-2 text-[var(--teal)]" />
                 ) : (
-                  <Download className="h-4 w-4 sm:mr-2 text-[#3B82F6]" />
+                  <Download className="h-4 w-4 sm:mr-2 text-[var(--teal)]" />
                 )}
                 <span className="hidden sm:inline">Download</span>
               </Button>
@@ -148,38 +148,38 @@ export function MessageDetailModal({
     >
       {message && (
         <div className="space-y-4">
-          <div className="neu-inset rounded-2xl p-4 sm:p-6 bg-[#E0E5EC]">
-            <p className="text-base sm:text-lg text-[#3D4852] whitespace-pre-wrap break-words leading-relaxed">
+          <div className="neu-inset rounded-2xl p-4 sm:p-6 bg-[var(--bg-elevated)]">
+            <p className="text-base sm:text-lg text-[var(--text-primary)] whitespace-pre-wrap break-words leading-relaxed">
               {message.content}
             </p>
           </div>
 
           <div className="space-y-3">
             <div className="flex items-center gap-2">
-              <Shield className="h-4 w-4 text-[#6B7280]" />
-              <h5 className="text-xs sm:text-sm font-semibold text-[#3D4852]">
+              <Shield className="h-4 w-4 text-[var(--text-secondary)]" />
+              <h5 className="text-xs sm:text-sm font-semibold text-[var(--text-primary)]">
                 Security Information
               </h5>
             </div>
-            <div className="neu-inset rounded-xl p-3 sm:p-4 bg-[#E0E5EC]">
+            <div className="neu-inset rounded-xl p-3 sm:p-4 bg-[var(--bg-elevated)]">
               <div className="flex flex-col gap-3">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                  <span className="text-xs sm:text-sm text-[#6B7280]">IP Hash:</span>
-                  <code className="text-xs font-mono bg-[#d4dce6] px-2 py-1 rounded text-[#3D4852] break-all">
+                  <span className="text-xs sm:text-sm text-[var(--text-secondary)]">IP Hash:</span>
+                  <code className="text-xs font-mono bg-[#d4dce6] px-2 py-1 rounded text-[var(--text-primary)] break-all">
                     ...{message.ipHash.substring(message.ipHash.length - 12)}
                   </code>
                 </div>
                 <Separator className="bg-[#d4dce6]" />
                 <div className="flex items-center justify-between gap-2">
-                  <span className="text-xs sm:text-sm text-[#6B7280]">Status:</span>
+                  <span className="text-xs sm:text-sm text-[var(--text-secondary)]">Status:</span>
                   <Badge variant={message.read ? 'outline' : 'default'} className="text-xs">
                     {message.read ? 'Read' : 'Unread'}
                   </Badge>
                 </div>
                 <Separator className="bg-[#d4dce6]" />
                 <div className="flex items-center justify-between gap-2">
-                  <span className="text-xs sm:text-sm text-[#6B7280]">Received:</span>
-                  <span className="text-xs sm:text-sm text-[#3D4852] font-medium">
+                  <span className="text-xs sm:text-sm text-[var(--text-secondary)]">Received:</span>
+                  <span className="text-xs sm:text-sm text-[var(--text-primary)] font-medium">
                     {formatDateTime(message.createdAt)}
                   </span>
                 </div>
@@ -190,12 +190,12 @@ export function MessageDetailModal({
           {message.country && (
             <div className="space-y-3">
               <div className="flex items-center gap-2">
-                <MapPin className="h-4 w-4 text-[#6B7280]" />
-                <h5 className="text-xs sm:text-sm font-semibold text-[#3D4852]">Location</h5>
+                <MapPin className="h-4 w-4 text-[var(--text-secondary)]" />
+                <h5 className="text-xs sm:text-sm font-semibold text-[var(--text-primary)]">Location</h5>
               </div>
-              <div className="neu-extruded rounded-xl p-3 sm:p-4 bg-[#E0E5EC]">
+              <div className="neu-extruded rounded-xl p-3 sm:p-4 bg-[var(--bg-elevated)]">
                 <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-                  <div className="w-12 h-12 rounded-full flex items-center justify-center neu-inset bg-[#E0E5EC]">
+                  <div className="w-12 h-12 rounded-full flex items-center justify-center neu-inset bg-[var(--bg-elevated)]">
                     {message.countryCode && (
                       <span className="text-2xl">
                         {message.countryCode === 'US'
@@ -252,11 +252,11 @@ export function MessageDetailModal({
                   </div>
                   <div className="flex-1">
                     <div className="flex flex-col gap-1">
-                      <span className="text-base font-semibold text-[#3D4852]">
+                      <span className="text-base font-semibold text-[var(--text-primary)]">
                         {message.country}
                       </span>
                       {message.city && (
-                        <span className="text-sm text-[#6B7280]">
+                        <span className="text-sm text-[var(--text-secondary)]">
                           {message.city}
                           {message.region && `, ${message.region}`}
                         </span>
@@ -264,7 +264,7 @@ export function MessageDetailModal({
                     </div>
                   </div>
                   <div className="flex-shrink-0">
-                    <Shield className="h-5 w-5 text-[#6B7280]" />
+                    <Shield className="h-5 w-5 text-[var(--text-secondary)]" />
                   </div>
                 </div>
               </div>

@@ -13,9 +13,9 @@ const TabsList = React.forwardRef<
   <TabsPrimitive.List
     ref={ref}
     className={cn(
-      'flex h-auto items-center justify-start rounded-[24px] p-1',
-      'bg-[#E0E5EC]',
-      'shadow-[inset_3px_3px_6px_rgba(163,177,198,0.4),inset_-3px_-3px_6px_rgba(255,255,255,0.4)]',
+      'flex h-auto items-center justify-start rounded-[var(--radius-base)] p-1',
+      'bg-[var(--bg-elevated)]',
+      'shadow-neu-extruded',
       'overflow-x-auto scrollbar-hide',
       'gap-1',
       className
@@ -34,11 +34,11 @@ const TabsTrigger = React.forwardRef<
     className={cn(
       'inline-flex items-center justify-center whitespace-nowrap rounded-[16px] px-3 py-2',
       'text-sm font-medium transition-all flex-shrink-0',
-      'text-[#6B7280]',
+      'text-[var(--text-secondary)]',
       'disabled:pointer-events-none disabled:opacity-50',
-      'data-[state=active]:text-[#3B82F6] data-[state=active]:bg-[#E0E5EC]',
-      'data-[state=active]:shadow-[3px_3px_6px_rgba(163,177,198,0.6),-3px_-3px_6px_rgba(255,255,255,0.5)]',
-      'hover:text-[#3D4852]',
+      'data-[state=active]:text-[var(--teal)] data-[state=active]:bg-[var(--bg-elevated)]',
+      'data-[state=active]:shadow-neu-extruded',
+      'hover:text-[var(--text-primary)]',
       className
     )}
     {...props}

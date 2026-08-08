@@ -30,7 +30,7 @@ export function ContactTable({
 
   return (
     <div
-      className="rounded-[32px] overflow-hidden bg-[#E0E5EC]"
+      className="rounded-[var(--radius-container)] overflow-hidden bg-[var(--bg-elevated)]"
       style={{
         boxShadow:
           '12px 12px 24px rgba(163, 177, 198, 0.6), -12px -12px 24px rgba(255, 255, 255, 0.5)',
@@ -43,12 +43,12 @@ export function ContactTable({
               <th className="px-6 py-4 text-left">
                 <Checkbox checked={isAllSelected} onCheckedChange={onSelectAll} />
               </th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-[#3D4852]">Status</th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-[#3D4852]">Name</th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-[#3D4852]">Email</th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-[#3D4852]">Subject</th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-[#3D4852]">Date</th>
-              <th className="px-6 py-4 text-center text-sm font-semibold text-[#3D4852]">
+              <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">Status</th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">Name</th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">Email</th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">Subject</th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">Date</th>
+              <th className="px-6 py-4 text-center text-sm font-semibold text-[var(--text-primary)]">
                 Actions
               </th>
             </tr>
@@ -59,7 +59,7 @@ export function ContactTable({
                 <tr
                   className={cn(
                     'border-b border-[#A3B1C6]/10 last:border-0 cursor-pointer transition-colors',
-                    !contact.read && 'bg-[#3B82F6]/5'
+                    !contact.read && 'bg-[var(--teal)]/5'
                   )}
                   onClick={(e) => {
                     if ((e.target as HTMLElement).closest('button, input')) return;
@@ -95,18 +95,18 @@ export function ContactTable({
                   </td>
                   <td className="px-6 py-4">
                     <p
-                      className={cn('font-medium text-[#3D4852]', !contact.read && 'font-semibold')}
+                      className={cn('font-medium text-[var(--text-primary)]', !contact.read && 'font-semibold')}
                     >
                       {contact.name}
                     </p>
                   </td>
-                  <td className="px-6 py-4 text-sm text-[#6B7280]">{contact.email}</td>
+                  <td className="px-6 py-4 text-sm text-[var(--text-secondary)]">{contact.email}</td>
                   <td className="px-6 py-4">
-                    <p className="text-sm text-[#3D4852] line-clamp-1">
-                      {contact.subject || <span className="italic text-[#6B7280]">No subject</span>}
+                    <p className="text-sm text-[var(--text-primary)] line-clamp-1">
+                      {contact.subject || <span className="italic text-[var(--text-secondary)]">No subject</span>}
                     </p>
                   </td>
-                  <td className="px-6 py-4 text-sm text-[#6B7280]">
+                  <td className="px-6 py-4 text-sm text-[var(--text-secondary)]">
                     {new Date(contact.createdAt).toLocaleDateString('en-US', {
                       month: 'short',
                       day: 'numeric',
@@ -122,7 +122,7 @@ export function ContactTable({
                               e.stopPropagation();
                               onView(contact.id);
                             }}
-                            className="p-2 rounded-xl bg-[#E0E5EC] text-[#6B7280] hover:text-[#3B82F6] transition-colors"
+                            className="p-2 rounded-xl bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:text-[var(--teal)] transition-colors"
                           >
                             <Eye className="h-4 w-4" />
                           </button>
@@ -136,7 +136,7 @@ export function ContactTable({
                               e.stopPropagation();
                               onToggleRead(contact);
                             }}
-                            className="p-2 rounded-xl bg-[#E0E5EC] text-[#6B7280] hover:text-[#38B2AC] transition-colors"
+                            className="p-2 rounded-xl bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:text-[var(--teal)] transition-colors"
                           >
                             {contact.read ? (
                               <EyeOff className="h-4 w-4" />
@@ -156,7 +156,7 @@ export function ContactTable({
                               e.stopPropagation();
                               onDelete(contact);
                             }}
-                            className="p-2 rounded-xl bg-[#E0E5EC] text-[#6B7280] hover:text-red-500 transition-colors"
+                            className="p-2 rounded-xl bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:text-red-500 transition-colors"
                           >
                             <Trash2 className="h-4 w-4" />
                           </button>

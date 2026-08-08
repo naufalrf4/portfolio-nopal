@@ -11,14 +11,13 @@ interface DetailFieldProps {
 export function DetailField({ label, value }: DetailFieldProps) {
   return (
     <div
-      className="rounded-xl p-3 bg-[#E0E5EC]"
+      className="rounded-xl p-3 bg-[var(--bg-elevated)]"
       style={{
-        boxShadow:
-          'inset 3px 3px 6px rgba(163,177,198,0.4), inset -3px -3px 6px rgba(255,255,255,0.4)',
+        boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
       }}
     >
-      <Label className="text-[#6B7280] text-xs mb-1 block">{label}</Label>
-      <p className="text-[#3D4852] text-sm font-medium">{value}</p>
+      <Label className="text-[var(--text-secondary)] text-xs mb-1 block">{label}</Label>
+      <p className="text-[var(--text-primary)] text-sm font-medium">{value}</p>
     </div>
   );
 }

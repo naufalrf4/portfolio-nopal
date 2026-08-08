@@ -128,27 +128,27 @@ export function FreelanceToolPanel() {
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="grid gap-4 md:grid-cols-3">
-            <div className="rounded-2xl bg-[#E9EEF5] p-4 shadow-[inset_4px_4px_10px_rgba(163,177,198,0.24),inset_-4px_-4px_10px_rgba(255,255,255,0.32)]">
-              <div className="text-xs uppercase tracking-[0.16em] text-[#6B7280]">Hourly Rate</div>
+            <div className="rounded-2xl bg-[#E9EEF5] p-4 shadow-neu-extruded">
+              <div className="text-xs uppercase tracking-[0.16em] text-[var(--text-secondary)]">Hourly Rate</div>
               <div className="mt-2 text-2xl font-bold text-[#2563EB]">
                 {draft.hourlyRate
                   ? `${draft.currency || 'IDR'} ${draft.hourlyRate.toLocaleString('en-US')}`
                   : 'Not set'}
               </div>
             </div>
-            <div className="rounded-2xl bg-[#E9EEF5] p-4 shadow-[inset_4px_4px_10px_rgba(163,177,198,0.24),inset_-4px_-4px_10px_rgba(255,255,255,0.32)]">
-              <div className="text-xs uppercase tracking-[0.16em] text-[#6B7280]">
+            <div className="rounded-2xl bg-[#E9EEF5] p-4 shadow-neu-extruded">
+              <div className="text-xs uppercase tracking-[0.16em] text-[var(--text-secondary)]">
                 Completed Jobs
               </div>
               <div className="mt-2 text-2xl font-bold text-[#2563EB]">
                 {draft.completedProjects ?? 0}
               </div>
             </div>
-            <div className="rounded-2xl bg-[#E9EEF5] p-4 shadow-[inset_4px_4px_10px_rgba(163,177,198,0.24),inset_-4px_-4px_10px_rgba(255,255,255,0.32)]">
-              <div className="text-xs uppercase tracking-[0.16em] text-[#6B7280]">
+            <div className="rounded-2xl bg-[#E9EEF5] p-4 shadow-neu-extruded">
+              <div className="text-xs uppercase tracking-[0.16em] text-[var(--text-secondary)]">
                 Intent Assets
               </div>
-              <div className="mt-2 flex items-center gap-3 text-sm text-[#3D4852]">
+              <div className="mt-2 flex items-center gap-3 text-sm text-[var(--text-primary)]">
                 <span>{featureCount} feature refs</span>
                 <span>{projectCount} project refs</span>
               </div>
@@ -157,7 +157,7 @@ export function FreelanceToolPanel() {
 
           <div className="grid gap-4 md:grid-cols-3">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-[#3D4852]">Hourly Rate</label>
+              <label className="text-sm font-medium text-[var(--text-primary)]">Hourly Rate</label>
               <Input
                 inputMode="decimal"
                 value={draft.hourlyRate ?? ''}
@@ -171,7 +171,7 @@ export function FreelanceToolPanel() {
               />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium text-[#3D4852]">Currency</label>
+              <label className="text-sm font-medium text-[var(--text-primary)]">Currency</label>
               <Input
                 value={draft.currency ?? 'IDR'}
                 onChange={(event) =>
@@ -184,7 +184,7 @@ export function FreelanceToolPanel() {
               />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium text-[#3D4852]">Completed Projects</label>
+              <label className="text-sm font-medium text-[var(--text-primary)]">Completed Projects</label>
               <Input
                 inputMode="numeric"
                 value={draft.completedProjects ?? ''}
@@ -200,7 +200,7 @@ export function FreelanceToolPanel() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-[#3D4852]">Pricing Notes</label>
+            <label className="text-sm font-medium text-[var(--text-primary)]">Pricing Notes</label>
             <Textarea
               value={draft.pricingNotes ?? ''}
               onChange={(event) =>
@@ -246,7 +246,7 @@ export function FreelanceToolPanel() {
         </CardHeader>
         <CardContent className="space-y-4">
           {(draft.featurePricing ?? []).length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-[#C9D4E3] px-4 py-6 text-sm text-[#6B7280]">
+            <div className="rounded-2xl border border-dashed border-[#C9D4E3] px-4 py-6 text-sm text-[var(--text-secondary)]">
               No feature references yet. Add the scoped features you quote often so the pricing tool
               can stay deterministic.
             </div>
@@ -255,10 +255,10 @@ export function FreelanceToolPanel() {
           {(draft.featurePricing ?? []).map((item, index) => (
             <div
               key={`feature-${index}`}
-              className="rounded-[28px] border border-[#D5DEE9] p-4 shadow-[inset_3px_3px_8px_rgba(163,177,198,0.16),inset_-3px_-3px_8px_rgba(255,255,255,0.24)]"
+              className="rounded-[28px] border border-[#D5DEE9] p-4 shadow-neu-extruded"
             >
               <div className="mb-4 flex items-center justify-between gap-3">
-                <div className="flex items-center gap-2 text-sm font-semibold text-[#3D4852]">
+                <div className="flex items-center gap-2 text-sm font-semibold text-[var(--text-primary)]">
                   <Sparkles className="h-4 w-4 text-[#2563EB]" />
                   Reference #{index + 1}
                 </div>
@@ -280,7 +280,7 @@ export function FreelanceToolPanel() {
               </div>
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-[#3D4852]">Feature Name</label>
+                  <label className="text-sm font-medium text-[var(--text-primary)]">Feature Name</label>
                   <Input
                     value={item.feature}
                     onChange={(event) =>
@@ -293,7 +293,7 @@ export function FreelanceToolPanel() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-[#3D4852]">Reference Price</label>
+                  <label className="text-sm font-medium text-[var(--text-primary)]">Reference Price</label>
                   <Input
                     inputMode="decimal"
                     value={item.price ?? ''}
@@ -309,7 +309,7 @@ export function FreelanceToolPanel() {
               </div>
               <div className="mt-4 grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-[#3D4852]">
+                  <label className="text-sm font-medium text-[var(--text-primary)]">
                     Related Project Slugs
                   </label>
                   <Input
@@ -327,7 +327,7 @@ export function FreelanceToolPanel() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-[#3D4852]">Notes</label>
+                  <label className="text-sm font-medium text-[var(--text-primary)]">Notes</label>
                   <Textarea
                     value={item.notes ?? ''}
                     onChange={(event) =>
@@ -373,7 +373,7 @@ export function FreelanceToolPanel() {
         </CardHeader>
         <CardContent className="space-y-4">
           {(draft.projectReferences ?? []).length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-[#C9D4E3] px-4 py-6 text-sm text-[#6B7280]">
+            <div className="rounded-2xl border border-dashed border-[#C9D4E3] px-4 py-6 text-sm text-[var(--text-secondary)]">
               No project references yet. Add project slugs here so quote workflows can mention the
               most relevant portfolio examples without loading every future intent dataset.
             </div>
@@ -382,10 +382,10 @@ export function FreelanceToolPanel() {
           {(draft.projectReferences ?? []).map((item, index) => (
             <div
               key={`project-reference-${index}`}
-              className="rounded-[28px] border border-[#D5DEE9] p-4 shadow-[inset_3px_3px_8px_rgba(163,177,198,0.16),inset_-3px_-3px_8px_rgba(255,255,255,0.24)]"
+              className="rounded-[28px] border border-[#D5DEE9] p-4 shadow-neu-extruded"
             >
               <div className="mb-4 flex items-center justify-between gap-3">
-                <div className="text-sm font-semibold text-[#3D4852]">Project #{index + 1}</div>
+                <div className="text-sm font-semibold text-[var(--text-primary)]">Project #{index + 1}</div>
                 <Button
                   type="button"
                   variant="ghost"
@@ -404,7 +404,7 @@ export function FreelanceToolPanel() {
               </div>
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-[#3D4852]">Project Slug</label>
+                  <label className="text-sm font-medium text-[var(--text-primary)]">Project Slug</label>
                   <Input
                     value={item.slug}
                     onChange={(event) =>
@@ -417,7 +417,7 @@ export function FreelanceToolPanel() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-[#3D4852]">Display Title</label>
+                  <label className="text-sm font-medium text-[var(--text-primary)]">Display Title</label>
                   <Input
                     value={item.title}
                     onChange={(event) =>
@@ -431,7 +431,7 @@ export function FreelanceToolPanel() {
                 </div>
               </div>
               <div className="mt-4 space-y-2">
-                <label className="text-sm font-medium text-[#3D4852]">Notes</label>
+                <label className="text-sm font-medium text-[var(--text-primary)]">Notes</label>
                 <Textarea
                   value={item.notes ?? ''}
                   onChange={(event) =>

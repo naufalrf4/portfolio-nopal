@@ -10,14 +10,14 @@ interface ImageGeneratorOptions {
 }
 
 const COLORS = {
-  background: '#E0E5EC',
-  surface: '#E0E5EC',
-  text: '#3D4852',
-  textMuted: '#6B7280',
+  background: 'var(--bg-elevated)',
+  surface: 'var(--bg-elevated)',
+  text: 'var(--text-primary)',
+  textMuted: 'var(--text-secondary)',
   textSubtle: '#A0AEC0',
-  accent: '#3B82F6',
-  accentLight: '#60A5FA',
-  accentGradient: 'linear-gradient(135deg, #3B82F6 0%, #60A5FA 100%)',
+  accent: 'var(--teal)',
+  accentLight: 'var(--amber)',
+  accentGradient: 'linear-gradient(135deg, var(--teal) 0%, var(--amber) 100%)',
   white: '#FFFFFF',
   shadow: {
     dark: 'rgb(163, 177, 198, 0.6)',
@@ -207,7 +207,7 @@ export async function generateMessageImage({
             left: 28px;
             right: 28px;
             height: 40%;
-            background: linear-gradient(180deg, rgba(255,255,255,0.4) 0%, transparent 100%);
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0.3) 0%, transparent 100%);
             border-radius: 9999px 9999px 50% 50%;
           }
 

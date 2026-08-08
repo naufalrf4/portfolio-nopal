@@ -124,14 +124,14 @@ export function ChatLogsTable({ logs, loading, onDelete }: ChatLogsTableProps) {
         <div
           className={cn(
             'mx-auto w-16 h-16 rounded-full flex items-center justify-center mb-4',
-            'bg-[#E0E5EC]',
-            '[box-shadow:inset_6px_6px_10px_rgba(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)]'
+            'bg-[var(--bg-elevated)]',
+            'shadow-neu-inset'
           )}
         >
-          <MessageSquare className="h-8 w-8 text-[#6B7280]" />
+          <MessageSquare className="h-8 w-8 text-[var(--text-secondary)]" />
         </div>
-        <h3 className="text-lg font-semibold text-[#3D4852] mb-2">No Chat Logs</h3>
-        <p className="text-[#6B7280]">
+        <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-2">No Chat Logs</h3>
+        <p className="text-[var(--text-secondary)]">
           Chat conversations will appear here when users interact with the AI assistant.
         </p>
       </Card>
@@ -144,39 +144,39 @@ export function ChatLogsTable({ logs, loading, onDelete }: ChatLogsTableProps) {
         <Table>
           <TableHeader>
             <TableRow className="border-b border-[#D1D9E6]">
-              <TableHead className="text-[#6B7280]">Session ID</TableHead>
-              <TableHead className="text-[#6B7280]">Messages</TableHead>
-              <TableHead className="text-[#6B7280]">Last Activity</TableHead>
-              <TableHead className="text-[#6B7280] hidden md:table-cell">Created</TableHead>
-              <TableHead className="text-[#6B7280] text-right">Actions</TableHead>
+              <TableHead className="text-[var(--text-secondary)]">Session ID</TableHead>
+              <TableHead className="text-[var(--text-secondary)]">Messages</TableHead>
+              <TableHead className="text-[var(--text-secondary)]">Last Activity</TableHead>
+              <TableHead className="text-[var(--text-secondary)] hidden md:table-cell">Created</TableHead>
+              <TableHead className="text-[var(--text-secondary)] text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {logs.map((log) => (
               <TableRow
                 key={log.id}
-                className="border-b border-[#D1D9E6]/50 hover:bg-[#E0E5EC]/50 transition-colors cursor-pointer"
+                className="border-b border-[#D1D9E6]/50 hover:bg-[var(--bg-elevated)]/50 transition-colors cursor-pointer"
                 onClick={() => router.push(`/chat-logs/${log.id}`)}
               >
-                <TableCell className="font-mono text-sm text-[#3D4852]">
+                <TableCell className="font-mono text-sm text-[var(--text-primary)]">
                   <div className="flex items-center gap-2">
-                    <Hash className="h-4 w-4 text-[#3B82F6]" />
+                    <Hash className="h-4 w-4 text-[var(--teal)]" />
                     {truncateSessionId(log.sessionId)}
                   </div>
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    <MessageSquare className="h-4 w-4 text-[#6B7280]" />
-                    <span className="text-[#3D4852] font-medium">{log.messageCount}</span>
+                    <MessageSquare className="h-4 w-4 text-[var(--text-secondary)]" />
+                    <span className="text-[var(--text-primary)] font-medium">{log.messageCount}</span>
                   </div>
                 </TableCell>
                 <TableCell>
-                  <div className="flex items-center gap-2 text-[#6B7280] text-sm">
+                  <div className="flex items-center gap-2 text-[var(--text-secondary)] text-sm">
                     <Clock className="h-4 w-4" />
                     {formatRelativeTime(log.lastMessageAt || log.updatedAt)}
                   </div>
                 </TableCell>
-                <TableCell className="text-[#6B7280] text-sm hidden md:table-cell">
+                <TableCell className="text-[var(--text-secondary)] text-sm hidden md:table-cell">
                   {formatDate(log.createdAt)}
                 </TableCell>
                 <TableCell>

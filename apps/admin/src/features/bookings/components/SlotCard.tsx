@@ -35,7 +35,7 @@ export function SlotCard({ slot, onEdit, onDelete, onToggle }: SlotCardProps) {
       </div>
 
       {isBooked && slot.bookerName && (
-        <p className="text-xs text-[#6B7280] mb-2 truncate">{slot.bookerName}</p>
+        <p className="text-xs text-[var(--text-secondary)] mb-2 truncate">{slot.bookerName}</p>
       )}
 
       <div className="flex items-center gap-1">
@@ -43,7 +43,7 @@ export function SlotCard({ slot, onEdit, onDelete, onToggle }: SlotCardProps) {
           <>
             <button
               onClick={onToggle}
-              className="p-1.5 rounded-lg bg-[#E0E5EC] text-[#6B7280] hover:text-[#3B82F6] transition-colors"
+              className="p-1.5 rounded-lg bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:text-[var(--teal)] transition-colors"
               style={NEUMORPHIC_STYLES.buttonMicro}
               title={slot.status === 'AVAILABLE' ? 'Block' : 'Unblock'}
             >
@@ -51,7 +51,7 @@ export function SlotCard({ slot, onEdit, onDelete, onToggle }: SlotCardProps) {
             </button>
             <button
               onClick={onEdit}
-              className="p-1.5 rounded-lg bg-[#E0E5EC] text-[#6B7280] hover:text-[#3B82F6] transition-colors"
+              className="p-1.5 rounded-lg bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:text-[var(--teal)] transition-colors"
               style={NEUMORPHIC_STYLES.buttonMicro}
               title="Edit"
             >
@@ -61,7 +61,7 @@ export function SlotCard({ slot, onEdit, onDelete, onToggle }: SlotCardProps) {
         )}
         <button
           onClick={onDelete}
-          className="p-1.5 rounded-lg bg-[#E0E5EC] text-[#6B7280] hover:text-red-500 transition-colors"
+          className="p-1.5 rounded-lg bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:text-red-500 transition-colors"
           style={NEUMORPHIC_STYLES.buttonMicro}
           title="Delete"
         >

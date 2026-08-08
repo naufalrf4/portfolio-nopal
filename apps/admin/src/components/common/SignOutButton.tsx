@@ -4,10 +4,10 @@ import { signOut } from 'next-auth/react';
 import { LogOut } from 'lucide-react';
 
 const neuStyles = {
-  background: '#E0E5EC',
-  foreground: '#3D4852',
-  blue: '#3B82F6',
-  extruded: '6px 6px 12px rgba(163,177,198,0.6), -6px -6px 12px rgba(255,255,255,0.5)',
+  background: 'var(--bg-elevated)',
+  foreground: 'var(--text-primary)',
+  blue: 'var(--teal)',
+  extruded: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
 };
 
 export function SignOutButton() {
@@ -22,7 +22,7 @@ export function SignOutButton() {
       style={{
         background: neuStyles.blue,
         color: '#FFFFFF',
-        boxShadow: `6px 6px 12px rgba(59,130,246,0.4), -6px -6px 12px rgba(255,255,255,0.5)`,
+        boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
       }}
     >
       <LogOut className="h-5 w-5" />

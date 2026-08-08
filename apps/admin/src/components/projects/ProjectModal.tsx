@@ -271,7 +271,7 @@ export function ProjectModal({ isOpen, onClose, onSuccess, project }: ProjectMod
               placeholder="React, Node.js, PostgreSQL"
               required
             />
-            <p className="text-xs text-[#6B7280]">Comma-separated list</p>
+            <p className="text-xs text-[var(--text-secondary)]">Comma-separated list</p>
           </div>
         </div>
 
@@ -303,13 +303,12 @@ export function ProjectModal({ isOpen, onClose, onSuccess, project }: ProjectMod
 
         {/* Settings Section */}
         <div
-          className="p-4 sm:p-6 rounded-2xl bg-[#E0E5EC]"
+          className="p-4 sm:p-6 rounded-2xl bg-[var(--bg-elevated)]"
           style={{
-            boxShadow:
-              'inset 4px 4px 8px rgba(163,177,198,0.4), inset -4px -4px 8px rgba(255,255,255,0.4)',
+            boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
           }}
         >
-          <h4 className="text-sm font-semibold text-[#3D4852] mb-4">Settings</h4>
+          <h4 className="text-sm font-semibold text-[var(--text-primary)] mb-4">Settings</h4>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Checkboxes */}
@@ -324,11 +323,11 @@ export function ProjectModal({ isOpen, onClose, onSuccess, project }: ProjectMod
                     onChange={handleInputChange}
                     className="sr-only peer"
                   />
-                  <div className="w-11 h-6 rounded-full bg-[#E0E5EC] shadow-[inset_4px_4px_8px_rgba(163,177,198,0.4),inset_-4px_-4px_8px_rgba(255,255,255,0.4)] peer-checked:bg-[#F59E0B] peer-checked:shadow-[inset_4px_4px_8px_rgba(217,119,6,0.4),inset_-4px_-4px_8px_rgba(251,191,36,0.4)] transition-all duration-300"></div>
-                  <div className="absolute left-1 top-1 w-4 h-4 rounded-full bg-[#E0E5EC] shadow-[2px_2px_4px_rgba(163,177,198,0.6),-2px_-2px_4px_rgba(255,255,255,0.5)] peer-checked:translate-x-5 peer-checked:bg-white transition-all duration-300"></div>
+                  <div className="w-11 h-6 rounded-full bg-[var(--bg-elevated)] shadow-neu-inset-sm peer-checked:bg-[var(--amber)] peer-checked:shadow-neu-inset-sm transition-all duration-300"></div>
+                  <div className="absolute left-1 top-1 w-4 h-4 rounded-full bg-[var(--bg-elevated)] shadow-neu-extruded peer-checked:translate-x-5 peer-checked:bg-white transition-all duration-300"></div>
                 </div>
-                <span className="text-sm font-medium text-[#3D4852] flex items-center gap-1.5">
-                  <Star className="h-4 w-4 text-[#F59E0B]" fill="currentColor" />
+                <span className="text-sm font-medium text-[var(--text-primary)] flex items-center gap-1.5">
+                  <Star className="h-4 w-4 text-[var(--amber)]" fill="currentColor" />
                   Featured
                 </span>
               </label>
@@ -343,11 +342,11 @@ export function ProjectModal({ isOpen, onClose, onSuccess, project }: ProjectMod
                     onChange={handleInputChange}
                     className="sr-only peer"
                   />
-                  <div className="w-11 h-6 rounded-full bg-[#E0E5EC] shadow-[inset_4px_4px_8px_rgba(163,177,198,0.4),inset_-4px_-4px_8px_rgba(255,255,255,0.4)] peer-checked:bg-[#10B981] peer-checked:shadow-[inset_4px_4px_8px_rgba(5,150,105,0.4),inset_-4px_-4px_8px_rgba(52,211,153,0.4)] transition-all duration-300"></div>
-                  <div className="absolute left-1 top-1 w-4 h-4 rounded-full bg-[#E0E5EC] shadow-[2px_2px_4px_rgba(163,177,198,0.6),-2px_-2px_4px_rgba(255,255,255,0.5)] peer-checked:translate-x-5 peer-checked:bg-white transition-all duration-300"></div>
+                  <div className="w-11 h-6 rounded-full bg-[var(--bg-elevated)] shadow-neu-inset-sm peer-checked:bg-[var(--teal)] peer-checked:shadow-neu-inset-sm transition-all duration-300"></div>
+                  <div className="absolute left-1 top-1 w-4 h-4 rounded-full bg-[var(--bg-elevated)] shadow-neu-extruded peer-checked:translate-x-5 peer-checked:bg-white transition-all duration-300"></div>
                 </div>
-                <span className="text-sm font-medium text-[#3D4852] flex items-center gap-1.5">
-                  <Eye className="h-4 w-4 text-[#10B981]" />
+                <span className="text-sm font-medium text-[var(--text-primary)] flex items-center gap-1.5">
+                  <Eye className="h-4 w-4 text-[var(--teal)]" />
                   Visible
                 </span>
               </label>
@@ -362,7 +361,7 @@ export function ProjectModal({ isOpen, onClose, onSuccess, project }: ProjectMod
                   onClick={() =>
                     setFormData((prev) => ({ ...prev, order: Math.max(0, prev.order - 1) }))
                   }
-                  className="w-9 h-9 flex items-center justify-center rounded-xl bg-[#E0E5EC] text-[#3D4852] text-lg font-semibold shadow-[4px_4px_8px_rgba(163,177,198,0.4),-4px_-4px_8px_rgba(255,255,255,0.4)] hover:shadow-[inset_3px_3px_6px_rgba(163,177,198,0.4),inset_-3px_-3px_6px_rgba(255,255,255,0.4)] active:shadow-[inset_4px_4px_8px_rgba(163,177,198,0.5),inset_-4px_-4px_8px_rgba(255,255,255,0.5)] transition-all duration-200"
+                  className="w-9 h-9 flex items-center justify-center rounded-xl bg-[var(--bg-elevated)] text-[var(--text-primary)] text-lg font-semibold shadow-neu-extruded hover:shadow-neu-extruded active:shadow-neu-extruded transition-all duration-200"
                 >
                   −
                 </button>
@@ -373,17 +372,17 @@ export function ProjectModal({ isOpen, onClose, onSuccess, project }: ProjectMod
                   value={formData.order}
                   onChange={handleInputChange}
                   min="0"
-                  className="w-16 text-center px-2 py-2 rounded-xl bg-[#E0E5EC] text-[#3D4852] font-semibold shadow-[inset_4px_4px_8px_rgba(163,177,198,0.4),inset_-4px_-4px_8px_rgba(255,255,255,0.4)] focus:outline-none focus:ring-2 focus:ring-[#3B82F6] transition-all"
+                  className="w-16 text-center px-2 py-2 rounded-xl bg-[var(--bg-elevated)] text-[var(--text-primary)] font-semibold shadow-neu-inset-sm focus:outline-none focus:ring-2 focus:ring-[var(--teal)] transition-all"
                 />
                 <button
                   type="button"
                   onClick={() => setFormData((prev) => ({ ...prev, order: prev.order + 1 }))}
-                  className="w-9 h-9 flex items-center justify-center rounded-xl bg-[#E0E5EC] text-[#3D4852] text-lg font-semibold shadow-[4px_4px_8px_rgba(163,177,198,0.4),-4px_-4px_8px_rgba(255,255,255,0.4)] hover:shadow-[inset_3px_3px_6px_rgba(163,177,198,0.4),inset_-3px_-3px_6px_rgba(255,255,255,0.4)] active:shadow-[inset_4px_4px_8px_rgba(163,177,198,0.5),inset_-4px_-4px_8px_rgba(255,255,255,0.5)] transition-all duration-200"
+                  className="w-9 h-9 flex items-center justify-center rounded-xl bg-[var(--bg-elevated)] text-[var(--text-primary)] text-lg font-semibold shadow-neu-extruded hover:shadow-neu-extruded active:shadow-neu-extruded transition-all duration-200"
                 >
                   +
                 </button>
               </div>
-              <p className="text-xs text-[#6B7280]">Lower numbers appear first</p>
+              <p className="text-xs text-[var(--text-secondary)]">Lower numbers appear first</p>
             </div>
           </div>
         </div>

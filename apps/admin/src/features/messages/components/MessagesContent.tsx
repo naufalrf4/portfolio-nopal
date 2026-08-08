@@ -84,7 +84,7 @@ export function MessagesContent({
 
         {countries.length > 0 && (
           <div className="flex items-center gap-3 w-full sm:w-auto">
-            <span className="text-sm text-[#6B7280] whitespace-nowrap">Filter by country:</span>
+            <span className="text-sm text-[var(--text-secondary)] whitespace-nowrap">Filter by country:</span>
             <Select
               value={selectedCountry || 'all'}
               onValueChange={(value) => setSelectedCountry(value === 'all' ? null : value)}
@@ -147,7 +147,7 @@ export function MessagesContent({
                                                                       ? '🇳🇿'
                                                                       : '🌍'}
                       <span>{country.name}</span>
-                      <span className="text-xs text-[#6B7280] ml-1">({country.count})</span>
+                      <span className="text-xs text-[var(--text-secondary)] ml-1">({country.count})</span>
                     </span>
                   </SelectItem>
                 ))}

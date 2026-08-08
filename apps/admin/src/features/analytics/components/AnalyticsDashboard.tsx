@@ -37,8 +37,8 @@ export function AnalyticsDashboard({ timeRange = '30d' }: AnalyticsDashboardProp
               onClick={() => setRange(option)}
               className={`rounded-full px-4 py-2 text-sm font-semibold transition-all ${
                 range === option
-                  ? 'bg-gradient-to-r from-[#3B82F6] to-[#60A5FA] text-white shadow-lg'
-                  : 'bg-[#E0E5EC] text-[#6B7280] shadow-[inset_4px_4px_8px_rgba(163,177,198,0.6),inset_-4px_-4px_8px_rgba(255,255,255,0.5)]'
+                  ? 'bg-gradient-to-r from-[var(--teal)] to-[var(--amber)] text-white shadow-lg'
+                  : 'bg-[var(--bg-elevated)] text-[var(--text-secondary)] shadow-neu-extruded'
               }`}
             >
               {option.toUpperCase()}

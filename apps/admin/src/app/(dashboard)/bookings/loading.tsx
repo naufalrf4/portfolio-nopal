@@ -29,10 +29,10 @@ export default function BookingsLoading() {
         <TabsContent value="bookings">
           <div className="space-y-4">
             <div
-              className="rounded-[32px] p-8 bg-[#E0E5EC]"
+              className="rounded-[var(--radius-container)] p-8 bg-[var(--bg-elevated)]"
               style={{
                 boxShadow:
-                  '12px 12px 24px rgba(163, 177, 198, 0.6), -12px -12px 24px rgba(255, 255, 255, 0.5)',
+                  '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
               }}
             >
               <div className="flex justify-between items-center mb-6">
@@ -44,10 +44,9 @@ export default function BookingsLoading() {
                 {[1, 2, 3, 4, 5].map((i) => (
                   <div
                     key={i}
-                    className="p-6 rounded-2xl bg-[#E0E5EC]"
+                    className="p-6 rounded-2xl bg-[var(--bg-elevated)]"
                     style={{
-                      boxShadow:
-                        '6px 6px 12px rgba(163,177,198,0.5), -6px -6px 12px rgba(255,255,255,0.5)',
+                      boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
                     }}
                   >
                     <div className="flex justify-between items-start">

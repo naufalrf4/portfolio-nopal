@@ -20,22 +20,22 @@ export default function BookingsError({
     <PageWrapper>
       <div className="flex items-center justify-center min-h-[60vh]">
         <div
-          className="max-w-md w-full rounded-[32px] p-8 bg-[#E0E5EC] text-center"
+          className="max-w-md w-full rounded-[var(--radius-container)] p-8 bg-[var(--bg-elevated)] text-center"
           style={{
             boxShadow:
-              '12px 12px 24px rgba(163, 177, 198, 0.6), -12px -12px 24px rgba(255, 255, 255, 0.5)',
+              '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
           }}
         >
           <div
-            className="inline-flex p-4 rounded-2xl bg-[#E0E5EC] mb-4"
+            className="inline-flex p-4 rounded-2xl bg-[var(--bg-elevated)] mb-4"
             style={{
-              boxShadow: '6px 6px 12px rgba(163,177,198,0.5), -6px -6px 12px rgba(255,255,255,0.5)',
+              boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
             }}
           >
             <AlertTriangle className="h-8 w-8 text-amber-500" />
           </div>
-          <h2 className="text-2xl font-bold text-[#3D4852] mb-2">Something went wrong</h2>
-          <p className="text-[#6B7280] mb-6">
+          <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-2">Something went wrong</h2>
+          <p className="text-[var(--text-secondary)] mb-6">
             We encountered an error while loading the bookings page. Please try again.
           </p>
           {error.digest && (

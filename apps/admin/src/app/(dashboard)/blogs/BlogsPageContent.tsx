@@ -108,7 +108,7 @@ export function BlogsPageContent() {
 
       {filteredBlogLinks.length === 0 ? (
         <div
-          className="rounded-[32px] p-12 text-center"
+          className="rounded-[var(--radius-container)] p-12 text-center"
           style={{
             backgroundColor: NEUMORPHIC_STYLES.background,
             boxShadow: NEUMORPHIC_STYLES.shadows.extruded,
@@ -117,7 +117,7 @@ export function BlogsPageContent() {
           <div
             className="mx-auto w-20 h-20 rounded-2xl flex items-center justify-center mb-6"
             style={{
-              background: 'linear-gradient(135deg, #3B82F6, #60A5FA)',
+              background: 'linear-gradient(135deg, var(--teal), var(--amber))',
               boxShadow: NEUMORPHIC_STYLES.shadows.small,
             }}
           >

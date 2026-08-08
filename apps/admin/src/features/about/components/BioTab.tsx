@@ -132,13 +132,13 @@ export function BioTab() {
       <Card className="neu-card-inset">
         <CardContent>
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-[#3D4852]">Bio</h3>
+            <h3 className="text-lg font-semibold text-[var(--text-primary)]">Bio</h3>
             <div className="flex items-center gap-3">
               {hasUnsavedChangesBio && !isSavingBio && (
                 <span className="text-sm text-amber-600">Unsaved changes</span>
               )}
               {isSavingBio && (
-                <span className="text-sm text-[#6B7280] flex items-center gap-2">
+                <span className="text-sm text-[var(--text-secondary)] flex items-center gap-2">
                   <Loader2 className="h-4 w-4 animate-spin" />
                   Saving...
                 </span>
@@ -147,7 +147,7 @@ export function BioTab() {
                 onClick={handleSaveBio}
                 disabled={!hasUnsavedChangesBio || isSavingBio}
                 size="sm"
-                className="bg-[#3B82F6] hover:bg-[#2563EB] text-white disabled:bg-gray-300 disabled:text-gray-500"
+                className="bg-[var(--teal)] hover:bg-[#2563EB] text-white disabled:bg-gray-300 disabled:text-gray-500"
               >
                 {isSavingBio ? 'Saving...' : 'Save Bio'}
               </Button>
@@ -160,7 +160,7 @@ export function BioTab() {
             rows={4}
             className="resize-y mb-4"
           />
-          <p className="text-xs text-[#6B7280] mb-4">
+          <p className="text-xs text-[var(--text-secondary)] mb-4">
             This short version is used on the homepage hero and links app.
           </p>
           <Textarea
@@ -170,7 +170,7 @@ export function BioTab() {
             rows={12}
             className="resize-y"
           />
-          <p className="text-xs text-[#6B7280] mt-3">
+          <p className="text-xs text-[var(--text-secondary)] mt-3">
             Save both the short and detailed versions together from this tab.
           </p>
         </CardContent>
@@ -180,8 +180,8 @@ export function BioTab() {
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-lg font-semibold text-[#3D4852]">Roles</h3>
-              <p className="text-sm text-[#6B7280]">
+              <h3 className="text-lg font-semibold text-[var(--text-primary)]">Roles</h3>
+              <p className="text-sm text-[var(--text-secondary)]">
                 Drag to reorder. First role is your primary role. Click &quot;Save Roles&quot; to
                 save.
               </p>
@@ -194,7 +194,7 @@ export function BioTab() {
                 onClick={saveRoles}
                 disabled={!hasUnsavedChangesRoles || saving}
                 size="sm"
-                className="bg-[#3B82F6] hover:bg-[#2563EB] text-white disabled:bg-gray-300 disabled:text-gray-500"
+                className="bg-[var(--teal)] hover:bg-[#2563EB] text-white disabled:bg-gray-300 disabled:text-gray-500"
               >
                 {saving && <Loader2 className="h-4 w-4 animate-spin" />}
                 {saving ? 'Saving...' : 'Save Roles'}

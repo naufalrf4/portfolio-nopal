@@ -10,15 +10,15 @@ export const FILTER_BUTTONS = [
 
 export const NEUMORPHIC_STYLES = {
   card: {
-    boxShadow: '12px 12px 24px rgba(163, 177, 198, 0.6), -12px -12px 24px rgba(255, 255, 255, 0.5)',
+    boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
   },
   iconContainer: {
-    boxShadow: '8px 8px 16px rgba(163, 177, 198, 0.5), -8px -8px 16px rgba(255, 255, 255, 0.5)',
+    boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
   },
   techBadge: {
-    boxShadow: 'inset 3px 3px 6px rgba(163,177,198,0.4), inset -3px -3px 6px rgba(255,255,255,0.4)',
+    boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
   },
   techBadgeSmall: {
-    boxShadow: 'inset 2px 2px 4px rgba(163,177,198,0.4), inset -2px -2px 4px rgba(255,255,255,0.4)',
+    boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
   },
 } as const;

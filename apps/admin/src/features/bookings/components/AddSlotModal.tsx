@@ -186,13 +186,12 @@ export function AddSlotModal({
                 setErrors({ ...errors, duration: undefined });
               }
             }}
-            className={`w-full px-3 py-2 rounded-xl border-none outline-none transition-all duration-200 focus:ring-2 focus:ring-[#3B82F6]/30 bg-[#E0E5EC] ${
+            className={`w-full px-3 py-2 rounded-xl border-none outline-none transition-all duration-200 focus:ring-2 focus:ring-[var(--teal)]/30 bg-[var(--bg-elevated)] ${
               errors.duration ? 'ring-2 ring-red-500' : ''
             }`}
             style={{
-              boxShadow:
-                'inset 6px 6px 10px rgba(163,177,198,0.6), inset -6px -6px 10px rgba(255,255,255,0.5)',
-              color: '#3D4852',
+              boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
+              color: 'var(--text-primary)',
             }}
           >
             <option value={15}>15 minutes</option>

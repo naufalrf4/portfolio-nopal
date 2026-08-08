@@ -60,7 +60,7 @@ export function ChatConversation({
           <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
             <div>
               <CardTitle className="flex items-center gap-2">
-                <MessageSquare className="h-5 w-5 text-[#3B82F6]" />
+                <MessageSquare className="h-5 w-5 text-[var(--teal)]" />
                 Chat Session
               </CardTitle>
               <CardDescription className="font-mono text-xs mt-1">{sessionId}</CardDescription>
@@ -79,9 +79,9 @@ export function ChatConversation({
         <CardContent>
           <div
             className={cn(
-              'flex flex-wrap gap-4 text-sm text-[#6B7280] p-4 rounded-xl',
-              'bg-[#E0E5EC]',
-              '[box-shadow:inset_4px_4px_8px_rgba(163,177,198,0.5),inset_-4px_-4px_8px_rgba(255,255,255,0.4)]'
+              'flex flex-wrap gap-4 text-sm text-[var(--text-secondary)] p-4 rounded-xl',
+              'bg-[var(--bg-elevated)]',
+              'shadow-neu-inset'
             )}
           >
             <div className="flex items-center gap-2">
@@ -109,7 +109,7 @@ export function ChatConversation({
         <CardContent>
           <div className="space-y-2">
             {messages.length === 0 ? (
-              <div className="text-center py-8 text-[#6B7280]">
+              <div className="text-center py-8 text-[var(--text-secondary)]">
                 No messages in this conversation.
               </div>
             ) : (

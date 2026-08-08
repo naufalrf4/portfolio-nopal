@@ -36,8 +36,8 @@ export function MessageBubble({ message }: MessageBubbleProps) {
       <div className="flex justify-center my-4">
         <div
           className={cn(
-            'px-4 py-2 rounded-xl text-sm text-[#6B7280] bg-[#E0E5EC]',
-            '[box-shadow:inset_4px_4px_8px_rgba(163,177,198,0.5),inset_-4px_-4px_8px_rgba(255,255,255,0.4)]'
+            'px-4 py-2 rounded-xl text-sm text-[var(--text-secondary)] bg-[var(--bg-elevated)]',
+            'shadow-neu-inset'
           )}
         >
           <span className="italic">{message.content}</span>
@@ -56,16 +56,16 @@ export function MessageBubble({ message }: MessageBubbleProps) {
       <div
         className={cn(
           'flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center',
-          'bg-[#E0E5EC]',
+          'bg-[var(--bg-elevated)]',
           isUser
-            ? '[box-shadow:6px_6px_12px_rgba(163,177,198,0.6),-6px_-6px_12px_rgba(255,255,255,0.5)]'
-            : '[box-shadow:inset_4px_4px_8px_rgba(163,177,198,0.6),inset_-4px_-4px_8px_rgba(255,255,255,0.5)]'
+            ? 'shadow-neu-extruded'
+            : 'shadow-neu-inset'
         )}
       >
         {isUser ? (
-          <User className="h-5 w-5 text-[#3B82F6]" />
+          <User className="h-5 w-5 text-[var(--teal)]" />
         ) : (
-          <Bot className="h-5 w-5 text-[#38B2AC]" />
+          <Bot className="h-5 w-5 text-[var(--teal)]" />
         )}
       </div>
 
@@ -73,17 +73,17 @@ export function MessageBubble({ message }: MessageBubbleProps) {
         <div
           className={cn(
             'px-4 py-3 rounded-2xl',
-            'bg-[#E0E5EC]',
+            'bg-[var(--bg-elevated)]',
             isUser
-              ? '[box-shadow:6px_6px_12px_rgba(163,177,198,0.6),-6px_-6px_12px_rgba(255,255,255,0.5)] rounded-tr-sm'
-              : '[box-shadow:inset_4px_4px_8px_rgba(163,177,198,0.5),inset_-4px_-4px_8px_rgba(255,255,255,0.4)] rounded-tl-sm'
+              ? 'shadow-neu-extruded rounded-tr-sm'
+              : 'shadow-neu-inset rounded-tl-sm'
           )}
         >
-          <p className="text-[#3D4852] whitespace-pre-wrap break-words">{message.content}</p>
+          <p className="text-[var(--text-primary)] whitespace-pre-wrap break-words">{message.content}</p>
         </div>
 
         <div className="flex items-center gap-2 mt-1.5 px-2">
-          <span className="text-xs text-[#6B7280] flex items-center gap-1">
+          <span className="text-xs text-[var(--text-secondary)] flex items-center gap-1">
             <Clock className="h-3 w-3" />
             {formatTime(message.timestamp)}
           </span>
@@ -91,19 +91,19 @@ export function MessageBubble({ message }: MessageBubbleProps) {
           {!isUser && message.metadata && (
             <>
               {message.metadata.model && (
-                <span className="text-xs text-[#6B7280] flex items-center gap-1">
+                <span className="text-xs text-[var(--text-secondary)] flex items-center gap-1">
                   <Cpu className="h-3 w-3" />
                   {message.metadata.model}
                 </span>
               )}
               {message.metadata.tokens !== undefined && (
-                <span className="text-xs text-[#6B7280] flex items-center gap-1">
+                <span className="text-xs text-[var(--text-secondary)] flex items-center gap-1">
                   <Hash className="h-3 w-3" />
                   {message.metadata.tokens} tokens
                 </span>
               )}
               {message.metadata.duration !== undefined && (
-                <span className="text-xs text-[#6B7280] flex items-center gap-1">
+                <span className="text-xs text-[var(--text-secondary)] flex items-center gap-1">
                   <Zap className="h-3 w-3" />
                   {(message.metadata.duration / 1000).toFixed(2)}s
                 </span>

@@ -27,25 +27,25 @@ export function ProjectCard({
   return (
     <TooltipProvider>
       <div
-        className="group relative rounded-[32px] p-6 bg-[#E0E5EC] transition-all duration-300 hover:-translate-y-1"
+        className="group relative rounded-[var(--radius-container)] p-6 bg-[var(--bg-elevated)] transition-all duration-300 hover:-translate-y-1"
         style={{
           boxShadow:
-            '12px 12px 24px rgba(163, 177, 198, 0.6), -12px -12px 24px rgba(255, 255, 255, 0.5)',
+            '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
           animationDelay: `${index * 50}ms`,
         }}
       >
         {imageUrl && (
-          <div className="mb-4 rounded-2xl overflow-hidden bg-[#E0E5EC] shadow-[inset_4px_4px_8px_rgba(163,177,198,0.4),inset_-4px_-4px_8px_rgba(255,255,255,0.4)]">
+          <div className="mb-4 rounded-2xl overflow-hidden bg-[var(--bg-elevated)] shadow-neu-inset-sm">
             <img src={imageUrl} alt={project.title} className="w-full h-40 object-cover" />
           </div>
         )}
 
         <div className="flex items-center justify-between mb-4">
           <div
-            className="p-3 rounded-2xl bg-[#E0E5EC] text-[#3B82F6]"
+            className="p-3 rounded-2xl bg-[var(--bg-elevated)] text-[var(--teal)]"
             style={{
               boxShadow:
-                '8px 8px 16px rgba(163, 177, 198, 0.5), -8px -8px 16px rgba(255, 255, 255, 0.5)',
+                '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
             }}
           >
             <CategoryIcon className="h-5 w-5" />
@@ -55,7 +55,7 @@ export function ProjectCard({
               <TooltipTrigger asChild>
                 <button
                   onClick={onEdit}
-                  className="p-2 rounded-xl bg-[#E0E5EC] text-[#6B7280] hover:text-[#3B82F6] transition-all duration-200 hover:shadow-[5px_5px_10px_rgba(163,177,198,0.6),-5px_-5px_10px_rgba(255,255,255,0.5)]"
+                  className="p-2 rounded-xl bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:text-[var(--teal)] transition-all duration-200 hover:shadow-neu-extruded-sm"
                 >
                   <Pencil className="h-4 w-4" />
                 </button>
@@ -66,7 +66,7 @@ export function ProjectCard({
               <TooltipTrigger asChild>
                 <button
                   onClick={onDelete}
-                  className="p-2 rounded-xl bg-[#E0E5EC] text-[#6B7280] hover:text-red-500 transition-all duration-200 hover:shadow-[5px_5px_10px_rgba(163,177,198,0.6),-5px_-5px_10px_rgba(255,255,255,0.5)]"
+                  className="p-2 rounded-xl bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:text-red-500 transition-all duration-200 hover:shadow-neu-extruded-sm"
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>
@@ -77,33 +77,32 @@ export function ProjectCard({
         </div>
 
         <div className="mb-3">
-          <h3 className="text-lg font-semibold text-[#3D4852] mb-1">{project.title}</h3>
-          <p className="text-sm text-[#6B7280]">{project.category}</p>
+          <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-1">{project.title}</h3>
+          <p className="text-sm text-[var(--text-secondary)]">{project.category}</p>
         </div>
 
-        <p className="text-sm text-[#6B7280] mb-4 line-clamp-2">{project.summary}</p>
+        <p className="text-sm text-[var(--text-secondary)] mb-4 line-clamp-2">{project.summary}</p>
 
         {project.techStack.length > 0 && (
           <div className="mb-4">
             <div className="flex items-center gap-2 mb-2">
-              <Wrench className="h-4 w-4 text-[#6B7280]" />
-              <span className="text-xs font-medium text-[#6B7280]">Tech Stack</span>
+              <Wrench className="h-4 w-4 text-[var(--text-secondary)]" />
+              <span className="text-xs font-medium text-[var(--text-secondary)]">Tech Stack</span>
             </div>
             <div className="flex flex-wrap gap-2">
               {project.techStack.slice(0, 3).map((tech) => (
                 <span
                   key={tech}
-                  className="px-3 py-1 text-xs rounded-full bg-[#E0E5EC] text-[#3D4852]"
+                  className="px-3 py-1 text-xs rounded-full bg-[var(--bg-elevated)] text-[var(--text-primary)]"
                   style={{
-                    boxShadow:
-                      'inset 3px 3px 6px rgba(163,177,198,0.4), inset -3px -3px 6px rgba(255,255,255,0.4)',
+                    boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
                   }}
                 >
                   {tech}
                 </span>
               ))}
               {project.techStack.length > 3 && (
-                <span className="px-3 py-1 text-xs rounded-full text-[#6B7280]">
+                <span className="px-3 py-1 text-xs rounded-full text-[var(--text-secondary)]">
                   +{project.techStack.length - 3}
                 </span>
               )}
@@ -114,13 +113,13 @@ export function ProjectCard({
         {(project.liveUrl || project.repoUrl) && (
           <div className="mb-4 space-y-2">
             {project.liveUrl && (
-              <div className="flex items-center gap-2 text-xs text-[#6B7280]">
+              <div className="flex items-center gap-2 text-xs text-[var(--text-secondary)]">
                 <ExternalLink className="h-4 w-4" />
                 <span className="truncate">{new URL(project.liveUrl).hostname}</span>
               </div>
             )}
             {project.repoUrl && (
-              <div className="flex items-center gap-2 text-xs text-[#6B7280]">
+              <div className="flex items-center gap-2 text-xs text-[var(--text-secondary)]">
                 <Github className="h-4 w-4" />
                 <span className="truncate">Repository</span>
               </div>
@@ -135,7 +134,7 @@ export function ProjectCard({
                 <button
                   onClick={onToggleVisibility}
                   className={`p-2 rounded-xl transition-colors ${
-                    project.visible ? 'text-[#38B2AC]' : 'text-[#6B7280]'
+                    project.visible ? 'text-[var(--teal)]' : 'text-[var(--text-secondary)]'
                   }`}
                 >
                   {project.visible ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
@@ -148,7 +147,7 @@ export function ProjectCard({
                 <button
                   onClick={onToggleFeatured}
                   className={`p-2 rounded-xl transition-colors ${
-                    project.featured ? 'text-[#F59E0B]' : 'text-[#6B7280]'
+                    project.featured ? 'text-[var(--amber)]' : 'text-[var(--text-secondary)]'
                   }`}
                 >
                   <Star className="h-4 w-4" fill={project.featured ? 'currentColor' : 'none'} />
@@ -157,7 +156,7 @@ export function ProjectCard({
               <TooltipContent>{project.featured ? 'Featured' : 'Not Featured'}</TooltipContent>
             </Tooltip>
           </div>
-          <div className="flex items-center gap-1.5 text-xs text-[#6B7280]">
+          <div className="flex items-center gap-1.5 text-xs text-[var(--text-secondary)]">
             <Hash className="h-4 w-4" />
             <span>{project.order}</span>
           </div>

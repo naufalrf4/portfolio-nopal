@@ -2,11 +2,11 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { PageWrapper } from '@/components/layout/PageWrapper';
 
 const neuStyles = {
-  background: '#E0E5EC',
+  background: 'var(--bg-elevated)',
   skeleton: '#A0AEC0',
-  extruded: '6px 6px 12px rgba(163,177,198,0.6), -6px -6px 12px rgba(255,255,255,0.5)',
-  inset: 'inset 6px 6px 10px rgba(163,177,198,0.6), inset -6px -6px 10px rgba(255,255,255,0.5)',
-  buttonShadow: '6px 6px 12px rgba(59,130,246,0.4), -6px -6px 12px rgba(255,255,255,0.5)',
+  extruded: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
+  inset: 'inset 0 1px 4px rgba(0, 0, 0, 0.25)',
+  buttonShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
 };
 
 function SkeletonCard({
@@ -108,7 +108,7 @@ export default function SettingsLoading() {
           <div
             className="h-12 w-full rounded-2xl"
             style={{
-              background: '#3B82F6',
+              background: 'var(--teal)',
               boxShadow: neuStyles.buttonShadow,
             }}
           />

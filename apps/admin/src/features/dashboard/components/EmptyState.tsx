@@ -11,10 +11,10 @@ export function EmptyState() {
       >
         <Inbox className="w-10 h-10 text-blue-500" />
       </div>
-      <h3 className="text-xl font-bold text-[#3D4852] mb-2 font-[family-name:var(--font-plus-jakarta)]">
+      <h3 className="text-xl font-bold text-[var(--text-primary)] mb-2 font-[family-name:var(--font-plus-jakarta)]">
         Welcome to your dashboard!
       </h3>
-      <p className="text-[#6B7280] mb-6 max-w-md mx-auto">
+      <p className="text-[var(--text-secondary)] mb-6 max-w-md mx-auto">
         Your portfolio activity and interactions will appear here.
       </p>
     </Card>

@@ -32,12 +32,12 @@ function SelectTrigger({
       data-size={size}
       className={cn(
         'flex w-full items-center justify-between gap-2 whitespace-nowrap outline-none disabled:cursor-not-allowed disabled:opacity-50',
-        'bg-[#E0E5EC] rounded-2xl h-12 px-4 text-base text-[#3D4852]',
-        '[box-shadow:5px_5px_10px_rgba(163,177,198,0.6),-5px_-5px_10px_rgba(255,255,255,0.5)]',
+        'bg-[var(--bg-elevated)] rounded-2xl h-12 px-4 text-base text-[var(--text-primary)]',
+        'shadow-neu-extruded',
         'transition-all duration-300 ease-out',
-        'hover:[box-shadow:7px_7px_12px_rgba(163,177,198,0.65),-7px_-7px_12px_rgba(255,255,255,0.55)]',
-        'focus-visible:ring-2 focus-visible:ring-[#3B82F6]/30 focus-visible:ring-offset-2',
-        'data-[state=open]:[box-shadow:inset_6px_6px_10px_rgba(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)]',
+        'hover:shadow-neu-extruded',
+        'focus-visible:ring-2 focus-visible:ring-[var(--teal)]/30 focus-visible:ring-offset-2',
+        'data-[state=open]:shadow-neu-inset',
         'data-[size=sm]:h-10 data-[size=sm]:px-3 data-[size=sm]:text-sm',
         '*:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-2',
         '[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*="size-"])]:size-4',
@@ -66,8 +66,8 @@ function SelectContent({
         data-slot="select-content"
         className={cn(
           'relative z-50 max-h-(--radix-select-content-available-height) min-w-[8rem] origin-(--radix-select-content-transform-origin) overflow-x-hidden overflow-y-auto',
-          'bg-[#E0E5EC] rounded-2xl p-2',
-          '[box-shadow:12px_12px_24px_rgba(163,177,198,0.7),-12px_-12px_24px_rgba(255,255,255,0.6)]',
+          'bg-[var(--bg-elevated)] rounded-2xl p-2',
+          'shadow-neu-extruded',
           'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
           'data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
           position === 'popper' &&
@@ -97,7 +97,7 @@ function SelectLabel({ className, ...props }: React.ComponentProps<typeof Select
   return (
     <SelectPrimitive.Label
       data-slot="select-label"
-      className={cn('px-3 py-2 text-xs text-[#3D4852]/60 font-medium', className)}
+      className={cn('px-3 py-2 text-xs text-[var(--text-primary)]/60 font-medium', className)}
       {...props}
     />
   );
@@ -112,10 +112,10 @@ function SelectItem({
     <SelectPrimitive.Item
       data-slot="select-item"
       className={cn(
-        'relative flex w-full cursor-default items-center gap-2 rounded-xl px-3 py-2 text-sm text-[#3D4852] outline-hidden select-none',
+        'relative flex w-full cursor-default items-center gap-2 rounded-xl px-3 py-2 text-sm text-[var(--text-primary)] outline-hidden select-none',
         'transition-colors duration-200',
-        'hover:bg-[#3B82F6]/10',
-        'data-[state=checked]:bg-[#3B82F6]/20 data-[state=checked]:text-[#3B82F6]',
+        'hover:bg-[var(--teal)]/10',
+        'data-[state=checked]:bg-[var(--teal)]/20 data-[state=checked]:text-[var(--teal)]',
         'data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
         '[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*="size-"])]:size-4',
         '*:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2',
@@ -143,7 +143,7 @@ function SelectSeparator({
   return (
     <SelectPrimitive.Separator
       data-slot="select-separator"
-      className={cn('pointer-events-none -mx-1 my-1 h-px bg-[#3D4852]/10', className)}
+      className={cn('pointer-events-none -mx-1 my-1 h-px bg-[var(--text-primary)]/10', className)}
       {...props}
     />
   );
@@ -157,7 +157,7 @@ function SelectScrollUpButton({
     <SelectPrimitive.ScrollUpButton
       data-slot="select-scroll-up-button"
       className={cn(
-        'flex cursor-default items-center justify-center py-1 text-[#3D4852]/50',
+        'flex cursor-default items-center justify-center py-1 text-[var(--text-primary)]/50',
         className
       )}
       {...props}
@@ -175,7 +175,7 @@ function SelectScrollDownButton({
     <SelectPrimitive.ScrollDownButton
       data-slot="select-scroll-down-button"
       className={cn(
-        'flex cursor-default items-center justify-center py-1 text-[#3D4852]/50',
+        'flex cursor-default items-center justify-center py-1 text-[var(--text-primary)]/50',
         className
       )}
       {...props}

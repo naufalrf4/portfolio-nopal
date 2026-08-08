@@ -9,12 +9,12 @@ function Card({ className, style, ...props }: React.ComponentProps<'div'>) {
     <div
       data-slot="card"
       className={cn(
-        'bg-[#E0E5EC] text-[#3D4852] flex flex-col rounded-[32px] transition-all duration-300 ease-out',
+        'bg-[var(--bg-elevated)] text-[var(--text-primary)] flex flex-col rounded-[var(--radius-container)] transition-all duration-300 ease-out',
         'data-[hoverable=true]:hover:-translate-y-0.5 data-[hoverable=true]:cursor-pointer',
         '[&.neu-card-inset]:rounded-2xl',
         isInset
-          ? '[box-shadow:inset_6px_6px_10px_rgba(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)]'
-          : '[box-shadow:9px_9px_16px_rgba(163,177,198,0.6),-9px_-9px_16px_rgba(255,255,255,0.5)] data-[hoverable=true]:hover:[box-shadow:12px_12px_20px_rgba(163,177,198,0.7),-12px_-12px_20px_rgba(255,255,255,0.6)]',
+          ? 'shadow-neu-inset'
+          : 'shadow-neu-extruded data-[hoverable=true]:hover:shadow-neu-extruded',
         className
       )}
       style={style}
@@ -42,7 +42,7 @@ function CardTitle({ className, ...props }: React.ComponentProps<'div'>) {
     <div
       data-slot="card-title"
       className={cn(
-        'font-display font-bold text-xl text-[#3D4852] tracking-tight leading-none',
+        'font-display font-bold text-xl text-[var(--text-primary)] tracking-tight leading-none',
         className
       )}
       {...props}
@@ -54,7 +54,7 @@ function CardDescription({ className, ...props }: React.ComponentProps<'div'>) {
   return (
     <div
       data-slot="card-description"
-      className={cn('text-sm text-[#6B7280]', className)}
+      className={cn('text-sm text-[var(--text-secondary)]', className)}
       {...props}
     />
   );

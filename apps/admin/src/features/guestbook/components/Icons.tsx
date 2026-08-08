@@ -38,7 +38,7 @@ export function EyeIcon() {
 export function EyeOffIcon() {
   return (
     <svg
-      className="w-3.5 h-3.5 text-[#6B7280]"
+      className="w-3.5 h-3.5 text-[var(--text-secondary)]"
       fill="none"
       viewBox="0 0 24 24"
       stroke="currentColor"
@@ -56,7 +56,7 @@ export function EyeOffIcon() {
 export function TrashIcon() {
   return (
     <svg
-      className="w-5 h-5 text-[#6B7280] group-hover:text-red-500 transition-colors"
+      className="w-5 h-5 text-[var(--text-secondary)] group-hover:text-red-500 transition-colors"
       fill="none"
       viewBox="0 0 24 24"
       stroke="currentColor"
@@ -86,7 +86,7 @@ export function WarningIcon() {
 
 export function BookOpenIcon() {
   return (
-    <svg className="w-12 h-12 text-[#6B7280]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <svg className="w-12 h-12 text-[var(--text-secondary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
       <path
         strokeLinecap="round"
         strokeLinejoin="round"
