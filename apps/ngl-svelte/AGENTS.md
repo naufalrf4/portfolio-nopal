@@ -8,14 +8,14 @@ Authoritative AI control contract for this repository.
 - **Purpose:** serve the anonymous-message experience for the portfolio ecosystem
 - **Architecture:** SvelteKit 2 application that submits public messages to Admin APIs with Turnstile protection
 - **Execution Model:** runs independently from `apps/ngl-svelte`; stays API-only and delegates persistence to Admin
-- **Critical Domains:** Turnstile validation, public-message flow, Admin API compatibility, legacy neumorphic visual consistency
+- **Critical Domains:** Turnstile validation, public-message flow, Admin API compatibility, dark-first shared design tokens
 
 ## 2. Technology Baseline
 
 - **Framework:** SvelteKit 2.50.2 with Svelte 5.51.0
 - **Runtime:** Bun and Vite
 - **Language:** TypeScript
-- **Styling:** Tailwind CSS 4 and existing light-neumorphic UI patterns
+- **Styling:** Tailwind CSS 4 with shared dark-first design tokens from `@naufalrf/design-tokens`
 - **Package Manager:** Bun via `bun.lock`
 - **Version Policy:** use versions resolved from `package.json` and `bun.lock`; never guess from memory
 - **State Management:** Svelte stores/components and app-local route state only
@@ -27,7 +27,7 @@ Authoritative AI control contract for this repository.
 - Stay API-only; this app must not connect directly to the database.
 - Preserve the Turnstile-backed public submission flow rather than bypassing CAPTCHA when issues occur.
 - Keep anonymous messaging isolated from admin/business logic by delegating persistence to Admin APIs.
-- Preserve the light-neumorphic page shell already established in `src/routes/+page.svelte`.
+- Preserve the dark-first page shell already established in `src/routes/+page.svelte` using shared design tokens.
 
 ## 4. Operational Command Set
 

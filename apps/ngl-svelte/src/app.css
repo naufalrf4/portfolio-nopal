@@ -1,53 +1,43 @@
 @import 'tailwindcss';
+@import '@naufalrf/design-tokens';
 
 @theme {
-	--color-neu-bg: oklch(0.92 0.008 240);
-	--color-neu-surface: oklch(0.92 0.008 240);
-	--color-neu-fg: oklch(0.35 0.015 240);
-	--color-neu-fg-muted: oklch(0.52 0.012 240);
-	--color-neu-fg-subtle: oklch(0.72 0.01 240);
-	--color-neu-accent: oklch(0.6 0.18 245);
-	--color-neu-accent-secondary: oklch(0.65 0.12 175);
-	--color-neu-shadow-light: rgba(255, 255, 255, 0.5);
-	--color-neu-shadow-dark: rgba(163, 177, 198, 0.6);
+	--color-neu-bg: var(--bg);
+	--color-neu-surface: var(--bg-elevated);
+	--color-neu-fg: var(--text-primary);
+	--color-neu-fg-muted: var(--text-secondary);
+	--color-neu-fg-subtle: var(--text-tertiary);
+	--color-neu-accent: var(--teal);
+	--color-neu-accent-secondary: var(--amber);
 
-	--font-display: 'Plus Jakarta Sans', sans-serif;
-	--font-body: 'DM Sans', sans-serif;
+	--font-display: 'Space Grotesk', sans-serif;
+	--font-sans: 'Inter', sans-serif;
+	--font-mono: 'JetBrains Mono', monospace;
 
-	--radius-container: 32px;
-	--radius-base: 16px;
-	--radius-inner: 12px;
+	--radius-container: var(--radius-container);
+	--radius-base: var(--radius-base);
+	--radius-inner: var(--radius-inner);
 }
 
 :root {
-	--neu-bg: oklch(0.92 0.008 240);
-	--neu-surface: oklch(0.92 0.008 240);
-	--neu-fg: oklch(0.35 0.015 240);
-	--neu-fg-muted: oklch(0.52 0.012 240);
-	--neu-fg-subtle: oklch(0.72 0.01 240);
-	--neu-accent: oklch(0.6 0.18 245);
-	--neu-accent-secondary: oklch(0.65 0.12 175);
-	--neu-shadow-light: rgba(255, 255, 255, 0.5);
-	--neu-shadow-dark: rgba(163, 177, 198, 0.6);
-
-	--font-plus-jakarta: 'Plus Jakarta Sans', sans-serif;
-	--font-dm-sans: 'DM Sans', sans-serif;
+	--neu-bg: var(--bg);
+	--neu-surface: var(--bg-elevated);
+	--neu-fg: var(--text-primary);
+	--neu-fg-muted: var(--text-secondary);
+	--neu-fg-subtle: var(--text-tertiary);
+	--neu-accent: var(--teal);
+	--neu-accent-secondary: var(--amber);
 }
 
 body {
-	background:
-		radial-gradient(circle at top, rgba(255, 255, 255, 0.82), transparent 42%),
-		radial-gradient(circle at top right, rgba(96, 165, 250, 0.14), transparent 24%),
-		radial-gradient(circle at bottom left, rgba(59, 130, 246, 0.15), transparent 28%),
-		radial-gradient(circle at bottom, rgba(147, 197, 253, 0.12), transparent 30%),
-		linear-gradient(180deg, rgba(233, 239, 246, 0.96) 0%, rgba(224, 231, 240, 0.98) 100%),
-		var(--neu-bg);
-	color: var(--neu-fg);
-	font-family: var(--font-dm-sans);
+	background-color: var(--bg);
+	color: var(--text-primary);
+	font-family: var(--font-sans), system-ui, sans-serif;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 	overflow-x: hidden;
 	min-height: 100vh;
+	transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 h1,
@@ -56,26 +46,21 @@ h3,
 h4,
 h5,
 h6 {
-	font-family: var(--font-plus-jakarta);
+	font-family: var(--font-display), system-ui, sans-serif;
 }
 
 .neu-card {
-	background: var(--neu-surface);
+	background: var(--bg-card);
+	border: 1px solid var(--border);
 	border-radius: var(--radius-container);
-	box-shadow:
-		9px 9px 16px var(--neu-shadow-dark),
-		-9px -9px 16px var(--neu-shadow-light);
 }
 
 .neu-button {
-	background: var(--neu-surface);
+	background: var(--bg-elevated);
+	border: 1px solid var(--border);
 	border-radius: var(--radius-base);
-	box-shadow:
-		6px 6px 12px var(--neu-shadow-dark),
-		-6px -6px 12px var(--neu-shadow-light);
-	transition: all 0.3s ease;
-	border: none;
-	color: var(--neu-fg);
+	transition: all 0.2s ease;
+	color: var(--text-primary);
 	font-weight: 500;
 	padding: 0.75rem 1.5rem;
 	cursor: pointer;
@@ -85,109 +70,88 @@ h6 {
 }
 
 .neu-button:hover:not(:disabled) {
-	transform: translateY(-2px);
-	box-shadow:
-		8px 8px 16px rgba(163, 177, 198, 0.7),
-		-8px -8px 16px rgba(255, 255, 255, 0.6);
+	border-color: var(--border-hover);
+	transform: translateY(-1px);
 }
 
 .neu-button:active:not(:disabled) {
 	transform: translateY(0);
-	box-shadow:
-		inset 4px 4px 8px var(--neu-shadow-dark),
-		inset -4px -4px 8px var(--neu-shadow-light);
 }
 
 .neu-button:disabled {
 	opacity: 0.55;
 	cursor: not-allowed;
-	box-shadow: none;
 }
 
 .neu-button-primary {
-	background: linear-gradient(135deg, #3b82f6, #60a5fa);
-	color: white;
-	box-shadow:
-		10px 10px 18px rgba(96, 165, 250, 0.28),
-		-10px -10px 18px rgba(255, 255, 255, 0.68);
-	border: 1px solid rgba(147, 197, 253, 0.65);
+	background: var(--teal);
+	color: var(--bg);
+	border: 1px solid var(--teal);
 }
 
 .neu-button-primary:hover:not(:disabled) {
-	filter: brightness(1.04);
+	filter: brightness(1.1);
 }
 
 .neu-button-primary:disabled {
 	opacity: 0.72;
-	background: linear-gradient(135deg, rgba(59, 130, 246, 0.78), rgba(96, 165, 250, 0.72));
-	color: rgba(255, 255, 255, 0.94);
-	box-shadow:
-		7px 7px 14px rgba(163, 177, 198, 0.28),
-		-7px -7px 14px rgba(255, 255, 255, 0.55);
-	border: 1px solid rgba(147, 197, 253, 0.55);
+	background: var(--bg-elevated);
+	color: var(--text-tertiary);
+	border-color: var(--border);
 }
 
 .neu-input {
-	background: var(--neu-surface);
+	background: var(--bg-elevated);
+	border: 1px solid var(--border);
 	border-radius: var(--radius-base);
-	box-shadow:
-		inset 6px 6px 10px var(--neu-shadow-dark),
-		inset -6px -6px 10px var(--neu-shadow-light);
-	border: none;
-	color: var(--neu-fg);
+	color: var(--text-primary);
 	padding: 1rem;
 	width: 100%;
-	transition: all 0.3s ease;
+	transition: all 0.2s ease;
 }
 
 .neu-input:focus {
 	outline: none;
-	box-shadow:
-		inset 8px 8px 14px rgba(163, 177, 198, 0.65),
-		inset -8px -8px 14px rgba(255, 255, 255, 0.6);
+	border-color: var(--teal);
+	box-shadow: 0 0 0 2px var(--teal-soft);
 }
 
 .ngl-panel {
-	background:
-		radial-gradient(circle at top right, rgba(96, 165, 250, 0.16), transparent 30%),
-		radial-gradient(circle at bottom left, rgba(59, 130, 246, 0.14), transparent 24%),
-		linear-gradient(150deg, rgba(239, 244, 250, 0.96), rgba(223, 231, 241, 0.94));
+	background: var(--bg-card);
 }
 
 .ngl-title {
-	color: var(--neu-fg);
+	color: var(--text-primary);
 }
 
 .ngl-muted {
-	color: var(--neu-fg-muted);
+	color: var(--text-secondary);
 }
 
 .ngl-subtle {
-	color: var(--neu-fg-subtle);
+	color: var(--text-tertiary);
 }
 
 .ngl-success-badge {
-	background: color-mix(in oklch, var(--neu-accent-secondary) 14%, white);
-	color: var(--neu-accent-secondary);
+	background: var(--teal-soft);
+	color: var(--teal);
 }
 
 .ngl-error-card {
-	background: color-mix(in oklch, #ef4444 9%, var(--neu-surface));
-	border: 1px solid color-mix(in oklch, #ef4444 24%, transparent);
+	background: color-mix(in srgb, #ef4444 9%, var(--bg-card));
+	border: 1px solid color-mix(in srgb, #ef4444 24%, transparent);
 }
 
 .ngl-notice-card {
-	background: color-mix(in oklch, var(--neu-accent) 8%, var(--neu-surface));
-	border: 1px solid color-mix(in oklch, var(--neu-accent) 20%, transparent);
+	background: var(--teal-soft);
+	border: 1px solid var(--border);
 }
 
 .ngl-turnstile-shell {
 	border-radius: var(--radius-base);
 	padding: 0.875rem;
-	background: linear-gradient(145deg, rgba(237, 242, 248, 0.94), rgba(224, 232, 241, 0.9));
-	box-shadow:
-		inset 3px 3px 6px rgba(163, 177, 198, 0.45),
-		inset -3px -3px 6px rgba(255, 255, 255, 0.45);
+	background: var(--bg-elevated);
+	border: 1px solid var(--border);
 }
 
 @keyframes fadeInUp {

@@ -48,13 +48,14 @@ function hashString(value: string) {
 }
 
 function getColorFromSeed(seed: string) {
-  const palette = ['#3B82F6', '#60A5FA', '#38BDF8', '#22C55E', '#8B5CF6', '#0EA5E9'];
+  const palette = ['var(--teal)', '#0f8577', '#f2a64c', '#b5701e', '#14b8a6', '#0ea5e9'];
+  return palette[hashString(seed) % palette.length] || 'var(--teal)';
   return palette[hashString(seed) % palette.length] || '#3B82F6';
 }
 
 function buildGuestIdentity() {
   if (typeof window === 'undefined') {
-    return { id: 'guest:links', name: 'Guest_links', color: '#3B82F6' };
+    return { id: 'guest:links', name: 'Guest_links', color: 'var(--teal)' };
   }
 
   try {
@@ -237,28 +238,28 @@ export function LivePresencePill({ socketUrl, pagePath, pageLabel }: LivePresenc
         <button
           type="button"
           onClick={() => setIsOpen((open) => !open)}
-          className="inline-flex max-w-[calc(100vw-2.5rem)] items-center justify-center gap-2 rounded-full border border-white/60 bg-[linear-gradient(150deg,rgba(247,250,255,0.82),rgba(231,239,249,0.72))] px-2.5 py-1.5 text-[10px] font-semibold text-[#475569] shadow-neu-extruded-sm backdrop-blur-xl transition-transform duration-200 hover:-translate-y-0.5 md:max-w-[260px] md:px-4 md:py-2 md:text-[11px]"
+          className="inline-flex max-w-[calc(100vw-2.5rem)] items-center justify-center gap-2 rounded-full border border-[var(--border)] bg-[var(--bg-card)] px-2.5 py-1.5 text-[10px] font-semibold text-[var(--text-secondary)] shadow-neu-extruded-sm backdrop-blur-xl transition-transform duration-200 hover:-translate-y-0.5 md:max-w-[260px] md:px-4 md:py-2 md:text-[11px]"
         >
-          <span className="inline-flex items-center gap-2 rounded-full bg-white/72 px-2 py-1 shadow-neu-inset md:px-2.5">
+          <span className="inline-flex items-center gap-2 rounded-full bg-[var(--bg-elevated)] px-2 py-1 shadow-neu-inset md:px-2.5">
             <span
-              className={`h-2.5 w-2.5 rounded-full ${status === 'connected' ? 'bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.75)]' : status === 'connecting' ? 'bg-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.65)]' : 'bg-slate-300 shadow-none'}`}
+              className={`h-2.5 w-2.5 rounded-full ${status === 'connected' ? 'bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.75)]' : status === 'connecting' ? 'bg-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.65)]' : 'bg-slate-500 shadow-none'}`}
             />
-            <Activity size={11} className="hidden text-[#3B82F6] md:block" />
+            <Activity size={11} className="hidden text-[var(--teal)] md:block" />
             <span className="md:hidden">{participants.length} Online</span>
             <span className="hidden md:inline">{participants.length} Online</span>
           </span>
         </button>
 
         {isOpen ? (
-          <div className="w-[min(92vw,360px)] rounded-[24px] border border-white/65 bg-[linear-gradient(160deg,rgba(248,251,255,0.94),rgba(233,240,249,0.88))] p-3 shadow-neu-extruded backdrop-blur-xl">
+          <div className="w-[min(92vw,360px)] rounded-[24px] border border-[var(--border)] bg-[var(--bg-card)] p-3 shadow-neu-extruded backdrop-blur-xl">
             <div className="mb-2 flex items-center justify-between px-1">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#64748B]">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--text-tertiary)]">
                   Live now
                 </p>
-                <p className="text-sm font-semibold text-[#334155]">Shared portfolio presence</p>
+                <p className="text-sm font-semibold text-[var(--text-primary)]">Shared portfolio presence</p>
               </div>
-              <span className="rounded-full bg-white/80 px-2.5 py-1 text-[10px] font-semibold text-[#3B82F6] shadow-neu-inset">
+              <span className="rounded-full bg-[var(--bg-elevated)] px-2.5 py-1 text-[10px] font-semibold text-[var(--teal)] shadow-neu-inset">
                 {participants.length}
               </span>
             </div>
@@ -267,7 +268,7 @@ export function LivePresencePill({ socketUrl, pagePath, pageLabel }: LivePresenc
               {participants.map((participant) => (
                 <div
                   key={`${participant.id}-${participant.pageLabel}`}
-                  className="flex items-start justify-between gap-3 rounded-[18px] border border-white/55 bg-white/75 px-3 py-2.5 shadow-neu-extruded-sm"
+                  className="flex items-start justify-between gap-3 rounded-[18px] border border-[var(--border)] bg-[var(--bg-elevated)] px-3 py-2.5 shadow-neu-extruded-sm"
                 >
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
@@ -275,19 +276,19 @@ export function LivePresencePill({ socketUrl, pagePath, pageLabel }: LivePresenc
                         className="h-2.5 w-2.5 rounded-full"
                         style={{ background: participant.color }}
                       />
-                      <p className="truncate text-sm font-semibold text-[#334155]">
+                      <p className="truncate text-sm font-semibold text-[var(--text-primary)]">
                         {participant.name}
                       </p>
                     </div>
-                    <p className="mt-1 text-[11px] font-medium uppercase tracking-[0.16em] text-[#64748B]">
+                    <p className="mt-1 text-[11px] font-medium uppercase tracking-[0.16em] text-[var(--text-tertiary)]">
                       {participant.pageLabel}
                     </p>
-                    <p className="mt-1 text-xs text-[#475569]">
+                    <p className="mt-1 text-xs text-[var(--text-secondary)]">
                       {participant.sectionLabel || 'Browsing page'}
                     </p>
                   </div>
                   {participant.id === selfId ? (
-                    <span className="shrink-0 rounded-full bg-emerald-50 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-emerald-600">
+                    <span className="shrink-0 rounded-full bg-teal-900 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--teal)]">
                       Here
                     </span>
                   ) : null}

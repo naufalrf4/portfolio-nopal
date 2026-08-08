@@ -2,7 +2,6 @@ import type { APIRoute } from 'astro';
 import { buildAnalyticsProxyHeaders } from '../../lib/analytics';
 
 const ADMIN_API_URL = import.meta.env.ADMIN_API_URL || 'http://localhost:3001';
-
 export const POST: APIRoute = async ({ request }) => {
   try {
     const body = await request.json();

@@ -1,43 +1,14 @@
 import type { AboutData, ProfileLink } from '../types';
+import type { AboutData as AdminAboutData } from '@naufalrf/contracts';
+import { createAbortSignal, HttpError, isAbortError, isSuccessEnvelope } from '@naufalrf/http';
 
 const API_BASE =
   process.env.ADMIN_API_URL?.trim() || import.meta.env.ADMIN_API_URL?.trim() || 'http://localhost:3001';
 const API_TIMEOUT_MS = 5000;
 
-interface ApiEnvelope<T> {
-  data?: T;
-  error?: {
-    message?: string;
-  };
-}
-
 interface LinksPageData {
   aboutData: AboutData;
   links: ProfileLink[];
-}
-
-class LinksApiError extends Error {
-  cause?: unknown;
-
-  constructor(message: string, cause?: unknown) {
-    super(message);
-    this.name = 'LinksApiError';
-    this.cause = cause;
-  }
-}
-
-function createAbortSignal(timeoutMs: number): { signal: AbortSignal; cleanup: () => void } {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-
-  return {
-    signal: controller.signal,
-    cleanup: () => clearTimeout(timeoutId),
-  };
-}
-
-function isAbortError(error: unknown): boolean {
-  return error instanceof Error && (error.name === 'AbortError' || error.name === 'TimeoutError');
 }
 
 async function apiFetch<T>(endpoint: string): Promise<T> {
@@ -55,16 +26,16 @@ async function apiFetch<T>(endpoint: string): Promise<T> {
       throw new Error(`API request failed: ${response.status} ${response.statusText}`);
     }
 
-    const json = (await response.json()) as T | ApiEnvelope<T>;
+    const json: unknown = await response.json();
 
-    if (typeof json === 'object' && json !== null && 'data' in json) {
-      return (json.data ?? null) as T;
-    }
+    if (isSuccessEnvelope<T>(json)) return json.data;
 
     return json as T;
   } catch (error) {
     if (isAbortError(error)) {
-      throw new LinksApiError(`Admin API request timed out for ${endpoint}`, error);
+      const timeoutError = new HttpError(`Admin API request timed out for ${endpoint}`, error);
+      timeoutError.name = 'LinksApiError';
+      throw timeoutError;
     }
 
     throw error;
@@ -79,7 +50,7 @@ export async function getProfileLinks(): Promise<ProfileLink[]> {
 }
 
 export async function getAboutData(): Promise<AboutData> {
-  const aboutData = await apiFetch<AboutData>('/api/v1/public/about');
+  const aboutData = await apiFetch<AdminAboutData>('/api/v1/public/about');
 
   return {
     fullName: aboutData?.fullName || 'NaufalRF',

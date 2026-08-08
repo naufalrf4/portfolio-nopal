@@ -34,6 +34,9 @@
 	"dependencies": {
 		"@sveltejs/adapter-node": "^5.5.4",
 		"@tailwindcss/vite": "^4.2.1",
-		"tailwindcss": "^4.2.1"
+		"tailwindcss": "^4.2.1",
+		"@naufalrf/http": "workspace:*",
+		"@naufalrf/contracts": "workspace:*",
+		"@naufalrf/design-tokens": "workspace:*"
 	}
 }

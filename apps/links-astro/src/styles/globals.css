@@ -1,140 +1,65 @@
 @import 'tailwindcss';
+@import '@naufalrf/design-tokens';
 
 @theme {
-  --font-display: 'Plus Jakarta Sans', sans-serif;
-  --font-sans: 'DM Sans', sans-serif;
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-sans: 'Inter', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
-  --color-background: var(--neu-bg);
-  --color-surface: var(--neu-surface);
-  --color-foreground: var(--neu-fg);
-  --color-foreground-muted: var(--neu-fg-muted);
-  --color-foreground-subtle: var(--neu-fg-subtle);
-  --color-muted-foreground: var(--neu-fg-muted);
-  --color-primary: var(--neu-accent);
-  --color-accent: var(--neu-accent);
-  --color-accent-light: var(--neu-accent-light);
-  --color-accent-secondary: var(--neu-accent-secondary);
+
+  --color-bg: var(--bg);
+  --color-bg-elevated: var(--bg-elevated);
+  --color-bg-card: var(--bg-card);
+  --color-line: var(--border);
+  --color-line-hover: var(--border-hover);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-tertiary: var(--text-tertiary);
+  --color-teal: var(--teal);
+  --color-amber: var(--amber);
+
+  /* Aliases */
+  --color-background: var(--bg);
+  --color-surface: var(--bg-elevated);
+  --color-foreground: var(--text-primary);
+  --color-foreground-muted: var(--text-secondary);
+  --color-foreground-subtle: var(--text-tertiary);
+  --color-muted-foreground: var(--text-secondary);
+  --color-primary: var(--teal);
+  --color-accent: var(--teal);
+  --color-accent-light: var(--teal);
+  --color-accent-secondary: var(--amber);
+
+  --shadow-neu-extruded: 0 8px 30px -12px rgba(0, 0, 0, 0.5);
+  --shadow-neu-extruded-hover: 0 12px 40px -12px rgba(0, 0, 0, 0.6);
+  --shadow-neu-extruded-sm: 0 4px 15px -8px rgba(0, 0, 0, 0.4);
+  --shadow-neu-inset: inset 0 2px 10px rgba(0, 0, 0, 0.3);
+  
   --radius-container: var(--radius-container);
-  --shadow-neu-extruded:
-    9px 9px 16px var(--neu-shadow-dark), -9px -9px 16px var(--neu-shadow-light);
-  --shadow-neu-extruded-hover:
-    12px 12px 20px var(--neu-shadow-dark-strong), -12px -12px 20px var(--neu-shadow-light-strong);
-  --shadow-neu-extruded-sm:
-    5px 5px 10px var(--neu-shadow-dark), -5px -5px 10px var(--neu-shadow-light);
-  --shadow-neu-inset:
-    inset 6px 6px 10px var(--neu-shadow-dark), inset -6px -6px 10px var(--neu-shadow-light);
-}
-
-:root {
-  /* Base surface - cool grey */
-  --neu-bg: oklch(0.92 0.008 240);
-  --neu-surface: oklch(0.92 0.008 240);
-
-  /* Text colors */
-  --neu-fg: oklch(0.35 0.015 240);
-  --neu-fg-muted: oklch(0.52 0.012 240);
-  --neu-fg-subtle: oklch(0.72 0.01 240);
-
-  /* Accent colors */
-  --neu-accent: #3b82f6;
-  --neu-accent-light: #60a5fa;
-  --neu-accent-secondary: #93c5fd;
-
-  /* Shadow colors - RGBA for smooth blending */
-  --neu-shadow-light: rgba(255, 255, 255, 0.5);
-  --neu-shadow-dark: rgb(163, 177, 198, 0.6);
-  --neu-shadow-light-strong: rgba(255, 255, 255, 0.6);
-  --neu-shadow-dark-strong: rgb(163, 177, 198, 0.7);
-
-  /* Border radius */
-  --radius-container: 32px;
-  --radius-base: 16px;
-  --radius-inner: 12px;
 }
 
 body {
-  background:
-    radial-gradient(circle at top, rgba(255, 255, 255, 0.82), transparent 42%),
-    radial-gradient(circle at bottom left, rgba(59, 130, 246, 0.16), transparent 28%),
-    radial-gradient(circle at top right, rgba(96, 165, 250, 0.14), transparent 24%),
-    radial-gradient(circle at top left, rgba(147, 197, 253, 0.1), transparent 22%),
-    linear-gradient(180deg, rgba(233, 239, 246, 0.97) 0%, rgba(224, 231, 240, 1) 100%),
-    var(--neu-bg);
-  color: var(--neu-fg);
-  font-family: 'DM Sans', system-ui, sans-serif;
+  background-color: var(--bg);
+  color: var(--text-primary);
+  font-family: var(--font-sans), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
   min-height: 100vh;
   position: relative;
   overflow-x: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-}
-
-/* Neumorphic Utilities */
-.neu-extruded {
-  box-shadow:
-    9px 9px 16px var(--neu-shadow-dark),
-    -9px -9px 16px var(--neu-shadow-light);
-}
-
-.neu-extruded-hover {
-  box-shadow:
-    12px 12px 20px var(--neu-shadow-dark-strong),
-    -12px -12px 20px var(--neu-shadow-light-strong);
-}
-
-.neu-extruded-sm {
-  box-shadow:
-    5px 5px 10px var(--neu-shadow-dark),
-    -5px -5px 10px var(--neu-shadow-light);
-}
-
-.neu-inset {
-  box-shadow:
-    inset 6px 6px 10px var(--neu-shadow-dark),
-    inset -6px -6px 10px var(--neu-shadow-light);
-}
-
-.neu-inset-deep {
-  box-shadow:
-    inset 10px 10px 20px var(--neu-shadow-dark),
-    inset -10px -10px 20px var(--neu-shadow-light);
-}
-
-.neu-flat {
-  box-shadow: none;
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display), system-ui, sans-serif;
 }
 
 @keyframes homepageReveal {
-  from {
-    opacity: 0;
-    transform: translateY(24px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes homepageRevealPop {
-  from {
-    opacity: 0;
-    transform: translateY(18px) scale(0.94);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+  from { opacity: 0; transform: translateY(18px) scale(0.94); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .homepage-reveal,
@@ -145,17 +70,6 @@ h6 {
   animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.homepage-reveal {
-  animation-name: homepageReveal;
-  animation-duration: 0.82s;
-}
-
-.homepage-reveal-soft {
-  animation-name: homepageReveal;
-  animation-duration: 0.72s;
-}
-
-.homepage-reveal-pop {
-  animation-name: homepageRevealPop;
-  animation-duration: 0.78s;
-}
+.homepage-reveal { animation-name: homepageReveal; animation-duration: 0.82s; }
+.homepage-reveal-soft { animation-name: homepageReveal; animation-duration: 0.72s; }
+.homepage-reveal-pop { animation-name: homepageRevealPop; animation-duration: 0.78s; }

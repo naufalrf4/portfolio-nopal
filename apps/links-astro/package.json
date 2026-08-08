@@ -17,7 +17,10 @@
     "lucide-react": "^0.575.0",
     "tailwind-merge": "^3.5.0",
     "react": "^19.2.4",
-    "react-dom": "^19.2.4"
+    "react-dom": "^19.2.4",
+    "@naufalrf/http": "workspace:*",
+    "@naufalrf/contracts": "workspace:*",
+    "@naufalrf/design-tokens": "workspace:*"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.2.2",

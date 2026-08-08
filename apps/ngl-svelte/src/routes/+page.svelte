@@ -228,13 +228,13 @@
 <div class="relative min-h-screen overflow-hidden px-4 py-10 md:px-6 md:py-14">
 	<div class="pointer-events-none absolute inset-0 overflow-hidden">
 		<div
-			class="absolute left-[-4rem] top-8 h-44 w-44 rounded-full bg-[radial-gradient(circle,rgba(59,130,246,0.18),transparent_70%)] blur-3xl"
+			class="absolute left-[-4rem] top-8 h-44 w-44 rounded-full bg-[radial-gradient(circle,var(--teal-glow),transparent_70%)] blur-3xl"
 		></div>
 		<div
-			class="absolute right-[-4rem] top-1/4 h-56 w-56 rounded-full bg-[radial-gradient(circle,rgba(96,165,250,0.16),transparent_72%)] blur-3xl"
+			class="absolute right-[-4rem] top-1/4 h-56 w-56 rounded-full bg-[radial-gradient(circle,var(--amber-soft),transparent_72%)] blur-3xl"
 		></div>
 		<div
-			class="absolute bottom-[-5rem] left-1/2 h-64 w-64 -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(147,197,253,0.14),transparent_70%)] blur-3xl"
+			class="absolute bottom-[-5rem] left-1/2 h-64 w-64 -translate-x-1/2 rounded-full bg-[radial-gradient(circle,var(--teal-soft),transparent_70%)] blur-3xl"
 		></div>
 	</div>
 
@@ -242,7 +242,7 @@
 		class="relative mx-auto flex min-h-[calc(100vh-5rem)] w-full max-w-2xl items-center justify-center"
 	>
 		<div
-			class="neu-card ngl-panel animate-scale-in relative w-full max-w-xl overflow-hidden rounded-[34px] border border-white/55 bg-[linear-gradient(150deg,rgba(236,242,248,0.96),rgba(222,230,240,0.94))] p-8 shadow-[14px_14px_28px_rgba(163,177,198,0.32),-14px_-14px_28px_rgba(255,255,255,0.58)] md:p-10"
+			class="neu-card ngl-panel animate-scale-in relative w-full max-w-xl overflow-hidden rounded-[34px] border border-[var(--border)] bg-[var(--bg-card)] p-8 shadow-[0_8px_30px_-12px_rgba(0,0,0,0.5)] md:p-10"
 		>
 			{#if form?.success}
 				<div in:scale class="flex flex-col items-center py-8 text-center">
@@ -277,7 +277,7 @@
 			{:else}
 				<div class="mb-8 text-center opacity-0 animate-fade-in-up">
 					<div
-						class="mx-auto mb-4 flex h-18 w-18 items-center justify-center rounded-full bg-[linear-gradient(145deg,rgba(236,242,248,0.98),rgba(222,230,240,0.94))] shadow-[inset_6px_6px_12px_rgba(163,177,198,0.25),inset_-6px_-6px_12px_rgba(255,255,255,0.7)]"
+				class="mx-auto mb-4 flex h-18 w-18 items-center justify-center rounded-full bg-[var(--bg-elevated)] border border-[var(--border)] shadow-neu-inset"
 					>
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
@@ -323,7 +323,7 @@
 							rows="6"
 							maxlength="550"
 							disabled={isSubmitting}
-							class="neu-input min-h-[220px] w-full resize-none rounded-[26px] border border-white/45 bg-[linear-gradient(150deg,rgba(238,243,249,0.98),rgba(223,232,241,0.94))] px-5 pb-9 pt-5 text-base disabled:opacity-50"
+					class="min-h-[220px] w-full resize-none rounded-[26px] border border-[var(--border)] bg-[var(--bg-elevated)] px-5 pb-9 pt-5 text-base disabled:opacity-50"
 						></textarea>
 
 						<div class="pointer-events-none absolute bottom-3 right-3 flex items-center gap-2">
@@ -342,7 +342,7 @@
 					<div class="space-y-3">
 						{#if hasTurnstileConfig && shouldShowTurnstile}
 							<div
-								class="ngl-turnstile-shell rounded-[24px] border border-white/45 bg-[linear-gradient(145deg,rgba(235,241,248,0.95),rgba(223,231,241,0.93))] p-4"
+					class="ngl-turnstile-shell rounded-[24px] border border-[var(--border)] bg-[var(--bg-elevated)] p-4"
 							>
 								<div bind:this={turnstileContainer} class="flex justify-center"></div>
 							</div>
@@ -433,9 +433,9 @@
 				</form>
 
 				<div
-					class="mt-8 border-t border-[#d8e1ed] pt-6 text-center opacity-0 animate-fade-in-up stagger-2"
+				class="mt-8 border-t border-[var(--border)] pt-6 text-center opacity-0 animate-fade-in-up stagger-2"
 				>
-					<p class="text-xs text-[#A0AEC0]">
+				<p class="text-xs text-[var(--text-tertiary)]">
 						Your message is completely anonymous. I will not know who sent it.
 					</p>
 				</div>

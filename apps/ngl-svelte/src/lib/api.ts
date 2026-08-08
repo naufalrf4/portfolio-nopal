@@ -1,5 +1,6 @@
 import { env } from '$env/dynamic/private';
-import type { MessagePayload, MessageResponse } from '../types';
+import type { MessagePayload, MessageResponse } from '@naufalrf/contracts';
+import { buildProxyHeaders, createAbortSignal, isAbortError } from '@naufalrf/http';
 
 interface MessageResult extends MessageResponse {
 	status?: number;
@@ -7,30 +8,6 @@ interface MessageResult extends MessageResponse {
 
 const API_TIMEOUT_MS = 5000;
 const adminApiUrl = env.ADMIN_API_URL ?? 'http://localhost:3001';
-const FORWARDED_HEADER_NAMES = [
-	'x-forwarded-for',
-	'x-real-ip',
-	'x-vercel-forwarded-for',
-	'cf-connecting-ip',
-	'user-agent',
-	'accept-language',
-	'referer'
-] as const;
-
-function createAbortSignal(timeoutMs: number): { signal: AbortSignal; cleanup: () => void } {
-	const controller = new AbortController();
-	const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-
-	return {
-		signal: controller.signal,
-		cleanup: () => clearTimeout(timeoutId)
-	};
-}
-
-function isAbortError(error: unknown): boolean {
-	return error instanceof Error && (error.name === 'AbortError' || error.name === 'TimeoutError');
-}
-
 export async function submitMessage(payload: MessagePayload): Promise<MessageResult> {
 	return submitMessageWithContext(payload, new Headers());
 }
@@ -42,22 +19,7 @@ export async function submitMessageWithContext(
 	const { signal, cleanup } = createAbortSignal(API_TIMEOUT_MS);
 
 	try {
-		const headers = new Headers({
-			'Content-Type': 'application/json',
-			'x-portfolio-source-app': 'ngl-svelte',
-			'x-portfolio-source-path': '/'
-		});
-
-		for (const headerName of FORWARDED_HEADER_NAMES) {
-			const headerValue = requestHeaders.get(headerName);
-			if (headerValue) {
-				headers.set(headerName, headerValue);
-			}
-		}
-
-		if (payload.timezone?.trim()) {
-			headers.set('x-portfolio-timezone', payload.timezone.trim().slice(0, 100));
-		}
+		const headers = buildProxyHeaders('ngl-svelte', '/', requestHeaders, payload.timezone);
 
 		const response = await fetch(`${adminApiUrl}/api/v1/public/messages`, {
 			method: 'POST',

@@ -1,13 +1,6 @@
-export interface ProfileLink {
-  id: string;
-  label: string;
-  url: string;
-  icon: string;
-  order: number;
-  visible?: boolean;
-  createdAt?: string;
-  updatedAt?: string;
-}
+import type { AboutData as AdminAboutData, ProfileLink } from '@naufalrf/contracts';
+
+export type { ProfileLink } from '@naufalrf/contracts';
 
 export interface SocialLink {
   platform: string;
@@ -16,6 +9,11 @@ export interface SocialLink {
   icon?: string;
 }
 
+/**
+ * Links-page view model, normalized from the full Admin AboutData contract.
+ * The Admin contract includes linkedin through socialLinks[].platform;
+ * this local shape keeps the links app's existing reduced view model.
+ */
 export interface AboutData {
   fullName: string;
   tagline: string | null;
@@ -24,3 +22,6 @@ export interface AboutData {
   avatarUrl: string | null;
   socialLinks: SocialLink[];
 }
+
+export type AdminAbout = AdminAboutData;
+export type AdminProfileLink = ProfileLink;
