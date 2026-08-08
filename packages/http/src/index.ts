@@ -1,0 +1,144 @@
+const FORWARDED_HEADER_NAMES = [
+  'x-forwarded-for',
+  'x-real-ip',
+  'x-vercel-forwarded-for',
+  'cf-connecting-ip',
+  'user-agent',
+  'accept-language',
+  'referer',
+] as const;
+
+function normalizeHeaderValue(
+  value: string | null | undefined,
+  maxLength: number,
+): string | null {
+  if (!value) return null;
+  const normalized = value.trim();
+  return normalized ? normalized.slice(0, maxLength) : null;
+}
+
+// --- Exports (1–6) ---
+
+/** 1. Check if an error is an abort/timeout */
+export function isAbortError(error: unknown): boolean {
+  return error instanceof Error && (error.name === 'AbortError' || error.name === 'TimeoutError');
+}
+
+/** 2. Create an AbortSignal that fires after timeoutMs */
+export function createAbortSignal(
+  timeoutMs: number,
+): { signal: AbortSignal; cleanup: () => void } {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+  return {
+    signal: controller.signal,
+    cleanup: () => clearTimeout(timeoutId),
+  };
+}
+
+/** 3. Base HTTP error with optional cause */
+export class HttpError extends Error {
+  cause?: unknown;
+
+  constructor(message: string, cause?: unknown) {
+    super(message);
+    this.name = 'HttpError';
+    this.cause = cause;
+  }
+}
+
+/** 4. Extract a human-readable message from any error shape */
+export function getErrorMessage(
+  error: unknown,
+  fallback = 'An unexpected error occurred',
+): string {
+  if (typeof error === 'string') return error;
+  if (error instanceof Error) return error.message;
+  if (error && typeof error === 'object') {
+    const obj = error as Record<string, unknown>;
+    if (typeof obj.message === 'string') return obj.message;
+    if (typeof obj.error === 'string') return obj.error;
+    if (obj.error && typeof obj.error === 'object') {
+      const inner = obj.error as Record<string, unknown>;
+      if (typeof inner.message === 'string') return inner.message;
+    }
+  }
+  return fallback;
+}
+
+/**
+ * 5. Build proxy headers for forwarding to Admin.
+ *
+ * @param sourceApp   - identity string e.g. "public-astro", "links-astro", "ngl-svelte"
+ * @param sourcePath  - path on the consuming app e.g. "/contact" or "/"
+ * @param requestHeaders - inbound request Headers to forward x-forwarded-for, user-agent, etc.
+ * @param timezone    - optional IANA timezone from consumer
+ */
+export function buildProxyHeaders(
+  sourceApp: string,
+  sourcePath: string,
+  requestHeaders?: Headers,
+  timezone?: string,
+): Headers {
+  const headers = new Headers({
+    'Content-Type': 'application/json',
+    'x-portfolio-source-app': sourceApp,
+    'x-portfolio-source-path': sourcePath,
+  });
+
+  if (requestHeaders) {
+    // ponytail: per-header maxLength differs across consumers (referer=512, others=255);
+    // normalize to the longest needed (512) which is safe for all header values.
+    for (const headerName of FORWARDED_HEADER_NAMES) {
+      const maxLen = headerName === 'referer' ? 512 : 255;
+      const value = normalizeHeaderValue(requestHeaders.get(headerName), maxLen);
+      if (value) headers.set(headerName, value);
+    }
+  }
+
+  const normalizedTimezone = normalizeHeaderValue(timezone, 100);
+  if (normalizedTimezone) {
+    headers.set('x-portfolio-timezone', normalizedTimezone);
+  }
+
+  return headers;
+}
+
+// --- 6. Admin API envelope types + unwrap ---
+
+export interface AdminApiSuccessEnvelope<T = unknown> {
+  success: true;
+  data: T;
+  message?: string;
+}
+
+export interface AdminApiErrorBody {
+  message: string;
+  code?: string;
+  details?: unknown;
+}
+
+export interface AdminApiErrorEnvelope {
+  success: false;
+  error: AdminApiErrorBody;
+}
+
+export type AdminApiEnvelope<T = unknown> =
+  | AdminApiSuccessEnvelope<T>
+  | AdminApiErrorEnvelope;
+
+/**
+ * Unwrap a successful Admin API envelope.
+ * Throws HttpError for non-ok responses or when `success !== true`.
+ */
+export function isSuccessEnvelope<T>(
+  json: unknown,
+): json is AdminApiSuccessEnvelope<T> {
+  return (
+    typeof json === 'object' &&
+    json !== null &&
+    'success' in json &&
+    (json as AdminApiSuccessEnvelope).success === true &&
+    'data' in json
+  );
+}
