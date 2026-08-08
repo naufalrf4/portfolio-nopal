@@ -15,15 +15,15 @@ export function MarkdownMessage({
   isStreaming = false,
 }: MarkdownMessageProps) {
   if (isUser) {
-    return <div className="text-sm leading-relaxed text-white whitespace-pre-wrap">{content}</div>;
+    return <div className="text-sm leading-relaxed text-bg whitespace-pre-wrap">{content}</div>;
   }
 
   return (
     <div
       className={cn(
-        'prose prose-sm max-w-none text-[#3D4852]',
-        'prose-a:text-[#1D4ED8] prose-a:no-underline hover:prose-a:text-[#1E40AF]',
-        'prose-strong:text-[#243447] prose-code:text-[#1D4ED8]',
+        'prose prose-sm max-w-none text-text-primary',
+        'prose-a:text-teal prose-a:no-underline hover:prose-a:brightness-110',
+        'prose-strong:text-text-primary prose-code:text-teal',
         isStreaming && 'animate-in fade-in duration-200'
       )}
     >
@@ -49,7 +49,7 @@ export function MarkdownMessage({
       >
         {content}
       </ReactMarkdown>
-      {isStreaming && <span className="inline-block w-1 h-4 ml-0.5 bg-[#3B82F6] animate-pulse" />}
+      {isStreaming && <span className="inline-block w-1 h-4 ml-0.5 bg-teal animate-pulse" />}
     </div>
   );
 }

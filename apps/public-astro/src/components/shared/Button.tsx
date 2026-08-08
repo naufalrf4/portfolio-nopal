@@ -1,14 +1,14 @@
 import { cn } from '../../lib/utils';
 import React, { forwardRef } from 'react';
 
-interface NeuButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'default' | 'primary' | 'accent' | 'ghost';
   size?: 'sm' | 'md' | 'lg';
   isLoading?: boolean;
   children: React.ReactNode;
 }
 
-export const NeuButton = forwardRef<HTMLButtonElement, NeuButtonProps>(
+export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   (
     { variant = 'default', size = 'md', isLoading, children, className, disabled, ...props },
     ref
@@ -18,7 +18,7 @@ export const NeuButton = forwardRef<HTMLButtonElement, NeuButtonProps>(
         ref={ref}
         disabled={disabled || isLoading}
         className={cn(
-          'inline-flex items-center justify-center font-medium rounded-xl transition-all duration-200',
+          'inline-flex items-center justify-center font-medium rounded-lg transition-all duration-300 ease-out',
           'disabled:opacity-50 disabled:cursor-not-allowed',
 
           // Sizes
@@ -28,16 +28,13 @@ export const NeuButton = forwardRef<HTMLButtonElement, NeuButtonProps>(
 
           // Variants
           variant === 'default' &&
-            'bg-[#E0E5EC] text-[#3D4852] hover:text-[#3B82F6] shadow-[6px_6px_12px_rgba(163,177,198,0.6),-6px_-6px_12px_rgba(255,255,255,0.5)] active:shadow-[inset_4px_4px_8px_rgba(163,177,198,0.6),inset_-4px_-4px_8px_rgba(255,255,255,0.5)] hover:-translate-y-0.5 active:translate-y-0',
+            'bg-bg-elevated text-text-primary border border-line hover:border-line-hover hover:text-teal hover:-translate-y-0.5 active:translate-y-0',
 
-          variant === 'primary' &&
-            'bg-[#3B82F6] text-white shadow-[6px_6px_12px_rgba(59,130,246,0.3),-6px_-6px_12px_rgba(255,255,255,0.5)] hover:bg-[#2563EB] active:shadow-[inset_4px_4px_8px_rgba(0,0,0,0.2)] hover:-translate-y-0.5 active:translate-y-0',
-
-          variant === 'accent' &&
-            'bg-accent text-white shadow-[6px_6px_12px_rgba(59,130,246,0.3),-6px_-6px_12px_rgba(255,255,255,0.5)] hover:bg-accent-light active:shadow-[inset_4px_4px_8px_rgba(0,0,0,0.2)] hover:-translate-y-0.5 active:translate-y-0',
+          (variant === 'primary' || variant === 'accent') &&
+            'bg-teal text-bg font-semibold border border-transparent hover:brightness-110 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_-8px_var(--teal-glow)] active:translate-y-0',
 
           variant === 'ghost' &&
-            'bg-transparent text-[#3D4852] hover:bg-[#E0E5EC]/50 hover:text-[#3B82F6] hover:shadow-[6px_6px_12px_rgba(163,177,198,0.6),-6px_-6px_12px_rgba(255,255,255,0.5)] active:shadow-[inset_4px_4px_8px_rgba(163,177,198,0.6),inset_-4px_-4px_8px_rgba(255,255,255,0.5)]',
+            'bg-transparent text-text-secondary border border-transparent hover:text-teal hover:bg-bg-elevated',
 
           className
         )}
@@ -73,4 +70,4 @@ export const NeuButton = forwardRef<HTMLButtonElement, NeuButtonProps>(
   }
 );
 
-NeuButton.displayName = 'NeuButton';
+Button.displayName = 'Button';

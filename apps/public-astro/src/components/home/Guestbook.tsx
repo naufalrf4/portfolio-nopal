@@ -1,12 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { ArrowRight, LogIn, LogOut, MessageSquare, Plus, UserCircle2 } from 'lucide-react';
-import { NeuCard } from '../shared/NeuCard';
-import { NeuButton } from '../shared/NeuButton';
+import { LogIn, MessageSquare, Plus, UserCircle2 } from 'lucide-react';
+import { Button } from '../shared/Button';
 import { Section } from '../shared/Section';
-import { SectionHeader } from '../shared/SectionHeader';
 import { GuestbookModal } from './GuestbookModal';
 import type { GuestbookEntry } from '@/types';
-import { motion } from 'framer-motion';
+import { BlurFade } from '@/components/ui/BlurFade';
+import { Marquee } from '@/components/ui/Marquee';
+import { BorderBeam } from '@/components/ui/BorderBeam';
 import {
   clearStoredGuestbookUser,
   getStoredGuestbookUser,
@@ -35,6 +35,53 @@ const SYNC_KEYS = [
   'guestbook_image',
   'guestbook_token',
 ] as const;
+
+/** Home preview keeps only the freshest entries. */
+const HOME_PREVIEW_COUNT = 6;
+/** Page mode trims nothing — it shows every entry in full. */
+const HOME_ROWS = 2;
+
+/**
+ * Split entries into up to `rowCount` rows, front-filled so no row is
+ * noticeably shorter than the others.
+ */
+function buildRows(entries: readonly GuestbookEntry[], rowCount: number): GuestbookEntry[][] {
+  const count = entries.length;
+  if (count === 0) return [];
+  const rows = Math.min(rowCount, count);
+  const base = Math.floor(count / rows);
+  const remainder = count % rows;
+  const out: GuestbookEntry[][] = [];
+  let cursor = 0;
+  for (let i = 0; i < rows; i++) {
+    const size = base + (i < remainder ? 1 : 0);
+    out.push(entries.slice(cursor, cursor + size));
+    cursor += size;
+  }
+  return out.filter((row) => row.length > 0);
+}
+
+/**
+ * How many times to duplicate a row's card set inside the marquee so the
+ * track is always wider than the lane and the loop never shows a gap.
+ */
+function repeatForRow(cardCount: number): number {
+  if (cardCount <= 0) return 4;
+  return Math.max(4, Math.ceil(6 / cardCount));
+}
+
+function Avatar({ image, size = 40 }: { image?: string | null; size?: number }) {
+  const dim = `h-${size === 40 ? '10' : '9'} w-${size === 40 ? '10' : '9'}`;
+  return (
+    <div className={`flex ${dim} shrink-0 overflow-hidden rounded-full bg-bg-elevated text-text-tertiary`}>
+      {image ? (
+        <img src={image} alt="" className="h-full w-full object-cover" loading="lazy" />
+      ) : (
+        <UserCircle2 size={20} className="m-auto" />
+      )}
+    </div>
+  );
+}
 
 export function Guestbook({
   initialEntries = [],
@@ -75,28 +122,20 @@ export function Guestbook({
     }
 
     const stored = getStoredGuestbookUser();
-    if (!stored) {
-      return;
+    if (stored) {
+      setUser(stored);
     }
-
-    setUser(stored);
   }, []);
 
-  const latestEntries = useMemo(() => entries.slice(0, 8), [entries]);
-  const marqueeRows = useMemo(() => {
-    const firstRow = latestEntries.slice(0, 4);
-    const secondRowSource = latestEntries.slice(4, 8);
-    const secondRow = secondRowSource.length > 0 ? secondRowSource : firstRow;
-    return [firstRow, secondRow].filter((row) => row.length > 0);
-  }, [latestEntries]);
   const isPageMode = mode === 'page';
+  const homePreview = useMemo(() => entries.slice(0, HOME_PREVIEW_COUNT), [entries]);
+  const homeRows = useMemo(() => buildRows(homePreview, HOME_ROWS), [homePreview]);
 
   async function refreshEntries(): Promise<void> {
     const response = await fetch('/api/guestbook');
     if (!response.ok) {
       throw new Error('Failed to refresh guestbook entries.');
     }
-
     const payload = (await response.json()) as GuestbookResponse;
     setEntries(payload.data?.entries ?? payload.entries ?? []);
   }
@@ -114,291 +153,201 @@ export function Guestbook({
     setSuccess(null);
   }
 
-  return (
-    <Section id="guestbook">
-      <style>{`
-        @keyframes guestbook-marquee {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-33.333%); }
-        }
+  const composerCard = (
+    <div className="relative overflow-hidden rounded-2xl border border-line bg-bg-card p-6">
+      {user ? (
+        <div className="relative z-10 space-y-6">
+          <div className="flex items-center gap-4">
+            <div className="h-10 w-10 overflow-hidden rounded-full bg-line">
+              {user.image ? (
+                <img src={user.image} alt={user.name || ''} className="h-full w-full object-cover" />
+              ) : (
+                <UserCircle2 className="h-full w-full p-2 text-text-tertiary" />
+              )}
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-text-primary">{user.name || user.email}</p>
+              <button
+                onClick={handleSignOut}
+                className="font-mono text-[10px] uppercase tracking-wider text-text-tertiary hover:text-text-primary"
+              >
+                Sign out
+              </button>
+            </div>
+          </div>
+          <Button
+            variant="primary"
+            size="md"
+            onClick={() => setIsModalOpen(true)}
+            className="w-full justify-center"
+            data-analytics-button
+            data-entity-type="guestbook_open_compose"
+            data-entity-id="guestbook"
+            data-entity-label="Leave a guestbook message"
+          >
+            <Plus size={18} className="mr-2" />
+            Compose Message
+          </Button>
+        </div>
+      ) : (
+        <div className="relative z-10 space-y-6">
+          <p className="text-center font-mono text-xs text-text-tertiary">Sign in to leave your mark</p>
+          <Button
+            variant="accent"
+            size="md"
+            onClick={() => setIsModalOpen(true)}
+            className="w-full justify-center"
+            data-analytics-button
+            data-entity-type="guestbook_signin_cta"
+            data-entity-id="guestbook"
+            data-entity-label="Sign in to guestbook"
+          >
+            <LogIn size={18} className="mr-2" />
+            Sign in to post
+          </Button>
+        </div>
+      )}
+      <BorderBeam size={100} duration={12} colorFrom="var(--teal)" colorTo="var(--bg-elevated)" />
+    </div>
+  );
 
-        .guestbook-marquee-track {
-          animation: guestbook-marquee 34s linear infinite;
-          will-change: transform;
-        }
+  const modal = (
+    <GuestbookModal
+      isOpen={isModalOpen}
+      onClose={() => setIsModalOpen(false)}
+      user={user}
+      onSuccess={handleSuccess}
+      turnstileSiteKey={turnstileSiteKey}
+    />
+  );
 
-        .guestbook-marquee-track-reverse {
-          animation-direction: reverse;
-          animation-duration: 40s;
-        }
-
-        .guestbook-marquee-track:hover {
-          animation-play-state: paused;
-        }
-      `}</style>
-      {!isPageMode ? (
-        <SectionHeader
-          title="Guestbook"
-          subtitle="A few words from people who stopped by. Leave a short message once you sign in with Google."
-        />
-      ) : null}
-
-      <motion.div
-        className="mx-auto max-w-4xl space-y-6"
-        initial={{ opacity: 0, y: 26 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, amount: 0.15 }}
-        transition={{ duration: 0.72, ease: [0.22, 1, 0.36, 1] }}
-      >
-        <NeuCard className="p-5 text-center md:p-6 homepage-card-hover">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-[20px] bg-[#E0E5EC] text-[#3B82F6] shadow-[8px_8px_16px_rgba(163,177,198,0.55),-8px_-8px_16px_rgba(255,255,255,0.7)]">
-            <MessageSquare size={24} />
+  // ----- Page mode: static grid, natural card height, no marquee -----
+  if (isPageMode) {
+    return (
+      <Section id="guestbook" className="relative w-full py-8">
+        <div className="mx-auto w-full max-w-7xl">
+          <div className="mb-10 grid gap-8 lg:grid-cols-[1fr_360px] lg:items-start">
+            <p className="max-w-xl text-base leading-relaxed text-text-secondary">
+              Every note left here stays public. Sign in with Google to add yours — the homepage only shows the latest few.
+            </p>
+            <div className="relative">
+              {composerCard}
+              {success && <p className="mt-4 font-mono text-xs text-teal">{success}</p>}
+              {error && <p className="mt-4 font-mono text-xs text-[var(--error)]">{error}</p>}
+            </div>
           </div>
 
-          <h3 className="text-xl font-bold text-[#3D4852] md:text-2xl">Leave a message</h3>
-          <p className="mx-auto mt-2 max-w-xl text-sm leading-relaxed text-[#6B7280]">
-            A few words from visitors, collaborators, and friends. Leave a short public note once
-            you sign in with Google.
-          </p>
-
-          {user ? (
-            <div className="mt-6 space-y-5">
-              <motion.div
-                className="mx-auto flex max-w-xl items-center justify-between gap-4 rounded-2xl bg-[#E0E5EC]/75 p-4 text-left shadow-[inset_4px_4px_8px_rgba(163,177,198,0.45),inset_-4px_-4px_8px_rgba(255,255,255,0.55)]"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.8 }}
-                transition={{ duration: 0.64, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
-              >
-                <div className="flex items-center gap-3">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#3B82F6]/10 text-[#3B82F6]">
-                    <UserCircle2 size={22} />
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-[#3D4852]">
-                      {user.name || user.email}
-                    </p>
-                    <p className="text-xs text-[#6B7280]">{user.email}</p>
-                  </div>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={handleSignOut}
-                  className="inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-[#6B7280] transition-all duration-300 hover:text-[#3B82F6] hover:-translate-y-0.5"
-                >
-                  <LogOut size={16} />
-                  Sign out
-                </button>
-              </motion.div>
-
-              <motion.div
-                className="flex flex-col items-center gap-3"
-                initial={{ opacity: 0, y: 18 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.8 }}
-                transition={{ duration: 0.62, delay: 0.14, ease: [0.22, 1, 0.36, 1] }}
-              >
-                <NeuButton
-                  variant="primary"
-                  size="md"
-                  onClick={() => setIsModalOpen(true)}
-                  data-analytics-button
-                  data-entity-type="guestbook_open_compose"
-                  data-entity-id="guestbook"
-                  data-entity-label="Leave a guestbook message"
-                >
-                  <Plus size={18} className="mr-2" />
-                  Leave a message
-                </NeuButton>
-
-                {!isPageMode ? (
-                  <a
-                    href="/guestbook"
-                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-transparent px-5 py-2.5 text-sm font-medium text-[#3D4852] transition-all duration-200 hover:bg-[#E0E5EC]/50 hover:text-[#3B82F6] hover:shadow-[6px_6px_12px_rgba(163,177,198,0.6),-6px_-6px_12px_rgba(255,255,255,0.5)]"
-                  >
-                    Read full guestbook
-                    <ArrowRight size={16} />
-                  </a>
-                ) : null}
-              </motion.div>
+          {entries.length === 0 ? (
+            <div className="flex h-32 w-full items-center justify-center rounded-2xl border border-dashed border-line">
+              <span className="font-mono text-xs text-text-tertiary">NO MESSAGES YET</span>
             </div>
           ) : (
-            <div className="mt-6 space-y-4">
-              <p className="text-sm text-[#6B7280]">
-                Sign in with Google before posting to the guestbook.
-              </p>
-              <motion.div
-                className="flex flex-wrap items-center justify-center gap-3"
-                initial={{ opacity: 0, y: 18 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.8 }}
-                transition={{ duration: 0.62, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-              >
-                <NeuButton
-                  variant="accent"
-                  size="md"
-                  onClick={() => setIsModalOpen(true)}
-                  data-analytics-button
-                  data-entity-type="guestbook_signin_cta"
-                  data-entity-id="guestbook"
-                  data-entity-label="Sign in to guestbook"
+            <div className="columns-1 gap-5 sm:columns-2 lg:columns-3">
+              {entries.map((entry) => (
+                <article
+                  key={entry.id}
+                  className="mb-5 break-inside-avoid rounded-2xl border border-line bg-bg-card p-5 transition-colors hover:border-line-hover"
                 >
-                  <LogIn size={18} className="mr-2" />
-                  Sign in to guestbook
-                </NeuButton>
-
-                {!isPageMode ? (
-                  <a
-                    href="/guestbook"
-                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-transparent px-5 py-3 text-sm font-medium text-[#3D4852] transition-all duration-200 hover:bg-[#E0E5EC]/50 hover:text-[#3B82F6] hover:shadow-[6px_6px_12px_rgba(163,177,198,0.6),-6px_-6px_12px_rgba(255,255,255,0.5)]"
-                  >
-                    Read full guestbook
-                    <ArrowRight size={16} />
-                  </a>
-                ) : null}
-              </motion.div>
-            </div>
-          )}
-
-          {success ? <p className="mt-4 text-sm text-emerald-600">{success}</p> : null}
-        </NeuCard>
-
-        {error ? (
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.4 }}
-            transition={{ duration: 0.68, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <NeuCard className="p-8 text-center">
-              <p className="text-base font-medium text-[#3D4852]">
-                Failed to load guestbook entries.
-              </p>
-              <p className="mt-2 text-sm text-red-500">{error}</p>
-            </NeuCard>
-          </motion.div>
-        ) : latestEntries.length === 0 ? (
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.4 }}
-            transition={{ duration: 0.68, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <NeuCard className="p-8 text-center">
-              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-[22px] bg-[#E0E5EC]/80 text-[#6B7280] shadow-[inset_4px_4px_8px_rgba(163,177,198,0.45),inset_-4px_-4px_8px_rgba(255,255,255,0.55)]">
-                <MessageSquare size={28} />
-              </div>
-              <p className="mt-5 text-lg font-medium text-[#3D4852]">No messages yet</p>
-              <p className="mt-2 text-sm text-[#6B7280]">Be the first to leave a short message.</p>
-            </NeuCard>
-          </motion.div>
-        ) : isPageMode ? (
-          <div className="grid gap-4 md:grid-cols-2">
-            {entries.map((entry, index) => (
-              <motion.div
-                key={entry.id}
-                initial={{ opacity: 0, y: 18 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.15 }}
-                transition={{
-                  duration: 0.56,
-                  delay: index * 0.03,
-                  ease: [0.22, 1, 0.36, 1],
-                }}
-              >
-                <NeuCard className="h-full p-5 md:p-6">
-                  <div className="flex items-start gap-4">
-                    <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#3B82F6]/10 text-[#3B82F6]">
-                      {entry.user.image ? (
-                        <img
-                          src={entry.user.image}
-                          alt={entry.user.name || 'Guestbook visitor'}
-                          className="h-full w-full object-cover"
-                          loading="lazy"
-                        />
-                      ) : (
-                        <UserCircle2 size={20} />
+                  <div className="flex items-center gap-3">
+                    <Avatar image={entry.user.image} />
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-semibold text-text-primary">
+                        {entry.user.name || 'Anonymous'}
+                      </p>
+                      {entry.createdAt && (
+                        <p className="font-mono text-[10px] uppercase tracking-wider text-text-tertiary">
+                          {new Date(entry.createdAt).toLocaleDateString('en-GB', {
+                            day: 'numeric',
+                            month: 'short',
+                            year: 'numeric',
+                          })}
+                        </p>
                       )}
                     </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-semibold text-[#3D4852]">
-                        {entry.user.name || 'Anonymous visitor'}
-                      </p>
-                      <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-[#556476]">
-                        {entry.message}
-                      </p>
-                    </div>
                   </div>
-                </NeuCard>
-              </motion.div>
-            ))}
-          </div>
-        ) : (
-          <div className="space-y-3 overflow-hidden">
-            {marqueeRows.map((row, rowIndex) => (
-              <motion.div
-                key={`guestbook-row-${rowIndex}`}
-                initial={{ opacity: 0, y: 18 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.2 }}
-                transition={{
-                  duration: 0.62,
-                  delay: 0.08 + rowIndex * 0.06,
-                  ease: [0.22, 1, 0.36, 1],
-                }}
-                className="overflow-hidden rounded-[24px]"
-              >
-                <div
-                  className={
-                    rowIndex % 2 === 1
-                      ? 'guestbook-marquee-track guestbook-marquee-track-reverse flex w-max gap-3'
-                      : 'guestbook-marquee-track flex w-max gap-3'
-                  }
-                >
-                  {[...row, ...row, ...row].map((entry, index) => (
-                    <div
-                      key={`${entry.id}-${rowIndex}-${index}`}
-                      className="flex w-[280px] flex-shrink-0 items-center gap-3 rounded-[22px] bg-[linear-gradient(145deg,rgba(248,250,252,0.98),rgba(240,244,249,0.96))] px-4 py-3 shadow-[8px_8px_18px_rgba(183,194,208,0.18),-8px_-8px_18px_rgba(255,255,255,0.72)]"
-                    >
-                      <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#3B82F6]/10 text-[#3B82F6]">
-                        {entry.user.image ? (
-                          <img
-                            src={entry.user.image}
-                            alt={entry.user.name || 'Guestbook visitor'}
-                            className="h-full w-full object-cover"
-                            loading="lazy"
-                          />
-                        ) : (
-                          <UserCircle2 size={18} />
-                        )}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-3">
-                          <p className="truncate text-sm font-semibold text-[#3D4852]">
-                            {entry.user.name || 'Anonymous visitor'}
+                  <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-text-secondary">
+                    {entry.message}
+                  </p>
+                </article>
+              ))}
+            </div>
+          )}
+        </div>
+        {modal}
+      </Section>
+    );
+  }
+
+  // ----- Home mode: composer on the right, marquee preview on the left -----
+  return (
+    <Section id="guestbook" className="relative w-full overflow-hidden border-t border-line py-16 lg:py-24">
+      <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="grid items-center gap-16 lg:grid-cols-[1.4fr_1fr] lg:gap-20">
+          {/* Marquee preview (left on desktop) */}
+          <BlurFade delay={0.2} inView className="order-2 w-full min-w-0 lg:order-1">
+            {homeRows.length === 0 ? (
+              <div className="flex h-32 w-full items-center justify-center rounded-2xl border border-dashed border-line">
+                <span className="font-mono text-xs text-text-tertiary">NO SIGNALS DETECTED</span>
+              </div>
+            ) : (
+              <div className="relative flex w-full flex-col gap-4 overflow-hidden">
+                <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-[var(--bg)] to-transparent" />
+                <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-[var(--bg)] to-transparent" />
+
+                {homeRows.map((row, idx) => (
+                  <Marquee
+                    key={`row-${idx}`}
+                    pauseOnHover
+                    reverse={idx % 2 === 0}
+                    repeat={repeatForRow(row.length)}
+                    className="w-full [--duration:40s]"
+                  >
+                    {row.map((entry) => (
+                      <div
+                        key={entry.id}
+                        className="flex h-[120px] w-[300px] shrink-0 items-start gap-4 overflow-hidden rounded-xl border border-line bg-bg-card p-4 transition-colors hover:border-line-hover"
+                      >
+                        <Avatar image={entry.user.image} />
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate font-mono text-[10px] uppercase tracking-wider text-text-tertiary">
+                            {entry.user.name || 'Anonymous'}
+                          </p>
+                          <p className="mt-1 line-clamp-3 text-sm leading-relaxed text-text-primary">
+                            {entry.message}
                           </p>
                         </div>
-                        <p className="mt-1 line-clamp-2 text-sm leading-relaxed text-[#556476]">
-                          {entry.message}
-                        </p>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        )}
-      </motion.div>
+                    ))}
+                  </Marquee>
+                ))}
+              </div>
+            )}
+          </BlurFade>
 
-      <GuestbookModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        user={user}
-        onSuccess={handleSuccess}
-        turnstileSiteKey={turnstileSiteKey}
-      />
+          {/* Composer side (right on desktop) */}
+          <BlurFade delay={0.4} inView className="order-1 flex flex-col justify-center lg:order-2">
+            <div className="mb-8 flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-sm bg-text-primary text-bg">
+                <MessageSquare size={18} />
+              </div>
+              <span className="font-mono text-xs uppercase tracking-widest text-text-primary">Incoming Transmissions</span>
+            </div>
+            <h2 className="font-display text-3xl font-bold tracking-tight text-text-primary md:text-4xl lg:text-5xl">
+              Guestbook
+            </h2>
+            <p className="mt-4 text-base leading-relaxed text-text-secondary md:text-lg">
+              A few words from visitors, collaborators, and friends. Leave a short public note once you sign in with Google.
+            </p>
+
+            <div className="relative mt-12">
+              {composerCard}
+              {success && <p className="mt-4 font-mono text-xs text-teal">{success}</p>}
+              {error && <p className="mt-4 font-mono text-xs text-[var(--error)]">{error}</p>}
+            </div>
+          </BlurFade>
+        </div>
+      </div>
+      {modal}
     </Section>
   );
 }

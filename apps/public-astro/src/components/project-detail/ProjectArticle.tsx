@@ -20,24 +20,24 @@ interface ProjectArticleProps {
 }
 
 const ARTICLE_STYLES = {
-  article: 'max-w-none text-[#4B5563]',
-  h1: 'font-display text-3xl md:text-4xl font-bold tracking-tight text-[#2F3A45] mt-12 mb-6 first:mt-0',
-  h2: 'font-display text-2xl md:text-[2rem] font-bold tracking-tight text-[#2F3A45] mt-12 mb-5 first:mt-0',
-  h3: 'font-display text-xl md:text-2xl font-semibold text-[#2F3A45] mt-10 mb-4',
-  h4: 'text-lg md:text-xl font-semibold text-[#2F3A45] mt-8 mb-3',
-  p: 'text-[1.02rem] md:text-[1.08rem] leading-8 text-[#4B5563] mb-5',
-  ul: 'mb-6 ml-5 list-disc space-y-3 text-[1.02rem] md:text-[1.08rem] leading-8 text-[#4B5563]',
-  ol: 'mb-6 ml-5 list-decimal space-y-3 text-[1.02rem] md:text-[1.08rem] leading-8 text-[#4B5563]',
+  article: 'max-w-none text-text-secondary',
+  h1: 'font-display text-3xl md:text-4xl font-bold tracking-tight text-text-primary mt-12 mb-6 first:mt-0',
+  h2: 'font-display text-2xl md:text-[2rem] font-bold tracking-tight text-text-primary mt-12 mb-5 first:mt-0',
+  h3: 'font-display text-xl md:text-2xl font-semibold text-text-primary mt-10 mb-4',
+  h4: 'text-lg md:text-xl font-semibold text-text-primary mt-8 mb-3',
+  p: 'text-[1.02rem] md:text-[1.08rem] leading-8 text-text-secondary mb-5',
+  ul: 'mb-6 ml-5 list-disc space-y-3 text-[1.02rem] md:text-[1.08rem] leading-8 text-text-secondary',
+  ol: 'mb-6 ml-5 list-decimal space-y-3 text-[1.02rem] md:text-[1.08rem] leading-8 text-text-secondary',
   li: 'pl-2',
   blockquote:
-    'my-8 border-l-4 border-[#3B82F6]/70 bg-white/40 pl-5 pr-4 py-4 italic text-[#52606D] shadow-[inset_3px_3px_8px_rgba(163,177,198,0.16),inset_-3px_-3px_8px_rgba(255,255,255,0.45)] rounded-r-[22px]',
-  pre: 'my-8 overflow-x-auto rounded-[24px] bg-[#DCE3EB] p-5 text-sm leading-7 text-[#2F3A45] shadow-[inset_6px_6px_12px_rgba(163,177,198,0.38),inset_-6px_-6px_12px_rgba(255,255,255,0.48)]',
-  code: 'rounded-md bg-[#D7DFE9] px-1.5 py-0.5 text-[0.9em] text-[#234D85]',
-  a: 'font-medium text-[#2563EB] underline decoration-[#2563EB]/30 underline-offset-4 transition-colors duration-200 hover:text-[#1D4ED8]',
-  hr: 'my-10 border-0 h-px bg-gradient-to-r from-transparent via-[#A3B1C6] to-transparent',
-  strong: 'font-semibold text-[#2F3A45]',
-  em: 'italic text-[#52606D]',
-  img: 'my-8 w-full rounded-[24px] object-cover shadow-[12px_12px_24px_rgba(163,177,198,0.35),-12px_-12px_24px_rgba(255,255,255,0.45)]',
+    'my-8 border-l-4 border-teal/70 bg-bg-card/60 pl-5 pr-4 py-4 italic text-text-secondary border border-line rounded-r-[22px]',
+  pre: 'my-8 overflow-x-auto rounded-xl bg-bg-elevated p-5 text-sm leading-7 text-text-primary border border-line',
+  code: 'rounded-md bg-bg-elevated px-1.5 py-0.5 text-[0.9em] text-teal',
+  a: 'font-medium text-teal underline decoration-teal/30 underline-offset-4 transition-colors duration-200 hover:brightness-110',
+  hr: 'my-10 border-0 h-px bg-gradient-to-r from-transparent via-[var(--border-hover)] to-transparent',
+  strong: 'font-semibold text-text-primary',
+  em: 'italic text-text-secondary',
+  img: 'my-8 w-full rounded-xl object-cover border border-line',
 };
 
 const SAFE_PROTOCOLS = new Set(['http:', 'https:', 'mailto:']);

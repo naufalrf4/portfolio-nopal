@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Chrome, UserCircle2 } from 'lucide-react';
-import { NeuButton } from '../shared/NeuButton';
-import { NeuCard } from '../shared/NeuCard';
+import { Button } from '../shared/Button';
+import { Card } from '../shared/Card';
 import { getStoredGuestbookUser, setStoredGuestbookUser } from '@/lib/guestbookIdentity';
 
 interface PublicSignInFormProps {
@@ -58,23 +58,23 @@ export function PublicSignInForm({ callbackUrl = '/' }: PublicSignInFormProps) {
   }
 
   return (
-    <NeuCard className="mx-auto max-w-xl p-6 md:p-8">
+    <Card className="mx-auto max-w-xl p-6 md:p-8">
       <div className="mb-6 flex items-center gap-4">
-        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#E0E5EC] text-[#3B82F6] shadow-[6px_6px_12px_rgba(163,177,198,0.6),-6px_-6px_12px_rgba(255,255,255,0.5)]">
+        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-bg-elevated text-teal border border-line">
           <UserCircle2 size={28} />
         </div>
         <div>
-          <h2 className="text-xl font-bold text-[#3D4852]">Sign in for guestbook</h2>
-          <p className="mt-1 text-sm text-[#6B7280]">
+          <h2 className="text-xl font-bold text-text-primary">Sign in for guestbook</h2>
+          <p className="mt-1 text-sm text-text-secondary">
             Continue with Google to create or refresh your guestbook identity through the Admin user
             system.
           </p>
         </div>
       </div>
 
-      {error ? <p className="mb-4 text-sm text-red-500">{error}</p> : null}
+      {error ? <p className="mb-4 text-sm text-[var(--error)]">{error}</p> : null}
 
-      <NeuButton
+      <Button
         type="button"
         variant="primary"
         size="md"
@@ -84,7 +84,7 @@ export function PublicSignInForm({ callbackUrl = '/' }: PublicSignInFormProps) {
       >
         <Chrome size={18} className="mr-2" />
         Continue with Google
-      </NeuButton>
-    </NeuCard>
+      </Button>
+    </Card>
   );
 }

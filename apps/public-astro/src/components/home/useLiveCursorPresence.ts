@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { resolveLiveCursorIdentity, type LiveCursorIdentity } from '@/lib/guestbookIdentity';
 
 export interface LiveCursorParticipant {
@@ -48,266 +48,341 @@ function resolveRoomId(currentPath: string): string {
   if (!currentPath || currentPath === '/') {
     return 'public-home';
   }
-
   return `public${currentPath.replace(/[^a-zA-Z0-9/_-]/g, '')}`;
 }
 
-export function useLiveCursorPresence(currentPath: string, socketUrl: string) {
-  const [status, setStatus] = useState<Status>('disconnected');
-  const [participants, setParticipants] = useState<LiveCursorParticipant[]>([]);
-  const [overviewParticipants, setOverviewParticipants] = useState<LiveCursorParticipant[]>([]);
-  const [selfId, setSelfId] = useState<string | null>(null);
-  const [identity, setIdentity] = useState<LiveCursorIdentity | null>(null);
-  const socketRef = useRef<WebSocket | null>(null);
-  const heartbeatRef = useRef<number | null>(null);
-  const reconnectTimeoutRef = useRef<number | null>(null);
-  const shouldReconnectRef = useRef(false);
-  const queuedMoveRef = useRef<{ x: number; y: number; isTouching: boolean } | null>(null);
-  const rafRef = useRef<number | null>(null);
-  const lastSentAtRef = useRef(0);
+// ── Singleton store ──────────────────────────────────────────────────
+export interface PresenceState {
+  status: Status;
+  self: LiveCursorParticipant | null;
+  others: LiveCursorParticipant[];
+  overviewParticipants: LiveCursorParticipant[];
+  totalParticipants: number;
+  identity: LiveCursorIdentity | null;
+}
+
+const INITIAL_STATE: PresenceState = {
+  status: 'disconnected',
+  self: null,
+  others: [],
+  overviewParticipants: [],
+  totalParticipants: 0,
+  identity: null,
+};
+
+interface Store {
+  state: PresenceState;
+  currentPath: string;
+  socketUrl: string;
+  socket: WebSocket | null;
+  selfId: string | null;
+  participants: LiveCursorParticipant[];
+  heartbeatId: number | null;
+  reconnectId: number | null;
+  rafId: number | null;
+  queuedMove: { x: number; y: number; isTouching: boolean; sectionId: string | null; sectionLabel: string | null } | null;
+  lastSentAt: number;
+  shouldReconnect: boolean;
+  listeners: Set<() => void>;
+  mountRefCount: number;
+}
+
+const store: Store = {
+  state: INITIAL_STATE,
+  currentPath: '/',
+  socketUrl: '',
+  socket: null,
+  selfId: null,
+  participants: [],
+  heartbeatId: null,
+  reconnectId: null,
+  rafId: null,
+  queuedMove: null,
+  lastSentAt: 0,
+  shouldReconnect: false,
+  listeners: new Set(),
+  mountRefCount: 0,
+};
+
+function notify(): void {
+  store.listeners.forEach((l) => l());
+}
+
+function setState(next: Partial<PresenceState>): void {
+  store.state = { ...store.state, ...next };
+  notify();
+}
+
+function getPageLabel(currentPath: string): string {
+  return currentPath === '/'
+    ? 'Home'
+    : currentPath
+        .split('/')
+        .filter(Boolean)
+        .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+        .join(' / ');
+}
+
+function clearTimers(): void {
+  if (store.heartbeatId !== null) {
+    window.clearInterval(store.heartbeatId);
+    store.heartbeatId = null;
+  }
+  if (store.reconnectId !== null) {
+    window.clearTimeout(store.reconnectId);
+    store.reconnectId = null;
+  }
+  if (store.rafId !== null) {
+    window.cancelAnimationFrame(store.rafId);
+    store.rafId = null;
+  }
+}
+
+function sendMessage(message: object): void {
+  const socket = store.socket;
+  if (!socket || socket.readyState !== WebSocket.OPEN) return;
+  socket.send(JSON.stringify(message));
+}
+
+function flushQueuedMove(): void {
+  store.rafId = null;
+  const queued = store.queuedMove;
+  if (!queued) return;
+
+  const now = performance.now();
+  if (now - store.lastSentAt < SEND_INTERVAL_MS) {
+    store.rafId = window.requestAnimationFrame(flushQueuedMove);
+    return;
+  }
+
+  store.lastSentAt = now;
+  store.queuedMove = null;
+  sendMessage({ type: 'move', payload: queued });
+}
+
+export function queueMove(move: {
+  x: number;
+  y: number;
+  isTouching: boolean;
+  sectionId: string | null;
+  sectionLabel: string | null;
+}): void {
+  store.queuedMove = move;
+  if (store.rafId === null) {
+    store.rafId = window.requestAnimationFrame(flushQueuedMove);
+  }
+}
+
+function scheduleReconnect(identity: LiveCursorIdentity): void {
+  if (!store.shouldReconnect || store.reconnectId !== null) return;
+  store.reconnectId = window.setTimeout(() => {
+    store.reconnectId = null;
+    void connect(identity);
+  }, RECONNECT_DELAY_MS);
+}
+
+async function connect(identity: LiveCursorIdentity): Promise<void> {
+  clearTimers();
+  store.shouldReconnect = true;
+  setState({ status: 'connecting', self: null, others: [], overviewParticipants: [], totalParticipants: 0 });
+  store.selfId = null;
+  store.participants = [];
+
+  const healthUrl = getHealthUrl(store.socketUrl);
+  if (healthUrl) {
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), HEALTHCHECK_TIMEOUT_MS);
+    try {
+      const response = await fetch(healthUrl, {
+        method: 'GET',
+        signal: controller.signal,
+        cache: 'no-store',
+      });
+      if (!response.ok) throw new Error(`Presence health check failed: ${response.status}`);
+    } catch {
+      if (store.shouldReconnect) {
+        setState({ status: 'disconnected' });
+        scheduleReconnect(identity);
+      }
+      return;
+    } finally {
+      window.clearTimeout(timeout);
+    }
+  }
+
+  const socket = new WebSocket(getSocketUrl(store.socketUrl));
+  store.socket = socket;
+  const currentPath = store.currentPath;
+  const pageLabel = getPageLabel(currentPath);
   const roomId = resolveRoomId(currentPath);
 
-  const clearTimers = useCallback(() => {
-    if (heartbeatRef.current) {
-      window.clearInterval(heartbeatRef.current);
-      heartbeatRef.current = null;
-    }
-    if (reconnectTimeoutRef.current) {
-      window.clearTimeout(reconnectTimeoutRef.current);
-      reconnectTimeoutRef.current = null;
-    }
-    if (rafRef.current) {
-      window.cancelAnimationFrame(rafRef.current);
-      rafRef.current = null;
-    }
-  }, []);
+  socket.addEventListener('open', () => {
+    if (store.socket !== socket) return;
+    setState({ status: 'connected' });
+    sendMessage({
+      type: 'join',
+      payload: {
+        roomId,
+        name: identity.name,
+        color: identity.color,
+        x: 0.5,
+        y: 0.5,
+        isTouching: false,
+        pagePath: currentPath,
+        pageLabel,
+        sectionId: null,
+        sectionLabel: null,
+      },
+    });
+    store.heartbeatId = window.setInterval(() => {
+      if (store.socket === socket) sendMessage({ type: 'ping' });
+    }, HEARTBEAT_MS);
+  });
 
-  const scheduleReconnect = useCallback(
-    (activeIdentity: LiveCursorIdentity) => {
-      clearTimers();
-      if (!shouldReconnectRef.current || reconnectTimeoutRef.current) {
+  socket.addEventListener('message', (event) => {
+    if (store.socket !== socket) return;
+    try {
+      const message = JSON.parse(event.data) as PresenceMessage;
+      if (message.type === 'welcome') {
+        store.selfId = message.payload.selfId;
+        recomputeParticipants();
         return;
       }
-
-      reconnectTimeoutRef.current = window.setTimeout(() => {
-        reconnectTimeoutRef.current = null;
-        void connect(activeIdentity);
-      }, RECONNECT_DELAY_MS);
-    },
-    [clearTimers]
-  );
-
-  const sendMessage = useCallback((message: object) => {
-    const socket = socketRef.current;
-    if (!socket || socket.readyState !== WebSocket.OPEN) {
-      return;
-    }
-    socket.send(JSON.stringify(message));
-  }, []);
-
-  const flushQueuedMove = useCallback(() => {
-    rafRef.current = null;
-    const queuedMove = queuedMoveRef.current;
-    if (!queuedMove) {
-      return;
-    }
-
-    const now = performance.now();
-    if (now - lastSentAtRef.current < SEND_INTERVAL_MS) {
-      rafRef.current = window.requestAnimationFrame(flushQueuedMove);
-      return;
-    }
-
-    lastSentAtRef.current = now;
-    queuedMoveRef.current = null;
-    sendMessage({ type: 'move', payload: queuedMove });
-  }, [sendMessage]);
-
-  const pageLabel =
-    currentPath === '/'
-      ? 'Home'
-      : currentPath
-          .split('/')
-          .filter(Boolean)
-          .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-          .join(' / ');
-
-  const sendMove = useCallback(
-    (move: {
-      x: number;
-      y: number;
-      isTouching: boolean;
-      sectionId: string | null;
-      sectionLabel: string | null;
-    }) => {
-      queuedMoveRef.current = move;
-      if (!rafRef.current) {
-        rafRef.current = window.requestAnimationFrame(flushQueuedMove);
+      if (message.type === 'state') {
+        store.participants = message.payload.participants;
+        recomputeParticipants();
+        return;
       }
-    },
-    [flushQueuedMove]
-  );
-
-  const connect = useCallback(
-    async (activeIdentity: LiveCursorIdentity) => {
-      clearTimers();
-      shouldReconnectRef.current = true;
-      setStatus('connecting');
-      setParticipants([]);
-      setOverviewParticipants([]);
-      setSelfId(null);
-
-      const healthUrl = getHealthUrl(socketUrl);
-      if (healthUrl) {
-        const controller = new AbortController();
-        const timeout = window.setTimeout(() => controller.abort(), HEALTHCHECK_TIMEOUT_MS);
-
-        try {
-          const response = await fetch(healthUrl, {
-            method: 'GET',
-            signal: controller.signal,
-            cache: 'no-store',
-          });
-
-          if (!response.ok) {
-            throw new Error(`Presence health check failed with status ${response.status}`);
-          }
-        } catch {
-          if (shouldReconnectRef.current) {
-            setStatus('disconnected');
-            scheduleReconnect(activeIdentity);
-          }
-          return;
-        } finally {
-          window.clearTimeout(timeout);
-        }
-      }
-
-      const socket = new WebSocket(getSocketUrl(socketUrl));
-      socketRef.current = socket;
-
-      socket.addEventListener('open', () => {
-        if (socketRef.current !== socket) {
-          return;
-        }
-
-        setStatus('connected');
-        sendMessage({
-          type: 'join',
-          payload: {
-            roomId,
-            name: activeIdentity.name,
-            color: activeIdentity.color,
-            x: 0.5,
-            y: 0.5,
-            isTouching: false,
-            pagePath: currentPath,
-            pageLabel,
-            sectionId: null,
-            sectionLabel: null,
-          },
+      if (message.type === 'overview') {
+        setState({
+          overviewParticipants: message.payload.participants,
+          totalParticipants: message.payload.participants.length || store.participants.length,
         });
-
-        heartbeatRef.current = window.setInterval(() => {
-          if (socketRef.current === socket) {
-            sendMessage({ type: 'ping' });
-          }
-        }, HEARTBEAT_MS);
-      });
-
-      socket.addEventListener('message', (event) => {
-        if (socketRef.current !== socket) {
-          return;
-        }
-
-        try {
-          const message = JSON.parse(event.data) as PresenceMessage;
-          if (message.type === 'welcome') {
-            setSelfId(message.payload.selfId);
-            return;
-          }
-          if (message.type === 'state') {
-            setParticipants(message.payload.participants);
-            return;
-          }
-          if (message.type === 'overview') {
-            setOverviewParticipants(message.payload.participants);
-          }
-        } catch {
-          // Ignore invalid frames.
-        }
-      });
-
-      socket.addEventListener('close', () => {
-        if (socketRef.current === socket) {
-          socketRef.current = null;
-          setStatus('disconnected');
-        }
-
-        clearTimers();
-        if (!shouldReconnectRef.current || socketRef.current !== null) {
-          return;
-        }
-
-        scheduleReconnect(activeIdentity);
-      });
-
-      socket.addEventListener('error', () => {
-        if (socketRef.current === socket) {
-          setStatus('disconnected');
-        }
-      });
-    },
-    [clearTimers, currentPath, pageLabel, roomId, scheduleReconnect, sendMessage, socketUrl]
-  );
-
-  useEffect(() => {
-    setIdentity(resolveLiveCursorIdentity());
-
-    return () => {
-      shouldReconnectRef.current = false;
-      clearTimers();
-    };
-  }, [clearTimers]);
-
-  useEffect(() => {
-    if (!identity) {
-      return;
+      }
+    } catch {
+      // Ignore invalid frames.
     }
+  });
 
-    void connect(identity);
+  socket.addEventListener('close', () => {
+    if (store.socket === socket) {
+      store.socket = null;
+      setState({ status: 'disconnected' });
+    }
+    clearTimers();
+    if (!store.shouldReconnect || store.socket !== null) return;
+    scheduleReconnect(identity);
+  });
 
-    return () => {
-      shouldReconnectRef.current = false;
-      const activeSocket = socketRef.current;
-      clearTimers();
-      queuedMoveRef.current = null;
-      setParticipants([]);
-      setOverviewParticipants([]);
-      setSelfId(null);
+  socket.addEventListener('error', () => {
+    if (store.socket === socket) setState({ status: 'disconnected' });
+  });
+}
 
-      if (activeSocket?.readyState === WebSocket.OPEN) {
-        activeSocket.send(JSON.stringify({ type: 'leave' }));
-      }
-
-      if (socketRef.current === activeSocket) {
-        socketRef.current = null;
-      }
-
-      activeSocket?.close();
-    };
-  }, [clearTimers, connect, identity]);
-
-  const self = participants.find((participant) => participant.id === selfId) || null;
-  const others = participants.filter((participant) => participant.id !== selfId);
-
-  return {
-    identity,
-    status,
+function recomputeParticipants(): void {
+  const self = store.participants.find((p) => p.id === store.selfId) || null;
+  const others = store.participants.filter((p) => p.id !== store.selfId);
+  setState({
     self,
     others,
-    overviewParticipants,
-    totalParticipants: overviewParticipants.length || participants.length,
-    sendMove,
+    totalParticipants: store.state.overviewParticipants.length || store.participants.length,
+  });
+}
+
+function disconnect(): void {
+  store.shouldReconnect = false;
+  clearTimers();
+  store.queuedMove = null;
+  const socket = store.socket;
+  if (socket?.readyState === WebSocket.OPEN) {
+    socket.send(JSON.stringify({ type: 'leave' }));
+  }
+  socket?.close();
+  store.socket = null;
+  store.participants = [];
+  store.selfId = null;
+  setState(INITIAL_STATE);
+}
+
+// ── Public API ───────────────────────────────────────────────────────
+
+function subscribe(listener: () => void): () => void {
+  store.listeners.add(listener);
+  return () => {
+    store.listeners.delete(listener);
+  };
+}
+
+function getSnapshot(): PresenceState {
+  return store.state;
+}
+
+function getServerSnapshot(): PresenceState {
+  return INITIAL_STATE;
+}
+
+/**
+ * Live cursor presence — subscribes to a SINGLE shared socket connection.
+ * Multiple hook instances (LiveCursorBand + PresenceChip) share the same socket.
+ * The first mount initializes the connection; the last unmount tears it down.
+ */
+export function useLiveCursorPresence(currentPath: string, socketUrl: string) {
+  const state = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const initializedRef = useRef(false);
+
+  useEffect(() => {
+    // Track mount count so we only disconnect when the LAST subscriber unmounts.
+    store.mountRefCount += 1;
+    store.currentPath = currentPath;
+    store.socketUrl = socketUrl;
+
+    if (!store.state.identity) {
+      const identity = resolveLiveCursorIdentity();
+      setState({ identity });
+    }
+
+    // Kick off connection on first mount.
+    if (!initializedRef.current) {
+      initializedRef.current = true;
+      const identity = store.state.identity || resolveLiveCursorIdentity();
+      if (!store.state.identity) setState({ identity });
+      if (!store.socket && store.shouldReconnect === false) {
+        void connect(identity);
+      }
+    }
+
+    return () => {
+      store.mountRefCount -= 1;
+      if (store.mountRefCount <= 0) {
+        store.mountRefCount = 0;
+        disconnect();
+      }
+    };
+  }, [currentPath, socketUrl]);
+
+  // If path changes while we're mounted, reconnect with new room.
+  useEffect(() => {
+    if (store.currentPath !== currentPath && store.state.identity) {
+      store.currentPath = currentPath;
+      // Reconnect to new room
+      const identity = store.state.identity;
+      const oldSocket = store.socket;
+      if (oldSocket?.readyState === WebSocket.OPEN) {
+        oldSocket.send(JSON.stringify({ type: 'leave' }));
+      }
+      oldSocket?.close();
+      store.socket = null;
+      void connect(identity);
+    }
+  }, [currentPath]);
+
+  return {
+    identity: state.identity,
+    status: state.status,
+    self: state.self,
+    others: state.others,
+    overviewParticipants: state.overviewParticipants,
+    totalParticipants: state.totalParticipants,
+    sendMove: queueMove,
   };
 }

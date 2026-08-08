@@ -1,6 +1,6 @@
 import React from 'react';
 import { BlogCard } from './BlogCard';
-import { NeuCard } from '../shared';
+import { Card } from '../shared';
 import type { BlogLink } from '@/types';
 import { FileX } from 'lucide-react';
 
@@ -11,15 +11,15 @@ interface BlogsGridProps {
 function EmptyState() {
   return (
     <div className="w-full flex justify-center py-12">
-      <NeuCard className="max-w-md w-full p-8 text-center flex flex-col items-center">
-        <div className="w-16 h-16 bg-[#E0E5EC] rounded-full flex items-center justify-center mb-4 shadow-[inset_4px_4px_8px_rgba(163,177,198,0.6),inset_-4px_-4px_8px_rgba(255,255,255,0.5)]">
-          <FileX className="w-8 h-8 text-[#6B7280]" />
+      <Card className="max-w-md w-full p-8 text-center flex flex-col items-center">
+        <div className="w-16 h-16 bg-bg-elevated rounded-full flex items-center justify-center mb-4 border border-line">
+          <FileX className="w-8 h-8 text-text-secondary" />
         </div>
-        <h3 className="text-xl font-bold text-[#3D4852] mb-2">No articles found</h3>
-        <p className="text-[#6B7280]">
+        <h3 className="text-xl font-bold text-text-primary mb-2">No articles found</h3>
+        <p className="text-text-secondary">
           No articles are available at the moment. Check back later for new content!
         </p>
-      </NeuCard>
+      </Card>
     </div>
   );
 }

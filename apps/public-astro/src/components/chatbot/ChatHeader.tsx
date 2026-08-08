@@ -16,13 +16,13 @@ export function ChatHeader({
   isExpanded = false,
 }: ChatHeaderProps) {
   return (
-    <div className="flex items-center justify-between border-b border-[#C8D6E8]/70 bg-[linear-gradient(180deg,rgba(226,235,246,0.96),rgba(219,230,242,0.92))] px-5 py-4 text-[#314155] shadow-[0_10px_24px_rgba(214,224,236,0.55)] md:px-6">
+    <div className="flex items-center justify-between border-b border-line bg-bg-elevated px-5 py-4 text-text-primary md:px-6">
       <div className="flex items-center gap-3">
-        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[linear-gradient(145deg,rgba(220,232,248,0.96),rgba(235,241,248,0.94))] shadow-[6px_6px_12px_rgba(163,177,198,0.26),-6px_-6px_12px_rgba(255,255,255,0.36)]">
-          <Sparkles size={20} className="text-[#2563EB]" />
+        <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-teal/30 bg-[var(--teal-soft)]">
+          <Sparkles size={20} className="text-teal" />
         </div>
         <div>
-          <h3 className="text-lg font-bold">Nau AI</h3>
+          <h3 className="text-lg font-bold font-display">Nau AI</h3>
         </div>
       </div>
       <div className="flex items-center gap-2">
@@ -30,9 +30,9 @@ export function ChatHeader({
           <button
             onClick={onClear}
             className={cn(
-              'rounded-xl p-2.5 text-[#5B6B7E]',
-              'hover:bg-[#DCE8FF] hover:text-[#2563EB] transition-colors',
-              'focus:outline-none focus:ring-2 focus:ring-[#93C5FD]'
+              'rounded-lg p-2.5 text-text-secondary',
+              'hover:bg-bg-card hover:text-teal transition-colors',
+              'focus:outline-none focus:ring-2 focus:ring-teal/40'
             )}
             aria-label="Reset chat"
             title="Reset chat"
@@ -44,9 +44,9 @@ export function ChatHeader({
           <a
             href="/ai-chatbot"
             className={cn(
-              'rounded-xl p-2.5 text-[#5B6B7E]',
-              'hover:bg-[#DCE8FF] hover:text-[#2563EB] transition-colors',
-              'focus:outline-none focus:ring-2 focus:ring-[#93C5FD]'
+              'rounded-lg p-2.5 text-text-secondary',
+              'hover:bg-bg-card hover:text-teal transition-colors',
+              'focus:outline-none focus:ring-2 focus:ring-teal/40'
             )}
             aria-label="Open full chat page"
             title="Open full page"
@@ -58,9 +58,9 @@ export function ChatHeader({
           <button
             onClick={onToggleSize}
             className={cn(
-              'rounded-xl p-2.5 text-[#5B6B7E]',
-              'hover:bg-[#DCE8FF] hover:text-[#2563EB] transition-colors',
-              'focus:outline-none focus:ring-2 focus:ring-[#93C5FD]'
+              'rounded-lg p-2.5 text-text-secondary',
+              'hover:bg-bg-card hover:text-teal transition-colors',
+              'focus:outline-none focus:ring-2 focus:ring-teal/40'
             )}
             aria-label={isExpanded ? 'Minimize chat' : 'Maximize chat'}
             title={isExpanded ? 'Minimize' : 'Maximize'}

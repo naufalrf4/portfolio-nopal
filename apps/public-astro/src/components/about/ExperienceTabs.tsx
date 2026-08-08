@@ -1,6 +1,7 @@
 import { useMemo, useState, type FC } from 'react';
-import { NeuCard } from '../shared/NeuCard';
+import { Card } from '../shared/Card';
 import { Calendar, Briefcase, GraduationCap, Award, Users, MapPin, Building2 } from 'lucide-react';
+import { BlurFade } from '@/components/ui';
 import type { Experience } from '../../types';
 
 interface ExperienceTabsProps {
@@ -65,7 +66,7 @@ function sortExperience(items: Experience[]): Experience[] {
 
 function ExperienceLogoPlaceholder() {
   return (
-    <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#E0E5EC] p-2 shadow-[inset_4px_4px_8px_rgba(163,177,198,0.45),inset_-4px_-4px_8px_rgba(255,255,255,0.45)]">
+    <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-bg-elevated p-2 border border-line">
       <Building2 className="h-6 w-6 text-primary/70" />
     </div>
   );
@@ -87,7 +88,7 @@ export const ExperienceTabs: FC<ExperienceTabsProps> = ({ experience }) => {
 
   return (
     <div>
-      <div className="sticky top-20 z-30 mb-8 rounded-[24px] bg-[linear-gradient(180deg,rgba(224,229,236,0.94),rgba(224,229,236,0.82))] p-2 backdrop-blur-xl shadow-[0_14px_28px_rgba(163,177,198,0.16)]">
+      <div className="sticky top-20 z-30 mb-8 rounded-xl border border-line bg-bg-elevated/90 p-1.5 backdrop-blur-xl">
         <div className="flex flex-wrap gap-2">
           {availableTabs.map((tab) => {
             const Icon = tab.icon;
@@ -98,10 +99,10 @@ export const ExperienceTabs: FC<ExperienceTabsProps> = ({ experience }) => {
                 key={tab.type}
                 onClick={() => setActiveTab(tab.type)}
                 className={cn(
-                  'flex items-center gap-2 rounded-xl px-4 py-2.5 font-medium transition-all duration-300',
+                  'flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-all duration-300',
                   isActive
-                    ? 'text-primary shadow-[inset_4px_4px_8px_rgba(163,177,198,0.6),inset_-4px_-4px_8px_rgba(255,255,255,0.5)]'
-                    : 'text-muted-foreground shadow-[4px_4px_8px_rgba(163,177,198,0.6),-4px_-4px_8px_rgba(255,255,255,0.5)] hover:text-primary hover:shadow-[6px_6px_10px_rgba(163,177,198,0.7),-6px_-6px_10px_rgba(255,255,255,0.6)]'
+                    ? 'bg-[var(--teal-soft)] text-teal border border-teal/30'
+                    : 'text-text-secondary border border-transparent hover:text-teal hover:bg-bg-card'
                 )}
                 aria-pressed={isActive}
                 aria-label={`Show ${tab.label} entries`}
@@ -115,24 +116,24 @@ export const ExperienceTabs: FC<ExperienceTabsProps> = ({ experience }) => {
       </div>
 
       <div className="relative">
-        <div className="absolute bottom-0 left-4 top-0 w-[3px] rounded-full bg-[linear-gradient(180deg,rgba(59,130,246,0.18)_0%,rgba(59,130,246,0.85)_18%,rgba(37,99,235,0.95)_50%,rgba(59,130,246,0.38)_100%)] shadow-[0_0_0_1px_rgba(191,219,254,0.55),0_0_18px_rgba(59,130,246,0.22)]" />
+        <div className="absolute bottom-0 left-4 top-0 w-[3px] rounded-full bg-[linear-gradient(180deg,var(--teal-soft)_0%,var(--teal)_50%,var(--teal-soft)_100%)]" />
 
         <div className="space-y-6">
           {filteredExperience.map((exp, index) => (
-            <div
+            <BlurFade
               key={`${exp.type}-${exp.title}-${index}`}
-              className="stagger-item relative pl-10"
-              style={{ animationDelay: `${index * 0.1}s` }}
+              delay={index * 0.08}
+              className="relative pl-10"
             >
-              <div className="absolute left-[5px] top-6 flex h-[22px] w-[22px] items-center justify-center rounded-full bg-[radial-gradient(circle_at_35%_35%,#dbeafe_0%,#60a5fa_42%,#2563eb_78%,#1d4ed8_100%)] shadow-[0_0_0_5px_rgba(224,236,255,0.92),0_10px_18px_rgba(59,130,246,0.3)]">
-                <div className="h-2.5 w-2.5 rounded-full bg-white/80 shadow-[0_0_0_1px_rgba(191,219,254,0.7)]" />
+              <div className="absolute left-[5px] top-6 flex h-[22px] w-[22px] items-center justify-center rounded-full border border-teal/40 bg-[var(--teal-soft)] shadow-[0_0_12px_var(--teal-glow)]">
+                <div className="h-2.5 w-2.5 rounded-full bg-teal shadow-[0_0_8px_var(--teal-glow)]" />
               </div>
 
-              <NeuCard className="p-5 md:p-6">
+              <Card className="p-5 md:p-6 transition-colors duration-300 hover:border-line-hover">
                 <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
                   <div className="flex items-start gap-3">
                     {exp.logoUrl ? (
-                      <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#E0E5EC] p-2 shadow-[inset_4px_4px_8px_rgba(163,177,198,0.45),inset_-4px_-4px_8px_rgba(255,255,255,0.45)]">
+                      <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-bg-elevated p-2 border border-line">
                         <img
                           src={exp.logoUrl}
                           alt={`${exp.organization} logo`}
@@ -175,24 +176,24 @@ export const ExperienceTabs: FC<ExperienceTabsProps> = ({ experience }) => {
                     {exp.skills.map((skill) => (
                       <span
                         key={`${exp.title}-${skill}`}
-                        className="rounded-full bg-primary/8 px-3 py-1 text-xs font-medium text-primary shadow-[2px_2px_4px_rgba(163,177,198,0.45),-2px_-2px_4px_rgba(255,255,255,0.45)]"
+                        className="rounded-full bg-primary/8 px-3 py-1 text-xs font-medium text-primary border border-line"
                       >
                         {skill}
                       </span>
                     ))}
                   </div>
                 ) : null}
-              </NeuCard>
-            </div>
+              </Card>
+            </BlurFade>
           ))}
         </div>
 
         {filteredExperience.length === 0 ? (
           <div className="pl-10">
-            <NeuCard className="p-6 text-center text-muted-foreground">
+            <Card className="p-6 text-center text-muted-foreground">
               No {tabConfig.find((tab) => tab.type === activeTab)?.label.toLowerCase()} entries to
               display.
-            </NeuCard>
+            </Card>
           </div>
         ) : null}
       </div>

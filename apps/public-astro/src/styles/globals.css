@@ -1,68 +1,38 @@
 @import 'tailwindcss';
+@import '@naufalrf/design-tokens';
+
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
 
 @layer base {
-  :root {
-    /* Base surface - cool grey */
-    --background: oklch(0.92 0.008 240);
-    --surface: oklch(0.92 0.008 240);
-
-    /* Text colors */
-    --foreground: oklch(0.35 0.015 240);
-    --foreground-muted: oklch(0.52 0.012 240);
-    --foreground-subtle: oklch(0.72 0.01 240);
-
-    /* Accent colors */
-    --accent: #3b82f6;
-    --accent-light: #60a5fa;
-    --accent-secondary: oklch(0.68 0.1 190);
-
-    /* Semantic */
-    --success: oklch(0.68 0.1 190);
-    --warning: oklch(0.75 0.15 70);
-    --error: oklch(0.62 0.22 25);
-
-    /* Shadow colors - use rgba directly in shadows */
-    --shadow-light: rgba(255, 255, 255, 0.5);
-    --shadow-light-strong: rgba(255, 255, 255, 0.6);
-    --shadow-dark: rgb(163, 177, 198, 0.6);
-    --shadow-dark-strong: rgb(163, 177, 198, 0.7);
-
-    /* Border radius */
-    --radius-container: 32px;
-    --radius-base: 16px;
-    --radius-inner: 12px;
-
-    /* Neumorphic Shadows (Variables for reuse if needed outside utility classes) */
-    --neu-extruded: 9px 9px 16px var(--shadow-dark), -9px -9px 16px var(--shadow-light);
-    --neu-extruded-hover:
-      12px 12px 20px var(--shadow-dark-strong), -12px -12px 20px var(--shadow-light-strong);
-    --neu-extruded-sm: 5px 5px 10px var(--shadow-dark), -5px -5px 10px var(--shadow-light);
-    --neu-inset: inset 6px 6px 10px var(--shadow-dark), inset -6px -6px 10px var(--shadow-light);
-    --neu-inset-deep:
-      inset 10px 10px 20px var(--shadow-dark-strong),
-      inset -10px -10px 20px var(--shadow-light-strong);
-    --neu-inset-sm: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light);
-  }
 
   @theme {
-    --font-display: 'Plus Jakarta Sans', sans-serif;
-    --font-sans: 'DM Sans', sans-serif;
+    --font-display: 'Space Grotesk', sans-serif;
+    --font-sans: 'Inter', sans-serif;
     --font-mono: 'JetBrains Mono', monospace;
-    --color-background: var(--background);
-    --color-surface: var(--surface);
-    --color-foreground: var(--foreground);
-    --color-foreground-muted: var(--foreground-muted);
-    --color-foreground-subtle: var(--foreground-subtle);
-    --color-muted-foreground: var(--foreground-muted);
-    --color-primary: var(--accent);
-    --color-accent: var(--accent);
-    --color-accent-light: var(--accent-light);
-    --color-accent-secondary: var(--accent-secondary);
+
+    --color-bg: var(--bg);
+    --color-bg-elevated: var(--bg-elevated);
+    --color-bg-card: var(--bg-card);
+    --color-line: var(--border);
+    --color-line-hover: var(--border-hover);
+    --color-text-primary: var(--text-primary);
+    --color-text-secondary: var(--text-secondary);
+    --color-text-tertiary: var(--text-tertiary);
+    --color-teal: var(--teal);
+    --color-amber: var(--amber);
+
+    /* Legacy color aliases so existing utility classes keep resolving */
+    --color-background: var(--bg);
+    --color-surface: var(--bg-elevated);
+    --color-foreground: var(--text-primary);
+    --color-foreground-muted: var(--text-secondary);
+    --color-foreground-subtle: var(--text-tertiary);
+    --color-muted-foreground: var(--text-secondary);
+    --color-primary: var(--teal);
+    --color-accent: var(--teal);
+    --color-accent-light: var(--teal);
+    --color-accent-secondary: var(--amber);
     --radius-container: var(--radius-container);
-    --shadow-neu-extruded: var(--neu-extruded);
-    --shadow-neu-extruded-hover: var(--neu-extruded-hover);
-    --shadow-neu-extruded-sm: var(--neu-extruded-sm);
-    --shadow-neu-inset: var(--neu-inset);
   }
 
   html {
@@ -70,44 +40,210 @@
   }
 
   body {
-    background-color: var(--background);
-    color: var(--foreground);
-    font-family: 'DM Sans', 'sans-serif';
+    background-color: var(--bg);
+    color: var(--text-primary);
+    font-family: 'Inter', sans-serif;
     -webkit-font-smoothing: antialiased;
     font-smooth: antialiased;
     min-height: 100vh;
+    transition:
+      background-color 0.35s ease,
+      color 0.35s ease;
   }
 
-  body::selection {
-    background-color: var(--accent);
-    color: white;
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: 'Space Grotesk', sans-serif;
+    letter-spacing: -0.02em;
+  }
+
+  body::selection,
+  body ::selection {
+    background-color: var(--teal);
+    color: var(--bg);
   }
 }
 
 @layer utilities {
-  .neu-extruded {
-    box-shadow: var(--neu-extruded);
+  /* ==== MagicUI animation utilities ==== */
+  .animate-marquee {
+    animation: marquee var(--duration, 40s) linear infinite;
   }
-  .neu-extruded-hover {
-    box-shadow: var(--neu-extruded-hover);
+  .animate-marquee-vertical {
+    animation: marquee-vertical var(--duration, 40s) linear infinite;
   }
-  .neu-extruded-sm {
-    box-shadow: var(--neu-extruded-sm);
+  .animate-meteor {
+    animation: meteor 5s linear infinite;
   }
-  .neu-inset {
-    box-shadow: var(--neu-inset);
-  }
-  .neu-inset-deep {
-    box-shadow: var(--neu-inset-deep);
-  }
-  .neu-inset-sm {
-    box-shadow: var(--neu-inset-sm);
-  }
-  .neu-flat {
-    box-shadow: none;
+  .animate-shine {
+    animation: shine var(--duration, 14s) linear infinite;
   }
 
-  /* Animations */
+  /* ==== Card / border system ==== */
+  .card-base {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-card);
+  }
+
+  /* Glass CTA — frosted teal glass with edge refraction, used on the landing CTA */
+  .glass-cta {
+    position: relative;
+    overflow: hidden;
+    color: #ffffff;
+    /* thin teal wash so the moving stars behind show through and get blurred */
+    background: color-mix(in srgb, var(--teal) 14%, transparent);
+    -webkit-backdrop-filter: blur(10px) saturate(1.35);
+    backdrop-filter: blur(10px) saturate(1.35);
+    border: 1px solid color-mix(in srgb, var(--teal) 55%, transparent);
+    box-shadow:
+      inset 0 1px 0 color-mix(in srgb, #ffffff 45%, transparent),
+      inset 0 -1px 0 color-mix(in srgb, var(--bg) 22%, transparent),
+      0 10px 30px -12px var(--teal-glow);
+  }
+  .glass-cta::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(115deg, transparent 30%, color-mix(in srgb, #ffffff 30%, transparent) 48%, transparent 60%);
+    transform: translateX(-120%);
+    transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    pointer-events: none;
+  }
+  .glass-cta:hover {
+    filter: brightness(1.06);
+    border-color: color-mix(in srgb, var(--teal) 80%, transparent);
+    box-shadow:
+      inset 0 1px 0 color-mix(in srgb, #ffffff 55%, transparent),
+      0 16px 40px -14px var(--teal-glow);
+  }
+  .glass-cta:hover::before {
+    transform: translateX(120%);
+  }
+
+  .homepage-reveal-blur {
+    opacity: 0;
+    animation: homepage-reveal-blur 0.95s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    will-change: opacity, transform, filter;
+  }
+
+  .card-glow-hover {
+    transition:
+      transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+      border-color 0.3s ease,
+      box-shadow 0.4s ease;
+  }
+  .card-glow-hover:hover {
+    transform: translateY(-4px);
+    border-color: var(--border-hover);
+    box-shadow:
+      0 0 0 1px var(--teal-soft),
+      0 8px 32px -12px var(--teal-glow);
+  }
+
+  /* Mono tag (tech stack, dates, status) */
+  .mono-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.02em;
+    color: var(--text-secondary);
+    background-color: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.2rem 0.55rem;
+    white-space: nowrap;
+    transition:
+      color 0.25s ease,
+      border-color 0.25s ease;
+  }
+  .mono-tag:hover {
+    color: var(--teal);
+    border-color: var(--border-hover);
+  }
+
+  /* ==== Hero background: dot grid + drifting glows ==== */
+  .hero-dot-grid {
+    background-image: radial-gradient(circle, var(--border) 1px, transparent 1px);
+    background-size: 26px 26px;
+    mask-image: radial-gradient(ellipse 75% 65% at 50% 45%, black 30%, transparent 78%);
+    -webkit-mask-image: radial-gradient(ellipse 75% 65% at 50% 45%, black 30%, transparent 78%);
+    opacity: 0.7;
+  }
+
+  .hero-glow-a {
+    background: radial-gradient(circle, var(--teal-glow), transparent 70%);
+    filter: blur(48px);
+    animation: hero-drift-a 26s ease-in-out infinite alternate;
+  }
+
+  .hero-glow-b {
+    background: radial-gradient(circle, var(--amber-soft), transparent 70%);
+    filter: blur(48px);
+    animation: hero-drift-b 32s ease-in-out infinite alternate;
+  }
+  /* Persistent WebGL scene: anchor the fade to the centered max-w-7xl (1280px) column so
+     the ambient backdrop tracks the content on ANY width. On ultrawide the grid no longer
+     bleeds across the whole viewport (no seam/border band); on narrow screens it keeps a
+     ~5vw gutter. Fade start/end are the greater of a vw gutter or the content-column edge. */
+  .scene-layer {
+    --scene-fade-start: max(2vw, calc(50% - 860px));
+    --scene-fade-end: max(4vw, calc(50% - 780px));
+    -webkit-mask-image: linear-gradient(to right, transparent 0, transparent var(--scene-fade-start), black var(--scene-fade-end), black calc(100% - var(--scene-fade-end)), transparent calc(100% - var(--scene-fade-start)), transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0, transparent var(--scene-fade-start), black var(--scene-fade-end), black calc(100% - var(--scene-fade-end)), transparent calc(100% - var(--scene-fade-start)), transparent 100%);
+  }
+  /* Inner pages: dim the ambient scene so bright lines/nodes don't cut through
+     card and body text (home hero keeps full scene presence). */
+  body[data-page='inner'] .scene-layer {
+    opacity: 0.65;
+  }
+  body[data-page='inner'] .scene-fallback {
+    opacity: 0.65;
+  }
+
+  .scene-fallback {
+    /* Static natural-star snapshot: layered radial-gradient specks in the same
+       blue-white / warm palette as the WebGL starfield, denser toward center. */
+    background-image:
+      radial-gradient(circle, rgba(207, 216, 255, 0.9) 0.5px, transparent 1px),
+      radial-gradient(circle, rgba(255, 255, 255, 0.8) 0.5px, transparent 1px),
+      radial-gradient(circle, rgba(255, 244, 214, 0.7) 0.5px, transparent 1px),
+      radial-gradient(circle, rgba(255, 212, 163, 0.6) 0.5px, transparent 1.2px),
+      radial-gradient(circle, rgba(207, 216, 255, 0.5) 0.5px, transparent 1px);
+    background-size: 180px 180px, 260px 260px, 340px 340px, 300px 300px, 220px 220px;
+    background-position: 0 0, 40px 60px, 130px 90px, 70px 160px, 150px 40px;
+    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 20%, transparent 80%);
+    -webkit-mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 20%, transparent 80%);
+    opacity: 0.6;
+    z-index: 0;
+    pointer-events: none;
+    display: block !important;
+  }
+
+  /* Huge outlined parallax word behind section headings */
+  .ghost-text {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: clamp(5rem, 16vw, 13rem);
+    line-height: 1;
+    letter-spacing: -0.03em;
+    color: transparent;
+    -webkit-text-stroke: 1px color-mix(in srgb, var(--border) 85%, var(--teal) 15%);
+    opacity: 0.55;
+  }
+
+  /* Live status readout */
+  .status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 9999px;
+    background-color: var(--teal);
+    box-shadow: 0 0 8px var(--teal);
+    animation: status-pulse 2s ease-in-out infinite;
+  }
+
+  /* ==== Animations (kept API-compatible) ==== */
   .animate-in {
     animation: animate-in 0.3s ease-out forwards;
   }
@@ -152,19 +288,16 @@
     animation: homepage-reveal 0.82s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     will-change: opacity, transform;
   }
-
   .homepage-reveal-soft {
     opacity: 0;
     animation: homepage-reveal-soft 0.92s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     will-change: opacity, transform;
   }
-
   .homepage-reveal-pop {
     opacity: 0;
     animation: homepage-reveal-pop 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     will-change: opacity, transform;
   }
-
   .homepage-stagger {
     opacity: 0;
     animation: homepage-stagger 0.88s cubic-bezier(0.22, 1, 0.36, 1) forwards;
@@ -178,7 +311,6 @@
       border-color 0.35s ease,
       background-color 0.35s ease;
   }
-
   .homepage-card-hover:hover {
     transform: translateY(-6px);
   }
@@ -189,7 +321,6 @@
       box-shadow 0.42s cubic-bezier(0.22, 1, 0.36, 1),
       color 0.3s ease;
   }
-
   .homepage-icon-hover:hover {
     transform: translateY(-4px) scale(1.04);
   }
@@ -200,14 +331,96 @@
       box-shadow 0.32s cubic-bezier(0.22, 1, 0.36, 1),
       color 0.25s ease;
   }
-
   .homepage-pill-hover:hover {
     transform: translateY(-2px);
+  }
+
+  /* ==== Scroll reveal (IntersectionObserver, one-shot) ==== */
+  [data-reveal] {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  [data-reveal].is-revealed {
+    opacity: 1;
+    transform: translateY(0);
+    transition:
+      opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    transition-delay: var(--reveal-delay, 0s);
+  }
+
+  /* Hide horizontal scrollbars on carousels */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
   }
 
   /* Safe area padding for mobile bottom nav */
   .safe-area-pb {
     padding-bottom: env(safe-area-inset-bottom, 20px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal],
+  [data-reveal].is-revealed {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .homepage-reveal,
+  .homepage-reveal-soft,
+  .homepage-reveal-pop,
+  .homepage-reveal-blur,
+  .homepage-stagger,
+  .stagger-item {
+    opacity: 1 !important;
+    animation: none !important;
+  }
+
+  .animate-wave,
+  .status-dot,
+  .hero-glow-a,
+  .hero-glow-b {
+    animation: none !important;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+@keyframes hero-drift-a {
+  from {
+    transform: translate(0, 0) scale(1);
+  }
+  to {
+    transform: translate(10%, 14%) scale(1.15);
+  }
+}
+
+@keyframes hero-drift-b {
+  from {
+    transform: translate(0, 0) scale(1.1);
+  }
+  to {
+    transform: translate(-12%, -10%) scale(0.95);
+  }
+}
+
+@keyframes status-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    box-shadow: 0 0 8px var(--teal);
+  }
+  50% {
+    opacity: 0.45;
+    box-shadow: 0 0 2px var(--teal);
   }
 }
 
@@ -341,6 +554,19 @@
   }
 }
 
+@keyframes homepage-reveal-blur {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+    filter: blur(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
 @keyframes homepage-reveal {
   from {
     opacity: 0;
@@ -351,7 +577,6 @@
     transform: translateY(0);
   }
 }
-
 @keyframes homepage-reveal-soft {
   from {
     opacity: 0;
@@ -362,7 +587,6 @@
     transform: translateY(0) scale(1);
   }
 }
-
 @keyframes homepage-reveal-pop {
   from {
     opacity: 0;
@@ -373,7 +597,6 @@
     transform: translateY(0) scale(1);
   }
 }
-
 @keyframes homepage-stagger {
   from {
     opacity: 0;
@@ -383,4 +606,89 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* ==== MagicUI / Aceternity adapted keyframes ==== */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(-100% - var(--gap, 1rem)));
+  }
+}
+
+@keyframes marquee-vertical {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(calc(-100% - var(--gap, 1rem)));
+  }
+}
+
+@keyframes meteor {
+  0% {
+    transform: rotate(var(--angle, 215deg)) translateX(0);
+    opacity: 1;
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    transform: rotate(var(--angle, 215deg)) translateX(-600px);
+    opacity: 0;
+  }
+}
+
+@keyframes shine {
+  0% {
+    background-position: 0% 0%;
+  }
+  50% {
+    background-position: 100% 100%;
+  }
+  100% {
+    background-position: 0% 0%;
+  }
+}
+
+/* ==== View-Transition theme reveal (AnimatedThemeToggler) ==== */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+/* New snapshot expands via clip-path on top of the old one. Old stays put below. */
+::view-transition-old(root) {
+  z-index: 1;
+}
+::view-transition-new(root) {
+  z-index: 9999;
+}
+
+@supports not (view-transition-name: none) {
+  body,
+  body *,
+  body *::before,
+  body *::after {
+    transition:
+      background-color 0.35s ease,
+      border-color 0.35s ease,
+      color 0.35s ease,
+      fill 0.35s ease,
+      stroke 0.35s ease;
+  }
+}
+
+/* ==== Form defaults ==== */
+::placeholder {
+  color: var(--text-tertiary);
+  opacity: 1;
+}
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 2px;
 }

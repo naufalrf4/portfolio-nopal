@@ -1,12 +1,8 @@
-import { Section } from '@/components/shared/Section';
-import { SectionHeader } from '@/components/shared/SectionHeader';
-import { NeuCard } from '@/components/shared/NeuCard';
-import { NeuBadge } from '@/components/shared/NeuBadge';
-import { NeuButton } from '@/components/shared/NeuButton';
-import { ArrowRight, ExternalLink, Calendar } from 'lucide-react';
+import { useState } from 'react';
+import { ArrowRight, Eye } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
 import type { BlogLink } from '@/types';
-import { motion } from 'framer-motion';
+import { ThreeDCard, CardItem, BorderBeam, BlurFade } from '@/components/ui';
 
 interface LatestArticlesProps {
   blogs?: BlogLink[];
@@ -14,88 +10,143 @@ interface LatestArticlesProps {
 
 export function LatestArticles({ blogs }: LatestArticlesProps) {
   const latestBlogs = (blogs ?? []).slice(0, 6);
-
-  if (latestBlogs.length === 0) {
-    return null;
-  }
+  const isEmpty = latestBlogs.length === 0;
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const selected = latestBlogs[selectedIndex] ?? latestBlogs[0];
+  const rest = latestBlogs.filter((_, i) => i !== selectedIndex).slice(0, 5);
 
   return (
-    <Section className="homepage-reveal-soft">
-      <SectionHeader
-        title="Latest Articles"
-        subtitle="Thoughts, tutorials, and insights on software development and technology"
-      />
+    <section className="relative w-full border-t border-line py-16 md:py-24">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        {/* Right-aligned header with offset — different from left-H2 pattern */}
+        <BlurFade direction="left" offset={24} className="mb-10 flex-col items-end">
+          <span className="font-mono text-xs uppercase tracking-[0.25em] text-teal mb-4">03 — Field Notes</span>
+          <h2 className="text-right font-display text-3xl font-bold tracking-tight text-text-primary md:text-5xl lg:text-6xl">
+            Latest Articles
+          </h2>
+          <div className="mt-6 flex w-full flex-col items-end gap-4 sm:flex-row sm:justify-end sm:items-end">
+            <p className="max-w-md text-right text-base text-text-secondary md:text-lg">
+              Notes from building, breaking, and shipping systems.
+            </p>
+            <a
+              href="/blogs"
+              className="group inline-flex items-center gap-2 font-mono text-sm uppercase tracking-wide text-text-secondary transition-colors hover:text-text-primary"
+              aria-label="View all articles"
+            >
+              <ArrowRight size={16} className="transition-transform duration-300 group-hover:translate-x-1" />
+            </a>
+          </div>
+        </BlurFade>
 
-      <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-6 md:overflow-visible md:pb-0">
-        {latestBlogs.map((blog, index) => (
-          <motion.a
-            key={blog.id}
-            href={blog.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="min-w-[280px] w-[280px] flex-shrink-0 snap-start md:min-w-0 md:w-auto md:flex-shrink"
-            initial={{ opacity: 0, y: 30, scale: 0.985 }}
-            whileInView={{ opacity: 1, y: 0, scale: 1 }}
-            viewport={{ once: true, amount: 0.2 }}
-            transition={{ duration: 0.72, delay: 0.12 + index * 0.1, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <NeuCard hover className="h-full group p-4 homepage-card-hover">
-              <div className="relative aspect-[16/10] rounded-lg overflow-hidden mb-3 shadow-[inset_3px_3px_6px_rgba(163,177,198,0.6),inset_-3px_-3px_6px_rgba(255,255,255,0.5)]">
-                {blog.imageUrl ? (
-                  <img
-                    src={blog.imageUrl}
-                    alt={blog.title}
-                    loading="lazy"
-                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.07]"
-                  />
-                ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-[#3B82F6] to-[#06B6D4] flex items-center justify-center">
-                    <span className="text-3xl text-white font-bold">{blog.title.charAt(0)}</span>
-                  </div>
-                )}
-              </div>
-
-              <div className="flex items-center gap-2 mb-2">
-                <NeuBadge variant="accent" size="sm">
-                  {blog.source}
-                </NeuBadge>
-                <div className="flex items-center text-xs text-[#6B7280]">
-                  <Calendar className="w-3 h-3 mr-1" />
-                  {blog.publishedAt ? formatDate(blog.publishedAt) : 'No date'}
+        {isEmpty ? (
+          <div className="grid gap-12 lg:grid-cols-[2fr_1fr] lg:gap-16">
+            <div className="flex flex-col justify-center border-l border-line pl-6 py-12">
+              <span className="font-mono text-xs uppercase tracking-widest text-teal mb-4">STATUS: DRAFTING</span>
+              <p className="font-display text-2xl font-bold text-text-primary md:text-3xl">Writing in progress</p>
+              <p className="mt-3 text-base text-text-secondary md:text-lg">Notes from building, breaking, and shipping systems will be published here shortly.</p>
+            </div>
+            <div className="flex flex-col border-t border-line lg:border-l lg:border-t-0 lg:pl-8">
+              <div className="flex flex-col border-b border-line py-6 md:py-8 lg:px-6">
+                <div className="mb-3 flex items-center gap-3 text-text-tertiary">
+                  <span className="font-mono text-[10px] uppercase tracking-wider">01</span>
                 </div>
+                <h4 className="font-display text-lg font-bold text-text-primary md:text-xl">Upcoming systems write-ups</h4>
+                <p className="mt-2 font-mono text-[10px] uppercase tracking-wider text-text-tertiary">STAY TUNED</p>
               </div>
+            </div>
+          </div>
+        ) : (
+          <div className="grid gap-12 lg:grid-cols-[2fr_1fr] lg:gap-16">
+            {/* Lead Article (Dominant) */}
+            {selected && (
+              <BlurFade direction="up" offset={20} className="lg:-ml-8 lg:pr-4">
+                <ThreeDCard maxTilt={6} className="group">
+                  <a
+                    key={selected.id}
+                    href={selected.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block"
+                  >
+                    <div className="relative rounded-2xl border border-line bg-bg-card p-4 transition-colors duration-500 group-hover:border-line-hover md:p-6">
+                      <BorderBeam duration={8} />
+                      <CardItem translateZ={30}>
+                        <div className="mb-6 overflow-hidden rounded-lg border border-line bg-bg-elevated">
+                          {selected.imageUrl ? (
+                            <img
+                              src={selected.imageUrl}
+                              alt={selected.title}
+                              loading="lazy"
+                              className="aspect-[16/9] w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                            />
+                          ) : (
+                            <div className="flex aspect-[16/9] w-full items-center justify-center bg-bg-card text-text-tertiary">
+                              <span className="font-display text-5xl font-bold opacity-30">{selected.title.charAt(0)}</span>
+                            </div>
+                          )}
+                        </div>
+                      </CardItem>
+                      <CardItem translateZ={16}>
+                        <div className="flex items-center gap-3 text-text-tertiary">
+                          <span className="font-mono text-xs uppercase tracking-widest">{selected.source}</span>
+                          <span className="h-px w-8 bg-line"></span>
+                          <span className="font-mono text-[10px] uppercase tracking-wider">{selected.publishedAt ? formatDate(selected.publishedAt) : ''}</span>
+                        </div>
+                        <h3 className="mt-4 font-display text-2xl font-bold text-text-primary transition-colors group-hover:text-teal md:text-4xl lg:text-5xl">
+                          {selected.title}
+                        </h3>
+                        {selected.description && (
+                          <p className="mt-4 text-base leading-relaxed text-text-secondary md:text-lg">
+                            {selected.description}
+                          </p>
+                        )}
+                      </CardItem>
+                    </div>
+                  </a>
+                </ThreeDCard>
+              </BlurFade>
+            )}
 
-              <h3 className="text-lg font-bold text-[#3D4852] group-hover:text-[#3B82F6] transition-all duration-300 mb-2 line-clamp-2 group-hover:translate-x-0.5">
-                {blog.title}
-              </h3>
-
-              {blog.description && (
-                <p className="text-sm text-[#6B7280] line-clamp-2">{blog.description}</p>
-              )}
-
-              <div className="mt-3 flex items-center text-sm text-[#3B82F6] font-medium transition-transform duration-300 group-hover:translate-x-0.5">
-                Read Article
-                <ExternalLink className="ml-1.5 w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-              </div>
-            </NeuCard>
-          </motion.a>
-        ))}
+            {/* Index List (Compact) */}
+            <div className="flex flex-col border-t border-line lg:border-l lg:border-t-0 lg:pl-8">
+              {rest.map((blog) => {
+                const originalIndex = latestBlogs.findIndex((b) => b.id === blog.id);
+                const listNumber = String(originalIndex + 1).padStart(2, '0');
+                return (
+                  <BlurFade key={blog.id} direction="left" offset={24} delay={0.05}>
+                    <div className="group flex w-full items-stretch border-b border-line transition-colors hover:bg-bg-card/50">
+                      <a
+                        href={blog.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex flex-1 flex-col py-6 text-left md:py-8 lg:pl-6"
+                        aria-label={`Read: ${blog.title}`}
+                      >
+                        <div className="mb-3 flex items-center gap-3 text-text-tertiary">
+                          <span className="font-mono text-[10px] uppercase tracking-wider">{listNumber}</span>
+                          <span className="font-mono text-[10px] uppercase tracking-wider">{blog.publishedAt ? formatDate(blog.publishedAt) : ''}</span>
+                        </div>
+                        <h4 className="font-display text-lg font-bold text-text-primary transition-colors group-hover:text-teal md:text-xl">
+                          {blog.title}
+                        </h4>
+                      </a>
+                      <button
+                        type="button"
+                        onClick={() => setSelectedIndex(originalIndex)}
+                        onMouseEnter={() => setSelectedIndex(originalIndex)}
+                        className="flex w-16 shrink-0 items-center justify-center border-l border-line text-text-tertiary transition-colors hover:bg-bg-card hover:text-teal"
+                        aria-label={`Preview: ${blog.title}`}
+                      >
+                        <Eye size={18} />
+                      </button>
+                    </div>
+                  </BlurFade>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
-
-      <motion.div
-        className="mt-10 text-center homepage-reveal-soft"
-        initial={{ opacity: 0, y: 24 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, amount: 0.7 }}
-        transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-      >
-        <a href="/blogs">
-          <NeuButton variant="primary" size="md" className="min-w-[200px] group">
-            View All Articles
-            <ArrowRight className="ml-2 w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
-          </NeuButton>
-        </a>
-      </motion.div>
-    </Section>
+    </section>
   );
 }

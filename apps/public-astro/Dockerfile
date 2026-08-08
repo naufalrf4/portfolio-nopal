@@ -1,21 +1,29 @@
-FROM oven/bun:1 AS dev
+FROM docker.io/oven/bun:1.3.6 AS dev
 WORKDIR /app
 CMD ["sh", "-lc", "bun install --frozen-lockfile && bun run dev"]
 
-FROM oven/bun:1 AS builder
+FROM docker.io/oven/bun:1.3.6 AS builder
 WORKDIR /app
 COPY package.json bun.lock ./
+COPY packages ./packages
+COPY apps/admin/package.json ./apps/admin/package.json
+COPY apps/public-astro/package.json ./apps/public-astro/package.json
+COPY apps/links-astro/package.json ./apps/links-astro/package.json
+COPY apps/ngl-svelte/package.json ./apps/ngl-svelte/package.json
+COPY apps/rag-service/package.json ./apps/rag-service/package.json
+COPY apps/live-presence/package.json ./apps/live-presence/package.json
 RUN bun install --frozen-lockfile
-COPY . .
+COPY apps/public-astro ./apps/public-astro
+WORKDIR /app/apps/public-astro
 RUN bun run build
 
-FROM oven/bun:1 AS prod
-WORKDIR /app
+FROM docker.io/oven/bun:1.3.6 AS prod
+WORKDIR /app/apps/public-astro
 ENV NODE_ENV=production
 ENV HOST=0.0.0.0
 ENV PORT=3000
-COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules /app/node_modules
+COPY --from=builder /app/apps/public-astro/package.json ./package.json
+COPY --from=builder /app/apps/public-astro/dist ./dist
 EXPOSE 3000
 CMD ["bun", "./dist/server/entry.mjs"]

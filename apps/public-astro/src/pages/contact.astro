@@ -1,5 +1,4 @@
 ---
-import { MessagesSquare } from 'lucide-react';
 import { ContactContent } from '../components/contact/ContactContent';
 import { PageHero } from '../components/shared';
 import PageLayout from '../layouts/PageLayout.astro';
@@ -21,10 +20,10 @@ const description =
     <div class="px-4 pt-6 sm:px-6 lg:px-8">
       <div class="mx-auto max-w-7xl">
         <PageHero
-          icon={MessagesSquare}
-          title="Get in Touch"
-        description="Send a direct message, ask a question, or book a call about integrated systems, automation workflows, IoT platforms, AI-enabled operations, speaking, or collaboration opportunities."
-      />
+          eyebrow="Get in touch"
+          title="Let's build something"
+          description="Send a direct message, ask a question, or book a call about integrated systems, automation workflows, IoT platforms, AI-enabled operations, speaking, or collaboration opportunities."
+        />
       </div>
     </div>
     <ContactContent client:load aboutData={aboutData} turnstileSiteKey={turnstileSiteKey} />

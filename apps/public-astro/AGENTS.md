@@ -8,14 +8,14 @@ Authoritative AI control contract for this repository.
 - **Purpose:** serve the public portfolio experience and AI chat entrypoint
 - **Architecture:** Astro 5 site with React islands and API consumption from Admin plus RAG chat integration
 - **Execution Model:** runs independently from `apps/public-astro`; reads content from Admin public APIs and sends chat requests to the RAG service
-- **Critical Domains:** legacy phase2 design parity, SEO metadata, Admin public API compatibility, chatbot integration
+- **Critical Domains:** dark-first design system parity, SEO metadata, Admin public API compatibility, chatbot integration
 
 ## 2. Technology Baseline
 
 - **Framework:** Astro 5.17.1 with React 19.2.4
 - **Runtime:** Bun
 - **Language:** TypeScript
-- **Styling:** Tailwind CSS 4, Framer Motion, and existing light-neumorphic `Neu*` components
+- **Styling:** Tailwind CSS 4, Framer Motion, and shared dark-first design tokens from `@naufalrf/design-tokens`
 - **Package Manager:** Bun via `bun.lock`
 - **Version Policy:** use versions resolved from `package.json` and `bun.lock`; never guess from memory
 - **State Management:** Astro page data plus app-local React state where needed
@@ -26,7 +26,7 @@ Authoritative AI control contract for this repository.
 
 - Stay API-only for content; this app must not connect directly to the database.
 - Keep content reads aligned with Admin public endpoints instead of duplicating backend logic.
-- Preserve the light-neumorphic legacy phase2 design system and page/section sequencing.
+- Preserve the dark-first design system from `@naufalrf/design-tokens` and page/section sequencing.
 - Keep SEO metadata, structured data, and page discoverability intact when editing routes.
 
 ## 4. Operational Command Set

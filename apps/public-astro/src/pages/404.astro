@@ -7,18 +7,18 @@ import PageLayout from '../layouts/PageLayout.astro';
   description="The page you are looking for does not exist or may have moved."
   canonicalUrl="/404"
 >
-  <section class="min-h-screen px-4 py-16 md:px-6">
-    <div class="mx-auto max-w-3xl rounded-[32px] bg-surface p-10 text-center neu-extruded">
+  <section class="min-h-screen px-4 py-16 sm:px-6 lg:px-8">
+    <div class="mx-auto max-w-3xl rounded-xl border border-line bg-bg-card p-10 text-center">
       <p class="mb-3 text-xs font-semibold uppercase tracking-[0.24em] text-subtle">404</p>
       <h1 class="mb-4 font-display text-4xl font-bold text-foreground">Page not found</h1>
       <p class="mx-auto max-w-xl text-base leading-relaxed text-muted-foreground">
         The page you requested is not available right now. Use the links below to get back to the main public site.
       </p>
       <div class="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
-        <a href="/" class="inline-flex items-center justify-center rounded-[16px] bg-surface px-6 py-3 text-sm font-medium text-foreground neu-extruded-hover">
+        <a href="/" class="inline-flex items-center justify-center rounded-lg border border-line bg-bg-elevated px-6 py-3 text-sm font-medium text-text-primary transition-colors hover:border-line-hover hover:text-teal">
           Go home
         </a>
-        <a href="/projects" class="inline-flex items-center justify-center rounded-[16px] bg-surface px-6 py-3 text-sm font-medium text-foreground neu-extruded-hover">
+        <a href="/projects" class="inline-flex items-center justify-center rounded-lg border border-line bg-bg-elevated px-6 py-3 text-sm font-medium text-text-primary transition-colors hover:border-line-hover hover:text-teal">
           Browse projects
         </a>
       </div>

@@ -7,6 +7,7 @@ export interface Message {
   citations?: Citation[];
   suggestedActions?: SuggestedAction[];
   metadata?: ChatMetadata;
+  pendingAction?: PendingAction;
 }
 
 export interface Citation {
@@ -34,6 +35,13 @@ export interface ChatMetadata {
   abstained: boolean;
 }
 
+export interface PendingAction {
+  tool: string;
+  payload: Record<string, unknown>;
+  description: string;
+  missingFields: string[];
+}
+
 export interface ChatRequest {
   sessionId?: string;
   message: string;
@@ -46,6 +54,7 @@ export interface ChatResponse {
   citations?: Citation[];
   suggestedActions?: SuggestedAction[];
   metadata?: ChatMetadata;
+  pendingAction?: PendingAction;
 }
 
 export interface ChatState {

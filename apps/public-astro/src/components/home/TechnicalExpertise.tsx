@@ -1,83 +1,170 @@
-import { Section } from '@/components/shared/Section';
-import { SectionHeader } from '@/components/shared/SectionHeader';
-import { NeuCard } from '@/components/shared/NeuCard';
-import { Globe, Brain, Cpu } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { IconCloud } from '@/components/ui/IconCloud';
+import { NumberTicker } from '@/components/ui/NumberTicker';
+import { BlurFade } from '@/components/ui/BlurFade';
+import { BorderBeam } from '@/components/ui/BorderBeam';
 
-const expertiseAreas = [
+type BadgeTone = 'accent' | 'neutral' | 'outline';
+
+interface SkillGroup {
+  readonly title: string;
+  readonly description: string;
+  readonly technologies: readonly { readonly label: string; readonly tone: BadgeTone }[];
+}
+
+const skillGroups: readonly SkillGroup[] = [
   {
-    icon: Globe,
-    title: 'Web Development',
+    title: 'Web & App Engineering',
     description:
-      'Building modern, responsive web applications with cutting-edge technologies. Expertise in creating scalable frontend architectures and intuitive user experiences.',
-    technologies: ['React', 'Next.js', 'TypeScript', 'Node.js', 'TailwindCSS'],
+      'Modern, responsive web and cross-platform app development with type-safe, scalable architectures.',
+    technologies: [
+      { label: 'React', tone: 'accent' },
+      { label: 'Next.js', tone: 'neutral' },
+      { label: 'TypeScript', tone: 'accent' },
+      { label: 'Node.js', tone: 'outline' },
+      { label: 'TailwindCSS', tone: 'neutral' },
+      { label: 'Rust', tone: 'accent' },
+      { label: 'Tauri', tone: 'outline' },
+    ],
   },
   {
-    icon: Brain,
-    title: 'AI & Automation',
+    title: 'AI & Agentic Systems',
     description:
-      'Implementing intelligent solutions using Large Language Models, RAG systems, and automation pipelines. Creating AI-powered applications that streamline workflows and solve real-world problems.',
-    technologies: ['LLMs', 'RAG', 'Python', 'LangChain', 'Automation'],
+      'LLM-driven automation: RAG pipelines, multi-step agent orchestration, and AI-assisted workflows.',
+    technologies: [
+      { label: 'LLMs', tone: 'accent' },
+      { label: 'RAG', tone: 'neutral' },
+      { label: 'AI Agents', tone: 'accent' },
+      { label: 'LangChain', tone: 'outline' },
+      { label: '0penAI', tone: 'neutral' },
+      { label: 'Python', tone: 'accent' },
+      { label: 'n8n', tone: 'outline' },
+    ],
   },
   {
-    icon: Cpu,
-    title: 'IoT & Hardware',
+    title: 'IoT & Embedded',
     description:
-      'Designing embedded systems and IoT solutions that bridge the physical and digital worlds. Building connected devices with sensors, microcontrollers, and real-time communication.',
-    technologies: ['Arduino', 'ESP32', 'Raspberry Pi', 'MQTT', 'Sensors'],
+      'Connected devices and embedded systems bridging physical sensors with real-time software.',
+    technologies: [
+      { label: 'ESP32', tone: 'accent' },
+      { label: 'Arduino', tone: 'neutral' },
+      { label: 'Raspberry Pi', tone: 'outline' },
+      { label: 'MQTT', tone: 'accent' },
+      { label: 'Sensors', tone: 'neutral' },
+    ],
+  },
+  {
+    title: 'Cloud & Tooling',
+    description:
+      'Deployment, infrastructure, and the daily-driver toolchain that keeps systems running.',
+    technologies: [
+      { label: 'AWS', tone: 'accent' },
+      { label: 'Docker', tone: 'outline' },
+      { label: 'PostgreSQL', tone: 'neutral' },
+      { label: 'Git', tone: 'accent' },
+      { label: 'Linux', tone: 'neutral' },
+    ],
   },
 ];
 
+const badgeClass: Record<BadgeTone, string> = {
+  accent:
+    'rounded-full border border-teal/40 bg-teal/10 px-3 py-1 font-mono text-[10px] uppercase tracking-wider text-teal transition-colors hover:border-teal/70',
+  neutral:
+    'rounded-md border border-line bg-bg-elevated px-3 py-1 font-mono text-[10px] uppercase tracking-wider text-text-secondary transition-colors hover:border-line-hover hover:text-text-primary',
+  outline:
+    'rounded-md border border-dashed border-line bg-transparent px-3 py-1 font-mono text-[10px] uppercase tracking-wider text-text-tertiary transition-colors hover:border-line-hover hover:text-text-secondary',
+};
+
+const cloudIcons = [
+  'https://cdn.simpleicons.org/react',
+  'https://cdn.simpleicons.org/nextdotjs/ffffff',
+  'https://cdn.simpleicons.org/typescript',
+  'https://cdn.simpleicons.org/nodedotjs',
+  'https://cdn.simpleicons.org/tailwindcss',
+  'https://cdn.simpleicons.org/rust',
+  'https://cdn.simpleicons.org/tauri',
+  'https://cdn.simpleicons.org/python',
+  'https://cdn.simpleicons.org/langchain/ffffff',
+  'https://cdn.simpleicons.org/openai/ffffff',
+  'https://cdn.simpleicons.org/arduino',
+  'https://cdn.simpleicons.org/espressif',
+  'https://cdn.simpleicons.org/raspberrypi',
+  'https://cdn.simpleicons.org/mqtt',
+  'https://cdn.simpleicons.org/amazonwebservices',
+  'https://cdn.simpleicons.org/docker',
+  'https://cdn.simpleicons.org/postgresql',
+  'https://cdn.simpleicons.org/git',
+  'https://cdn.simpleicons.org/linux',
+  'https://cdn.simpleicons.org/n8n',
+] as const;
+
 export function TechnicalExpertise() {
   return (
-    <Section className="homepage-reveal-soft">
-      <SectionHeader
-        title="Technical Expertise"
-        subtitle="Areas of specialization and technical skills I bring to every project"
-      />
-
-      <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-6 md:overflow-visible md:pb-0">
-        {expertiseAreas.map((area, index) => {
-          const Icon = area.icon;
-          return (
-            <motion.div
-              key={index}
-              className="min-w-[280px] w-[280px] flex-shrink-0 snap-start md:min-w-0 md:w-auto md:flex-shrink"
-              initial={{ opacity: 0, y: 28, scale: 0.985 }}
-              whileInView={{ opacity: 1, y: 0, scale: 1 }}
-              viewport={{ once: true, amount: 0.25 }}
-              transition={{ duration: 0.7, delay: 0.12 + index * 0.12, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <NeuCard hover className="h-full group homepage-card-hover">
-                <div className="flex flex-col h-full">
-                  <div className="w-12 h-12 rounded-xl bg-[#E0E5EC] shadow-[inset_3px_3px_6px_rgba(163,177,198,0.6),inset_-3px_-3px_6px_rgba(255,255,255,0.5)] flex items-center justify-center mb-4 transition-transform duration-500 ease-out group-hover:scale-[1.08] group-hover:-translate-y-1">
-                    <Icon className="w-8 h-8 md:w-10 md:h-10 text-[#3B82F6] transition-transform duration-500 ease-out group-hover:scale-[1.12] group-hover:-translate-y-0.5" />
-                  </div>
-
-                  <h3 className="text-xl font-bold text-[#3D4852] mb-2 md:text-2xl">
-                    {area.title}
-                  </h3>
-
-                  <p className="text-sm text-[#6B7280] leading-relaxed mb-4 flex-1 md:text-base">
-                    {area.description}
-                  </p>
-
-                  <div className="flex flex-wrap gap-1.5">
-                    {area.technologies.map((tech, techIndex) => (
-                      <span
-                        key={techIndex}
-                        className="px-2.5 py-1 text-xs font-medium text-[#3B82F6] bg-[#E0E5EC] rounded-full shadow-[2px_2px_4px_rgba(163,177,198,0.6),-2px_-2px_4px_rgba(255,255,255,0.5)] homepage-pill-hover"
-                      >
-                        {tech}
-                      </span>
-                    ))}
-                  </div>
+    <section className="relative w-full border-t border-teal/30 py-16 md:py-24">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-8">
+          {/* Left column — heading, stats, grouped stack */}
+          <div className="flex flex-col gap-10">
+            <BlurFade delay={0.1} inView>
+              <div className="flex flex-col gap-5">
+                <span className="font-mono text-xs uppercase tracking-[0.25em] text-teal">
+                  01 — Domains & Stack
+                </span>
+                <h2 className="font-display text-4xl font-bold tracking-tight text-text-primary md:text-5xl lg:text-6xl">
+                  Technical Expertise
+                </h2>
+                <p className="max-w-md text-base leading-relaxed text-text-secondary">
+                  Integrated systems across software, cloud, IoT, and AI — spun into a single rotating stack.
+                </p>
+                <div className="flex items-baseline gap-3 font-mono text-xs uppercase tracking-widest text-text-tertiary">
+                  <span className="text-3xl font-bold text-teal md:text-4xl">
+                    0<NumberTicker value={skillGroups.length} />
+                  </span>
+                  <span>domains</span>
+                  <span className="mx-2 inline-block h-px w-8 bg-line" />
+                  <span className="text-3xl font-bold text-text-primary md:text-4xl">
+                    <NumberTicker value={cloudIcons.length} />+
+                  </span>
+                  <span>stack depth</span>
                 </div>
-              </NeuCard>
-            </motion.div>
-          );
-        })}
+              </div>
+            </BlurFade>
+
+            <div className="flex flex-col gap-6 border-t border-line pt-8">
+              {skillGroups.map((group, index) => (
+                <BlurFade key={group.title} delay={0.15 + index * 0.1} inView>
+                  <div className="flex flex-col gap-3">
+                    <div className="flex items-center gap-3">
+                      <span className="font-mono text-[10px] uppercase tracking-widest text-teal">
+                        0{index + 1}
+                      </span>
+                      <h3 className="font-display text-lg font-bold text-text-primary">
+                        {group.title}
+                      </h3>
+                    </div>
+                    <p className="text-sm leading-relaxed text-text-tertiary">{group.description}</p>
+                    <div className="flex flex-wrap gap-2">
+                      {group.technologies.map((tech) => (
+                        <span key={tech.label} className={badgeClass[tech.tone]}>
+                          {tech.label}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </BlurFade>
+              ))}
+            </div>
+          </div>
+
+          {/* Right column — interactive 3D icon cloud */}
+          <BlurFade delay={0.3} inView className="flex w-full items-center justify-center lg:justify-end">
+            <div className="relative overflow-hidden rounded-2xl border border-line bg-bg-card p-4">
+              <IconCloud size={400} images={[...cloudIcons]} />
+              <BorderBeam size={140} duration={12} colorFrom="var(--teal)" colorTo="var(--bg-elevated)" />
+            </div>
+          </BlurFade>
+        </div>
       </div>
-    </Section>
+    </section>
   );
 }

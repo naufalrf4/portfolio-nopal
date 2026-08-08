@@ -127,12 +127,12 @@ export function TurnstileWidget({
     return (
       <div
         className={cn(
-          'rounded-[24px] border border-dashed border-[#BFDBFE] bg-[#E7ECF2] p-4 text-sm text-[#6B7280]',
+          'rounded-xl border border-dashed border-line-hover bg-bg-elevated p-4 text-sm text-text-secondary',
           className
         )}
       >
         <div className="flex items-start gap-3">
-          <ShieldCheck className="mt-0.5 h-5 w-5 flex-shrink-0 text-[#3B82F6]" />
+          <ShieldCheck className="mt-0.5 h-5 w-5 flex-shrink-0 text-teal" />
           <p>
             CAPTCHA is unavailable until `PUBLIC_TURNSTILE_SITE_KEY` is configured for this app.
           </p>
@@ -145,7 +145,7 @@ export function TurnstileWidget({
     <div className={cn('', className)}>
       <div
         ref={containerRef}
-        className="min-h-[65px] rounded-[24px] bg-[#E0E5EC]/72 p-2 shadow-[inset_4px_4px_8px_rgba(163,177,198,0.42),inset_-4px_-4px_8px_rgba(255,255,255,0.48)]"
+        className="min-h-[65px] rounded-xl border border-line bg-bg-elevated p-2"
       />
     </div>
   );

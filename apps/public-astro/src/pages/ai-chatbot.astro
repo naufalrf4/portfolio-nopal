@@ -1,5 +1,4 @@
 ---
-import { Sparkles } from 'lucide-react';
 import { PageHero } from '@/components/shared';
 import PageLayout from '../layouts/PageLayout.astro';
 import { ChatWindow } from '../components/chatbot/ChatWindow';
@@ -9,20 +8,20 @@ const description = 'Chat with Nau AI about Naufal Rizqullah Firdaus, his System
 ---
 
 <PageLayout title={title} description={description}>
-  <section class="px-4 py-12 md:px-6 md:py-16">
+  <section class="px-4 py-12 sm:px-6 md:py-16 lg:px-8">
     <div class="mx-auto max-w-7xl">
-        <PageHero
-          icon={Sparkles}
-          title="AI Assistant"
-          description="Ask about my system design approach, projects, automation workflows, IoT systems, AI integration work, or general questions in the same language you use."
-          className="homepage-reveal"
-        />
+      <PageHero
+        eyebrow="AI Assistant"
+        title="Ask me anything"
+        description="Ask about my system design approach, projects, automation workflows, IoT systems, AI integration work, or general questions in the same language you use."
+        centered
+      />
 
       <div class="homepage-reveal" style="animation-delay:0.22s">
         <ChatWindow
           client:load
           isFullPage={true}
-          className="mx-auto h-[72vh] min-h-[620px] max-w-[1100px]"
+          className="mx-auto h-[72vh] min-h-[620px] max-w-3xl"
         />
       </div>
     </div>

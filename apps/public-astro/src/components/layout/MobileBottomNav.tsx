@@ -39,21 +39,21 @@ export function MobileBottomNav({ currentPath }: MobileBottomNavProps) {
     <>
       {otherOpen && (
         <div className="fixed inset-0 z-40 md:hidden" onClick={() => setOtherOpen(false)} data-analytics-button data-entity-type="mobile_nav_overlay" data-entity-id="other-links-overlay" data-entity-label="Close other links overlay">
-          <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" />
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
 
           <div
-            className="absolute bottom-24 right-4 w-56 py-3 rounded-2xl bg-[#E0E5EC] shadow-[9px_9px_16px_rgba(163,177,198,0.6),-9px_-9px_16px_rgba(255,255,255,0.5)] animate-in slide-in-from-bottom-4 fade-in duration-200"
+            className="absolute bottom-24 right-4 w-56 py-3 rounded-xl border border-line bg-bg-card shadow-[0_16px_40px_-16px_rgba(0,0,0,0.5)] animate-in slide-in-from-bottom-4 fade-in duration-200"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between px-4 pb-2 mb-2 border-b border-[#d1d5db]">
-              <span className="text-sm font-semibold text-[#3D4852]">Other Links</span>
+            <div className="flex items-center justify-between px-4 pb-2 mb-2 border-b border-line">
+              <span className="text-sm font-semibold text-text-primary">Other Links</span>
               <button
                 onClick={() => setOtherOpen(false)}
                 data-analytics-button
                 data-entity-type="mobile_nav_close"
                 data-entity-id="other-links-menu"
                 data-entity-label="Close other links menu"
-                className="p-1 rounded-lg text-[#6B7280] hover:text-[#3B82F6]"
+                className="p-1 rounded-lg text-text-secondary hover:text-teal"
               >
                 <X size={18} />
               </button>
@@ -69,7 +69,7 @@ export function MobileBottomNav({ currentPath }: MobileBottomNavProps) {
                   href={link.href}
                   target={isExternal ? '_blank' : undefined}
                   rel={isExternal ? 'noopener noreferrer' : undefined}
-                  className="flex items-center gap-3 px-4 py-3 text-sm text-[#3D4852] hover:text-[#3B82F6] hover:bg-[#E0E5EC]/50 transition-colors"
+                  className="flex items-center gap-3 px-4 py-3 text-sm text-text-primary hover:text-teal hover:bg-bg-elevated transition-colors"
                   onClick={() => setOtherOpen(false)}
                   data-entity-type={link.external ? 'mobile_nav_external' : 'mobile_nav_internal'}
                   data-entity-id={link.label}
@@ -78,7 +78,7 @@ export function MobileBottomNav({ currentPath }: MobileBottomNavProps) {
                 >
                   <Icon size={20} />
                   <span className="flex-1">{link.label}</span>
-                  {link.external && <ExternalLink size={14} className="text-[#6B7280]" />}
+                  {link.external && <ExternalLink size={14} className="text-text-tertiary" />}
                 </a>
               );
             })}
@@ -87,7 +87,7 @@ export function MobileBottomNav({ currentPath }: MobileBottomNavProps) {
       )}
 
       <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden px-4 pb-4 safe-area-pb">
-        <div className="flex items-center justify-around px-1 py-2 rounded-2xl bg-[#E0E5EC] shadow-[9px_9px_16px_rgb(163,177,198,0.6),-9px_-9px_16px_rgba(255,255,255,0.5)]">
+        <div className="flex items-center justify-around px-1 py-2 rounded-xl border border-line bg-bg-card/95 backdrop-blur-md shadow-[0_12px_32px_-12px_rgba(0,0,0,0.5)]">
           {navItems.map((item) => {
             const active = isActive(item.href);
             const Icon = item.icon;
@@ -99,8 +99,8 @@ export function MobileBottomNav({ currentPath }: MobileBottomNavProps) {
                 className={cn(
                   'flex flex-col items-center justify-center min-w-[44px] min-h-[44px] px-2 py-1.5 rounded-xl transition-all duration-200',
                   active
-                    ? 'text-[#3B82F6] shadow-[inset_3px_3px_6px_rgba(163,177,198,0.6),inset_-3px_-3px_6px_rgba(255,255,255,0.5)]'
-                    : 'text-[#6B7280] hover:text-[#3B82F6]'
+                    ? 'text-teal bg-[var(--teal-soft)]'
+                    : 'text-text-secondary hover:text-teal'
                 )}
                 aria-label={item.label}
                 data-entity-type="mobile_nav_link"
@@ -123,8 +123,8 @@ export function MobileBottomNav({ currentPath }: MobileBottomNavProps) {
             className={cn(
               'flex flex-col items-center justify-center min-w-[44px] min-h-[44px] px-2 py-1.5 rounded-xl transition-all duration-200',
               otherOpen
-                ? 'text-[#3B82F6] shadow-[inset_3px_3px_6px_rgba(163,177,198,0.6),inset_-3px_-3px_6px_rgba(255,255,255,0.5)]'
-                : 'text-[#6B7280] hover:text-[#3B82F6]'
+                ? 'text-teal bg-[var(--teal-soft)]'
+                : 'text-text-secondary hover:text-teal'
             )}
             aria-label="Other links"
           >

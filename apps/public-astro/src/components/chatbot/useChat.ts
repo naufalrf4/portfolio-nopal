@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { sendChatMessage } from './chat.service';
+import { sendChatMessage, confirmAction } from './chat.service';
 import { useChatSession } from './useChatSession';
 import type { Message } from './types';
 
@@ -13,6 +13,7 @@ interface UseChat {
   clearMessages: () => void;
   streamingMessageId: string | null;
   shouldScrollToBottom: boolean;
+  confirmPendingAction: (messageId: string, confirm: boolean) => Promise<void>;
 }
 
 function generateId(): string {
@@ -167,6 +168,7 @@ export function useChat(): UseChat {
           citations: response.citations,
           suggestedActions: response.suggestedActions,
           metadata: response.metadata,
+          pendingAction: response.pendingAction,
         };
 
         setMessages((prev) => [...prev, assistantMessage]);
@@ -199,6 +201,46 @@ export function useChat(): UseChat {
     [sessionId, setSessionId]
   );
 
+  const confirmPendingAction = useCallback(
+    async (messageId: string, confirm: boolean) => {
+      const message = messages.find((m) => m.id === messageId);
+      if (!message?.pendingAction) return;
+
+      // Clear the pendingAction from the message immediately
+      setMessages((prev) =>
+        prev.map((m) =>
+          m.id === messageId ? { ...m, pendingAction: undefined } : m
+        )
+      );
+
+      const action = message.pendingAction;
+
+      try {
+        const result = await confirmAction(
+          action.tool,
+          action.payload,
+          confirm,
+          sessionId ?? undefined,
+        );
+
+        // Add result as a new assistant message
+        const resultMessage: Message = {
+          id: generateId(),
+          role: 'assistant',
+          content: confirm ? result.message : 'Action cancelled.',
+          timestamp: new Date(),
+        };
+
+        setMessages((prev) => [...prev, resultMessage]);
+        setShouldScrollToBottom(true);
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'Failed to confirm action';
+        setError(errorMessage);
+      }
+    },
+    [messages, sessionId]
+  );
+
   const clearMessages = useCallback(() => {
     if (streamingIntervalRef.current) {
       clearInterval(streamingIntervalRef.current);
@@ -220,5 +262,6 @@ export function useChat(): UseChat {
     clearMessages,
     streamingMessageId,
     shouldScrollToBottom,
+    confirmPendingAction,
   };
 }

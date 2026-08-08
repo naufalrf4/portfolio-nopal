@@ -78,9 +78,9 @@ export function ChatWidget({ currentPath }: ChatWidgetProps) {
         className={cn(
           'fixed bottom-20 md:bottom-6 left-4 md:left-auto md:right-6 z-[60]',
           'w-14 h-14 rounded-full',
-          'bg-[#3B82F6] text-white',
-          'shadow-[6px_6px_12px_rgba(59,130,246,0.4),-6px_-6px_12px_rgba(255,255,255,0.3)]',
-          'hover:shadow-[8px_8px_16px_rgba(59,130,246,0.5),-8px_-8px_16px_rgba(255,255,255,0.4)]',
+          'bg-teal text-bg',
+          'shadow-[0_8px_24px_-8px_var(--teal-glow)]',
+          'hover:shadow-[0_12px_32px_-8px_var(--teal-glow)]',
           'hover:scale-105',
           'active:scale-95',
           'transition-all duration-300',

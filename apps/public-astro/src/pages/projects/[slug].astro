@@ -47,13 +47,13 @@ const articleSchema = project
 
 >
   {project ? (
-    <>
+    <div>
       <ProjectDetail project={project} client:load />
       <script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
-    </>
+    </div>
   ) : (
     <section class="py-24 px-4">
-      <div class="mx-auto max-w-3xl rounded-[32px] bg-surface p-10 text-center neu-extruded">
+      <div class="mx-auto max-w-3xl rounded-xl border border-line bg-bg-card p-10 text-center">
         <p class="mb-3 text-xs font-semibold uppercase tracking-[0.24em] text-subtle">Temporary issue</p>
         <h1 class="mb-4 font-display text-3xl font-bold text-foreground">Project detail is temporarily unavailable</h1>
         <p class="mx-auto max-w-xl text-base leading-relaxed text-muted-foreground">
@@ -61,7 +61,7 @@ const articleSchema = project
           Please try again shortly.
         </p>
         <div class="mt-8">
-          <a href="/projects" class="inline-flex items-center justify-center rounded-[16px] bg-surface px-6 py-3 text-sm font-medium text-foreground neu-extruded-hover">
+          <a href="/projects" class="inline-flex items-center justify-center rounded-lg border border-line bg-bg-elevated px-6 py-3 text-sm font-medium text-text-primary transition-colors hover:border-line-hover hover:text-teal">
             Back to projects
           </a>
         </div>

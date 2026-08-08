@@ -19,15 +19,15 @@ export function ChatWindow({
   isExpanded = false,
   className,
 }: ChatWindowProps) {
-  const { messages, isLoading, error, sendMessage, clearMessages, shouldScrollToBottom } =
+  const { messages, isLoading, error, sendMessage, clearMessages, shouldScrollToBottom, confirmPendingAction } =
     useChat();
 
   return (
     <div
       className={cn(
-        'flex flex-col overflow-hidden rounded-[30px] bg-[linear-gradient(180deg,rgba(234,240,247,0.98),rgba(222,232,243,0.98))] backdrop-blur-sm',
-        'shadow-[16px_16px_32px_rgba(163,177,198,0.34),-16px_-16px_32px_rgba(255,255,255,0.42)]',
-        'border border-[#F7FAFC]/60',
+        'flex flex-col overflow-hidden rounded-xl bg-bg-card',
+        'shadow-[0_24px_64px_-16px_rgba(0,0,0,0.5)]',
+        'border border-line',
         isFullPage ? 'h-full' : 'h-[500px]',
         className
       )}
@@ -43,11 +43,13 @@ export function ChatWindow({
         messages={messages}
         isLoading={isLoading}
         shouldScrollToBottom={shouldScrollToBottom}
+        onConfirmAction={confirmPendingAction}
+        onQuickPrompt={sendMessage}
       />
 
       {error && (
-        <div className="border-t border-red-200 bg-red-50/90 px-4 py-2 backdrop-blur-sm">
-          <div className="flex items-center gap-2 text-red-600 text-sm">
+        <div className="border-t border-[var(--error)]/40 bg-[var(--error)]/10 px-4 py-2">
+          <div className="flex items-center gap-2 text-[var(--error)] text-sm">
             <AlertCircle size={16} />
             <span>{error}</span>
           </div>

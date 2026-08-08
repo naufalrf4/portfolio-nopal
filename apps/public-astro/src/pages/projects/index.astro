@@ -2,7 +2,6 @@
 import PageLayout from '../../layouts/PageLayout.astro';
 import { ProjectsGrid } from '../../components/projects/ProjectsGrid';
 import { getProjects } from '../../lib/api';
-import { FolderKanban } from 'lucide-react';
 import { PageHero } from '@/components/shared';
 
 // Fetch all projects for client-side filtering
@@ -21,8 +20,8 @@ const description = 'Explore integrated system projects by Naufal Rizqullah Fird
   <div class="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-7xl mx-auto">
       <PageHero
-        icon={FolderKanban}
-        title={title}
+        eyebrow="Projects"
+        title="Things I've built"
         description="A collection of real-world system builds covering software, infrastructure, data flow, automation, and connected devices shaped by practical engineering tradeoffs."
       />
 

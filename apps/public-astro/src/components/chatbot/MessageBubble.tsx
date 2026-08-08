@@ -1,16 +1,30 @@
 import { cn } from '@/lib/utils';
-import { ArrowRight, Bot, User } from 'lucide-react';
+import { ArrowRight, Bot, User, Check, X } from 'lucide-react';
 import type { Message } from './types';
 import { MarkdownMessage } from './MarkdownMessage';
 
 interface MessageBubbleProps {
   message: Message;
   isStreaming?: boolean;
+  onConfirmAction?: (messageId: string, confirm: boolean) => Promise<void>;
 }
 
-export function MessageBubble({ message, isStreaming = false }: MessageBubbleProps) {
+export function MessageBubble({ message, isStreaming = false, onConfirmAction }: MessageBubbleProps) {
   const isUser = message.role === 'user';
   const suggestedActions = message.suggestedActions;
+  const pendingAction = message.pendingAction;
+
+  const handleConfirm = async () => {
+    if (onConfirmAction && pendingAction && pendingAction.missingFields.length === 0) {
+      await onConfirmAction(message.id, true);
+    }
+  };
+
+  const handleDecline = async () => {
+    if (onConfirmAction && pendingAction) {
+      await onConfirmAction(message.id, false);
+    }
+  };
 
   return (
     <div
@@ -20,8 +34,8 @@ export function MessageBubble({ message, isStreaming = false }: MessageBubblePro
       )}
     >
       {!isUser && (
-        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#3B82F6] shadow-[4px_4px_8px_rgba(59,130,246,0.3),-4px_-4px_8px_rgba(255,255,255,0.5)] flex items-center justify-center">
-          <Bot size={18} className="text-white" />
+        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-teal flex items-center justify-center">
+          <Bot size={18} className="text-bg" />
         </div>
       )}
 
@@ -29,11 +43,42 @@ export function MessageBubble({ message, isStreaming = false }: MessageBubblePro
         className={cn(
           'max-w-[75%] rounded-2xl px-4 py-3',
           isUser
-            ? 'bg-gradient-to-br from-[#3B82F6] to-[#2563EB] text-white rounded-br-md shadow-[6px_6px_12px_rgba(59,130,246,0.4),-6px_-6px_12px_rgba(255,255,255,0.3)]'
-            : 'bg-[#E0E5EC] text-[#3D4852] rounded-bl-md shadow-[6px_6px_12px_rgba(163,177,198,0.5),-6px_-6px_12px_rgba(255,255,255,0.5)]'
+            ? 'bg-teal text-bg rounded-br-md'
+            : 'bg-bg-elevated border border-line text-text-primary rounded-bl-md'
         )}
       >
         <MarkdownMessage content={message.content} isUser={isUser} isStreaming={isStreaming} />
+
+        {/* Pending Action Confirmation Card */}
+        {!isUser && pendingAction && (
+          <div className="mt-3 rounded-xl border border-[var(--teal)]/40 bg-[var(--teal-soft)] p-3">
+            <p className="text-sm font-medium text-[var(--teal)] mb-2">
+              {pendingAction.description}
+            </p>
+            {pendingAction.missingFields.length > 0 ? (
+              <p className="text-xs text-[var(--text-muted)]">
+                Missing: {pendingAction.missingFields.join(', ')}
+              </p>
+            ) : (
+              <div className="flex gap-2 mt-2">
+                <button
+                  onClick={handleConfirm}
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--teal)] px-3 py-1.5 text-xs font-semibold text-white transition-all hover:bg-[var(--teal)]/90"
+                >
+                  <Check size={14} />
+                  Confirm
+                </button>
+                <button
+                  onClick={handleDecline}
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--line)] bg-[var(--bg-card)] px-3 py-1.5 text-xs font-medium text-[var(--text-secondary)] transition-all hover:bg-[var(--bg-elevated)]"
+                >
+                  <X size={14} />
+                  Decline
+                </button>
+              </div>
+            )}
+          </div>
+        )}
 
         {!isUser && suggestedActions && suggestedActions.length > 0 ? (
           <div className="mt-3 flex flex-wrap gap-2">
@@ -44,9 +89,8 @@ export function MessageBubble({ message, isStreaming = false }: MessageBubblePro
                   href={action.target}
                   className={cn(
                     'inline-flex items-center gap-2 rounded-full px-3 py-2 text-sm font-medium',
-                    'bg-[linear-gradient(145deg,rgba(59,130,246,0.12),rgba(255,255,255,0.58))] text-[#1D4ED8]',
-                    'shadow-[4px_4px_10px_rgba(163,177,198,0.18),-4px_-4px_10px_rgba(255,255,255,0.25)]',
-                    'transition-all hover:-translate-y-0.5 hover:text-[#1E40AF]'
+                    'border border-teal/30 bg-[var(--teal-soft)] text-teal',
+                    'transition-all hover:-translate-y-0.5 hover:border-teal/50'
                   )}
                 >
                   <span>{action.label}</span>
@@ -59,8 +103,8 @@ export function MessageBubble({ message, isStreaming = false }: MessageBubblePro
       </div>
 
       {isUser && (
-        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#E0E5EC] shadow-[4px_4px_8px_rgba(163,177,198,0.4),-4px_-4px_8px_rgba(255,255,255,0.4)] flex items-center justify-center">
-          <User size={18} className="text-[#3B82F6]" />
+        <div className="flex-shrink-0 w-8 h-8 rounded-full border border-line bg-bg-elevated flex items-center justify-center">
+          <User size={18} className="text-teal" />
         </div>
       )}
     </div>

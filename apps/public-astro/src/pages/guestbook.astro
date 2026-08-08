@@ -1,5 +1,4 @@
 ---
-import { MessageSquare } from 'lucide-react';
 import PageLayout from '../layouts/PageLayout.astro';
 import { PageHero } from '@/components/shared';
 import { Guestbook } from '@/components/home/Guestbook';
@@ -13,15 +12,14 @@ const description = 'Read guestbook messages left for Naufal Rizqullah Firdaus b
 ---
 
 <PageLayout title={title} description={description}>
-  <section class="px-4 py-12 md:px-6 md:py-16">
+  <section class="px-4 py-12 sm:px-6 md:py-16 lg:px-8">
     <div class="mx-auto max-w-7xl">
       <PageHero
-        icon={MessageSquare}
-        title="Guestbook"
+        eyebrow="Guestbook"
+        title="Leave a mark"
         description="A running wall of notes from people who stopped by. The homepage keeps the latest preview, while this page keeps the full messages easy to read."
-        className="homepage-reveal"
       />
-      <div class="homepage-reveal" style="animation-delay:0.18s">
+      <div class="homepage-reveal-blur" style="animation-delay:0.18s">
         <Guestbook client:load initialEntries={guestbookData.entries} turnstileSiteKey={turnstileSiteKey} mode="page" />
       </div>
     </div>

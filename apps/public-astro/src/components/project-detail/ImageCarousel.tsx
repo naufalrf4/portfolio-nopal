@@ -14,7 +14,7 @@ export function ImageCarousel({ images, title }: ImageCarouselProps) {
 
   if (!images || images.length === 0) {
     return (
-      <div className="w-full h-full bg-gradient-to-br from-[#3B82F6] to-[#8B5CF6] flex items-center justify-center">
+      <div className="w-full h-full bg-bg-elevated flex items-center justify-center">
         <span className="text-7xl text-white font-bold opacity-80">{safeTitle.charAt(0)}</span>
       </div>
     );
@@ -56,15 +56,15 @@ export function ImageCarousel({ images, title }: ImageCarouselProps) {
         data-entity-label={`Previous image: ${safeTitle}`}
         className={cn(
           'absolute left-4 top-1/2 -translate-y-1/2 z-10',
-          'bg-[#E0E5EC] rounded-full p-3',
-          'shadow-[6px_6px_12px_rgba(163,177,198,0.6),-6px_-6px_12px_rgba(255,255,255,0.5)]',
-          'hover:shadow-[inset_4px_4px_8px_rgba(163,177,198,0.4),inset_-4px_-4px_8px_rgba(255,255,255,0.4)]',
+          'bg-bg-elevated rounded-full p-3',
+          'border border-line',
+          '',
           'transition-all duration-200',
           'opacity-0 group-hover:opacity-100'
         )}
         aria-label="Previous image"
       >
-        <ChevronLeft className="w-6 h-6 text-[#3B82F6]" />
+        <ChevronLeft className="w-6 h-6 text-teal" />
       </button>
 
       <button
@@ -75,15 +75,15 @@ export function ImageCarousel({ images, title }: ImageCarouselProps) {
         data-entity-label={`Next image: ${safeTitle}`}
         className={cn(
           'absolute right-4 top-1/2 -translate-y-1/2 z-10',
-          'bg-[#E0E5EC] rounded-full p-3',
-          'shadow-[6px_6px_12px_rgba(163,177,198,0.6),-6px_-6px_12px_rgba(255,255,255,0.5)]',
-          'hover:shadow-[inset_4px_4px_8px_rgba(163,177,198,0.4),inset_-4px_-4px_8px_rgba(255,255,255,0.4)]',
+          'bg-bg-elevated rounded-full p-3',
+          'border border-line',
+          '',
           'transition-all duration-200',
           'opacity-0 group-hover:opacity-100'
         )}
         aria-label="Next image"
       >
-        <ChevronRight className="w-6 h-6 text-[#3B82F6]" />
+        <ChevronRight className="w-6 h-6 text-teal" />
       </button>
 
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex gap-2">
@@ -97,7 +97,7 @@ export function ImageCarousel({ images, title }: ImageCarouselProps) {
             data-entity-label={`Image ${index + 1}: ${safeTitle}`}
             className={cn(
               'w-2 h-2 rounded-full transition-all duration-200',
-              index === currentIndex ? 'bg-[#3B82F6] w-8' : 'bg-white/50 hover:bg-white/75'
+              index === currentIndex ? 'bg-teal w-8' : 'bg-bg-card/50 hover:bg-bg-card/80'
             )}
             aria-label={`Go to image ${index + 1}`}
           />

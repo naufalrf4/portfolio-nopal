@@ -1,11 +1,9 @@
-import { Section } from '@/components/shared/Section';
-import { SectionHeader } from '@/components/shared/SectionHeader';
-import { NeuCard } from '@/components/shared/NeuCard';
-import { NeuBadge } from '@/components/shared/NeuBadge';
-import { NeuButton } from '@/components/shared/NeuButton';
+import { Card } from '@/components/shared/Card';
+import { Badge } from '@/components/shared/Badge';
+import { Button } from '@/components/shared/Button';
 import { ArrowRight } from 'lucide-react';
 import type { Project } from '@/types';
-import { motion } from 'framer-motion';
+import { ThreeDCard, CardItem, BorderBeam, BlurFade } from '@/components/ui';
 
 interface FeaturedProjectsProps {
   projects?: Project[];
@@ -19,86 +17,105 @@ export function FeaturedProjects({ projects }: FeaturedProjectsProps) {
   }
 
   return (
-    <Section className="homepage-reveal-soft">
-      <SectionHeader
-        title="Featured Projects"
-        subtitle="A selection of projects that showcase my skills and passion for building"
-      />
+    <section className="relative w-full border-t border-line py-16 md:py-24">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        {/* Right-aligned header — breaks the left-top pattern */}
+        <BlurFade direction="left" offset={24} className="mb-10 flex-col items-end">
+          <span className="font-mono text-xs uppercase tracking-[0.25em] text-teal mb-4">
+            02 — Selected Work
+          </span>
+          <h2 className="max-w-lg text-right font-display text-3xl font-bold tracking-tight text-text-primary md:text-5xl lg:text-6xl">
+            Featured Projects
+          </h2>
+        </BlurFade>
 
-      <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-6 md:overflow-visible md:pb-0">
-        {featuredProjects.map((project, index) => {
-          const thumbnailUrl = project.imageUrl || project.images?.[0]?.url;
-          const thumbnailAlt = project.images?.[0]?.alt || project.title;
+        {/* Compact 3-col grid */}
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {featuredProjects.map((project, index) => {
+            const thumbnailUrl = project.imageUrl || project.images?.[0]?.url;
+            const thumbnailAlt = project.images?.[0]?.alt || project.title;
+            const isFirst = index === 0;
 
-          return (
-            <motion.a
-              key={project.id}
-              href={`/projects/${project.slug}`}
-              className="min-w-[280px] w-[280px] flex-shrink-0 snap-start md:min-w-0 md:w-auto md:flex-shrink"
-              initial={{ opacity: 0, y: 30, scale: 0.985 }}
-              whileInView={{ opacity: 1, y: 0, scale: 1 }}
-              viewport={{ once: true, amount: 0.2 }}
-              transition={{ duration: 0.72, delay: 0.12 + index * 0.1, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <NeuCard hover className="h-full group p-4 homepage-card-hover">
-                <div className="relative aspect-[16/10] rounded-lg overflow-hidden mb-3 shadow-[inset_3px_3px_6px_rgba(163,177,198,0.6),inset_-3px_-3px_6px_rgba(255,255,255,0.5)]">
-                  {thumbnailUrl ? (
-                    <img
-                      src={thumbnailUrl}
-                      alt={thumbnailAlt}
-                      loading="lazy"
-                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.07]"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-[#3B82F6] to-[#8B5CF6] flex items-center justify-center">
-                      <span className="text-3xl text-white font-bold">
-                        {project.title.charAt(0)}
-                      </span>
+            return (
+              <BlurFade
+                key={project.id}
+                direction="up"
+                offset={40}
+                delay={index * 0.06}
+                className="block h-full w-full"
+              >
+                <ThreeDCard maxTilt={7} className="group h-full">
+                  <a href={`/projects/${project.slug}`} className="block h-full">
+                    <div className="relative h-full">
+                      <Card
+                        className="relative flex h-full flex-col p-4 rounded-2xl border-line transition-colors duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:border-line-hover"
+                      >
+                        {isFirst && <BorderBeam />}
+
+                        <CardItem translateZ={30}>
+                          <div className="relative aspect-[16/10] rounded-lg overflow-hidden mb-3 border border-line">
+                            {thumbnailUrl ? (
+                              <img
+                                src={thumbnailUrl}
+                                alt={thumbnailAlt}
+                                loading="lazy"
+                                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.05]"
+                              />
+                            ) : (
+                              <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-[#0d9488] to-[#3ed9c4] flex items-center justify-center">
+                                <span className="text-3xl text-white font-bold">
+                                  {project.title.charAt(0)}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        </CardItem>
+
+                        <CardItem translateZ={20}>
+                          <div className="flex items-start justify-between gap-2 mb-2">
+                            <h3 className="text-base font-bold text-text-primary group-hover:text-teal transition-all duration-300 line-clamp-1">
+                              {project.title}
+                            </h3>
+                            <Badge variant="accent" size="sm">
+                              {project.category}
+                            </Badge>
+                          </div>
+                          <p className="text-sm text-text-secondary mb-3 line-clamp-2">
+                            {project.summary}
+                          </p>
+                        </CardItem>
+
+                        <CardItem translateZ={10} className="mt-auto">
+                          <div className="flex flex-wrap gap-1.5">
+                            {project.techStack.slice(0, 3).map((tech, i) => (
+                              <Badge key={i} size="sm">
+                                {tech}
+                              </Badge>
+                            ))}
+                            {project.techStack.length > 3 && (
+                              <Badge size="sm">+{project.techStack.length - 3}</Badge>
+                            )}
+                          </div>
+                        </CardItem>
+                      </Card>
                     </div>
-                  )}
-                </div>
+                  </a>
+                </ThreeDCard>
+              </BlurFade>
+            );
+          })}
+        </div>
 
-                <div className="flex items-start justify-between gap-2 mb-2">
-                  <h3 className="text-lg font-bold text-[#3D4852] group-hover:text-[#3B82F6] transition-all duration-300 line-clamp-1 group-hover:translate-x-0.5">
-                    {project.title}
-                  </h3>
-                  <NeuBadge variant="accent" size="sm">
-                    {project.category}
-                  </NeuBadge>
-                </div>
-
-                <p className="text-sm text-[#6B7280] mb-3 line-clamp-2">{project.summary}</p>
-
-                <div className="flex flex-wrap gap-1.5">
-                  {project.techStack.slice(0, 3).map((tech, index) => (
-                    <NeuBadge key={index} size="sm">
-                      {tech}
-                    </NeuBadge>
-                  ))}
-                  {project.techStack.length > 3 && (
-                    <NeuBadge size="sm">+{project.techStack.length - 3}</NeuBadge>
-                  )}
-                </div>
-              </NeuCard>
-            </motion.a>
-          );
-        })}
+        {/* CTA — left-aligned, breaking the center pattern */}
+        <BlurFade direction="up" offset={24} delay={0.1} className="mt-16">
+          <a href="/projects">
+            <Button variant="primary" size="md" className="min-w-[200px] group">
+              View All Projects
+              <ArrowRight className="ml-2 w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
+            </Button>
+          </a>
+        </BlurFade>
       </div>
-
-      <motion.div
-        className="mt-10 text-center homepage-reveal-soft"
-        initial={{ opacity: 0, y: 24 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, amount: 0.7 }}
-        transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-      >
-        <a href="/projects">
-          <NeuButton variant="primary" size="md" className="min-w-[200px] group">
-            View All Projects
-            <ArrowRight className="ml-2 w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
-          </NeuButton>
-        </a>
-      </motion.div>
-    </Section>
+    </section>
   );
 }

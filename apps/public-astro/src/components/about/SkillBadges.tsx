@@ -1,5 +1,6 @@
 import type { FC } from 'react';
-import { NeuBadge } from '../shared/NeuBadge';
+import { Badge } from '../shared/Badge';
+import { BlurFade } from '@/components/ui';
 import type { Skill } from '../../types';
 
 interface SkillBadgesProps {
@@ -25,25 +26,19 @@ export const SkillBadges: FC<SkillBadgesProps> = ({ skills }) => {
 
   return (
     <div className="space-y-6">
-      {categories.map((category) => (
-        <div key={category} className="animate-fade-in-up">
-          <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
+      {categories.map((category, catIndex) => (
+        <BlurFade key={category} delay={catIndex * 0.08}>
+          <h4 className="text-sm font-semibold font-mono text-muted-foreground uppercase tracking-wider mb-3">
             {category}
           </h4>
           <div className="flex flex-wrap gap-2">
             {groupedSkills[category].map((skill, index) => (
-              <div
-                key={`${category}-${skill.name}-${index}`}
-                className="stagger-item"
-                style={{ animationDelay: `${index * 0.03}s` }}
-              >
-                <NeuBadge size="md" variant="default">
-                  {skill.name}
-                </NeuBadge>
-              </div>
+              <Badge key={`${category}-${skill.name}-${index}`} size="md" variant="default">
+                {skill.name}
+              </Badge>
             ))}
           </div>
-        </div>
+        </BlurFade>
       ))}
     </div>
   );

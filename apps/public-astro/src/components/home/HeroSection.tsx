@@ -11,30 +11,29 @@ import {
   Instagram,
   Youtube,
 } from 'lucide-react';
-import { NeuButton } from '@/components/shared/NeuButton';
+import { Button } from '@/components/shared/Button';
+import { HeroFlipCard } from './HeroFlipCard';
 import type { AboutData } from '@/types';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion, useScroll, useTransform, useReducedMotion } from 'framer-motion';
 
 interface HeroSectionProps {
   about: AboutData;
 }
 
+// Greetings restricted to Latin scripts — Space Grotesk has no CJK/Arabic/Devanagari
+// glyphs, so non-Latin entries render as tofu boxes (□). Add a fallback font before
+// re-adding ja/ko/zh/hi/fa.
 const GREETINGS = {
   en: "Hi, I'm",
   id: 'Halo, saya',
   ms: 'Hai, saya',
   de: 'Hallo, ich bin',
   nl: 'Hallo, ik ben',
-  ja: 'こんにちは、私は',
-  ko: '안녕하세요, 저는',
   pl: 'Cześć, jestem',
   cs: 'Ahoj, jsem',
   ro: 'Salut, sunt',
   tr: 'Merhaba, ben',
-  fa: 'سلام، من',
-  hi: 'नमस्ते, मैं',
   sw: 'Habari, mimi ni',
-  zh: '你好，我是',
 } as const;
 
 const GREETING_KEYS = Object.keys(GREETINGS) as (keyof typeof GREETINGS)[];
@@ -61,14 +60,15 @@ export function HeroSection({ about }: HeroSectionProps) {
     about.shortBio?.trim() || 'Building digital experiences with purpose and precision.';
   const fullName = about.fullName?.trim() || 'NaufalRF';
   const firstName = fullName.split(' ')[0];
+  const reduceMotion = useReducedMotion() ?? false;
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ['start start', 'end start'],
   });
-  const avatarY = useTransform(scrollYProgress, [0, 1], [0, 56]);
-  const avatarOpacity = useTransform(scrollYProgress, [0, 0.9], [1, 0.78]);
-  const contentY = useTransform(scrollYProgress, [0, 1], [0, 28]);
-  const contentOpacity = useTransform(scrollYProgress, [0, 1], [1, 0.88]);
+  const contentYRaw = useTransform(scrollYProgress, [0, 1], [0, 32]);
+  const contentOpacityRaw = useTransform(scrollYProgress, [0, 1], [1, 0.6]);
+  const contentY = reduceMotion ? 0 : contentYRaw;
+  const contentOpacity = reduceMotion ? 1 : contentOpacityRaw;
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -97,38 +97,26 @@ export function HeroSection({ about }: HeroSectionProps) {
   }, [roles.length]);
 
   return (
-    <motion.section
+    <section
       ref={sectionRef}
-      className="min-h-[85vh] flex items-center justify-center py-16 md:py-24 px-4 md:px-8 homepage-reveal-soft"
-      style={{ opacity: contentOpacity }}
+     
+      className="relative min-h-[100dvh] overflow-hidden"
     >
-      <div className="mx-auto max-w-4xl w-full text-center">
-        <motion.div
-          className="flex justify-center mb-8 homepage-reveal-pop"
-          style={{ animationDelay: '0.04s', y: avatarY, opacity: avatarOpacity }}
-        >
-          <div className="relative w-40 h-40 md:w-52 md:h-52 rounded-full shadow-[12px_12px_24px_rgba(163,177,198,0.6),-12px_-12px_24px_rgba(255,255,255,0.5)] p-2 bg-[#E0E5EC] homepage-card-hover group hover:shadow-[16px_16px_28px_rgba(163,177,198,0.62),-16px_-16px_28px_rgba(255,255,255,0.58)]">
-            <div className="w-full h-full rounded-full overflow-hidden shadow-[inset_4px_4px_8px_rgba(163,177,198,0.6),inset_-4px_-4px_8px_rgba(255,255,255,0.5)]">
-              {about.avatarUrl ? (
-                <img
-                  src={about.avatarUrl}
-                  alt={fullName}
-                  className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.035]"
-                />
-              ) : (
-                <div className="w-full h-full bg-gradient-to-br from-[#3B82F6] to-[#8B5CF6] flex items-center justify-center">
-                  <span className="text-5xl md:text-6xl text-white font-bold">
-                    {fullName.charAt(0)}
-                  </span>
-                </div>
-              )}
-            </div>
-          </div>
-        </motion.div>
+      {/* Centered content container — aligns hero with every other section gutter */}
+      <div className="relative z-10 mx-auto flex min-h-[100dvh] w-full max-w-7xl items-stretch px-4 sm:px-6 lg:px-8">
+      {/* Left column — oversized headline identity field */}
+      <motion.div
+        className="relative z-10 flex w-full flex-col justify-center py-24 md:w-[62%] md:pr-10 lg:pr-16"
+        style={{ opacity: contentOpacity }}
+      >
 
+        {/* Oversized editorial headline */}
         <motion.h1
-          className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#3D4852] mb-4 homepage-reveal"
-          style={{ animationDelay: '0.14s', y: contentY }}
+          className="mb-6 max-w-3xl font-display text-[clamp(2.75rem,7vw,5.5rem)] font-bold leading-[0.9] tracking-[-0.04em] text-text-primary"
+          style={{ y: contentY }}
+          initial={reduceMotion ? false : { opacity: 0, y: 32 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.9, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
         >
           <span
             className={cn(
@@ -140,16 +128,21 @@ export function HeroSection({ about }: HeroSectionProps) {
           >
             {GREETINGS[GREETING_KEYS[greetingIndex]]}
           </span>{' '}
-          {firstName} <span className="inline-block animate-wave origin-[70%_70%]">👋</span>
+          {firstName}
+          <span className="text-teal">.</span>
         </motion.h1>
 
+        {/* Role line — left-aligned, mono teal */}
         <motion.div
-          className="h-12 md:h-14 flex items-center justify-center mb-6 homepage-reveal-soft"
-          style={{ animationDelay: '0.24s', y: contentY }}
+          className="mb-6 flex h-10 items-center md:h-12"
+          style={{ y: contentY }}
+          initial={reduceMotion ? false : { opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
         >
           <p
             className={cn(
-              'text-xl md:text-2xl lg:text-3xl font-semibold text-[#3B82F6] transition-all duration-500 ease-out',
+              'font-display text-xl font-semibold text-teal transition-all duration-500 ease-out md:text-2xl lg:text-3xl',
               isRoleVisible
                 ? 'opacity-100 translate-y-0 blur-0'
                 : 'opacity-0 translate-y-3 blur-[2px]'
@@ -159,19 +152,94 @@ export function HeroSection({ about }: HeroSectionProps) {
           </p>
         </motion.div>
 
+        {/* Bio paragraph — max-w-2xl, left-aligned */}
         <motion.p
-          className="text-[#6B7280] text-lg md:text-xl leading-relaxed mb-8 max-w-2xl mx-auto homepage-reveal-soft"
-          style={{ animationDelay: '0.34s', y: contentY }}
+          className="mb-10 max-w-2xl text-base leading-relaxed text-text-secondary md:text-lg lg:text-xl"
+          style={{ y: contentY }}
+          initial={reduceMotion ? false : { opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.42, ease: [0.22, 1, 0.36, 1] }}
         >
           {heroBio}
         </motion.p>
 
+        {/* CTAs + availability — left-aligned */}
+        <motion.div
+          className="flex flex-col items-start gap-4"
+          style={{ y: contentY }}
+          initial={reduceMotion ? false : { opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.55, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-text-secondary">
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green opacity-60"></span>
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-green shadow-[0_0_8px_var(--green)]"></span>
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-amber shadow-[0_0_8px_var(--amber)]"></span>
+            </span>
+            Available for work
+          </div>
+
+          <div className="flex flex-row items-center gap-3 md:gap-4">
+            <a href="/about">
+              <Button
+                variant="accent"
+                size="sm"
+                className="group px-5 py-2.5 text-sm md:px-7 md:py-3 md:text-base"
+              >
+                Learn More
+                <ArrowRight
+                  className="ml-1 transition-transform duration-300 ease-out group-hover:translate-x-1 group-hover:text-amber md:ml-2"
+                  size={16}
+                />
+              </Button>
+            </a>
+            {about.resumeUrl && (
+              <a href={about.resumeUrl} target="_blank" rel="noopener noreferrer">
+                <Button
+                  variant="default"
+                  size="sm"
+                  className="group px-5 py-2.5 text-sm md:px-7 md:py-3 md:text-base"
+                >
+                  <Download
+                    className="mr-1 transition-transform duration-300 ease-out group-hover:-translate-y-0.5 md:mr-2"
+                    size={16}
+                  />
+                  Download CV
+                </Button>
+              </a>
+            )}
+          </div>
+        </motion.div>
+      </motion.div>
+
+      {/* Right column — telemetry rail (monochrome, narrow) */}
+      {/* Right column — 3D ID card + telemetry rail */}
+      <div className="pointer-events-auto relative z-10 hidden w-[38%] flex-col items-center justify-center gap-6 border-l border-line/60 bg-bg-elevated/20 px-8 py-24 backdrop-blur-sm md:flex lg:w-[32%] lg:px-12">
+        {/* Subtle vertical tick marks along the left edge */}
+        <div className="absolute left-0 top-0 h-full w-[1px] overflow-hidden opacity-30">
+          <div className="h-full w-full bg-[linear-gradient(to_bottom,transparent_50%,var(--border)_50%)] bg-[length:1px_12px]" />
+        </div>
+
+        {/* 3D ID card — focal point */}
+        <motion.div
+          className="flex w-full justify-center"
+          initial={reduceMotion ? false : { opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <HeroFlipCard about={about} />
+        </motion.div>
+
+        {/* Social links — compact, right-aligned */}
         {socialLinks.length > 0 && (
           <motion.div
-            className="flex items-center justify-center gap-3 mb-10 homepage-reveal-soft"
-            style={{ animationDelay: '0.42s', y: contentY }}
+            className="flex items-center justify-center gap-2"
+            initial={reduceMotion ? false : { opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.7, ease: [0.22, 1, 0.36, 1] }}
           >
-            {socialLinks.slice(0, 4).map((link, index) => {
+            {socialLinks.slice(0, 5).map((link, index) => {
               const Icon = socialIcons[link.platform.toLowerCase()] || Mail;
               return (
                 <a
@@ -179,11 +247,10 @@ export function HeroSection({ about }: HeroSectionProps) {
                   href={link.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-3 rounded-xl text-[#6B7280] hover:text-[#3B82F6] homepage-icon-hover shadow-[4px_4px_8px_rgba(163,177,198,0.6),-4px_-4px_8px_rgba(255,255,255,0.5)] hover:shadow-[8px_8px_14px_rgba(163,177,198,0.6),-8px_-8px_14px_rgba(255,255,255,0.54)] homepage-stagger"
-                  style={{ animationDelay: `${0.5 + index * 0.08}s` }}
+                  className="flex h-9 w-9 items-center justify-center rounded-lg border border-line text-text-secondary transition-all duration-300 hover:border-line-hover hover:bg-bg-card/60 hover:text-teal"
                   aria-label={link.platform}
                 >
-                  <Icon size={22} />
+                  <Icon size={16} />
                 </a>
               );
             })}
@@ -191,39 +258,30 @@ export function HeroSection({ about }: HeroSectionProps) {
         )}
 
         <motion.div
-          className="flex flex-row items-center justify-center gap-2 md:gap-4 homepage-reveal-soft"
-          style={{ animationDelay: '0.62s', y: contentY }}
+          className="flex flex-col items-center gap-1 font-mono text-[0.65rem] uppercase tracking-widest text-text-tertiary"
+          initial={reduceMotion ? false : { opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.7, delay: 0.85 }}
         >
-          <a href="/about">
-            <NeuButton
-              variant="accent"
-              size="sm"
-              className="text-sm px-3 py-2 md:px-6 md:py-3 md:text-base group"
-            >
-              Learn More
-              <ArrowRight
-                className="ml-1 md:ml-2 transition-transform duration-300 ease-out group-hover:translate-x-1"
-                size={16}
-              />
-            </NeuButton>
-          </a>
-          {about.resumeUrl && (
-            <a href={about.resumeUrl} target="_blank" rel="noopener noreferrer">
-              <NeuButton
-                variant="default"
-                size="sm"
-                className="text-sm px-3 py-2 md:px-6 md:py-3 md:text-base group"
-              >
-                <Download
-                  className="mr-1 md:mr-2 transition-transform duration-300 ease-out group-hover:-translate-y-0.5"
-                  size={16}
-                />
-                Download CV
-              </NeuButton>
-            </a>
-          )}
+          <span>Indonesia</span>
         </motion.div>
       </div>
-    </motion.section>
+      </div>
+
+      {/* HeroScene CSS background — constrained to content container so far L/R edges keep a clean gutter */}
+      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden="true">
+        <div className="relative mx-auto h-full w-full max-w-7xl overflow-hidden px-4 sm:px-6 lg:px-8">
+          <div className="absolute inset-x-4 inset-y-0 sm:inset-x-6 lg:inset-x-8">
+            <div className="hero-dot-grid absolute inset-0" />
+            <div className="hero-glow-a absolute left-[10%] top-[12%] h-[42vh] w-[42vh] rounded-full" />
+            <div className="hero-glow-b absolute bottom-[8%] right-[8%] h-[34vh] w-[34vh] rounded-full" />
+          </div>
+        </div>
+        <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[var(--bg)] to-transparent" />
+      </div>
+
+      {/* Bottom fade into page background */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-32 bg-gradient-to-t from-[var(--bg)] to-transparent" />
+    </section>
   );
 }

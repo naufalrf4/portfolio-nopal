@@ -4,11 +4,11 @@ import '../styles/globals.css';
 import { getAbout } from '@/lib/api';
 import Navbar from '../components/layout/Navbar.astro';
 import Footer from '../components/layout/Footer.astro';
-import FloatingBlobs from '../components/layout/FloatingBlobs.astro';
 import { MobileBottomNav } from '../components/layout/MobileBottomNav';
 import { ChatWidget } from '../components/chatbot/ChatWidget';
 import { LiveCursorBand } from '../components/home/LiveCursorBand';
 import { ScrollToTopButton } from '../components/shared/ScrollToTopButton';
+import { GlobalScene } from '../components/shared/GlobalScene';
 
 const SITE_NAME = 'NaufalRF Portfolio';
 const about = await getAbout();
@@ -82,9 +82,25 @@ const websiteSchema = {
 ---
 
 <!doctype html>
-<html lang="en" class="scroll-smooth">
+<html lang="en" class="scroll-smooth" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
+    <script is:inline>
+      (function () {
+        function applyTheme() {
+          var theme = 'dark';
+          try {
+            var stored = localStorage.getItem('theme');
+            if (stored === 'light' || stored === 'dark') theme = stored;
+          } catch (e) {
+            /* ignore */
+          }
+          document.documentElement.dataset.theme = theme;
+        }
+        applyTheme();
+        document.addEventListener('astro:after-swap', applyTheme);
+      })();
+    </script>
     <meta name="viewport" content="width=device-width" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <meta name="generator" content={Astro.generator} />
@@ -116,10 +132,16 @@ const websiteSchema = {
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   </head>
-  <body class="bg-background text-foreground min-h-screen selection:bg-accent selection:text-white">
-    <FloatingBlobs />
+  <body class="bg-background text-foreground min-h-screen" data-page={currentPath === '/' ? 'home' : 'inner'}>
+    <div
+      id="scroll-progress"
+      class="pointer-events-none fixed left-0 right-0 top-0 z-[90] h-[2px] origin-left scale-x-0 bg-teal"
+      aria-hidden="true"
+    >
+    </div>
+    <GlobalScene client:load transition:persist />
     <LiveCursorBand client:load currentPath={currentPath} socketUrl={presenceSocketUrl} />
     <ScrollToTopButton client:load currentPath={currentPath} />
     <Navbar />
@@ -129,6 +151,59 @@ const websiteSchema = {
     <Footer className="relative z-10" />
     <ChatWidget client:load currentPath={currentPath} />
     <MobileBottomNav client:load currentPath={currentPath} />
+    <script is:inline>
+      (function () {
+        function setupReveal() {
+          var els = document.querySelectorAll('[data-reveal]:not(.is-revealed)');
+          if (!els.length) return;
+          var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          if (reduced || !('IntersectionObserver' in window)) {
+            els.forEach(function (el) {
+              el.classList.add('is-revealed');
+            });
+            return;
+          }
+          var io = new IntersectionObserver(
+            function (entries) {
+              entries.forEach(function (entry) {
+                if (entry.isIntersecting) {
+                  entry.target.classList.add('is-revealed');
+                  io.unobserve(entry.target);
+                }
+              });
+            },
+            { threshold: 0.12, rootMargin: '0px 0px -32px 0px' }
+          );
+          els.forEach(function (el) {
+            io.observe(el);
+          });
+        }
+        setupReveal();
+        document.addEventListener('astro:page-load', setupReveal);
+
+        var progressTicking = false;
+        function updateScrollProgress() {
+          progressTicking = false;
+          var bar = document.getElementById('scroll-progress');
+          if (!bar) return;
+          var max = document.documentElement.scrollHeight - window.innerHeight;
+          var p = max > 0 ? Math.min(window.scrollY / max, 1) : 0;
+          bar.style.transform = 'scaleX(' + p + ')';
+        }
+        window.addEventListener(
+          'scroll',
+          function () {
+            if (!progressTicking) {
+              progressTicking = true;
+              requestAnimationFrame(updateScrollProgress);
+            }
+          },
+          { passive: true }
+        );
+        updateScrollProgress();
+        document.addEventListener('astro:page-load', updateScrollProgress);
+      })();
+    </script>
     <script is:inline>
       {`
         (function () {

@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { AlertCircle, Chrome, Send, UserCircle2 } from 'lucide-react';
 import { getBrowserTimezone } from '@/lib/submission-context';
-import { NeuButton } from '../shared/NeuButton';
-import { NeuTextarea } from '../shared/NeuTextarea';
+import { Button } from '../shared/Button';
+import { Textarea } from '../shared/Textarea';
 import { ResponsiveModal } from '../shared/ResponsiveModal';
 import { TurnstileWidget } from '../shared/TurnstileWidget';
 
@@ -137,12 +137,11 @@ export function GuestbookModal({
       titleId="guestbook-modal-title"
       description={description}
       disableClose={isSubmitting || isSigningIn}
-      contentClassName="bg-[linear-gradient(160deg,rgba(238,243,249,0.48),rgba(220,230,241,0.42))]"
       bodyClassName="px-5 pb-5 md:px-7 md:pb-6"
       footer={
         isComposerMode ? (
           <div className="flex flex-col-reverse gap-3 md:flex-row md:justify-end">
-            <NeuButton
+            <Button
               type="button"
               variant="ghost"
               onClick={onClose}
@@ -153,8 +152,8 @@ export function GuestbookModal({
               data-entity-label="Cancel guestbook compose"
             >
               Cancel
-            </NeuButton>
-            <NeuButton
+            </Button>
+            <Button
               type="submit"
               form="guestbook-modal-form"
               variant="primary"
@@ -163,11 +162,11 @@ export function GuestbookModal({
             >
               <Send size={18} className="mr-2" />
               Send message
-            </NeuButton>
+            </Button>
           </div>
         ) : (
           <div className="flex flex-col-reverse gap-3 md:flex-row md:justify-end">
-            <NeuButton
+            <Button
               type="button"
               variant="ghost"
               onClick={onClose}
@@ -178,8 +177,8 @@ export function GuestbookModal({
               data-entity-label="Close guestbook sign in"
             >
               Maybe later
-            </NeuButton>
-            <NeuButton
+            </Button>
+            <Button
               type="button"
               variant="primary"
               isLoading={isSigningIn}
@@ -187,25 +186,25 @@ export function GuestbookModal({
             >
               <Chrome size={18} className="mr-2" />
               Continue with Google
-            </NeuButton>
+            </Button>
           </div>
         )
       }
     >
       {isComposerMode ? (
         <>
-          <div className="mb-5 rounded-[24px] bg-white/28 p-4 shadow-[inset_1px_1px_0_rgba(255,255,255,0.35),0_14px_30px_rgba(135,157,183,0.12)] ring-1 ring-white/28 backdrop-blur-xl md:p-5">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#3B82F6]">
+          <div className="mb-5 rounded-xl border border-line bg-bg-elevated p-4 md:p-5">
+            <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-teal">
               Posting as
             </p>
-            <p className="mt-1 text-sm font-medium text-[#3D4852] md:text-base">
+            <p className="mt-1 text-sm font-medium text-text-primary md:text-base">
               {user?.name || user?.email}
             </p>
-            <p className="mt-1 text-xs text-[#6B7280] md:text-sm">{user?.email}</p>
+            <p className="mt-1 font-mono text-xs text-text-tertiary md:text-sm">{user?.email}</p>
           </div>
 
           <form id="guestbook-modal-form" onSubmit={handleSubmit} className="space-y-5">
-            <NeuTextarea
+            <Textarea
               label="Message"
               name="message"
               value={message}
@@ -216,9 +215,9 @@ export function GuestbookModal({
               disabled={isSubmitting}
             />
 
-            <div className="flex items-center justify-between text-xs text-[#6B7280] md:text-sm">
+            <div className="flex items-center justify-between text-xs text-text-secondary md:text-sm">
               <span>Keep it respectful and concise.</span>
-              <span>{message.length}/500</span>
+              <span className="font-mono">{message.length}/500</span>
             </div>
 
             {(!hasTurnstile || shouldShowTurnstile) && (
@@ -231,14 +230,14 @@ export function GuestbookModal({
             )}
 
             {turnstileError ? (
-              <div className="flex items-center gap-2 rounded-[20px] border border-red-200 bg-red-50/80 p-3 text-sm text-red-600 animate-in fade-in slide-in-from-bottom-2">
+              <div className="flex items-center gap-2 rounded-xl border border-[var(--error)]/40 bg-[var(--error)]/10 p-3 text-sm text-[var(--error)] animate-in fade-in slide-in-from-bottom-2">
                 <AlertCircle size={16} />
                 <span>{turnstileError}</span>
               </div>
             ) : null}
 
             {error ? (
-              <div className="flex items-center gap-2 rounded-[20px] border border-red-200 bg-red-50/80 p-3 text-sm text-red-600 animate-in fade-in slide-in-from-bottom-2">
+              <div className="flex items-center gap-2 rounded-xl border border-[var(--error)]/40 bg-[var(--error)]/10 p-3 text-sm text-[var(--error)] animate-in fade-in slide-in-from-bottom-2">
                 <AlertCircle size={16} />
                 <span>{error}</span>
               </div>
@@ -247,14 +246,16 @@ export function GuestbookModal({
         </>
       ) : (
         <div className="space-y-4">
-          <div className="rounded-[28px] bg-white/24 p-5 shadow-[inset_1px_1px_0_rgba(255,255,255,0.35),0_16px_32px_rgba(135,157,183,0.12)] ring-1 ring-white/28 backdrop-blur-xl md:p-6">
+          <div className="rounded-xl border border-line bg-bg-elevated p-5 md:p-6">
             <div className="flex items-center gap-4">
-              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#E0E5EC] text-[#3B82F6] shadow-[6px_6px_12px_rgba(163,177,198,0.52),-6px_-6px_12px_rgba(255,255,255,0.52)]">
+              <div className="flex h-14 w-14 items-center justify-center rounded-xl border border-teal/30 bg-[var(--teal-soft)] text-teal">
                 <UserCircle2 size={28} />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-[#3D4852]">Sign in with Google</h3>
-                <p className="mt-1 text-sm leading-relaxed text-[#6B7280]">
+                <h3 className="text-xl font-bold font-display text-text-primary">
+                  Sign in with Google
+                </h3>
+                <p className="mt-1 text-sm leading-relaxed text-text-secondary">
                   You will come right back here and the guestbook composer will open automatically.
                 </p>
               </div>
@@ -262,7 +263,7 @@ export function GuestbookModal({
           </div>
 
           {error ? (
-            <div className="flex items-center gap-2 rounded-[20px] border border-red-200 bg-red-50/80 p-3 text-sm text-red-600 animate-in fade-in slide-in-from-bottom-2">
+            <div className="flex items-center gap-2 rounded-xl border border-[var(--error)]/40 bg-[var(--error)]/10 p-3 text-sm text-[var(--error)] animate-in fade-in slide-in-from-bottom-2">
               <AlertCircle size={16} />
               <span>{error}</span>
             </div>

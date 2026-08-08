@@ -1,12 +1,12 @@
 import { cn } from '../../lib/utils';
 import React, { forwardRef } from 'react';
 
-export interface NeuInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
 }
 
-export const NeuInput = forwardRef<HTMLInputElement, NeuInputProps>(
+export const Input = forwardRef<HTMLInputElement, InputProps>(
   ({ label, error, className, id, ...props }, ref) => {
     // Generate an ID if not provided, for accessibility
     const inputId = id || (label ? label.toLowerCase().replace(/\s+/g, '-') : undefined);
@@ -14,7 +14,7 @@ export const NeuInput = forwardRef<HTMLInputElement, NeuInputProps>(
     return (
       <div className="w-full">
         {label && (
-          <label htmlFor={inputId} className="block text-sm font-medium text-[#3D4852] mb-2">
+          <label htmlFor={inputId} className="block text-sm font-medium text-text-primary mb-2">
             {label}
           </label>
         )}
@@ -22,20 +22,19 @@ export const NeuInput = forwardRef<HTMLInputElement, NeuInputProps>(
           ref={ref}
           id={inputId}
           className={cn(
-            'w-full px-4 py-3 rounded-xl bg-[#E0E5EC] text-[#3D4852]',
-            'shadow-[inset_4px_4px_8px_rgba(163,177,198,0.6),inset_-4px_-4px_8px_rgba(255,255,255,0.5)]',
-            'focus:outline-none focus:ring-2 focus:ring-[#3B82F6] focus:ring-opacity-50',
-            'placeholder:text-[#6B7280]',
+            'w-full px-4 py-3 rounded-lg bg-bg-elevated text-text-primary border border-line',
+            'focus:outline-none focus:border-teal focus:ring-1 focus:ring-teal/40',
+            'placeholder:text-text-tertiary',
             'transition-all duration-200',
-            error ? 'ring-2 ring-red-500' : '',
+            error ? 'border-[var(--error)] ring-1 ring-[var(--error)]/40' : '',
             className
           )}
           {...props}
         />
-        {error && <p className="mt-1 text-sm text-red-500">{error}</p>}
+        {error && <p className="mt-1 text-sm text-[var(--error)]">{error}</p>}
       </div>
     );
   }
 );
 
-NeuInput.displayName = 'NeuInput';
+Input.displayName = 'Input';

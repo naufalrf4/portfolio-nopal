@@ -2,9 +2,9 @@ import React, { useMemo, useState } from 'react';
 import { AlertCircle, CheckCircle2, Send } from 'lucide-react';
 import { submitContactForm } from '@/lib/api';
 import { getBrowserTimezone } from '@/lib/submission-context';
-import { NeuButton } from '../shared/NeuButton';
-import { NeuInput } from '../shared/NeuInput';
-import { NeuTextarea } from '../shared/NeuTextarea';
+import { Button } from '../shared/Button';
+import { Input } from '../shared/Input';
+import { Textarea } from '../shared/Textarea';
 import { TurnstileWidget } from '../shared/TurnstileWidget';
 
 interface FormData {
@@ -124,7 +124,7 @@ export function ContactForm({ turnstileSiteKey }: ContactFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-        <NeuInput
+        <Input
           label="Name"
           name="name"
           value={formData.name}
@@ -134,7 +134,7 @@ export function ContactForm({ turnstileSiteKey }: ContactFormProps) {
           disabled={isLoading}
           required
         />
-        <NeuInput
+        <Input
           label="Email"
           name="email"
           type="email"
@@ -147,7 +147,7 @@ export function ContactForm({ turnstileSiteKey }: ContactFormProps) {
         />
       </div>
 
-      <NeuInput
+      <Input
         label="Subject"
         name="subject"
         value={formData.subject}
@@ -158,7 +158,7 @@ export function ContactForm({ turnstileSiteKey }: ContactFormProps) {
         required
       />
 
-      <NeuTextarea
+      <Textarea
         label="Message"
         name="message"
         value={formData.message}
@@ -180,27 +180,27 @@ export function ContactForm({ turnstileSiteKey }: ContactFormProps) {
       )}
 
       {turnstileError ? (
-        <div className="flex items-center gap-2 rounded-[20px] border border-red-200 bg-red-50/80 p-3 text-sm text-red-600 animate-in fade-in slide-in-from-bottom-2">
+        <div className="flex items-center gap-2 rounded-xl border border-[var(--error)]/40 bg-[var(--error)]/10 p-3 text-sm text-[var(--error)] animate-in fade-in slide-in-from-bottom-2">
           <AlertCircle size={16} />
           <span>{turnstileError}</span>
         </div>
       ) : null}
 
       {submitError ? (
-        <div className="flex items-center gap-2 rounded-[20px] border border-red-200 bg-red-50/80 p-3 text-sm text-red-600 animate-in fade-in slide-in-from-bottom-2">
+        <div className="flex items-center gap-2 rounded-xl border border-[var(--error)]/40 bg-[var(--error)]/10 p-3 text-sm text-[var(--error)] animate-in fade-in slide-in-from-bottom-2">
           <AlertCircle size={16} />
           <span>{submitError}</span>
         </div>
       ) : null}
 
       {submitSuccess ? (
-        <div className="flex items-center gap-2 rounded-[20px] border border-emerald-200 bg-emerald-50/80 p-3 text-sm text-emerald-700 animate-in fade-in slide-in-from-bottom-2">
+        <div className="flex items-center gap-2 rounded-xl border border-teal/30 bg-[var(--teal-soft)] p-3 text-sm text-teal animate-in fade-in slide-in-from-bottom-2">
           <CheckCircle2 size={16} />
           <span>{submitSuccess}</span>
         </div>
       ) : null}
 
-      <NeuButton
+      <Button
         type="submit"
         data-analytics-button
         data-entity-type="contact_submit"
@@ -214,7 +214,7 @@ export function ContactForm({ turnstileSiteKey }: ContactFormProps) {
       >
         <Send size={18} className="mr-2" />
         Send Message
-      </NeuButton>
+      </Button>
     </form>
   );
 }

@@ -13,9 +13,9 @@ import { getBookingAvailability, submitBooking } from '@/lib/api';
 import { getBrowserTimezone } from '@/lib/submission-context';
 import type { BookingAvailability, BookingSlot } from '@/types';
 import { cn } from '@/lib/utils';
-import { NeuButton } from '../shared/NeuButton';
-import { NeuInput } from '../shared/NeuInput';
-import { NeuTextarea } from '../shared/NeuTextarea';
+import { Button } from '../shared/Button';
+import { Input } from '../shared/Input';
+import { Textarea } from '../shared/Textarea';
 import { TurnstileWidget } from '../shared/TurnstileWidget';
 
 interface BookingFormData {
@@ -229,12 +229,12 @@ export function BookingCalendar({ turnstileSiteKey }: BookingCalendarProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-start justify-between gap-4 rounded-[24px] bg-[#E7ECF2] p-5 shadow-[inset_4px_4px_10px_rgba(163,177,198,0.32),inset_-4px_-4px_10px_rgba(255,255,255,0.46)]">
+      <div className="flex items-start justify-between gap-4 rounded-xl bg-bg-elevated p-5 border border-line">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#3B82F6]">
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-teal">
             Availability
           </p>
-          <h3 className="mt-2 text-xl font-semibold text-[#3D4852]">Book a call</h3>
+          <h3 className="mt-2 text-xl font-semibold text-text-primary">Book a call</h3>
         </div>
         <button
           type="button"
@@ -243,7 +243,7 @@ export function BookingCalendar({ turnstileSiteKey }: BookingCalendarProps) {
           data-entity-type="booking_refresh"
           data-entity-id="booking-calendar"
           data-entity-label="Refresh booking availability"
-          className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-[#E0E5EC] text-[#6B7280] shadow-[6px_6px_12px_rgba(163,177,198,0.55),-6px_-6px_12px_rgba(255,255,255,0.45)] transition-all duration-200 hover:-translate-y-0.5 hover:text-[#3B82F6]"
+          className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-bg-elevated text-text-secondary border border-line transition-all duration-200 hover:-translate-y-0.5 hover:text-teal"
           aria-label="Refresh availability"
         >
           <RefreshCcw size={18} className={cn(isLoading && 'animate-spin')} />
@@ -267,13 +267,13 @@ export function BookingCalendar({ turnstileSiteKey }: BookingCalendarProps) {
               data-entity-label={step.title}
               disabled={!isAccessible}
               className={cn(
-                'rounded-[24px] px-4 py-4 text-left transition-all duration-200',
-                'shadow-[6px_6px_12px_rgba(163,177,198,0.5),-6px_-6px_12px_rgba(255,255,255,0.44)]',
+                'rounded-xl px-4 py-4 text-left transition-all duration-200',
+                'border border-line',
                 isActive &&
-                  'bg-[#DCE8FF] text-[#2453C5] shadow-[inset_4px_4px_10px_rgba(163,177,198,0.28),inset_-4px_-4px_10px_rgba(255,255,255,0.48)]',
+                  'bg-[var(--teal-soft)] text-teal border border-line',
                 isComplete &&
-                  'bg-[#E5F6EC] text-emerald-700 shadow-[inset_4px_4px_10px_rgba(163,177,198,0.2),inset_-4px_-4px_10px_rgba(255,255,255,0.4)]',
-                !isActive && !isComplete && 'bg-[#E0E5EC] text-[#6B7280]',
+                  'bg-[var(--teal-soft)] text-teal border border-line',
+                !isActive && !isComplete && 'bg-bg-elevated text-text-secondary',
                 !isAccessible && 'cursor-not-allowed opacity-60'
               )}
             >
@@ -281,9 +281,9 @@ export function BookingCalendar({ turnstileSiteKey }: BookingCalendarProps) {
                 <div
                   className={cn(
                     'flex h-9 w-9 items-center justify-center rounded-2xl text-sm font-semibold',
-                    isActive && 'bg-white/70 text-[#2453C5]',
-                    isComplete && 'bg-white/70 text-emerald-700',
-                    !isActive && !isComplete && 'bg-[#E7ECF2] text-[#6B7280]'
+                    isActive && 'bg-bg-card/70 text-teal',
+                    isComplete && 'bg-bg-card/70 text-teal',
+                    !isActive && !isComplete && 'bg-bg-elevated text-text-secondary'
                   )}
                 >
                   {isComplete ? <Check size={16} /> : step.id}
@@ -301,24 +301,24 @@ export function BookingCalendar({ turnstileSiteKey }: BookingCalendarProps) {
       </div>
 
       {loadError ? (
-        <div className="flex items-center gap-2 rounded-[20px] border border-red-200 bg-red-50/80 p-3 text-sm text-red-600 animate-in fade-in slide-in-from-bottom-2">
+        <div className="flex items-center gap-2 rounded-xl border border-[var(--error)]/40 bg-[var(--error)]/10 p-3 text-sm text-[var(--error)] animate-in fade-in slide-in-from-bottom-2">
           <AlertCircle size={16} />
           <span>{loadError}</span>
         </div>
       ) : null}
 
       {submitSuccess ? (
-        <div className="flex items-center gap-2 rounded-[20px] border border-emerald-200 bg-emerald-50/80 p-3 text-sm text-emerald-700 animate-in fade-in slide-in-from-bottom-2">
+        <div className="flex items-center gap-2 rounded-xl border border-teal/30 bg-[var(--teal-soft)] p-3 text-sm text-teal animate-in fade-in slide-in-from-bottom-2">
           <CheckCircle2 size={16} />
           <span>{submitSuccess}</span>
         </div>
       ) : null}
 
-      <div className="rounded-[28px] bg-[#E7ECF2] p-5 shadow-[inset_4px_4px_10px_rgba(163,177,198,0.32),inset_-4px_-4px_10px_rgba(255,255,255,0.46)] md:p-6">
+      <div className="rounded-xl bg-bg-elevated p-5 border border-line md:p-6">
         {currentStep === 1 ? (
           <div className="space-y-5 animate-in fade-in slide-in-from-bottom-3 duration-300">
-            <div className="flex items-center gap-2 text-sm font-medium text-[#3D4852]">
-              <CalendarDays size={16} className="text-[#3B82F6]" />
+            <div className="flex items-center gap-2 text-sm font-medium text-text-primary">
+              <CalendarDays size={16} className="text-teal" />
               <span>Select a date</span>
             </div>
 
@@ -327,7 +327,7 @@ export function BookingCalendar({ turnstileSiteKey }: BookingCalendarProps) {
                 ? Array.from({ length: 4 }).map((_, index) => (
                     <div
                       key={index}
-                      className="h-[88px] animate-pulse rounded-[24px] bg-[#E0E5EC] shadow-[inset_4px_4px_8px_rgba(163,177,198,0.35),inset_-4px_-4px_8px_rgba(255,255,255,0.45)]"
+                      className="h-[88px] animate-pulse rounded-xl bg-bg-elevated border border-line"
                     />
                   ))
                 : dates.map((date) => {
@@ -347,15 +347,15 @@ export function BookingCalendar({ turnstileSiteKey }: BookingCalendarProps) {
                           setSubmitError(null);
                         }}
                         className={cn(
-                          'rounded-[24px] px-4 py-4 text-left transition-all duration-200',
-                          'shadow-[6px_6px_12px_rgba(163,177,198,0.55),-6px_-6px_12px_rgba(255,255,255,0.45)]',
+                          'rounded-xl px-4 py-4 text-left transition-all duration-200',
+                          'border border-line',
                           isActive
-                            ? 'bg-[#DCE8FF] text-[#2453C5] shadow-[inset_4px_4px_10px_rgba(163,177,198,0.32),inset_-4px_-4px_10px_rgba(255,255,255,0.48)]'
-                            : 'bg-[#E0E5EC] text-[#3D4852] hover:-translate-y-0.5 hover:text-[#3B82F6]'
+                            ? 'bg-[var(--teal-soft)] text-teal border border-line'
+                            : 'bg-bg-elevated text-text-primary hover:-translate-y-0.5 hover:text-teal'
                         )}
                       >
                         <p className="text-sm font-semibold">{formatDateLabel(date)}</p>
-                        <p className="mt-1 text-xs text-[#6B7280]">
+                        <p className="mt-1 text-xs text-text-secondary">
                           {count} slot{count === 1 ? '' : 's'} available
                         </p>
                       </button>
@@ -364,14 +364,14 @@ export function BookingCalendar({ turnstileSiteKey }: BookingCalendarProps) {
             </div>
 
             {!isLoading && dates.length === 0 ? (
-              <div className="rounded-[24px] bg-[#E0E5EC] p-5 text-sm text-[#6B7280] shadow-[inset_4px_4px_10px_rgba(163,177,198,0.32),inset_-4px_-4px_10px_rgba(255,255,255,0.46)]">
+              <div className="rounded-xl bg-bg-elevated p-5 text-sm text-text-secondary border border-line">
                 No booking slots are available right now. Send a direct message instead and we can
                 coordinate another time manually.
               </div>
             ) : null}
 
             <div className="flex justify-end">
-              <NeuButton
+              <Button
                 type="button"
                 variant="accent"
                 onClick={() => goToStep(2)}
@@ -384,22 +384,22 @@ export function BookingCalendar({ turnstileSiteKey }: BookingCalendarProps) {
               >
                 Continue to time
                 <ArrowRight size={16} />
-              </NeuButton>
+              </Button>
             </div>
           </div>
         ) : null}
 
         {currentStep === 2 ? (
           <div className="space-y-5 animate-in fade-in slide-in-from-bottom-3 duration-300">
-            <div className="rounded-[24px] bg-[#E0E5EC] p-4 text-sm text-[#6B7280] shadow-[inset_4px_4px_10px_rgba(163,177,198,0.28),inset_-4px_-4px_10px_rgba(255,255,255,0.44)]">
+            <div className="rounded-xl bg-bg-elevated p-4 text-sm text-text-secondary border border-line">
               Selected date:{' '}
-              <span className="font-semibold text-[#3D4852]">
+              <span className="font-semibold text-text-primary">
                 {selectedDate ? formatDateLabel(selectedDate) : '-'}
               </span>
             </div>
 
-            <div className="flex items-center gap-2 text-sm font-medium text-[#3D4852]">
-              <Clock3 size={16} className="text-[#3B82F6]" />
+            <div className="flex items-center gap-2 text-sm font-medium text-text-primary">
+              <Clock3 size={16} className="text-teal" />
               <span>Select a time slot</span>
             </div>
 
@@ -419,28 +419,28 @@ export function BookingCalendar({ turnstileSiteKey }: BookingCalendarProps) {
                       setSubmitError(null);
                     }}
                     className={cn(
-                      'rounded-[22px] px-4 py-4 text-left transition-all duration-200',
-                      'shadow-[5px_5px_10px_rgba(163,177,198,0.5),-5px_-5px_10px_rgba(255,255,255,0.42)]',
+                      'rounded-xl px-4 py-4 text-left transition-all duration-200',
+                      'border border-line',
                       isActive
-                        ? 'bg-[#DCE8FF] text-[#2453C5] shadow-[inset_4px_4px_10px_rgba(163,177,198,0.3),inset_-4px_-4px_10px_rgba(255,255,255,0.48)]'
-                        : 'bg-[#E0E5EC] text-[#3D4852] hover:-translate-y-0.5 hover:text-[#3B82F6]'
+                        ? 'bg-[var(--teal-soft)] text-teal border border-line'
+                        : 'bg-bg-elevated text-text-primary hover:-translate-y-0.5 hover:text-teal'
                     )}
                   >
                     <p className="font-semibold">{formatTimeRange(slot)}</p>
-                    <p className="mt-1 text-xs text-[#6B7280]">{slot.duration} minutes</p>
+                    <p className="mt-1 text-xs text-text-secondary">{slot.duration} minutes</p>
                   </button>
                 );
               })}
             </div>
 
             {slots.length === 0 ? (
-              <div className="rounded-[24px] bg-[#E0E5EC] p-5 text-sm text-[#6B7280] shadow-[inset_4px_4px_10px_rgba(163,177,198,0.28),inset_-4px_-4px_10px_rgba(255,255,255,0.44)]">
+              <div className="rounded-xl bg-bg-elevated p-5 text-sm text-text-secondary border border-line">
                 There are no remaining time slots for this date. Pick a different day.
               </div>
             ) : null}
 
             <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <NeuButton
+              <Button
                 type="button"
                 variant="ghost"
                 onClick={() => setCurrentStep(1)}
@@ -452,8 +452,8 @@ export function BookingCalendar({ turnstileSiteKey }: BookingCalendarProps) {
               >
                 <ArrowLeft size={16} />
                 Back to dates
-              </NeuButton>
-              <NeuButton
+              </Button>
+              <Button
                 type="button"
                 variant="accent"
                 onClick={() => goToStep(3)}
@@ -466,7 +466,7 @@ export function BookingCalendar({ turnstileSiteKey }: BookingCalendarProps) {
               >
                 Continue to details
                 <ArrowRight size={16} />
-              </NeuButton>
+              </Button>
             </div>
           </div>
         ) : null}
@@ -477,19 +477,19 @@ export function BookingCalendar({ turnstileSiteKey }: BookingCalendarProps) {
             className="space-y-5 animate-in fade-in slide-in-from-bottom-3 duration-300"
           >
             <div className="grid gap-3 md:grid-cols-2">
-              <div className="rounded-[24px] bg-[#E0E5EC] p-4 shadow-[inset_4px_4px_10px_rgba(163,177,198,0.28),inset_-4px_-4px_10px_rgba(255,255,255,0.44)]">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#3B82F6]">
+              <div className="rounded-xl bg-bg-elevated p-4 border border-line">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-teal">
                   Date
                 </p>
-                <p className="mt-2 text-sm font-semibold text-[#3D4852]">
+                <p className="mt-2 text-sm font-semibold text-text-primary">
                   {selectedDate ? formatDateLabel(selectedDate) : '-'}
                 </p>
               </div>
-              <div className="rounded-[24px] bg-[#E0E5EC] p-4 shadow-[inset_4px_4px_10px_rgba(163,177,198,0.28),inset_-4px_-4px_10px_rgba(255,255,255,0.44)]">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#3B82F6]">
+              <div className="rounded-xl bg-bg-elevated p-4 border border-line">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-teal">
                   Time
                 </p>
-                <p className="mt-2 text-sm font-semibold text-[#3D4852]">
+                <p className="mt-2 text-sm font-semibold text-text-primary">
                   {selectedSlot
                     ? `${formatTimeRange(selectedSlot)} (${selectedSlot.duration} min)`
                     : '-'}
@@ -498,7 +498,7 @@ export function BookingCalendar({ turnstileSiteKey }: BookingCalendarProps) {
             </div>
 
             <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-              <NeuInput
+              <Input
                 label="Name"
                 name="name"
                 value={formData.name}
@@ -508,7 +508,7 @@ export function BookingCalendar({ turnstileSiteKey }: BookingCalendarProps) {
                 disabled={isSubmitting}
                 required
               />
-              <NeuInput
+              <Input
                 label="Email"
                 name="email"
                 type="email"
@@ -521,7 +521,7 @@ export function BookingCalendar({ turnstileSiteKey }: BookingCalendarProps) {
               />
             </div>
 
-            <NeuInput
+            <Input
               label="Phone (optional)"
               name="phone"
               value={formData.phone}
@@ -531,7 +531,7 @@ export function BookingCalendar({ turnstileSiteKey }: BookingCalendarProps) {
               disabled={isSubmitting}
             />
 
-            <NeuTextarea
+            <Textarea
               label="Notes (optional)"
               name="notes"
               value={formData.notes}
@@ -542,7 +542,7 @@ export function BookingCalendar({ turnstileSiteKey }: BookingCalendarProps) {
             />
 
             {hasTurnstile && !shouldShowTurnstile ? (
-              <p className="text-center text-xs text-[#6B7280] md:text-sm">
+              <p className="text-center text-xs text-text-secondary md:text-sm">
                 Add your details first and the CAPTCHA will appear before the final submit.
               </p>
             ) : null}
@@ -557,21 +557,21 @@ export function BookingCalendar({ turnstileSiteKey }: BookingCalendarProps) {
             )}
 
             {turnstileError ? (
-              <div className="flex items-center gap-2 rounded-[20px] border border-red-200 bg-red-50/80 p-3 text-sm text-red-600 animate-in fade-in slide-in-from-bottom-2">
+              <div className="flex items-center gap-2 rounded-xl border border-[var(--error)]/40 bg-[var(--error)]/10 p-3 text-sm text-[var(--error)] animate-in fade-in slide-in-from-bottom-2">
                 <AlertCircle size={16} />
                 <span>{turnstileError}</span>
               </div>
             ) : null}
 
             {submitError ? (
-              <div className="flex items-center gap-2 rounded-[20px] border border-red-200 bg-red-50/80 p-3 text-sm text-red-600 animate-in fade-in slide-in-from-bottom-2">
+              <div className="flex items-center gap-2 rounded-xl border border-[var(--error)]/40 bg-[var(--error)]/10 p-3 text-sm text-[var(--error)] animate-in fade-in slide-in-from-bottom-2">
                 <AlertCircle size={16} />
                 <span>{submitError}</span>
               </div>
             ) : null}
 
             <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <NeuButton
+              <Button
                 type="button"
                 variant="ghost"
                 onClick={() => setCurrentStep(2)}
@@ -583,8 +583,8 @@ export function BookingCalendar({ turnstileSiteKey }: BookingCalendarProps) {
               >
                 <ArrowLeft size={16} />
                 Back to time
-              </NeuButton>
-              <NeuButton
+              </Button>
+              <Button
                 type="submit"
                 variant="accent"
                 size="lg"
@@ -598,7 +598,7 @@ export function BookingCalendar({ turnstileSiteKey }: BookingCalendarProps) {
               >
                 Reserve selected slot
                 <ArrowRight size={16} />
-              </NeuButton>
+              </Button>
             </div>
           </form>
         ) : null}

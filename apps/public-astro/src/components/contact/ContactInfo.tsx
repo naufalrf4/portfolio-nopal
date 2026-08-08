@@ -1,6 +1,6 @@
 import React from 'react';
 import type { ComponentType } from 'react';
-import { NeuCard } from '../shared/NeuCard';
+import { Card } from '../shared/Card';
 import {
   MapPin,
   Mail,
@@ -42,19 +42,19 @@ export function ContactInfo({
   error,
 }: ContactInfoProps) {
   return (
-    <NeuCard className="p-6 md:p-8 h-full">
+    <Card className="p-6 md:p-8 h-full">
       <div className="flex flex-col h-full">
-        <h2 className="text-2xl md:text-3xl font-bold text-[#3D4852] mb-2">Get in Touch</h2>
-        <p className="text-[#6B7280] mb-8">
+        <h2 className="text-2xl md:text-3xl font-bold text-text-primary mb-2">Get in Touch</h2>
+        <p className="text-text-secondary mb-8">
           Have a question or want to work together? I&apos;d love to hear from you.
         </p>
 
         {error ? (
-          <div className="flex items-start gap-3 p-4 rounded-lg bg-red-50 border border-red-200 mb-6">
-            <AlertCircle size={20} className="text-red-500 flex-shrink-0 mt-0.5" />
+          <div className="flex items-start gap-3 p-4 rounded-lg border border-[var(--error)]/40 bg-[var(--error)]/10 mb-6">
+            <AlertCircle size={20} className="text-[var(--error)] flex-shrink-0 mt-0.5" />
             <div>
-              <p className="text-sm font-medium text-red-800">Failed to load contact information</p>
-              <p className="text-xs text-red-600 mt-1">{error}</p>
+              <p className="text-sm font-medium text-[var(--error)]">Failed to load contact information</p>
+              <p className="text-xs text-[var(--error)] mt-1">{error}</p>
             </div>
           </div>
         ) : null}
@@ -62,24 +62,24 @@ export function ContactInfo({
         <div className="space-y-4 mb-8">
           {location && (
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-[#E0E5EC] shadow-[4px_4px_8px_rgba(163,177,198,0.6),-4px_-4px_8px_rgba(255,255,255,0.5)] flex items-center justify-center">
-                <MapPin size={18} className="text-[#3B82F6]" />
+              <div className="w-10 h-10 rounded-xl bg-bg-elevated border border-line flex items-center justify-center">
+                <MapPin size={18} className="text-teal" />
               </div>
               <div>
-                <p className="text-sm text-[#6B7280]">Location</p>
-                <p className="text-[#3D4852] font-medium">{location}</p>
+                <p className="text-sm text-text-secondary">Location</p>
+                <p className="text-text-primary font-medium">{location}</p>
               </div>
             </div>
           )}
 
           {email && (
             <a href={`mailto:${email}`} className="flex items-center gap-3 group">
-              <div className="w-10 h-10 rounded-xl bg-[#E0E5EC] shadow-[4px_4px_8px_rgba(163,177,198,0.6),-4px_-4px_8px_rgba(255,255,255,0.5)] flex items-center justify-center transition-all duration-200 group-hover:shadow-[6px_6px_12px_rgba(163,177,198,0.7),-6px_-6px_12px_rgba(255,255,255,0.6)]">
-                <Mail size={18} className="text-[#3B82F6]" />
+              <div className="w-10 h-10 rounded-xl bg-bg-elevated border border-line flex items-center justify-center transition-all duration-200 group-hover:border-line-hover">
+                <Mail size={18} className="text-teal" />
               </div>
               <div>
-                <p className="text-sm text-[#6B7280]">Email</p>
-                <p className="text-[#3D4852] font-medium group-hover:text-[#3B82F6] transition-colors">
+                <p className="text-sm text-text-secondary">Email</p>
+                <p className="text-text-primary font-medium group-hover:text-teal transition-colors">
                   {email}
                 </p>
               </div>
@@ -88,18 +88,18 @@ export function ContactInfo({
 
           {availabilityStatus && (
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-[#E0E5EC] shadow-[4px_4px_8px_rgba(163,177,198,0.6),-4px_-4px_8px_rgba(255,255,255,0.5)] flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-bg-elevated border border-line flex items-center justify-center">
                 {availabilityStatus === 'available' ? (
-                  <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse" />
+                  <div className="w-3 h-3 rounded-full bg-green animate-pulse" />
                 ) : availabilityStatus === 'busy' ? (
-                  <div className="w-3 h-3 rounded-full bg-yellow-500" />
+                  <div className="w-3 h-3 rounded-full bg-amber" />
                 ) : (
-                  <div className="w-3 h-3 rounded-full bg-gray-400" />
+                  <div className="w-3 h-3 rounded-full bg-line-hover" />
                 )}
               </div>
               <div>
-                <p className="text-sm text-[#6B7280]">Status</p>
-                <p className="text-[#3D4852] font-medium">
+                <p className="text-sm text-text-secondary">Status</p>
+                <p className="text-text-primary font-medium">
                   {availabilityStatus === 'available' && 'Available to work'}
                   {availabilityStatus === 'busy' && 'Currently busy'}
                   {availabilityStatus === 'unavailable' && 'Not available'}
@@ -111,7 +111,7 @@ export function ContactInfo({
 
         {socialLinks.length > 0 && (
           <div className="mt-auto">
-            <p className="text-sm text-[#6B7280] mb-4">Connect with me</p>
+            <p className="text-sm text-text-secondary mb-4">Connect with me</p>
             <div className="flex flex-wrap gap-3">
               {socialLinks.map((link, index) => {
                 const platform = detectPublicSocialPlatform(link) ?? link.platform.toLowerCase();
@@ -122,7 +122,7 @@ export function ContactInfo({
                     href={link.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-3 rounded-xl text-[#6B7280] hover:text-[#3B82F6] transition-all duration-200 shadow-[4px_4px_8px_rgba(163,177,198,0.6),-4px_-4px_8px_rgba(255,255,255,0.5)] hover:shadow-[6px_6px_12px_rgba(163,177,198,0.7),-6px_-6px_12px_rgba(255,255,255,0.6)]"
+                    className="p-3 rounded-xl text-text-secondary hover:text-teal transition-all duration-200 border border-line"
                     aria-label={link.platform}
                   >
                     <Icon size={20} />
@@ -133,6 +133,6 @@ export function ContactInfo({
           </div>
         )}
       </div>
-    </NeuCard>
+    </Card>
   );
 }

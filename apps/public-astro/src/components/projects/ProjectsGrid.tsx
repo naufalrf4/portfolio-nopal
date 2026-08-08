@@ -25,7 +25,7 @@ export function ProjectsGrid({ projects }: ProjectsGridProps) {
 
   return (
     <div className="animate-fade-in">
-      <div className="sticky top-20 z-30 mb-8 -mx-2 rounded-[28px] bg-[linear-gradient(180deg,rgba(224,229,236,0.94),rgba(224,229,236,0.82))] px-2 py-3 backdrop-blur-xl shadow-[0_14px_28px_rgba(163,177,198,0.18)]">
+      <div className="sticky top-20 z-30 mb-8 -mx-2 rounded-xl border border-line bg-bg-elevated/90 px-2 py-2 backdrop-blur-xl">
         <div className="flex flex-wrap justify-center gap-3">
           {categories.map((category) => {
             const isActive = activeCategory === category;
@@ -40,18 +40,18 @@ export function ProjectsGrid({ projects }: ProjectsGridProps) {
                 onClick={() => setActiveCategory(category)}
                 aria-pressed={isActive}
                 className={cn(
-                  'px-5 py-2.5 rounded-2xl font-medium transition-all duration-300 capitalize flex items-center',
-                  'focus:outline-none focus:ring-2 focus:ring-[#3B82F6] focus:ring-offset-2 focus:ring-offset-[#E0E5EC]',
+                  'px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 capitalize flex items-center',
+                  'focus:outline-none focus:ring-2 focus:ring-teal/40 focus:ring-offset-0',
                   isActive
-                    ? 'text-[#3B82F6] bg-[#E0E5EC] shadow-[inset_6px_6px_10px_rgba(163,177,198,0.6),inset_-6px_-6px_10px_rgba(255,255,255,0.5)]'
-                    : 'text-[#6B7280] bg-[#E0E5EC] shadow-[6px_6px_12px_rgba(163,177,198,0.6),-6px_-6px_12px_rgba(255,255,255,0.5)] hover:text-[#3B82F6] hover:-translate-y-0.5 hover:shadow-[8px_8px_16px_rgba(163,177,198,0.7),-8px_-8px_16px_rgba(255,255,255,0.6)]'
+                    ? 'bg-[var(--teal-soft)] text-teal border border-teal/30'
+                    : 'text-text-secondary border border-transparent hover:text-teal hover:bg-bg-card'
                 )}
               >
                 {category}
                 <span
                   className={cn(
                     'ml-2 text-xs px-2 py-0.5 rounded-full',
-                    isActive ? 'bg-[#3B82F6]/10 text-[#3B82F6]' : 'bg-[#6B7280]/10 text-[#6B7280]'
+                    isActive ? 'bg-[var(--teal-soft)] text-teal' : 'bg-bg-card text-text-secondary'
                   )}
                 >
                   {count}
@@ -64,7 +64,7 @@ export function ProjectsGrid({ projects }: ProjectsGridProps) {
 
       {projectCount === 0 ? (
         <div className="text-center py-12">
-          <p className="text-[#6B7280]">No projects found in this category.</p>
+          <p className="text-text-secondary">No projects found in this category.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

@@ -1,4 +1,5 @@
 import type { ChatRequest, ChatResponse } from './types';
+import { createAbortSignal, isAbortError } from '@naufalrf/http';
 
 export class ChatServiceError extends Error {
   constructor(
@@ -16,20 +17,6 @@ interface SendChatMessageOptions {
 
 const CHAT_REQUEST_TIMEOUT_MS = 10000;
 
-function createAbortSignal(timeoutMs: number): { signal: AbortSignal; cleanup: () => void } {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-
-  return {
-    signal: controller.signal,
-    cleanup: () => clearTimeout(timeoutId),
-  };
-}
-
-function isAbortError(error: unknown): boolean {
-  return error instanceof Error && (error.name === 'AbortError' || error.name === 'TimeoutError');
-}
-
 export async function sendChatMessage({ request }: SendChatMessageOptions): Promise<ChatResponse> {
   try {
     const endpoint = '/api/rag/chat';
@@ -46,27 +33,16 @@ export async function sendChatMessage({ request }: SendChatMessageOptions): Prom
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
+        const errorData = await response.json().catch(() => ({})) as Record<string, unknown>;
         throw new ChatServiceError(
-          errorData?.error?.message || 'Failed to get response from AI',
+          String((errorData.error as Record<string, string>)?.message ?? 'Failed to get response from AI'),
           response.status
         );
       }
 
-      const data = await response.json();
-
-      if (!data.success) {
-        throw new ChatServiceError(data.error?.message || 'Failed to process chat message');
-      }
-
-      return {
-        sessionId: data.data.sessionId,
-        message: data.data.message,
-        sources: data.data.sources || [],
-        citations: data.data.citations || [],
-        suggestedActions: data.data.suggestedActions || [],
-        metadata: data.data.metadata,
-      };
+      // RAG returns ChatResponse shape directly (raw pass-through via proxy)
+      const data: ChatResponse = await response.json();
+      return data;
     } finally {
       cleanup();
     }
@@ -85,5 +61,36 @@ export async function sendChatMessage({ request }: SendChatMessageOptions): Prom
     throw new ChatServiceError(
       'Maaf, saat ini AI tidak tersedia. Silakan coba lagi beberapa saat atau hubungi saya melalui formulir kontak.'
     );
+  }
+}
+
+export async function confirmAction(
+  tool: string,
+  payload: Record<string, unknown>,
+  confirm: boolean,
+  sessionId?: string,
+): Promise<{ success: boolean; message: string }> {
+  const endpoint = '/api/rag/chat/confirm';
+  const { signal, cleanup } = createAbortSignal(CHAT_REQUEST_TIMEOUT_MS);
+
+  try {
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tool, payload, confirm, sessionId }),
+      signal,
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({})) as Record<string, unknown>;
+      throw new ChatServiceError(
+        String((errorData.error as Record<string, string>)?.message ?? 'Failed to confirm action'),
+        response.status,
+      );
+    }
+
+    return (await response.json()) as { success: boolean; message: string };
+  } finally {
+    cleanup();
   }
 }

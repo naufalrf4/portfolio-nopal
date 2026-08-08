@@ -21,7 +21,10 @@
     "react-markdown": "^10.1.0",
     "rehype-sanitize": "^6.0.0",
     "remark-gfm": "^4.0.1",
-    "tailwind-merge": "^3.5.0"
+    "tailwind-merge": "^3.5.0",
+    "@naufalrf/http": "workspace:*",
+    "@naufalrf/contracts": "workspace:*",
+    "@naufalrf/design-tokens": "workspace:*"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.2.2",
