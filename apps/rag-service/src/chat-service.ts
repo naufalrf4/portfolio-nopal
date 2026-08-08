@@ -1,0 +1,518 @@
+import * as adminClient from "./admin-client";
+import { config } from "./config";
+import { embedTexts, generateText } from "./embedding";
+import { RagServiceError } from "./errors";
+import {
+  buildAbstentionResponse,
+  buildChatPrompt,
+  buildQueryAnalysisPrompt,
+  fallbackQueryPlan,
+  formatContext,
+  formatHistory,
+  normalizeIntent,
+  normalizeLanguage,
+} from "./prompt-builder";
+import * as repository from "./repository";
+import { executeTool } from "./tool-service";
+import type {
+  ChatLogMessage,
+  ChatRequest,
+  ChatResponse,
+  Citation,
+  PendingAction,
+  QueryPlan,
+  RetrievedChunk,
+  SuggestedAction,
+} from "./types";
+import {
+  stageSubmitGuestbook,
+  stageSendMessage,
+  stageCreateBooking,
+} from "./agentic-tools";
+
+function stringOrNone(value: unknown): string | undefined {
+  if (value == null) return undefined;
+  const text = String(value).trim();
+  return text || undefined;
+}
+
+function resolveToolName(
+  intent: string,
+  workflow: string,
+  toolName: string | null,
+): string | null {
+  if (toolName) return toolName;
+  if (intent === "freelance_quote" && (workflow === "tool" || workflow === "hybrid")) {
+    return "feature_pricing_quote";
+  }
+  if (intent === "freelance_services" && (workflow === "tool" || workflow === "hybrid")) {
+    return "freelance_profile_lookup";
+  }
+  return null;
+}
+
+async function buildToolArguments(
+  toolName: string | null,
+  toolArguments: Record<string, unknown>,
+): Promise<Record<string, unknown>> {
+  if (
+    toolName !== "feature_pricing_quote" &&
+    toolName !== "freelance_profile_lookup"
+  ) {
+    return { ...toolArguments };
+  }
+
+  const enriched = { ...toolArguments };
+  const context = await adminClient.getFreelanceIntentContext();
+  if (context.freelanceProfile !== null) {
+    enriched.freelanceProfile = context.freelanceProfile;
+  }
+  return enriched;
+}
+
+function buildCitations(
+  retrievedChunks: RetrievedChunk[],
+): Citation[] {
+  const citations: Citation[] = [];
+  const seen = new Set<string>();
+  for (const chunk of retrievedChunks) {
+    const metadata = chunk.metadata as Record<string, unknown>;
+    const route = stringOrNone(metadata.route);
+    const key = `${chunk.source}::${route ?? ""}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    const citation: Citation = { source: chunk.source };
+    const title = stringOrNone(metadata.title);
+    if (title !== undefined) citation.title = title;
+    if (route !== undefined) citation.route = route;
+    const routeLabel = stringOrNone(metadata.route_label);
+    if (routeLabel !== undefined) citation.routeLabel = routeLabel;
+    const sourceType = stringOrNone(metadata.source_type);
+    if (sourceType !== undefined) citation.sourceType = sourceType;
+    const sourceRef = stringOrNone(metadata.source_ref);
+    if (sourceRef !== undefined) citation.sourceRef = sourceRef;
+    const section = stringOrNone(metadata.section);
+    if (section !== undefined) citation.section = section;
+    citations.push(citation);
+  }
+  return citations;
+}
+
+function buildSuggestedActions(
+  citations: Citation[],
+  fallbackActions: Array<{ type: string; target: string; label: string }>,
+): SuggestedAction[] {
+  const citationActions = citations
+    .filter((c) => !!c.route)
+    .map(
+      (c): SuggestedAction => ({
+        type: "open_page",
+        target: c.route!,
+        label: c.routeLabel ?? `Open ${c.title ?? c.source}`,
+      }),
+    );
+  if (citationActions.length > 0) return citationActions;
+  return fallbackActions.map((a) => ({
+    type: a.type,
+    target: a.target,
+    label: a.label,
+  }));
+}
+
+function minimumRetrievalConfidence(intent: string): number {
+  if (
+    [
+      "skills_question",
+      "experience_question",
+      "personal_profile",
+      "contact_question",
+    ].includes(intent)
+  ) {
+    return 0.22;
+  }
+  if (intent === "general_portfolio") return 0.3;
+  return 0.45;
+}
+
+const ABOUT_FALLBACK_ACTION: SuggestedAction = {
+  type: "open_page",
+  target: "/about",
+  label: "Open about page",
+};
+
+function buildAbstentionActions(
+  portfolioAreas: string[],
+): SuggestedAction[] {
+  if (portfolioAreas.includes("contact")) {
+    return [{ type: "open_page", target: "/contact", label: "Open contact page" }];
+  }
+  if (portfolioAreas.includes("projects")) {
+    return [{ type: "open_page", target: "/projects", label: "View projects" }];
+  }
+  return [ABOUT_FALLBACK_ACTION];
+}
+
+function messageToPayload(msg: ChatLogMessage): Record<string, unknown> {
+  const payload: Record<string, unknown> = {
+    id: msg.id ?? `legacy-${crypto.randomUUID()}`,
+    role: msg.role,
+    content: msg.content,
+    timestamp: msg.timestamp,
+  };
+  if (msg.metadata) {
+    payload.metadata = msg.metadata;
+  }
+  return payload;
+}
+
+// ---- agentic intent detection ----
+
+const AGENTIC_PATTERNS: Array<{
+  regex: RegExp;
+  handler: (msg: string) => PendingAction | null;
+}> = [
+  {
+    regex: /\b(post|write|add|make)\s+(to\s+)?(the\s+)?guestbook\b|\bguestbook entry\b|\btulis\s+guestbook\b/i,
+    handler: (msg) => {
+      // Extract the message from the user's request
+      const match = msg.match(/[""]([^""]{1,500})[""]|'([^']{1,500})'/);
+      const content = match ? (match[1] ?? match[2]) : msg.replace(/\b(post|write|add|make)\s+(to\s+)?(the\s+)?guestbook\b|\bguestbook entry\b|\btulis\s+guestbook\b/gi, '').trim();
+      if (!content || content.length < 3) return null;
+      const result = stageSubmitGuestbook(content).pendingAction;
+      return result;
+    },
+  },
+  {
+    regex: /\b(send|kirim)\s+(an?\s+)?(anonymous\s+)?(message|pesan)\b/i,
+    handler: (msg) => {
+      const match = msg.match(/[""]([^""]{1,500})[""]|'([^']{1,500})'/);
+      const content = match ? (match[1] ?? match[2]) : msg.replace(/\b(send|kirim)\s+(an?\s+)?(anonymous\s+)?(message|pesan)\b/gi, '').trim();
+      if (!content || content.length < 3) return null;
+      const result = stageSendMessage(content).pendingAction;
+      return result;
+    },
+  },
+  {
+    regex: /\b(book|schedule|reserve|pesan|jadwalkan)\s+(a\s+)?(slot|booking|appointment)\b/i,
+    handler: (msg) => {
+      const result = stageCreateBooking("TBD", "you", "unknown@unknown.com").pendingAction;
+      result.description = "Create a booking (more details needed)";
+      result.missingFields.push("Please provide: slotId, name, email");
+      return result;
+    },
+  },
+];
+
+function detectAgenticIntent(message: string): PendingAction | null {
+  for (const pattern of AGENTIC_PATTERNS) {
+    if (pattern.regex.test(message)) {
+      return pattern.handler(message);
+    }
+  }
+  return null;
+}
+
+// ---- chat ----
+
+export async function chat(
+  request: ChatRequest,
+  preferredLanguage?: string,
+): Promise<ChatResponse> {
+  const startedAt = performance.now();
+  const sessionId = request.sessionId ?? crypto.randomUUID();
+
+  // Check for agentic intent FIRST — short-circuit before expensive RAG
+  const pendingAction = detectAgenticIntent(request.message);
+  if (pendingAction !== null) {
+    const now = new Date().toISOString();
+    return {
+      sessionId,
+      message: pendingAction.missingFields.length > 0
+        ? `I can help with that, but I need more information: ${pendingAction.missingFields.join(', ')}`
+        : `Ready to proceed: ${pendingAction.description}. Would you like me to confirm?`,
+      sources: [],
+      citations: [],
+      suggestedActions: [],
+      metadata: {
+        workflow: "agentic",
+        intent: pendingAction.tool,
+        queryLanguage: "en",
+        answerLanguage: "en",
+        retrievalConfidence: 0,
+        abstained: false,
+      },
+      pendingAction,
+    };
+  }
+
+  let history: ChatLogMessage[] = [];
+  try {
+    history = await adminClient.getChatLog(sessionId);
+  } catch {
+    console.warn("Failed to load chat history from admin API");
+  }
+
+  const historyText = formatHistory(history, config.chatHistoryLimit);
+
+  let queryPlan: QueryPlan;
+  try {
+    const prompt = buildQueryAnalysisPrompt(request.message, historyText, preferredLanguage);
+    const generated = await generateText(prompt, config.chatModel, 0.1);
+    const payload = JSON.parse(generated.text) as Record<string, unknown>;
+
+    const retrievalQueries = (
+      Array.isArray(payload.retrievalQueries)
+        ? (payload.retrievalQueries as string[]).filter((s) => typeof s === "string")
+        : []
+    ).slice(0, 3);
+    const portfolioAreas = (
+      Array.isArray(payload.portfolioAreas)
+        ? (payload.portfolioAreas as string[]).filter((s) => typeof s === "string")
+        : ["general"]
+    );
+    const suggestedActions: Array<{ type: string; target: string; label: string }> = [];
+    if (Array.isArray(payload.suggestedActions)) {
+      for (const a of payload.suggestedActions as Array<Record<string, string>>) {
+        const t = a.type;
+        const tg = a.target;
+        const l = a.label;
+        if (t && tg && l) {
+          suggestedActions.push({ type: t, target: tg, label: l });
+        }
+      }
+    }
+
+    let workflow = String(payload.workflow ?? "rag").trim().toLowerCase();
+    if (!["rag", "tool", "hybrid"].includes(workflow)) {
+      const fb = fallbackQueryPlan(request.message);
+      workflow = String(fb.workflow);
+    }
+
+    let toolName: string | null =
+      payload.toolName != null ? String(payload.toolName).trim() || null : null;
+    let toolArguments: Record<string, unknown> =
+      payload.toolArguments != null && typeof payload.toolArguments === "object"
+        ? (payload.toolArguments as Record<string, unknown>)
+        : {};
+    if (Object.keys(toolArguments).length === 0) {
+      const fb = fallbackQueryPlan(request.message);
+      toolArguments = (fb.toolArguments as Record<string, unknown>) ?? {};
+    }
+
+    queryPlan = {
+      workflow,
+      intent: normalizeIntent(String(payload.intent ?? "general_portfolio")),
+      queryLanguage: normalizeLanguage(String(payload.queryLanguage ?? "en")),
+      answerLanguage: normalizeLanguage(String(payload.answerLanguage ?? "en")),
+      needsPortfolioContext: Boolean(payload.needsPortfolioContext ?? true),
+      toolName,
+      toolArguments,
+      retrievalQueries,
+      portfolioAreas,
+      suggestedActions,
+      promptTokens: generated.promptTokens,
+      completionTokens: generated.completionTokens,
+    };
+  } catch {
+    const fb = fallbackQueryPlan(request.message);
+    queryPlan = {
+      workflow: String(fb.workflow),
+      intent: normalizeIntent(String(fb.intent)),
+      queryLanguage: normalizeLanguage(String(fb.queryLanguage)),
+      answerLanguage: normalizeLanguage(String(fb.answerLanguage)),
+      needsPortfolioContext: Boolean(fb.needsPortfolioContext),
+      toolName: (fb.toolName as string) || null,
+      toolArguments: (fb.toolArguments as Record<string, unknown>) ?? {},
+      retrievalQueries: (fb.retrievalQueries as string[]) ?? [],
+      portfolioAreas: (fb.portfolioAreas as string[]) ?? ["general"],
+      suggestedActions: (fb.suggestedActions as Array<{
+        type: string;
+        target: string;
+        label: string;
+      }>) ?? [],
+      promptTokens: 0,
+      completionTokens: 0,
+    };
+  }
+
+  const resolvedToolName = resolveToolName(
+    queryPlan.intent,
+    queryPlan.workflow,
+    queryPlan.toolName,
+  );
+  const enrichedToolArgs = await buildToolArguments(resolvedToolName, queryPlan.toolArguments);
+
+  let toolResult:
+    | {
+        toolName: string;
+        text: string;
+        context: string;
+        metadata: Record<string, unknown>;
+      }
+    | undefined;
+  if (
+    (queryPlan.workflow === "tool" || queryPlan.workflow === "hybrid") &&
+    resolvedToolName
+  ) {
+    toolResult = executeTool(
+      resolvedToolName,
+      enrichedToolArgs,
+      request.message,
+      queryPlan.answerLanguage,
+    );
+  }
+
+  let retrievedChunks: RetrievedChunk[] = [];
+  if (queryPlan.workflow !== "tool" && queryPlan.needsPortfolioContext) {
+    const seenChunks = new Set<string>();
+    for (const retrievalQuery of queryPlan.retrievalQueries) {
+      try {
+        const [queryEmbedding] = await embedTexts([retrievalQuery]);
+        if (!queryEmbedding) continue;
+        const results = await repository.searchChunksHybrid(
+          queryEmbedding,
+          retrievalQuery,
+          config.retrievalLimit,
+          ["public"],
+        );
+        for (const chunk of results) {
+          const fingerprint = `${chunk.source}::${chunk.content}`;
+          if (seenChunks.has(fingerprint)) continue;
+          seenChunks.add(fingerprint);
+          retrievedChunks.push(chunk);
+        }
+      } catch (err) {
+        if (err instanceof RagServiceError) throw err;
+        throw new RagServiceError(
+          "The contextual retrieval database is currently unavailable.",
+          "RAG_DATABASE_UNAVAILABLE",
+          503,
+        );
+      }
+    }
+  }
+
+  retrievedChunks = retrievedChunks.slice(0, config.retrievalLimit);
+  const sources = [...new Set(retrievedChunks.map((c) => c.source))];
+  const citations = buildCitations(retrievedChunks);
+  const finalSuggestedActions = buildSuggestedActions(
+    citations,
+    queryPlan.suggestedActions,
+  );
+  const retrievalConfidence = retrievedChunks.reduce(
+    (max, c) => Math.max(max, c.score),
+    0,
+  );
+
+  let finalText: string;
+  let tokens = {
+    analysisPrompt: queryPlan.promptTokens,
+    analysisCompletion: queryPlan.completionTokens,
+    prompt: 0,
+    completion: 0,
+  };
+  let abstained = false;
+
+  const minimumConf = minimumRetrievalConfidence(queryPlan.intent);
+
+  if (
+    toolResult !== undefined &&
+    (queryPlan.workflow === "tool" ||
+      (queryPlan.workflow === "hybrid" && retrievedChunks.length === 0))
+  ) {
+    finalText = toolResult.text;
+  } else if (
+    queryPlan.needsPortfolioContext &&
+    retrievalConfidence < minimumConf
+  ) {
+    abstained = true;
+    finalText = buildAbstentionResponse(
+      queryPlan.answerLanguage,
+      queryPlan.portfolioAreas,
+      retrievedChunks.length === 0 ? "no_data" : "low_confidence",
+    );
+    finalSuggestedActions.splice(
+      0,
+      finalSuggestedActions.length,
+      ...buildAbstentionActions(queryPlan.portfolioAreas),
+    );
+  } else {
+    const contextSections: Array<{ source: string; content: string }> = [];
+    if (toolResult) {
+      contextSections.push({
+        source: `tool:${toolResult.toolName}`,
+        content: toolResult.context,
+      });
+    }
+    for (const chunk of retrievedChunks) {
+      contextSections.push({
+        source: chunk.source,
+        content: chunk.content,
+      });
+    }
+    const context = formatContext(contextSections);
+    const prompt = buildChatPrompt(
+      request.message,
+      historyText,
+      context,
+      preferredLanguage,
+      queryPlan.needsPortfolioContext,
+    );
+    const generated = await generateText(prompt, config.chatModel, 0.2);
+    finalText = generated.text;
+    tokens = {
+      analysisPrompt: queryPlan.promptTokens,
+      analysisCompletion: queryPlan.completionTokens,
+      prompt: generated.promptTokens,
+      completion: generated.completionTokens,
+    };
+  }
+
+  const durationMs = Math.round(performance.now() - startedAt);
+  const now = new Date().toISOString();
+  const newMessages: Array<Record<string, unknown>> = [
+    {
+      id: `${sessionId}-user-${Math.floor(Date.now() / 1000)}`,
+      role: "user",
+      content: request.message,
+      timestamp: now,
+    },
+    {
+      id: `${sessionId}-assistant-${Math.floor(Date.now() / 1000)}`,
+      role: "assistant",
+      content: finalText,
+      timestamp: new Date().toISOString(),
+      metadata: {
+        model: config.chatModel,
+        provider: "google",
+        tokens: tokens.prompt + tokens.completion,
+        duration: durationMs,
+      },
+    },
+  ];
+
+  const persistedMessages = history.map(messageToPayload);
+  persistedMessages.push(...newMessages);
+  try {
+    await adminClient.saveChatLog(sessionId, persistedMessages, "append");
+  } catch {
+    console.warn("Failed to persist chat log to admin API");
+  }
+
+  return {
+    sessionId,
+    message: finalText,
+    sources,
+    citations,
+    suggestedActions: finalSuggestedActions,
+    metadata: {
+      workflow: queryPlan.workflow,
+      intent: queryPlan.intent,
+      queryLanguage: queryPlan.queryLanguage,
+      answerLanguage: queryPlan.answerLanguage,
+      retrievalConfidence,
+      abstained,
+    },
+
+  };
+}

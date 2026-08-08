@@ -1,1 +1,0 @@
-"""FastAPI contextual RAG scaffold."""

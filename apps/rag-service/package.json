@@ -1,18 +1,22 @@
 {
   "name": "rag-service",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
-    "dev": "bun run dev:fastapi",
-    "build": "bun run build:fastapi",
-    "start": "cd fastapi && uv run uvicorn app.main:app --host 0.0.0.0 --port 3005",
-    "dev:fastapi": "cd fastapi && uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 3005",
-    "build:fastapi": "cd fastapi && uv run python -m compileall app alembic",
-    "check:fastapi": "cd fastapi && uv run python -c \"from app.main import app; print(app.title)\"",
-    "sync:fastapi": "cd fastapi && uv sync",
-    "migrate:fastapi": "python -c \"print('RAG schema migrations are managed by apps/admin Drizzle.')\"",
-    "compare": "node scripts/compare-rag-services.mjs",
-    "typecheck": "bun run check:fastapi",
-    "clean": "rm -rf fastapi/.venv fastapi/.pytest_cache fastapi/.ruff_cache node_modules"
+    "dev": "bun run --watch src/index.ts",
+    "build": "bun build src/index.ts --target bun --outdir dist --minify",
+    "start": "NODE_ENV=production bun run dist/index.js",
+    "typecheck": "bun x tsc --noEmit",
+    "db:bootstrap": "bun run src/db-bootstrap.ts",
+    "clean": "rm -rf dist node_modules"
+  },
+  "dependencies": {
+    "hono": "^4.7.5",
+    "postgres": "^3.4.5"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.2.0",
+    "typescript": "^5.7.0"
   }
 }
