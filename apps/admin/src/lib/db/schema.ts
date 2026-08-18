@@ -293,7 +293,7 @@ export const sessions = pgTable(
 export const ragDocuments = rag.table(
   'documents',
   {
-    id: uuid().primaryKey().notNull(),
+    id: uuid().primaryKey().defaultRandom().notNull(),
     sourceType: varchar('source_type', { length: 32 }).notNull(),
     sourceRef: varchar('source_ref', { length: 255 }).notNull(),
     title: varchar({ length: 255 }).notNull(),
@@ -335,7 +335,7 @@ export const ragDocuments = rag.table(
 export const ragChunks = rag.table(
   'chunks',
   {
-    id: uuid().primaryKey().notNull(),
+    id: uuid().primaryKey().defaultRandom().notNull(),
     documentId: uuid('document_id').notNull(),
     chunkIndex: integer('chunk_index').notNull(),
     sourceType: varchar('source_type', { length: 32 }).notNull(),
@@ -378,7 +378,7 @@ export const ragChunks = rag.table(
 export const ragIngestionRuns = rag.table(
   'ingestion_runs',
   {
-    id: uuid().primaryKey().notNull(),
+    id: uuid().primaryKey().defaultRandom().notNull(),
     documentId: uuid('document_id'),
     triggerType: varchar('trigger_type', { length: 32 }).notNull(),
     requestPayload: jsonb('request_payload')

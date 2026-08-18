@@ -17,7 +17,7 @@ CREATE TABLE "llm_settings" (
 	"updatedAt" timestamp(3) NOT NULL
 );
 --> statement-breakpoint
-ALTER TABLE "AboutMe" ALTER COLUMN "skills" SET DATA TYPE jsonb;--> statement-breakpoint
+ALTER TABLE "AboutMe" ALTER COLUMN "skills" SET DATA TYPE jsonb USING to_jsonb("skills");--> statement-breakpoint
 ALTER TABLE "AboutMe" ALTER COLUMN "skills" SET DEFAULT '[]'::jsonb;--> statement-breakpoint
 ALTER TABLE "booking_settings" ADD COLUMN "google_calendar_refresh_token" text;--> statement-breakpoint
 ALTER TABLE "booking_settings" ADD COLUMN "google_calendar_calendar_id" text;--> statement-breakpoint

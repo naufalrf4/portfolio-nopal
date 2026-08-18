@@ -64,6 +64,20 @@
       "when": 1785609748356,
       "tag": "0008_wild_red_hulk",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1787048232622,
+      "tag": "0009_productive_lady_vermin",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1787050835991,
+      "tag": "0010_parallel_lady_shuma",
+      "breakpoints": true
     }
   ]
 }
