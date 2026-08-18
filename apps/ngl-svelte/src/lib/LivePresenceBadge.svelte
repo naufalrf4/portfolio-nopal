@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { createAbortSignal } from '@naufalrf/http';
 
 	export let socketUrl = 'ws://localhost:3006/ws';
 
@@ -50,9 +51,8 @@
 	}
 
 	function getColorFromSeed(seed: string) {
-	const palette = ['var(--teal)', '#0f8577', '#f2a64c', '#b5701e', '#14b8a6', '#0ea5e9'];
-	return palette[hashString(seed) % palette.length] || 'var(--teal)';
-		return palette[hashString(seed) % palette.length] || '#3B82F6';
+		const palette = ['var(--teal)', '#0f8577', '#f2a64c', '#b5701e', '#14b8a6', '#0ea5e9'];
+		return palette[hashString(seed) % palette.length] || 'var(--teal)';
 	}
 
 	function resolveIdentity() {
@@ -80,7 +80,7 @@
 
 	const identity =
 		typeof window === 'undefined'
-		? { id: 'guest:ngl', name: 'Guest_ngl', color: 'var(--teal)' }
+			? { id: 'guest:ngl', name: 'Guest_ngl', color: 'var(--teal)' }
 			: resolveIdentity();
 
 	function clearTimers() {
@@ -110,12 +110,11 @@
 
 		const healthUrl = getHealthUrl(socketUrl);
 		if (healthUrl) {
-			const controller = new AbortController();
-			const timeout = setTimeout(() => controller.abort(), HEALTHCHECK_TIMEOUT_MS);
+			const { signal, cleanup } = createAbortSignal(HEALTHCHECK_TIMEOUT_MS);
 			try {
 				const response = await fetch(healthUrl, {
 					method: 'GET',
-					signal: controller.signal,
+					signal,
 					cache: 'no-store'
 				});
 				if (!response.ok) {
@@ -126,7 +125,7 @@
 				scheduleReconnect();
 				return;
 			} finally {
-				clearTimeout(timeout);
+				cleanup();
 			}
 		}
 
@@ -221,12 +220,16 @@
 
 		{#if isOpen}
 			<div
-					class="w-[min(92vw,360px)] rounded-[24px] border border-[var(--border)] bg-[var(--bg-card)] p-3 shadow-[0_8px_30px_-12px_rgba(0,0,0,0.5)] backdrop-blur-xl"
+				class="w-[min(92vw,360px)] rounded-[24px] border border-[var(--border)] bg-[var(--bg-card)] p-3 shadow-[0_8px_30px_-12px_rgba(0,0,0,0.5)] backdrop-blur-xl"
 			>
 				<div class="mb-2 flex items-center justify-between px-1">
 					<div>
-					<p class="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--text-tertiary)]">Live now</p>
-					<p class="text-sm font-semibold text-[var(--text-primary)]">Shared portfolio presence</p>
+						<p class="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--text-tertiary)]">
+							Live now
+						</p>
+						<p class="text-sm font-semibold text-[var(--text-primary)]">
+							Shared portfolio presence
+						</p>
 					</div>
 					<span
 						class="rounded-full bg-[var(--bg-elevated)] px-2.5 py-1 text-[10px] font-semibold text-[var(--teal)] shadow-[inset_0_2px_10px_rgba(0,0,0,0.3)]"
@@ -237,15 +240,19 @@
 				<div class="max-h-[40vh] space-y-2 overflow-y-auto pr-1">
 					{#each participants as participant (participant.id + participant.pageLabel)}
 						<div
-						class="flex items-start justify-between gap-3 rounded-[18px] border border-[var(--border)] bg-[var(--bg-elevated)] px-3 py-2.5 shadow-[0_4px_15px_-8px_rgba(0,0,0,0.4)]"
+							class="flex items-start justify-between gap-3 rounded-[18px] border border-[var(--border)] bg-[var(--bg-elevated)] px-3 py-2.5 shadow-[0_4px_15px_-8px_rgba(0,0,0,0.4)]"
 						>
 							<div class="min-w-0">
 								<div class="flex items-center gap-2">
 									<span class="h-2.5 w-2.5 rounded-full" style={`background:${participant.color}`}
 									></span>
-									<p class="truncate text-sm font-semibold text-[var(--text-primary)]">{participant.name}</p>
+									<p class="truncate text-sm font-semibold text-[var(--text-primary)]">
+										{participant.name}
+									</p>
 								</div>
-								<p class="mt-1 text-[11px] font-medium uppercase tracking-[0.16em] text-[var(--text-tertiary)]">
+								<p
+									class="mt-1 text-[11px] font-medium uppercase tracking-[0.16em] text-[var(--text-tertiary)]"
+								>
 									{participant.pageLabel}
 								</p>
 								<p class="mt-1 text-xs text-[var(--text-secondary)]">
@@ -253,7 +260,10 @@
 								</p>
 							</div>
 							{#if participant.id === selfId}
-								<span class="shrink-0 rounded-full bg-[var(--teal-soft)] px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--teal)]">Here</span>
+								<span
+									class="shrink-0 rounded-full bg-[var(--teal-soft)] px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--teal)]"
+									>Here</span
+								>
 							{/if}
 						</div>
 					{/each}

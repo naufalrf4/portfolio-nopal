@@ -148,6 +148,16 @@ function sanitizeSectionId(value: string | null | undefined): string | null {
   return trimmed ? trimmed.slice(0, 48) : null;
 }
 
+function sanitizeRoomId(value: string | undefined): string {
+  const trimmed = (value || '').trim();
+  if (!trimmed) {
+    return ROOM_ID;
+  }
+
+  const safe = trimmed.replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 64);
+  return safe || ROOM_ID;
+}
+
 function isAllowedOrigin(origin: string | null): boolean {
   if (!origin) {
     return !isProduction;
@@ -175,7 +185,11 @@ function broadcastState(roomId: string): void {
 
   for (const socket of sockets) {
     if (socket.data.roomId === roomId) {
-      socket.send(message);
+      try {
+        socket.send(message);
+      } catch {
+        // Ignore send failures for individual sockets (e.g. already closing).
+      }
     }
   }
 
@@ -193,12 +207,21 @@ function broadcastOverview(): void {
   const message = JSON.stringify(payload);
 
   for (const socket of sockets) {
-    socket.send(message);
+    try {
+      socket.send(message);
+    } catch {
+      // Ignore send failures for individual sockets (e.g. already closing).
+    }
   }
 }
 
 function joinRoom(socket: PresenceSocket, payload: JoinPayload): void {
-  const roomId = payload.roomId?.trim() || ROOM_ID;
+  const roomId = sanitizeRoomId(payload.roomId);
+
+  if (socket.data.roomId && socket.data.roomId !== roomId) {
+    leaveRoom(socket);
+  }
+
   const room = getRoom(roomId);
   const participant: PresenceParticipant = {
     id: socket.data.socketId,
@@ -347,7 +370,7 @@ const server = Bun.serve<ConnectionData>({
         return;
       }
 
-      if (typeof parsed !== 'object' || typeof parsed.type !== 'string') {
+      if (parsed === null || typeof parsed !== 'object' || typeof parsed.type !== 'string') {
         return;
       }
 

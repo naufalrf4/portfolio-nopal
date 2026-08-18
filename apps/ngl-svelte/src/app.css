@@ -37,7 +37,9 @@ body {
 	-moz-osx-font-smoothing: grayscale;
 	overflow-x: hidden;
 	min-height: 100vh;
-	transition: background-color 0.3s ease, color 0.3s ease;
+	transition:
+		background-color 0.3s ease,
+		color 0.3s ease;
 }
 
 h1,

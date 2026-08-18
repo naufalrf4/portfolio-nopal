@@ -277,7 +277,7 @@
 			{:else}
 				<div class="mb-8 text-center opacity-0 animate-fade-in-up">
 					<div
-				class="mx-auto mb-4 flex h-18 w-18 items-center justify-center rounded-full bg-[var(--bg-elevated)] border border-[var(--border)] shadow-neu-inset"
+						class="mx-auto mb-4 flex h-18 w-18 items-center justify-center rounded-full bg-[var(--bg-elevated)] border border-[var(--border)] shadow-neu-inset"
 					>
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
@@ -323,7 +323,7 @@
 							rows="6"
 							maxlength="550"
 							disabled={isSubmitting}
-					class="min-h-[220px] w-full resize-none rounded-[26px] border border-[var(--border)] bg-[var(--bg-elevated)] px-5 pb-9 pt-5 text-base disabled:opacity-50"
+							class="min-h-[220px] w-full resize-none rounded-[26px] border border-[var(--border)] bg-[var(--bg-elevated)] px-5 pb-9 pt-5 text-base disabled:opacity-50"
 						></textarea>
 
 						<div class="pointer-events-none absolute bottom-3 right-3 flex items-center gap-2">
@@ -342,7 +342,7 @@
 					<div class="space-y-3">
 						{#if hasTurnstileConfig && shouldShowTurnstile}
 							<div
-					class="ngl-turnstile-shell rounded-[24px] border border-[var(--border)] bg-[var(--bg-elevated)] p-4"
+								class="ngl-turnstile-shell rounded-[24px] border border-[var(--border)] bg-[var(--bg-elevated)] p-4"
 							>
 								<div bind:this={turnstileContainer} class="flex justify-center"></div>
 							</div>
@@ -433,9 +433,9 @@
 				</form>
 
 				<div
-				class="mt-8 border-t border-[var(--border)] pt-6 text-center opacity-0 animate-fade-in-up stagger-2"
+					class="mt-8 border-t border-[var(--border)] pt-6 text-center opacity-0 animate-fade-in-up stagger-2"
 				>
-				<p class="text-xs text-[var(--text-tertiary)]">
+					<p class="text-xs text-[var(--text-tertiary)]">
 						Your message is completely anonymous. I will not know who sent it.
 					</p>
 				</div>

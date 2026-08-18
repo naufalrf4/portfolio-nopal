@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Activity } from 'lucide-react';
+import { createAbortSignal } from '@naufalrf/http';
 
 type Status = 'connecting' | 'connected' | 'disconnected';
 
@@ -50,7 +51,6 @@ function hashString(value: string) {
 function getColorFromSeed(seed: string) {
   const palette = ['var(--teal)', '#0f8577', '#f2a64c', '#b5701e', '#14b8a6', '#0ea5e9'];
   return palette[hashString(seed) % palette.length] || 'var(--teal)';
-  return palette[hashString(seed) % palette.length] || '#3B82F6';
 }
 
 function buildGuestIdentity() {
@@ -123,13 +123,12 @@ export function LivePresencePill({ socketUrl, pagePath, pageLabel }: LivePresenc
 
       const healthUrl = getHealthUrl(socketUrl);
       if (healthUrl) {
-        const controller = new AbortController();
-        const timeout = window.setTimeout(() => controller.abort(), HEALTHCHECK_TIMEOUT_MS);
+        const { signal, cleanup } = createAbortSignal(HEALTHCHECK_TIMEOUT_MS);
 
         try {
           const response = await fetch(healthUrl, {
             method: 'GET',
-            signal: controller.signal,
+            signal,
             cache: 'no-store',
           });
 
@@ -141,7 +140,7 @@ export function LivePresencePill({ socketUrl, pagePath, pageLabel }: LivePresenc
           scheduleReconnect();
           return;
         } finally {
-          window.clearTimeout(timeout);
+          cleanup();
         }
       }
 
