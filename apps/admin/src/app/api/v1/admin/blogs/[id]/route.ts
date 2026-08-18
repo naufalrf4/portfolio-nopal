@@ -8,6 +8,7 @@ import {
   serverErrorResponse,
 } from '@/lib/api/responses';
 import { updateBlogLinkSchema } from '@/lib/validations/blog-link.schema';
+import { queueRagIngest } from '@/lib/services/ragIngest';
 
 type RouteContext = {
   params: Promise<{ id: string }>;
@@ -47,6 +48,9 @@ export async function PUT(req: NextRequest, context: RouteContext) {
       }
 
       const blogLink = await blogLinksService.update(id, validation.data);
+      if (blogLink?.visible) {
+        queueRagIngest({ type: 'blog', documentId: id });
+      }
       return successResponse(blogLink, 'Blog link updated successfully');
     } catch {
       return serverErrorResponse();

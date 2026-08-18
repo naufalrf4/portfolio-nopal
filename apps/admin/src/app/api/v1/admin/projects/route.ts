@@ -11,6 +11,7 @@ import { projectQuerySchema, createProjectSchema } from '@/lib/validations/proje
 import { logger } from '@/lib/utils/logger';
 import { handleApiError } from '@/lib/api/utils/error-handler';
 import { signAssetUrlsMany, signAssetUrls } from '@/lib/utils/sign-urls';
+import { queueRagIngest } from '@/lib/services/ragIngest';
 
 async function handleGet(req: NextRequest) {
   const requestId = crypto.randomUUID();
@@ -81,6 +82,10 @@ async function handlePost(req: NextRequest) {
       operation: 'projects.create',
       projectId: project.id,
     });
+
+    if (project.visible) {
+      queueRagIngest({ type: 'project', documentId: project.slug });
+    }
 
     return successResponse(signedProject, 'Project created successfully');
   } catch (error) {

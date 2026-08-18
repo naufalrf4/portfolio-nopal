@@ -1,4 +1,6 @@
-type RagIngestType = 'knowledge' | 'project' | 'about' | 'all';
+import { logger } from '@/lib/utils/logger';
+
+type RagIngestType = 'knowledge' | 'project' | 'blog' | 'about' | 'all';
 
 interface RagIngestRequest {
   type: RagIngestType;
@@ -14,9 +16,12 @@ export interface RagIngestResult {
   errorMessage?: string;
 }
 
+// ADMIN_SERVICE_TOKEN is a legacy fallback shared across two auth directions
+// (outbound admin auth + inbound rag ingest auth). Prefer setting
+// RAG_INGEST_SERVICE_TOKEN (and ADMIN_INTERNAL_API_TOKEN) explicitly instead.
 const RAG_INGEST_SERVICE_TOKEN =
   process.env.RAG_INGEST_SERVICE_TOKEN || process.env.ADMIN_SERVICE_TOKEN || '';
-const FASTAPI_RAG_SERVICE_URL = process.env.FASTAPI_RAG_SERVICE_URL || 'http://localhost:3005';
+const RAG_SERVICE_URL = process.env.RAG_SERVICE_URL || 'http://localhost:3005';
 
 function normalizeBaseUrl(url: string): string {
   return url.endsWith('/') ? url.slice(0, -1) : url;
@@ -53,7 +58,7 @@ async function parseResponsePayload(response: Response): Promise<unknown> {
 }
 
 export async function dispatchRagIngest(request: RagIngestRequest): Promise<RagIngestResult> {
-  const url = `${normalizeBaseUrl(FASTAPI_RAG_SERVICE_URL)}/ingest`;
+  const url = `${normalizeBaseUrl(RAG_SERVICE_URL)}/ingest`;
 
   try {
     const response = await fetch(url, {
@@ -97,4 +102,31 @@ export async function dispatchRagIngest(request: RagIngestRequest): Promise<RagI
         error instanceof Error ? error.message : 'Failed to contact FastAPI RAG service',
     };
   }
+}
+
+/**
+ * Fire-and-forget RAG ingest dispatch for content mutations.
+ * Never throws and never blocks the admin save flow; failures are logged only.
+ */
+export function queueRagIngest(request: RagIngestRequest): void {
+  void dispatchRagIngest(request)
+    .then((result) => {
+      if (!result.ok) {
+        logger.warn('RAG ingest dispatch failed', {
+          operation: 'ragIngest.queue',
+          type: request.type,
+          documentId: request.documentId,
+          status: result.status,
+          error: result.errorMessage,
+        });
+      }
+    })
+    .catch((error) => {
+      logger.warn('RAG ingest dispatch error', {
+        operation: 'ragIngest.queue',
+        type: request.type,
+        documentId: request.documentId,
+        error: error instanceof Error ? error.message : String(error),
+      });
+    });
 }

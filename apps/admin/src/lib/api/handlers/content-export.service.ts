@@ -1,6 +1,6 @@
 import { db } from '@/lib/db';
 import { eq } from 'drizzle-orm';
-import { projects, knowledgeDocs } from '@/lib/db/schema';
+import { projects, knowledgeDocs, blogLink } from '@/lib/db/schema';
 import { getAboutMeRecord } from '@/lib/api/handlers/about-read.service';
 import type {
   ExperienceItem,
@@ -30,10 +30,22 @@ export interface RagKnowledgeDocument {
   content: string;
 }
 
+export interface RagBlogContent {
+  id: string;
+  url: string;
+  title: string;
+  description: string | null;
+  category: string | null;
+  tags: string[];
+  publishedAt: string;
+  visible: boolean;
+}
+
 export interface RagContentExport {
   aboutMe: RagAboutContent;
   projects: RagProjectContent[];
   knowledgeDocs: RagKnowledgeDocument[];
+  blogs: RagBlogContent[];
 }
 
 export interface FreelanceProfileIntentContext {
@@ -161,16 +173,18 @@ function normalizeFreelanceProfile(profile: unknown): FreelanceProfile | null {
 
 export class ContentExportService {
   async exportForRAG(): Promise<RagContentExport> {
-    const [aboutMeData, projectsData, knowledgeDocsData] = await Promise.all([
+    const [aboutMeData, projectsData, knowledgeDocsData, blogsData] = await Promise.all([
       this.getAboutMe(),
       this.getProjects(),
       this.getKnowledgeDocs(),
+      this.getBlogs(),
     ]);
 
     return {
       aboutMe: aboutMeData,
       projects: projectsData,
       knowledgeDocs: knowledgeDocsData,
+      blogs: blogsData,
     };
   }
 
@@ -227,6 +241,27 @@ export class ContentExportService {
       .from(knowledgeDocs);
 
     return docs;
+  }
+
+  private async getBlogs(): Promise<RagBlogContent[]> {
+    const blogLinks = await db
+      .select({
+        id: blogLink.id,
+        url: blogLink.url,
+        title: blogLink.title,
+        description: blogLink.description,
+        category: blogLink.category,
+        tags: blogLink.tags,
+        publishedAt: blogLink.publishedAt,
+        visible: blogLink.visible,
+      })
+      .from(blogLink)
+      .where(eq(blogLink.visible, true));
+
+    return blogLinks.map((blog) => ({
+      ...blog,
+      tags: blog.tags ?? [],
+    }));
   }
 }
 

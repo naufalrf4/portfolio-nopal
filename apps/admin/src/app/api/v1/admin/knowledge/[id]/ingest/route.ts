@@ -42,7 +42,7 @@ async function handlePost(_req: NextRequest, context: RouteContext) {
       {
         success: true,
         chunksIngested: result.chunksIngested,
-        target: 'fastapi',
+        target: 'rag-service',
       },
       'Document ingested successfully'
     );

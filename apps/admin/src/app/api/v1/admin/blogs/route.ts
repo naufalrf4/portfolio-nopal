@@ -7,6 +7,7 @@ import { z } from 'zod';
 import { logger } from '@/lib/utils/logger';
 import { handleApiError } from '@/lib/api/utils/error-handler';
 import { signAssetUrlsMany, signAssetUrls } from '@/lib/utils/sign-urls';
+import { queueRagIngest } from '@/lib/services/ragIngest';
 
 const querySchema = z.object({
   source: z.string().optional(),
@@ -82,6 +83,10 @@ async function handlePost(req: NextRequest) {
       operation: 'blogs.create',
       blogId: blogLink.id,
     });
+
+    if (blogLink.visible) {
+      queueRagIngest({ type: 'blog', documentId: blogLink.id });
+    }
 
     return successResponse(signedBlog, 'Blog link created successfully');
   } catch (error) {

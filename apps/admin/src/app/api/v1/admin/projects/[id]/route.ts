@@ -10,6 +10,7 @@ import {
 } from '@/lib/api/responses';
 import { updateProjectSchema } from '@/lib/validations/project.schema';
 import { signAssetUrls } from '@/lib/utils/sign-urls';
+import { queueRagIngest } from '@/lib/services/ragIngest';
 
 type RouteContext = {
   params: Promise<{ id: string }>;
@@ -66,6 +67,10 @@ export async function PUT(req: NextRequest, context: RouteContext) {
       const signedProject = await signAssetUrls(project, {
         fields: ['imageUrl'],
       });
+
+      if (project.visible) {
+        queueRagIngest({ type: 'project', documentId: project.slug });
+      }
 
       return successResponse(signedProject, 'Project updated successfully');
     } catch {

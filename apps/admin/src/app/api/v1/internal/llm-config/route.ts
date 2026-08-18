@@ -3,7 +3,6 @@ import { withServiceAuth } from '@/lib/api/middleware/auth';
 import { db } from '@/lib/db';
 import { llmSettings } from '@/lib/db/schema';
 import { successResponse, serverErrorResponse } from '@/lib/api/responses';
-import { eq } from 'drizzle-orm';
 
 async function handleGet(_req: NextRequest) {
   try {
