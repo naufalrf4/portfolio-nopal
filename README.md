@@ -239,8 +239,7 @@ packages/
   contracts/        Shared API contracts
 .context/           Shared repo context and architecture notes
 start-dev.sh        Multi-app local development launcher
-reset-seed-rag.sh   Reset, seed, and ingest workflow
-scripts/            Docker/dev/prod orchestration helpers
+scripts/            Docker/dev/prod orchestration helpers (incl. docker-dev-reset-seed.sh)
 ```
 
 ## Operational Notes
