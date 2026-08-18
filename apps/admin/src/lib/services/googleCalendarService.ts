@@ -49,6 +49,36 @@ export type GoogleCalendarConnectionResult = {
   defaultCalendarName: string | null;
 };
 
+// Thrown when a Google API call fails because the stored refresh token has
+// been revoked or expired, so callers can distinguish this from "not
+// connected" (no refresh token at all) instead of surfacing a generic 500.
+export class GoogleCalendarAuthError extends Error {
+  constructor(message = 'Google Calendar authorization has been revoked or expired.') {
+    super(message);
+    this.name = 'GoogleCalendarAuthError';
+  }
+}
+
+function isGoogleAuthError(error: unknown): boolean {
+  if (!error || typeof error !== 'object') {
+    return false;
+  }
+
+  const response = (error as { response?: { status?: number; data?: { error?: string } } })
+    .response;
+  const code = (error as { code?: number | string }).code;
+
+  if (response?.status === 401 || response?.status === 403) {
+    return true;
+  }
+
+  if (code === 401 || code === 403 || code === '401' || code === '403') {
+    return true;
+  }
+
+  return response?.data?.error === 'invalid_grant';
+}
+
 function getOAuthSecret() {
   const secret = process.env.NEXTAUTH_SECRET?.trim();
 
@@ -145,11 +175,19 @@ function createOAuthClient(origin: string) {
 }
 
 async function listCalendarsWithAuth(auth: InstanceType<typeof google.auth.OAuth2>) {
-  const response = await google.calendar({ version: 'v3', auth }).calendarList.list({
-    minAccessRole: 'writer',
-    showDeleted: false,
-    showHidden: false,
-  });
+  let response;
+  try {
+    response = await google.calendar({ version: 'v3', auth }).calendarList.list({
+      minAccessRole: 'writer',
+      showDeleted: false,
+      showHidden: false,
+    });
+  } catch (error) {
+    if (isGoogleAuthError(error)) {
+      throw new GoogleCalendarAuthError();
+    }
+    throw error;
+  }
 
   const items = response.data.items ?? [];
 
@@ -260,39 +298,47 @@ export const googleCalendarService = {
     const start = parseSlotDateTime(slot.date, slot.time);
     const end = new Date(start.getTime() + slot.duration * 60 * 1000);
 
-    const response = await calendar.events.insert({
-      calendarId,
-      conferenceDataVersion: 1,
-      sendUpdates: 'all',
-      requestBody: {
-        summary: `Call with ${booking.name}`,
-        description: [
-          'Booking approved via NaufalRF Portfolio Admin.',
-          `Booking reference: ${booking.id}`,
-          booking.notes ? `Original notes: ${booking.notes}` : null,
-          message ? `Approval note: ${message}` : null,
-        ]
-          .filter(Boolean)
-          .join('\n\n'),
-        start: {
-          dateTime: start.toISOString(),
-          timeZone: timezone,
-        },
-        end: {
-          dateTime: end.toISOString(),
-          timeZone: timezone,
-        },
-        attendees: [{ email: booking.email, displayName: booking.name }],
-        conferenceData: {
-          createRequest: {
-            requestId: `booking-${booking.id}`,
-            conferenceSolutionKey: {
-              type: 'hangoutsMeet',
+    let response;
+    try {
+      response = await calendar.events.insert({
+        calendarId,
+        conferenceDataVersion: 1,
+        sendUpdates: 'all',
+        requestBody: {
+          summary: `Call with ${booking.name}`,
+          description: [
+            'Booking approved via NaufalRF Portfolio Admin.',
+            `Booking reference: ${booking.id}`,
+            booking.notes ? `Original notes: ${booking.notes}` : null,
+            message ? `Approval note: ${message}` : null,
+          ]
+            .filter(Boolean)
+            .join('\n\n'),
+          start: {
+            dateTime: start.toISOString(),
+            timeZone: timezone,
+          },
+          end: {
+            dateTime: end.toISOString(),
+            timeZone: timezone,
+          },
+          attendees: [{ email: booking.email, displayName: booking.name }],
+          conferenceData: {
+            createRequest: {
+              requestId: `booking-${booking.id}`,
+              conferenceSolutionKey: {
+                type: 'hangoutsMeet',
+              },
             },
           },
         },
-      },
-    });
+      });
+    } catch (error) {
+      if (isGoogleAuthError(error)) {
+        throw new GoogleCalendarAuthError();
+      }
+      throw error;
+    }
 
     return {
       eventId: response.data.id || booking.id,
@@ -312,13 +358,20 @@ export const googleCalendarService = {
 
     client.setCredentials({ refresh_token: refreshToken });
 
-    await google.calendar({ version: 'v3', auth: client }).events.patch({
-      calendarId,
-      eventId,
-      sendUpdates: 'all',
-      requestBody: {
-        status: 'cancelled',
-      },
-    });
+    try {
+      await google.calendar({ version: 'v3', auth: client }).events.patch({
+        calendarId,
+        eventId,
+        sendUpdates: 'all',
+        requestBody: {
+          status: 'cancelled',
+        },
+      });
+    } catch (error) {
+      if (isGoogleAuthError(error)) {
+        throw new GoogleCalendarAuthError();
+      }
+      throw error;
+    }
   },
 };

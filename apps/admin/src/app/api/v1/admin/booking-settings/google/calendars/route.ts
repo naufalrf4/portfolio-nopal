@@ -2,7 +2,10 @@ import { NextRequest } from 'next/server';
 import { withAdminAuth } from '@/lib/api/middleware/auth';
 import { bookingSettingsService } from '@/lib/api/handlers/booking-settings.service';
 import { errorResponse, serverErrorResponse, successResponse } from '@/lib/api/responses';
-import { googleCalendarService } from '@/lib/services/googleCalendarService';
+import {
+  googleCalendarService,
+  GoogleCalendarAuthError,
+} from '@/lib/services/googleCalendarService';
 
 async function handleGet(request: NextRequest) {
   try {
@@ -22,7 +25,14 @@ async function handleGet(request: NextRequest) {
       connected: true,
       selectedCalendarId: settings.googleCalendarCalendarId ?? null,
     });
-  } catch {
+  } catch (error) {
+    if (error instanceof GoogleCalendarAuthError) {
+      return errorResponse(
+        'Google Calendar authorization has been revoked. Please reconnect.',
+        409,
+        'GOOGLE_CALENDAR_REAUTH_REQUIRED'
+      );
+    }
     return serverErrorResponse();
   }
 }

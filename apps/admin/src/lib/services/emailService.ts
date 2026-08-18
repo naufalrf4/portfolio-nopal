@@ -31,12 +31,13 @@ export class EmailService {
   private async sendEmail(to: string, subject: string, html: string): Promise<void> {
     if (!isEmailConfigured()) {
       console.warn(`[EmailService] SMTP not configured, skipping email: ${subject}`);
-      return;
+      throw new EmailServiceError(`SMTP not configured, cannot send email: ${subject}`);
     }
 
     const transporter = getEmailTransporter();
     if (!transporter) {
-      return;
+      console.warn(`[EmailService] Email transporter unavailable, skipping email: ${subject}`);
+      throw new EmailServiceError(`Email transporter unavailable, cannot send email: ${subject}`);
     }
 
     try {

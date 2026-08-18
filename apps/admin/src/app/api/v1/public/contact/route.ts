@@ -145,7 +145,17 @@ export async function POST(request: NextRequest) {
       console.error('[Contact API] Admin notification email failed:', emailError);
     }
 
-    const response = successResponse(contact, 'Message sent successfully');
+    const response = successResponse(
+      {
+        id: contact.id,
+        name: contact.name,
+        email: contact.email,
+        subject: contact.subject,
+        message: contact.message,
+        createdAt: contact.createdAt,
+      },
+      'Message sent successfully',
+    );
 
     Object.entries(rateLimitHeaders).forEach(([key, value]) => {
       response.headers.set(key, value);

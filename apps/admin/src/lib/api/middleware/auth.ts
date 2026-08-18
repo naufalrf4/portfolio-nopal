@@ -1,21 +1,35 @@
 import { NextRequest } from 'next/server';
+import { timingSafeEqual } from 'crypto';
 import { safeAuth } from '@/lib/auth';
 import type { Session } from 'next-auth';
 import { unauthorizedResponse, forbiddenResponse } from '../responses';
 
+// ADMIN_SERVICE_TOKEN is a legacy fallback shared across two auth directions
+// (outbound admin auth + inbound rag ingest auth). Prefer setting
+// ADMIN_INTERNAL_API_TOKEN (and RAG_INGEST_SERVICE_TOKEN) explicitly instead.
 const ADMIN_INTERNAL_API_TOKEN =
   process.env.ADMIN_INTERNAL_API_TOKEN || process.env.ADMIN_SERVICE_TOKEN;
 
-export function withAuth(handler: (req: NextRequest) => Promise<Response>) {
-  return async (req: NextRequest) => {
-    const session = (await safeAuth()) as Session | null;
+if (!ADMIN_INTERNAL_API_TOKEN) {
+  console.warn(
+    '[auth] Neither ADMIN_INTERNAL_API_TOKEN nor ADMIN_SERVICE_TOKEN is set. ' +
+      'All withServiceAuth requests will be rejected until one is configured.'
+  );
+}
 
-    if (!session?.user) {
-      return unauthorizedResponse();
-    }
+function isServiceTokenValid(provided: string | null): boolean {
+  if (!provided || !ADMIN_INTERNAL_API_TOKEN) {
+    return false;
+  }
 
-    return handler(req);
-  };
+  const providedBuffer = Buffer.from(provided);
+  const expectedBuffer = Buffer.from(ADMIN_INTERNAL_API_TOKEN);
+
+  if (providedBuffer.length !== expectedBuffer.length) {
+    return false;
+  }
+
+  return timingSafeEqual(providedBuffer, expectedBuffer);
 }
 
 export function withAdminAuth(handler: (req: NextRequest) => Promise<Response>) {
@@ -56,7 +70,7 @@ export function withServiceAuth<T>(handler: (req: NextRequest, context?: T) => P
   return async (req: NextRequest, context?: T) => {
     const token = req.headers.get('X-Service-Token');
 
-    if (!token || token !== ADMIN_INTERNAL_API_TOKEN) {
+    if (!isServiceTokenValid(token)) {
       return unauthorizedResponse('Invalid service token');
     }
 

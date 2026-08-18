@@ -11,7 +11,10 @@ import {
 } from '@/lib/api/responses';
 import { withAdminAuth } from '@/lib/api/middleware/auth';
 import { emailService } from '@/lib/services/emailService';
-import { googleCalendarService } from '@/lib/services/googleCalendarService';
+import {
+  googleCalendarService,
+  GoogleCalendarAuthError,
+} from '@/lib/services/googleCalendarService';
 import { bookingSettingsService } from '@/lib/api/handlers/booking-settings.service';
 
 const updateBookingStatusSchema = z.object({
@@ -147,6 +150,13 @@ export async function PUT(request: NextRequest, context: RouteContext) {
     } catch (error) {
       if (error instanceof SyntaxError) {
         return errorResponse('Invalid JSON body', 400);
+      }
+      if (error instanceof GoogleCalendarAuthError) {
+        return errorResponse(
+          'Google Calendar authorization has been revoked. Please reconnect in booking settings.',
+          409,
+          'GOOGLE_CALENDAR_REAUTH_REQUIRED'
+        );
       }
       return serverErrorResponse();
     }
