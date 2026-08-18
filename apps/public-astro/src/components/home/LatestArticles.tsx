@@ -16,7 +16,7 @@ export function LatestArticles({ blogs }: LatestArticlesProps) {
   const rest = latestBlogs.filter((_, i) => i !== selectedIndex).slice(0, 5);
 
   return (
-    <section className="relative w-full border-t border-line py-16 md:py-24">
+    <section data-scene="flow" className="relative w-full border-t border-line py-16 md:py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Right-aligned header with offset — different from left-H2 pattern */}
         <BlurFade direction="left" offset={24} className="mb-10 flex-col items-end">

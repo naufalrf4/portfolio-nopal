@@ -224,7 +224,7 @@ export function Guestbook({
   // ----- Page mode: static grid, natural card height, no marquee -----
   if (isPageMode) {
     return (
-      <Section id="guestbook" className="relative w-full py-8">
+      <Section id="guestbook" scene="signal" className="relative w-full py-8">
         <div className="mx-auto w-full max-w-7xl">
           <div className="mb-10 grid gap-8 lg:grid-cols-[1fr_360px] lg:items-start">
             <p className="max-w-xl text-base leading-relaxed text-text-secondary">
@@ -280,7 +280,7 @@ export function Guestbook({
 
   // ----- Home mode: composer on the right, marquee preview on the left -----
   return (
-    <Section id="guestbook" className="relative w-full overflow-hidden border-t border-line py-16 lg:py-24">
+    <Section id="guestbook" scene="signal" className="relative w-full overflow-hidden border-t border-line py-16 lg:py-24">
       <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid items-center gap-16 lg:grid-cols-[1.4fr_1fr] lg:gap-20">
           {/* Marquee preview (left on desktop) */}

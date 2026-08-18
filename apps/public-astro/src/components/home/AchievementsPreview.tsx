@@ -13,7 +13,7 @@ export function AchievementsPreview({ achievements }: AchievementsPreviewProps) 
   if (items.length === 0) return null;
 
   return (
-    <section className="relative w-full border-t border-line py-16 md:py-24">
+    <section data-scene="circuit" className="relative w-full border-t border-line py-16 md:py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <BlurFade direction="up" offset={24} className="mb-12 flex flex-col items-start">
           <span className="mb-4 font-mono text-xs uppercase tracking-[0.25em] text-teal">

@@ -17,7 +17,7 @@ export function FeaturedProjects({ projects }: FeaturedProjectsProps) {
   }
 
   return (
-    <section className="relative w-full border-t border-line py-16 md:py-24">
+    <section data-scene="circuit" className="relative w-full border-t border-line py-16 md:py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Right-aligned header — breaks the left-top pattern */}
         <BlurFade direction="left" offset={24} className="mb-10 flex-col items-end">
@@ -87,13 +87,13 @@ export function FeaturedProjects({ projects }: FeaturedProjectsProps) {
 
                         <CardItem translateZ={10} className="mt-auto">
                           <div className="flex flex-wrap gap-1.5">
-                            {project.techStack.slice(0, 3).map((tech, i) => (
+                            {(project.techStack ?? []).slice(0, 3).map((tech, i) => (
                               <Badge key={i} size="sm">
                                 {tech}
                               </Badge>
                             ))}
-                            {project.techStack.length > 3 && (
-                              <Badge size="sm">+{project.techStack.length - 3}</Badge>
+                            {(project.techStack ?? []).length > 3 && (
+                              <Badge size="sm">+{(project.techStack ?? []).length - 3}</Badge>
                             )}
                           </div>
                         </CardItem>

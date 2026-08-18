@@ -99,7 +99,7 @@ export function HeroSection({ about }: HeroSectionProps) {
   return (
     <section
       ref={sectionRef}
-     
+      data-scene="terrain"
       className="relative min-h-[100dvh] overflow-hidden"
     >
       {/* Centered content container — aligns hero with every other section gutter */}
@@ -175,7 +175,6 @@ export function HeroSection({ about }: HeroSectionProps) {
             <span className="relative flex h-2 w-2">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green opacity-60"></span>
               <span className="relative inline-flex h-2 w-2 rounded-full bg-green shadow-[0_0_8px_var(--green)]"></span>
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-amber shadow-[0_0_8px_var(--amber)]"></span>
             </span>
             Available for work
           </div>

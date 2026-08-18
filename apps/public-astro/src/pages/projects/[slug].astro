@@ -9,21 +9,13 @@ if (!slug) {
   return Astro.redirect('/404');
 }
 
-let project = null;
-let projectUnavailable = false;
+const project = await getProjectBySlug(slug);
 
-try {
-  project = await getProjectBySlug(slug);
-} catch {
-  projectUnavailable = true;
-}
-
-if (!projectUnavailable && !project) {
+if (!project) {
   return Astro.redirect('/404');
 }
 
-const articleSchema = project
-  ? {
+const articleSchema = {
   "@context": "https://schema.org",
   "@type": "Article",
   "headline": project.title,
@@ -32,41 +24,21 @@ const articleSchema = project
   "datePublished": project.createdAt,
   "author": {
     "@type": "Person",
-    "name": "Naufal Rizqullah Fauzan"
+    "name": "Naufal Rizqullah Firdaus"
   }
-}
-  : null;
+};
 
 ---
 
 <PageLayout
-  title={project ? project.title : 'Project Temporarily Unavailable'}
-  description={project ? project.summary : 'This project detail is temporarily unavailable while the portfolio reconnects to the Admin API.'}
-  ogImage={project?.imageUrl || undefined}
-  ogType={project ? 'article' : 'website'}
-
+  title={project.title}
+  description={project.summary}
+  ogImage={project.imageUrl || undefined}
+  ogType="article"
 >
-  {project ? (
-    <div>
-      <ProjectDetail project={project} client:load />
-      <script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
-    </div>
-  ) : (
-    <section class="py-24 px-4">
-      <div class="mx-auto max-w-3xl rounded-xl border border-line bg-bg-card p-10 text-center">
-        <p class="mb-3 text-xs font-semibold uppercase tracking-[0.24em] text-subtle">Temporary issue</p>
-        <h1 class="mb-4 font-display text-3xl font-bold text-foreground">Project detail is temporarily unavailable</h1>
-        <p class="mx-auto max-w-xl text-base leading-relaxed text-muted-foreground">
-          The project index is still available, but this detail page could not refresh from the Admin API right now.
-          Please try again shortly.
-        </p>
-        <div class="mt-8">
-          <a href="/projects" class="inline-flex items-center justify-center rounded-lg border border-line bg-bg-elevated px-6 py-3 text-sm font-medium text-text-primary transition-colors hover:border-line-hover hover:text-teal">
-            Back to projects
-          </a>
-        </div>
-      </div>
-    </section>
-  )}
+  <div>
+    <ProjectDetail project={project} client:load />
+    <script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
+  </div>
 </PageLayout>
 

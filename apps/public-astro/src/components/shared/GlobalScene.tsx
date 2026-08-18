@@ -17,6 +17,13 @@
  * save-data / WebGL-failure fall back to a static CSS/SVG snapshot (the .scene-fallback
  * class on the container, not this component). Three.js is dynamically imported so it
  * is code-split out of the initial content bundle.
+ *
+ * Scene-state protocol (DESIGN.md scene map): route + visible `[data-scene]` sections
+ * morph the shared particle buffers through four states — terrain (hero), circuit
+ * (credibility/projects/about), flow (writing), signal (guestbook/contact). One
+ * IntersectionObserver picks the dominant visible section; pages without sections
+ * fall back to a route default. Moods are tint/speed/softness/twinkle morphs plus a
+ * radar-ping pulse in `signal`; no new geometry is allocated on state change.
  */
 import { useEffect, useRef } from 'react';
 import type * as ThreeNS from 'three';
@@ -34,6 +41,49 @@ const STAR_COLORS: ReadonlyArray<readonly [number, number, number]> = [
 const STAR_WEIGHTS: ReadonlyArray<number> = [0.28, 0.3, 0.2, 0.14, 0.08];
 // Relative brightness/size per class (bright classes bigger, dim classes smaller).
 const STAR_SCALE: ReadonlyArray<number> = [1.9, 1.5, 1.15, 0.9, 0.7];
+
+// ── Scene-state protocol ──────────────────────────────────────────────────
+/** The four scene moods a route/section can drive the canvas into. */
+export type SceneStateName = 'terrain' | 'circuit' | 'flow' | 'signal';
+
+const SCENE_ORDER: ReadonlyArray<SceneStateName> = ['terrain', 'circuit', 'flow', 'signal'];
+
+interface SceneMood {
+  /** Multiplied over the natural star palette to tint the field. */
+  rgb: readonly [number, number, number];
+  /** Global opacity scale for the field. */
+  opacity: number;
+  /** Idle forward-speed multiplier. */
+  speed: number;
+  /** Sprite softness 0..1 (bigger, dimmer dots read softer). */
+  softness: number;
+  /** Extra twinkle amplitude, may be negative to calm the field. */
+  twinkle: number;
+  /** Periodic radar ping pulses particle brightness (signal state). */
+  ping?: boolean;
+}
+
+const SCENE_MOODS: Record<SceneStateName, SceneMood> = {
+  // Hero / identity — natural star palette, bright, lively drift.
+  terrain: { rgb: [1, 1, 1], opacity: 1, speed: 1, softness: 0, twinkle: 0 },
+  // Credibility / projects / about — teal circuit traces, steadier.
+  circuit: { rgb: [0.55, 1.05, 0.95], opacity: 0.85, speed: 0.75, softness: 0.35, twinkle: 0.5 },
+  // Writing / blogs — warm amber, soft, dim, slow.
+  flow: { rgb: [1.08, 0.9, 0.62], opacity: 0.55, speed: 0.45, softness: 1, twinkle: -0.4 },
+  // Guestbook / contact / chat — cool beacon with radar pings.
+  signal: { rgb: [0.5, 1.1, 1.0], opacity: 0.7, speed: 0.6, softness: 0.55, twinkle: 0.6, ping: true },
+};
+
+function isSceneName(v: string | undefined): v is SceneStateName {
+  return v !== undefined && (SCENE_ORDER as ReadonlyArray<string>).includes(v);
+}
+
+/** Pages without [data-scene] sections fall back to a route-driven default. */
+function routeDefault(pathname: string): SceneStateName {
+  if (pathname.startsWith('/blogs')) return 'flow';
+  if (pathname.startsWith('/contact') || pathname.startsWith('/guestbook') || pathname.startsWith('/ai-chatbot')) return 'signal';
+  return 'circuit';
+}
 
 function pickStarClass(rand: number): number {
   let acc = 0;
@@ -165,34 +215,41 @@ function initEngine(
     depthWrite: false,
     blending: THREE.AdditiveBlending,
     uniforms: {
-      uTex: { value: makeDotTexture(THREE) },
+      uTex: { value: null as ThreeNS.Texture | null },
       uTime: { value: 0 },
       uOpacity: { value: 1 },
       uPixelRatio: { value: Math.min(window.devicePixelRatio, 2) },
+      uSoft: { value: 0 },
+      uTwAmp: { value: 0 },
     },
     vertexShader: /* glsl */ `
       attribute float size;
       varying vec3 vColor;
       varying float vTwinkle;
       uniform float uTime;
+      uniform float uSoft;
+      uniform float uTwAmp;
       uniform float uPixelRatio;
       void main() {
         vColor = color;
         vec4 mv = modelViewMatrix * vec4(position, 1.0);
-        float tw = 0.82 + 0.18 * sin(uTime * 2.0 + position.x * 12.0 + position.y * 7.0);
+        float tw = 0.82 + (0.18 + uTwAmp) * sin(uTime * 2.2 + position.x * 12.0 + position.y * 7.0 + 0.6);
         vTwinkle = tw;
-        gl_PointSize = size * uPixelRatio * tw * (140.0 / -mv.z);
+        gl_PointSize = size * uPixelRatio * tw * mix(1.0, 1.35, uSoft) * (140.0 / -mv.z);
         gl_Position = projectionMatrix * mv;
       }
     `,
     fragmentShader: /* glsl */ `
       uniform sampler2D uTex;
       uniform float uOpacity;
+      uniform float uSoft;
       varying vec3 vColor;
       varying float vTwinkle;
       void main() {
         vec4 tex = texture2D(uTex, gl_PointCoord);
-        gl_FragColor = vec4(vColor, tex.a * vTwinkle * uOpacity);
+        // Crisp star core always; uSoft adds a soft halo skirt without blurring the core.
+        float a = mix(tex.a, max(tex.a, pow(tex.a, 0.45) * 0.6), uSoft);
+        gl_FragColor = vec4(vColor, a * vTwinkle * uOpacity);
       }
     `,
     vertexColors: true,
@@ -256,7 +313,101 @@ function initEngine(
     fadeTarget = 0.25;
     window.setTimeout(() => { fadeTarget = 1; }, 260);
   }
-  window.addEventListener('astro:page-load', onPageLoad);
+  document.addEventListener('astro:page-load', onPageLoad);
+
+  // ══════════════════════════════════════════════════════════════════════
+  // SCENE-STATE MOOD — morphs the shared buffers per route/section protocol
+  // ══════════════════════════════════════════════════════════════════════
+  const dotTexture = makeDotTexture(THREE);
+  dotMat.uniforms.uTex.value = dotTexture;
+
+  // Per-star palette baked into the color buffer once up front.
+  const baseColors = new Float32Array(dotColors);
+  const softMult = new Float32Array(COUNT);
+
+  let moodR = 1, moodG = 1, moodB = 1;
+  let moodOpacity = 1, moodSpeed = 1, moodSoft = 0, moodTwinkleAmp = 0;
+  let moodRt = 1, moodGt = 1, moodBt = 1;
+  let moodOpacityT = 1, moodSpeedT = 1, moodSoftT = 0, moodTwinkleAmpT = 0;
+  let pingOn = false, pingEnv = 0;
+
+  function bakeMood(rgb: readonly [number, number, number], softness: number): void {
+    for (let i = 0; i < COUNT; i++) {
+      // soft states compress dynamic range so the field converges to one dim glow
+      softMult[i] = 1 - softness * 0.85 * (0.35 + 0.65 * (starClass[i] / (STAR_COLORS.length - 1)));
+      dotColors[i * 3] = baseColors[i * 3] * rgb[0] * softMult[i];
+      dotColors[i * 3 + 1] = baseColors[i * 3 + 1] * rgb[1] * softMult[i];
+      dotColors[i * 3 + 2] = baseColors[i * 3 + 2] * rgb[2] * softMult[i];
+    }
+    (dotGeo.attributes.color as ThreeNS.BufferAttribute).needsUpdate = true;
+  }
+
+  const initialSceneName = container.dataset.scene;
+  let currentScene: SceneStateName = isSceneName(initialSceneName)
+    ? initialSceneName
+    : routeDefault(window.location.pathname);
+
+  {
+    const m = SCENE_MOODS[currentScene];
+    moodR = moodRt = m.rgb[0];
+    moodG = moodGt = m.rgb[1];
+    moodB = moodBt = m.rgb[2];
+    moodOpacity = moodOpacityT = m.opacity;
+    moodSpeed = moodSpeedT = m.speed;
+    moodSoft = moodSoftT = m.softness;
+    moodTwinkleAmp = moodTwinkleAmpT = m.twinkle;
+    pingOn = Boolean(m.ping);
+    bakeMood(m.rgb, m.softness);
+  }
+
+  /**
+   * Scene director: the dominant visible `[data-scene]` section wins; pages
+   * without sections fall back to the route default. Sections discovered at
+   * page-load are picked up by the scan, then tracked by one observer.
+   *
+   * ponytail: section→mood binding is one-way (content declares, canvas
+   * reacts). Upgrade path: per-project accent hues once chapters carry a
+   * design accent color.
+   */
+  const sectionEntries = new Map<Element, { rootTop: number }>();
+  let targetScene: SceneStateName = currentScene;
+
+  const sceneObserver = new IntersectionObserver((entries) => {
+    for (const entry of entries) {
+      const prev = sectionEntries.get(entry.target);
+      if (prev) prev.rootTop = entry.isIntersecting ? entry.boundingClientRect.top : Number.POSITIVE_INFINITY;
+    }
+    let best: Element | null = null;
+    let bestTop = Number.POSITIVE_INFINITY;
+    for (const [el, meta] of sectionEntries) {
+      if (meta.rootTop < bestTop) { bestTop = meta.rootTop; best = el; }
+    }
+    const raw = best?.getAttribute('data-scene');
+    const next: SceneStateName = isSceneName(raw) ? raw : routeDefault(window.location.pathname);
+    if (next !== targetScene) targetScene = next;
+  }, {});
+
+  function scanSceneSections(): void {
+    for (const el of Array.from(document.querySelectorAll('[data-scene]'))) {
+      if (!sectionEntries.has(el)) {
+        sectionEntries.set(el, { rootTop: Number.POSITIVE_INFINITY });
+        sceneObserver.observe(el);
+      }
+    }
+    for (const [el] of sectionEntries) {
+      if (!document.contains(el)) {
+        sceneObserver.unobserve(el);
+        sectionEntries.delete(el);
+      }
+    }
+  }
+
+  function onPageLoadScene(): void {
+    scanSceneSections();
+    targetScene = routeDefault(window.location.pathname);
+  }
+  document.addEventListener('astro:page-load', onPageLoadScene);
+  scanSceneSections();
 
   // ── Pointer (parallax + repel) ──
   const pointer = { x: 0, y: 0 };
@@ -308,6 +459,7 @@ function initEngine(
   const BASE_SPEED = 3.0;     // idle drift units/sec
   const BURST_SPEED = 150;    // peak forward speed at warp apex
   const SCROLL_SPEED = 40;    // extra speed per scrollVel unit
+  const MOOD_LERP = 1 - Math.pow(0.12, 1 / 60); // ~0.35s ease between scene states
 
   function render(): void {
     rafId = requestAnimationFrame(render);
@@ -315,6 +467,38 @@ function initEngine(
 
     const dt = Math.min(clock.getDelta(), 0.05);
     const time = clock.getElapsedTime();
+
+    // ── scene-state morph: ease mood toward the dominant section's target ──
+    if (targetScene !== currentScene) {
+      currentScene = targetScene;
+      const m = SCENE_MOODS[currentScene];
+      moodRt = m.rgb[0];
+      moodGt = m.rgb[1];
+      moodBt = m.rgb[2];
+      moodOpacityT = m.opacity;
+      moodSpeedT = m.speed;
+      moodSoftT = m.softness;
+      moodTwinkleAmpT = m.twinkle;
+      pingOn = Boolean(m.ping);
+      container.dataset.scene = currentScene;
+    }
+    const moodK = 1 - Math.pow(1 - MOOD_LERP, dt * 60);
+    moodR += (moodRt - moodR) * moodK;
+    moodG += (moodGt - moodG) * moodK;
+    moodB += (moodBt - moodB) * moodK;
+    moodOpacity += (moodOpacityT - moodOpacity) * moodK;
+    moodSpeed += (moodSpeedT - moodSpeed) * moodK;
+    moodSoft += (moodSoftT - moodSoft) * moodK;
+    moodTwinkleAmp += (moodTwinkleAmpT - moodTwinkleAmp) * moodK;
+    const tintDelta = Math.abs(moodRt - moodR) + Math.abs(moodGt - moodG) + Math.abs(moodBt - moodB);
+    if (tintDelta > 0.003) {
+      for (let i = 0; i < COUNT * 3; i++) {
+        dotColors[i] = baseColors[i] * ((i % 3 === 0) ? moodR : (i % 3 === 1) ? moodG : moodB) * softMult[Math.floor(i / 3)];
+      }
+      (dotGeo.attributes.color as ThreeNS.BufferAttribute).needsUpdate = true;
+    }
+    // radar ping pulse while the signal state is live
+    pingEnv = pingOn ? Math.max(0, Math.sin(time * 1.4) - 0.62) * 2.6 * moodK + pingEnv * (1 - moodK) : pingEnv * 0.9;
 
     // advance warp + fade
     if (warp < 1) {
@@ -332,7 +516,7 @@ function initEngine(
     panY *= Math.pow(0.2, dt);
 
     const warpEase = easeOutCubic(1 - warp); // 1 at start → 0 when settled
-    const forward = BASE_SPEED + BURST_SPEED * warpEase + SCROLL_SPEED * scrollVel;
+    const forward = moodSpeed * BASE_SPEED + BURST_SPEED * warpEase + SCROLL_SPEED * scrollVel;
 
     // pointer world target for repel (at a mid depth plane)
     const repelWorldX = pointer.x * 30;
@@ -406,7 +590,9 @@ function initEngine(
     streakMat.opacity += (streakTarget - streakMat.opacity) * 0.2;
 
     dotMat.uniforms.uTime.value = time;
-    dotMat.uniforms.uOpacity.value = fade * (0.45 + 0.55 * easeOutCubic(warp));
+    dotMat.uniforms.uSoft.value = moodSoft;
+    dotMat.uniforms.uTwAmp.value = moodTwinkleAmp;
+    dotMat.uniforms.uOpacity.value = fade * moodOpacity * (0.45 + 0.55 * easeOutCubic(warp)) * (1 + pingEnv * 0.6);
 
     // camera parallax (gentle) + page-transition pan + tiny drift for life
     camera.position.x += (pointer.x * 3 + panX - camera.position.x) * 0.06;
@@ -421,14 +607,16 @@ function initEngine(
 
   return () => {
     cancelAnimationFrame(rafId);
-    window.removeEventListener('astro:page-load', onPageLoad);
+    document.removeEventListener('astro:page-load', onPageLoad);
+    document.removeEventListener('astro:page-load', onPageLoadScene);
     window.removeEventListener('pointermove', onPointerMove);
     window.removeEventListener('scroll', onScroll);
     window.removeEventListener('resize', onResize);
     document.removeEventListener('visibilitychange', onVisibility);
+    sceneObserver.disconnect();
 
     dotGeo.dispose();
-    dotMat.uniforms.uTex.value?.dispose();
+    dotTexture.dispose();
     dotMat.dispose();
     streakGeo.dispose();
     streakMat.dispose();

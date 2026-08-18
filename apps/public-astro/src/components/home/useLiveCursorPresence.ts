@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { resolveLiveCursorIdentity, type LiveCursorIdentity } from '@/lib/guestbookIdentity';
+import { createAbortSignal } from '@naufalrf/http';
 
 export interface LiveCursorParticipant {
   id: string;
@@ -190,12 +191,11 @@ async function connect(identity: LiveCursorIdentity): Promise<void> {
 
   const healthUrl = getHealthUrl(store.socketUrl);
   if (healthUrl) {
-    const controller = new AbortController();
-    const timeout = window.setTimeout(() => controller.abort(), HEALTHCHECK_TIMEOUT_MS);
+    const { signal, cleanup } = createAbortSignal(HEALTHCHECK_TIMEOUT_MS);
     try {
       const response = await fetch(healthUrl, {
         method: 'GET',
-        signal: controller.signal,
+        signal,
         cache: 'no-store',
       });
       if (!response.ok) throw new Error(`Presence health check failed: ${response.status}`);
@@ -206,7 +206,7 @@ async function connect(identity: LiveCursorIdentity): Promise<void> {
       }
       return;
     } finally {
-      window.clearTimeout(timeout);
+      cleanup();
     }
   }
 

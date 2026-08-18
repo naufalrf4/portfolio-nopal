@@ -100,7 +100,7 @@ const cloudIcons = [
 
 export function TechnicalExpertise() {
   return (
-    <section className="relative w-full border-t border-teal/30 py-16 md:py-24">
+    <section data-scene="circuit" className="relative w-full border-t border-teal/30 py-16 md:py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-8">
           {/* Left column — heading, stats, grouped stack */}
