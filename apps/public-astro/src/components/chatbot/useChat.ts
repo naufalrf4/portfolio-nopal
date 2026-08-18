@@ -14,6 +14,7 @@ interface UseChat {
   streamingMessageId: string | null;
   shouldScrollToBottom: boolean;
   confirmPendingAction: (messageId: string, confirm: boolean) => Promise<void>;
+  confirmingMessageId: string | null;
 }
 
 function generateId(): string {
@@ -112,6 +113,7 @@ export function useChat(): UseChat {
   const [error, setError] = useState<string | null>(null);
   const [streamingMessageId, setStreamingMessageId] = useState<string | null>(null);
   const [shouldScrollToBottom, setShouldScrollToBottom] = useState(false);
+  const [confirmingMessageId, setConfirmingMessageId] = useState<string | null>(null);
   const { sessionId, setSessionId, clearSession } = useChatSession();
   const streamingIntervalRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -215,6 +217,8 @@ export function useChat(): UseChat {
 
       const action = message.pendingAction;
 
+      setConfirmingMessageId(messageId);
+
       try {
         const result = await confirmAction(
           action.tool,
@@ -236,6 +240,8 @@ export function useChat(): UseChat {
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Failed to confirm action';
         setError(errorMessage);
+      } finally {
+        setConfirmingMessageId(null);
       }
     },
     [messages, sessionId]
@@ -263,5 +269,6 @@ export function useChat(): UseChat {
     streamingMessageId,
     shouldScrollToBottom,
     confirmPendingAction,
+    confirmingMessageId,
   };
 }

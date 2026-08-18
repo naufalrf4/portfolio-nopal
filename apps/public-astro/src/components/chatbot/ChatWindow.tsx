@@ -19,8 +19,16 @@ export function ChatWindow({
   isExpanded = false,
   className,
 }: ChatWindowProps) {
-  const { messages, isLoading, error, sendMessage, clearMessages, shouldScrollToBottom, confirmPendingAction } =
-    useChat();
+  const {
+    messages,
+    isLoading,
+    error,
+    sendMessage,
+    clearMessages,
+    shouldScrollToBottom,
+    confirmPendingAction,
+    confirmingMessageId,
+  } = useChat();
 
   return (
     <div
@@ -45,6 +53,7 @@ export function ChatWindow({
         shouldScrollToBottom={shouldScrollToBottom}
         onConfirmAction={confirmPendingAction}
         onQuickPrompt={sendMessage}
+        confirmingMessageId={confirmingMessageId}
       />
 
       {error && (

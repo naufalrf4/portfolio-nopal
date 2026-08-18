@@ -17,6 +17,7 @@ interface MessageListProps {
   shouldScrollToBottom?: boolean;
   onConfirmAction?: (messageId: string, confirm: boolean) => Promise<void>;
   onQuickPrompt?: (prompt: string) => void;
+  confirmingMessageId?: string | null;
 }
 
 export function MessageList({
@@ -25,6 +26,7 @@ export function MessageList({
   shouldScrollToBottom = false,
   onConfirmAction,
   onQuickPrompt,
+  confirmingMessageId = null,
 }: MessageListProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const prevMessageCountRef = useRef(0);
@@ -115,7 +117,12 @@ export function MessageList({
       )}
     >
       {messages.map((message) => (
-        <MessageBubble key={message.id} message={message} onConfirmAction={onConfirmAction} />
+        <MessageBubble
+          key={message.id}
+          message={message}
+          onConfirmAction={onConfirmAction}
+          isConfirming={confirmingMessageId === message.id}
+        />
       ))}
 
       {isLoading && (

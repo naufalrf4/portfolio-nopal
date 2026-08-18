@@ -26,10 +26,6 @@ export function ChatWidget({ currentPath }: ChatWidgetProps) {
     sessionStorage.removeItem(WIDGET_STATE_KEY);
   }, [pathname]);
 
-  if (pathname === '/ai-chatbot') {
-    return null;
-  }
-
   useEffect(() => {
     if (window.innerWidth < 768) {
       sessionStorage.removeItem(WIDGET_STATE_KEY);
@@ -70,6 +66,10 @@ export function ChatWidget({ currentPath }: ChatWidgetProps) {
   const handleToggleSize = useCallback(() => {
     setIsExpanded((prev) => !prev);
   }, []);
+
+  if (pathname === '/ai-chatbot') {
+    return null;
+  }
 
   return (
     <>

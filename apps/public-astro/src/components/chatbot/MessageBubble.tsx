@@ -1,26 +1,35 @@
 import { cn } from '@/lib/utils';
-import { ArrowRight, Bot, User, Check, X } from 'lucide-react';
+import { ArrowRight, Bot, User, Check, X, Loader2 } from 'lucide-react';
 import type { Message } from './types';
 import { MarkdownMessage } from './MarkdownMessage';
+import { SourcesList } from './SourcesList';
 
 interface MessageBubbleProps {
   message: Message;
   isStreaming?: boolean;
   onConfirmAction?: (messageId: string, confirm: boolean) => Promise<void>;
+  isConfirming?: boolean;
 }
 
-export function MessageBubble({ message, isStreaming = false, onConfirmAction }: MessageBubbleProps) {
+export function MessageBubble({
+  message,
+  isStreaming = false,
+  onConfirmAction,
+  isConfirming = false,
+}: MessageBubbleProps) {
   const isUser = message.role === 'user';
   const suggestedActions = message.suggestedActions;
   const pendingAction = message.pendingAction;
 
   const handleConfirm = async () => {
+    if (isConfirming) return;
     if (onConfirmAction && pendingAction && pendingAction.missingFields.length === 0) {
       await onConfirmAction(message.id, true);
     }
   };
 
   const handleDecline = async () => {
+    if (isConfirming) return;
     if (onConfirmAction && pendingAction) {
       await onConfirmAction(message.id, false);
     }
@@ -63,21 +72,27 @@ export function MessageBubble({ message, isStreaming = false, onConfirmAction }:
               <div className="flex gap-2 mt-2">
                 <button
                   onClick={handleConfirm}
-                  className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--teal)] px-3 py-1.5 text-xs font-semibold text-white transition-all hover:bg-[var(--teal)]/90"
+                  disabled={isConfirming}
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--teal)] px-3 py-1.5 text-xs font-semibold text-white transition-all hover:bg-[var(--teal)]/90 disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  <Check size={14} />
+                  {isConfirming ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
                   Confirm
                 </button>
                 <button
                   onClick={handleDecline}
-                  className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--line)] bg-[var(--bg-card)] px-3 py-1.5 text-xs font-medium text-[var(--text-secondary)] transition-all hover:bg-[var(--bg-elevated)]"
+                  disabled={isConfirming}
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--line)] bg-[var(--bg-card)] px-3 py-1.5 text-xs font-medium text-[var(--text-secondary)] transition-all hover:bg-[var(--bg-elevated)] disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  <X size={14} />
+                  {isConfirming ? <Loader2 size={14} className="animate-spin" /> : <X size={14} />}
                   Decline
                 </button>
               </div>
             )}
           </div>
+        )}
+
+        {!isUser && message.citations && message.citations.length > 0 && (
+          <SourcesList citations={message.citations} />
         )}
 
         {!isUser && suggestedActions && suggestedActions.length > 0 ? (
