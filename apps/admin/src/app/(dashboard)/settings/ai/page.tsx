@@ -43,7 +43,6 @@ const PROVIDER_OPTIONS = [
 ];
 
 export default function AISettingsPage() {
-  const [configId, setConfigId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -61,7 +60,6 @@ export default function AISettingsPage() {
       .then(data => {
         const d = data.data as LlmConfigData | null;
         if (!d) return;
-        setConfigId(d.id ?? null);
         setMain(prev => ({ ...prev, provider: d.mainProvider, baseUrl: d.mainBaseUrl, apiKey: d.mainApiKey, model: d.mainModel, existingApiKey: d.mainApiKey }));
         if (d.fallbackProvider) {
           setFallbackEnabled(true);

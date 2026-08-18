@@ -7,15 +7,20 @@ import { Button } from '@/components/ui/button';
 interface SignInFormProps {
   callbackUrl?: string;
   mode?: 'admin' | 'public';
+  /** When the env-gated demo Credentials provider is active, show email/password log in. */
+  demoAuthEnabled?: boolean;
 }
 
 function normalizeCallbackUrl(callbackUrl: string | undefined, fallback: string) {
   return callbackUrl && callbackUrl.startsWith('/') ? callbackUrl : fallback;
 }
 
-export function SignInForm({ callbackUrl, mode = 'admin' }: SignInFormProps) {
+export function SignInForm({ callbackUrl, mode = 'admin', demoAuthEnabled = false }: SignInFormProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const [demoLoading, setDemoLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [demoEmail, setDemoEmail] = useState('');
+  const [demoPassword, setDemoPassword] = useState('');
 
   const handleGoogleSignIn = async () => {
     try {
@@ -31,11 +36,26 @@ export function SignInForm({ callbackUrl, mode = 'admin' }: SignInFormProps) {
     }
   };
 
+  const handleDemoSignIn = async () => {
+    try {
+      setDemoLoading(true);
+      setErrorMessage(null);
+      await signIn('demo', {
+        email: demoEmail,
+        password: demoPassword,
+        callbackUrl: normalizeCallbackUrl(callbackUrl, mode === 'public' ? '/' : '/dashboard'),
+      });
+    } catch {
+      setErrorMessage('Demo sign-in failed. Check the email and password.');
+      setDemoLoading(false);
+    }
+  };
+
   return (
     <div className="space-y-3">
       <Button
         onClick={handleGoogleSignIn}
-        disabled={isLoading}
+        disabled={isLoading || demoLoading}
         className="neu-button w-full py-6 text-base font-semibold"
       >
         <svg className="mr-2 h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
@@ -58,6 +78,38 @@ export function SignInForm({ callbackUrl, mode = 'admin' }: SignInFormProps) {
         </svg>
         {isLoading ? 'Signing in...' : 'Sign in with Google'}
       </Button>
+
+      {demoAuthEnabled && (
+        <div className="space-y-3 rounded-xl border border-line bg-bg-elevated p-4">
+          <p className="text-center text-xs uppercase tracking-wider text-text-secondary">Demo sign-in</p>
+          <div className="space-y-2">
+            <input
+              type="email"
+              value={demoEmail}
+              onChange={(e) => setDemoEmail(e.target.value)}
+              placeholder="admin@example.com"
+              autoComplete="email"
+              className="w-full rounded-lg border border-line bg-background px-3 py-2 text-sm text-text-primary placeholder:text-text-secondary focus:border-teal focus:outline-none"
+            />
+            <input
+              type="password"
+              value={demoPassword}
+              onChange={(e) => setDemoPassword(e.target.value)}
+              placeholder="Demo password"
+              autoComplete="current-password"
+              className="w-full rounded-lg border border-line bg-background px-3 py-2 text-sm text-text-primary placeholder:text-text-secondary focus:border-teal focus:outline-none"
+            />
+          </div>
+          <Button
+            onClick={handleDemoSignIn}
+            disabled={isLoading || demoLoading || !demoEmail || !demoPassword}
+            variant="primary"
+            className="w-full py-5 text-sm font-semibold"
+          >
+            {demoLoading ? 'Signing in...' : 'Sign in (demo)'}
+          </Button>
+        </div>
+      )}
 
       {errorMessage && <p className="text-sm text-destructive text-center">{errorMessage}</p>}
     </div>

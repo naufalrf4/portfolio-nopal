@@ -1,5 +1,6 @@
-import NextAuth from 'next-auth';
+import NextAuth, { type NextAuthConfig } from 'next-auth';
 import Google from 'next-auth/providers/google';
+import Credentials from 'next-auth/providers/credentials';
 import { db } from '@/lib/db';
 import { eq } from 'drizzle-orm';
 import { createId } from '@paralleldrive/cuid2';
@@ -16,6 +17,8 @@ interface AuthDbCallbacks {
   }): Promise<void>;
 }
 
+const ROLE_REVALIDATION_INTERVAL_MS = 60 * 60 * 1000;
+
 function readProfileImage(profile: unknown, fallbackImage?: string | null) {
   if (profile && typeof profile === 'object') {
     if ('picture' in profile && typeof profile.picture === 'string') {
@@ -30,15 +33,51 @@ function readProfileImage(profile: unknown, fallbackImage?: string | null) {
   return fallbackImage ?? null;
 }
 
+// Local demo sign-in bypass: Credentials provider that only activates when both
+// DEMO_AUTH_ENABLED=true and DEMO_AUTH_PASSWORD are set. It still enforces the
+// ADMIN_EMAILS allowlist, so it never grants access outside allowlisted emails.
+// ponytail: keep this env-gated; upgrade path is removing it once real OAuth is
+// configured in every environment that needs sign-in.
+export function isDemoAuthEnabled(): boolean {
+  return process.env.DEMO_AUTH_ENABLED === 'true' && Boolean(process.env.DEMO_AUTH_PASSWORD);
+}
+
 function createAuthConfig(authCallbacks: AuthDbCallbacks) {
+  const providers: NonNullable<NextAuthConfig['providers']> = [
+    Google({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      allowDangerousEmailAccountLinking: true,
+    }),
+  ];
+
+  if (isDemoAuthEnabled()) {
+    providers.push(
+      Credentials({
+        id: 'demo',
+        name: 'Demo',
+        credentials: {
+          email: { label: 'Email', type: 'email' },
+          password: { label: 'Password', type: 'password' },
+        },
+        async authorize(credentials) {
+          const email = (typeof credentials?.email === 'string' ? credentials.email : '')
+            .trim()
+            .toLowerCase();
+          const password = typeof credentials?.password === 'string' ? credentials.password : '';
+          if (!email || !password || password !== process.env.DEMO_AUTH_PASSWORD) return null;
+          if (!isEmailAllowed(email)) return null;
+
+          await authCallbacks.upsertUser({ email, name: 'Demo User', role: 'ADMIN' });
+          const dbUser = await authCallbacks.getUserByEmail(email);
+          return { id: dbUser?.id ?? `demo:${email}`, email, name: 'Demo User' };
+        },
+      })
+    );
+  }
+
   return NextAuth({
-    providers: [
-      Google({
-        clientId: process.env.GOOGLE_CLIENT_ID!,
-        clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-        allowDangerousEmailAccountLinking: true,
-      }),
-    ],
+    providers,
     session: {
       strategy: 'jwt',
       maxAge: 30 * 24 * 60 * 60,
@@ -85,15 +124,21 @@ function createAuthConfig(authCallbacks: AuthDbCallbacks) {
         if (user) {
           token.userId = user.id;
           token.role = user.role === 'ADMIN' || user.role === 'USER' ? user.role : 'USER';
+          token.lastValidated = Date.now();
         }
 
-        if (trigger === 'update' || trigger === 'signIn') {
+        const lastValidated = token.lastValidated as number | undefined;
+        const isStale =
+          !lastValidated || Date.now() - lastValidated > ROLE_REVALIDATION_INTERVAL_MS;
+
+        if (trigger === 'update' || trigger === 'signIn' || isStale) {
           if (token.email) {
             const dbUser = await authCallbacks.getUserByEmail(token.email);
             if (dbUser) {
               token.userId = dbUser.id;
-              token.role = dbUser.role === 'ADMIN' || dbUser.role === 'USER' ? dbUser.role : 'USER';
+              token.role = isEmailAllowed(token.email) ? 'ADMIN' : 'USER';
             }
+            token.lastValidated = Date.now();
           }
         }
 

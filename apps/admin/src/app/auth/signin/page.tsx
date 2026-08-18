@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import { auth } from '@/lib/auth';
+import { auth, isDemoAuthEnabled } from '@/lib/auth';
 import { SignInForm } from './sign-in-form';
 
 interface SignInPageProps {
@@ -42,12 +42,13 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
               {params.error === 'unauthorized' && 'You do not have admin privileges.'}
               {params.error === 'OAuthAccountNotLinked' &&
                 'Email already used with different provider.'}
-              {!['access_denied', 'unauthorized', 'OAuthAccountNotLinked'].includes(params.error) &&
+              {params.error === 'CredentialsSignin' && 'Demo sign-in failed. Check email and password.'}
+              {!['access_denied', 'unauthorized', 'OAuthAccountNotLinked', 'CredentialsSignin'].includes(params.error) &&
                 'Authentication error occurred.'}
             </div>
           )}
 
-          <SignInForm callbackUrl={callbackUrl} mode="admin" />
+          <SignInForm callbackUrl={callbackUrl} mode="admin" demoAuthEnabled={isDemoAuthEnabled()} />
         </div>
       </div>
     </div>

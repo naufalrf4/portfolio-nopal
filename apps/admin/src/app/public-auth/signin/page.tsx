@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import { safeAuth } from '@/lib/auth';
+import { safeAuth, isDemoAuthEnabled } from '@/lib/auth';
 import { SignInForm } from '@/app/auth/signin/sign-in-form';
 
 interface PublicGuestbookSignInPageProps {
@@ -34,7 +34,7 @@ export default async function PublicGuestbookSignInPage({
             </p>
           </div>
 
-          <SignInForm callbackUrl={callbackUrl} mode="public" />
+          <SignInForm callbackUrl={callbackUrl} mode="public" demoAuthEnabled={isDemoAuthEnabled()} />
         </div>
       </div>
     </div>
