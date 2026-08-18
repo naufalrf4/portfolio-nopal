@@ -119,6 +119,37 @@ function buildSuggestedActions(
   }));
 }
 
+function buildToolProjectActions(
+  toolResult:
+    | { metadata: Record<string, unknown> }
+    | undefined,
+  existingActions: SuggestedAction[],
+): SuggestedAction[] {
+  if (!toolResult) return [];
+  const refs = toolResult.metadata.referencedProjects;
+  if (!Array.isArray(refs)) return [];
+  const actions: SuggestedAction[] = [];
+  const seen = new Set<string>();
+  for (const ref of refs) {
+    if (!ref || typeof ref !== "object") continue;
+    const typed = ref as Record<string, unknown>;
+    const slug = stringOrNone(typed.slug);
+    const title = stringOrNone(typed.title);
+    if (!slug || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) continue;
+    const target = `/projects/${slug}`;
+    if (seen.has(target)) continue;
+    if (existingActions.some((a) => a.target === target)) continue;
+    seen.add(target);
+    actions.push({
+      type: "open_page",
+      target,
+      label: title ? `Open ${title}` : "Open referenced project",
+    });
+    if (actions.length >= 3) break;
+  }
+  return actions;
+}
+
 function minimumRetrievalConfidence(intent: string): number {
   if (
     [
@@ -131,6 +162,9 @@ function minimumRetrievalConfidence(intent: string): number {
     return 0.22;
   }
   if (intent === "general_portfolio") return 0.3;
+  if (intent === "project_question") return 0.3;
+  if (intent === "freelance_services") return 0.3;
+  if (intent === "freelance_quote") return 0.3;
   return 0.45;
 }
 
@@ -194,10 +228,8 @@ const AGENTIC_PATTERNS: Array<{
   },
   {
     regex: /\b(book|schedule|reserve|pesan|jadwalkan)\s+(a\s+)?(slot|booking|appointment)\b/i,
-    handler: (msg) => {
-      const result = stageCreateBooking("TBD", "you", "unknown@unknown.com").pendingAction;
-      result.description = "Create a booking (more details needed)";
-      result.missingFields.push("Please provide: slotId, name, email");
+    handler: () => {
+      const result = stageCreateBooking("", "", "").pendingAction;
       return result;
     },
   },
@@ -224,7 +256,6 @@ export async function chat(
   // Check for agentic intent FIRST — short-circuit before expensive RAG
   const pendingAction = detectAgenticIntent(request.message);
   if (pendingAction !== null) {
-    const now = new Date().toISOString();
     return {
       sessionId,
       message: pendingAction.missingFields.length > 0
@@ -362,32 +393,48 @@ export async function chat(
     );
   }
 
+  if (toolResult?.metadata?.status === "unavailable") {
+    toolResult = undefined;
+    if (queryPlan.workflow === "tool") queryPlan.workflow = "hybrid";
+    queryPlan.needsPortfolioContext = true;
+  }
+
   let retrievedChunks: RetrievedChunk[] = [];
   if (queryPlan.workflow !== "tool" && queryPlan.needsPortfolioContext) {
+    const retrievalQueries = queryPlan.retrievalQueries.slice(0, 2);
+    if (!retrievalQueries.includes(request.message)) {
+      retrievalQueries.push(request.message);
+    }
+    let queryEmbeddings: Array<number[] | undefined>;
+    try {
+      queryEmbeddings = await embedTexts(retrievalQueries);
+    } catch (err) {
+      if (err instanceof RagServiceError) throw err;
+      throw new RagServiceError(
+        "The embedding provider is currently unavailable.",
+        "RAG_EMBEDDING_UNAVAILABLE",
+        503,
+      );
+    }
     const seenChunks = new Set<string>();
-    for (const retrievalQuery of queryPlan.retrievalQueries) {
-      try {
-        const [queryEmbedding] = await embedTexts([retrievalQuery]);
-        if (!queryEmbedding) continue;
-        const results = await repository.searchChunksHybrid(
-          queryEmbedding,
-          retrievalQuery,
-          config.retrievalLimit,
-          ["public"],
-        );
-        for (const chunk of results) {
-          const fingerprint = `${chunk.source}::${chunk.content}`;
-          if (seenChunks.has(fingerprint)) continue;
-          seenChunks.add(fingerprint);
-          retrievedChunks.push(chunk);
-        }
-      } catch (err) {
-        if (err instanceof RagServiceError) throw err;
-        throw new RagServiceError(
-          "The contextual retrieval database is currently unavailable.",
-          "RAG_DATABASE_UNAVAILABLE",
-          503,
-        );
+    const searchResults = await Promise.all(
+      queryEmbeddings.map((queryEmbedding, index) =>
+        queryEmbedding
+          ? repository.searchChunksHybrid(
+              queryEmbedding,
+              retrievalQueries[index]!,
+              config.retrievalLimit,
+              ["public"],
+            )
+          : Promise.resolve([]),
+      ),
+    );
+    for (const results of searchResults) {
+      for (const chunk of results) {
+        const fingerprint = `${chunk.source}::${chunk.content}`;
+        if (seenChunks.has(fingerprint)) continue;
+        seenChunks.add(fingerprint);
+        retrievedChunks.push(chunk);
       }
     }
   }
@@ -398,6 +445,9 @@ export async function chat(
   const finalSuggestedActions = buildSuggestedActions(
     citations,
     queryPlan.suggestedActions,
+  );
+  finalSuggestedActions.push(
+    ...buildToolProjectActions(toolResult, finalSuggestedActions),
   );
   const retrievalConfidence = retrievedChunks.reduce(
     (max, c) => Math.max(max, c.score),
@@ -469,19 +519,20 @@ export async function chat(
   }
 
   const durationMs = Math.round(performance.now() - startedAt);
-  const now = new Date().toISOString();
+  const turnEpochMs = Date.now();
+  const now = new Date(turnEpochMs).toISOString();
   const newMessages: Array<Record<string, unknown>> = [
     {
-      id: `${sessionId}-user-${Math.floor(Date.now() / 1000)}`,
+      id: `${sessionId}-user-${turnEpochMs}`,
       role: "user",
       content: request.message,
       timestamp: now,
     },
     {
-      id: `${sessionId}-assistant-${Math.floor(Date.now() / 1000)}`,
+      id: `${sessionId}-assistant-${turnEpochMs}`,
       role: "assistant",
       content: finalText,
-      timestamp: new Date().toISOString(),
+      timestamp: now,
       metadata: {
         model: config.chatModel,
         provider: "google",

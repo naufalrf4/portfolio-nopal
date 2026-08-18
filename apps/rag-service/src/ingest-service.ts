@@ -1,4 +1,5 @@
 import * as adminClient from "./admin-client";
+import { config } from "./config";
 import { embedTexts } from "./embedding";
 import { RagServiceError } from "./errors";
 import { buildSourceMetadata } from "./prompt-builder";
@@ -52,7 +53,10 @@ function chunkText(
     for (let pos = 0; pos < paragraph.length; ) {
       const slice = paragraph.slice(pos, pos + targetTokens * 4);
       rawChunks.push(slice.trim());
-      pos += targetTokens * 4 - overlapTokens * 4;
+      // Guarantee forward progress even if overlap misconfiguration slips past
+      // config-level validation (belt-and-suspenders against an infinite loop).
+      const step = Math.max(targetTokens * 4 - overlapTokens * 4, targetTokens);
+      pos += step;
     }
   }
 
@@ -118,8 +122,8 @@ async function ingestTextDocument(params: {
   const source = `${sourceType}:${sourceRef}${title ? ` (${title})` : ""}`;
   const rawChunks = chunkText(
     text,
-    (await import("./config")).config.chunkTargetTokens,
-    (await import("./config")).config.chunkOverlapTokens,
+    config.chunkTargetTokens,
+    config.chunkOverlapTokens,
   );
 
   const contents = rawChunks.map((c) => c.content);
@@ -211,7 +215,7 @@ async function ingestProject(
     description: string;
     content: string;
     techStack: string[];
-    contexts: Array<{ title: string; content: string }>;
+    contexts?: Array<{ title: string; content: string }>;
   },
   runId: string,
 ): Promise<{ chunksWritten: number; source: string }> {
@@ -230,7 +234,7 @@ async function ingestProject(
   ];
 
   if (!project.content.trim()) {
-    for (const ctx of project.contexts) {
+    for (const ctx of project.contexts ?? []) {
       sections.push(`## ${ctx.title}\n${ctx.content.trim()}`);
     }
   }
@@ -284,6 +288,49 @@ async function ingestAbout(
     storageKey: null,
     tags: ["about"],
     extraMetadata: { origin: "about-export", run_id: runId },
+  });
+}
+
+async function ingestBlog(
+  blog: {
+    id: string;
+    url: string;
+    title: string;
+    description: string | null;
+    category: string | null;
+    tags: string[];
+    publishedAt: string;
+    visible: boolean;
+  },
+  runId: string,
+): Promise<{ chunksWritten: number; source: string }> {
+  const sections: string[] = [
+    `# ${blog.title}`,
+    blog.category ? `Category: ${blog.category}` : "",
+    blog.tags.length > 0 ? `Tags: ${blog.tags.join(", ")}` : "",
+    blog.description ? `## Description
+${blog.description.trim()}` : "",
+    `Published: ${blog.publishedAt}`,
+    `Read more: ${blog.url}`,
+  ];
+
+  return ingestTextDocument({
+    sourceType: "blog",
+    sourceRef: blog.id,
+    title: blog.title,
+    text: sections.filter(Boolean).join("\n\n"),
+    visibility: "public",
+    sensitivity: "normal",
+    mimeType: "text/markdown",
+    storageKey: null,
+    tags: ["blog"],
+    extraMetadata: {
+      origin: "blog-export",
+      run_id: runId,
+      url: blog.url,
+      route: blog.url,
+      route_label: `Read: ${blog.title}`,
+    },
   });
 }
 
@@ -344,6 +391,31 @@ export async function ingest(request: IngestRequest): Promise<IngestResponse> {
       return { success: true, chunksIngested: result.chunksWritten, source: result.source };
     }
 
+    if (request.type === "blog") {
+      if (!request.documentId) {
+        throw new RagServiceError(
+          "documentId is required for blog ingestion.",
+          "INGEST_REQUEST_INVALID",
+          400,
+        );
+      }
+      const export_ = await adminClient.getContentExport();
+      const blog = export_.blogs.find((b) => b.id === request.documentId);
+      if (!blog) {
+        throw new RagServiceError(
+          `Blog link not found for id ${request.documentId}.`,
+          "INGEST_REQUEST_INVALID",
+          400,
+        );
+      }
+      const result = await ingestBlog(blog, runId);
+      await repository.updateIngestionRun(runId, {
+        status: "completed",
+        chunksWritten: result.chunksWritten,
+      });
+      return { success: true, chunksIngested: result.chunksWritten, source: result.source };
+    }
+
     let totalChunks = 0;
     const export_ = await adminClient.getContentExport();
     const errors: string[] = [];
@@ -370,6 +442,15 @@ export async function ingest(request: IngestRequest): Promise<IngestResponse> {
         totalChunks += knowledgeResult.chunksWritten;
       } catch (err) {
         errors.push(`knowledge:${doc.id}:${err}`);
+      }
+    }
+
+    for (const blog of export_.blogs) {
+      try {
+        const blogResult = await ingestBlog(blog, runId);
+        totalChunks += blogResult.chunksWritten;
+      } catch (err) {
+        errors.push(`blog:${blog.id}:${err}`);
       }
     }
 

@@ -30,6 +30,9 @@ export const config = {
     "postgres://postgres:postgres@localhost:5432/naufalrf_portfolio",
   ),
   adminApiUrl: env("ADMIN_API_URL", "http://localhost:3001"),
+  // ADMIN_SERVICE_TOKEN is a legacy fallback shared across two auth directions
+  // (outbound admin auth + inbound rag ingest auth). Prefer setting
+  // ADMIN_INTERNAL_API_TOKEN and RAG_INGEST_SERVICE_TOKEN explicitly instead.
   adminServiceToken: env("ADMIN_SERVICE_TOKEN", ""),
   adminInternalApiToken: env("ADMIN_INTERNAL_API_TOKEN", ""),
   ragIngestServiceToken: env("RAG_INGEST_SERVICE_TOKEN", ""),
@@ -38,7 +41,6 @@ export const config = {
   embeddingModel: env("EMBEDDING_MODEL", "gemini-embedding-001"),
   embeddingDimension: envInt("EMBEDDING_DIMENSION", 768),
   chatModel: env("CHAT_MODEL", "gemini-2.5-flash"),
-  contextModel: env("CONTEXT_MODEL", "gemini-2.5-flash"),
   adminApiTimeoutMs: envInt("ADMIN_API_TIMEOUT_MS", 5000),
 
   corsOrigins: env("CORS_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000")
@@ -53,3 +55,10 @@ export const config = {
   chatHistoryLimit: envInt("CHAT_HISTORY_LIMIT", 6),
   isProduction: env("APP_ENV", "development").toLowerCase() === "production",
 } as const;
+
+if (config.chunkOverlapTokens >= config.chunkTargetTokens) {
+  throw new Error(
+    `Invalid chunk config: CHUNK_OVERLAP_TOKENS (${config.chunkOverlapTokens}) must be less than ` +
+      `CHUNK_TARGET_TOKENS (${config.chunkTargetTokens}) or paragraph splitting never advances.`,
+  );
+}

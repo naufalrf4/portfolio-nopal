@@ -27,6 +27,7 @@ interface AdminLlmConfigResponse {
 let cached: AdminLlmConfigResponse | null = null;
 let cacheTime = 0;
 const CACHE_TTL_MS = 10_000;
+let fetchInFlight: Promise<AdminLlmConfigResponse> | null = null;
 
 function internalToken(): string {
   const token = config.adminInternalApiToken || config.adminServiceToken;
@@ -46,6 +47,22 @@ export async function fetchLlmConfigFromAdmin(): Promise<AdminLlmConfigResponse>
     return cached;
   }
 
+  // Single-flight: concurrent callers await the same in-progress refresh
+  // instead of each triggering a redundant admin-API round-trip.
+  if (fetchInFlight !== null) {
+    return fetchInFlight;
+  }
+  fetchInFlight = doFetchLlmConfigFromAdmin(now);
+  try {
+    return await fetchInFlight;
+  } finally {
+    fetchInFlight = null;
+  }
+}
+
+async function doFetchLlmConfigFromAdmin(
+  now: number,
+): Promise<AdminLlmConfigResponse> {
   const url = `${config.adminApiUrl.replace(/\/$/, "")}/api/v1/internal/llm-config`;
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), config.adminApiTimeoutMs);
@@ -119,6 +136,7 @@ export async function resolveLlmConfig(): Promise<FullLlmConfig> {
       baseUrl: admin.embedding.baseUrl,
       apiKey: admin.embedding.apiKey,
       model: admin.embedding.model,
+      ...(admin.embeddingDimension ? { dimensions: admin.embeddingDimension } : {}),
     };
     const result: FullLlmConfig = { main, embedding };
     if (fallback !== undefined) {

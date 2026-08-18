@@ -58,7 +58,7 @@ interface ConfirmResponse {
 }
 
 interface IngestRequest {
-  type: "knowledge" | "project" | "about" | "all";
+  type: "knowledge" | "project" | "about" | "blog" | "all",
   documentId?: string;
 }
 
@@ -155,9 +155,19 @@ interface ContentExport {
     description: string;
     content: string;
     techStack: string[];
-    contexts: Array<{ title: string; content: string }>;
+    contexts?: Array<{ title: string; content: string }>;
   }>;
   knowledgeDocs: Array<{ id: string; filename: string; content: string; indexed: boolean }>;
+  blogs: Array<{
+    id: string;
+    url: string;
+    title: string;
+    description: string | null;
+    category: string | null;
+    tags: string[];
+    publishedAt: string;
+    visible: boolean;
+  }>;
 }
 
 export type {

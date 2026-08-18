@@ -133,7 +133,7 @@ app.post("/ingest", async (c) => {
 
   const raw = body as Record<string, unknown>;
   const type = String(raw.type ?? "all");
-  if (!["knowledge", "project", "about", "all"].includes(type)) {
+  if (!["knowledge", "project", "blog", "about", "all"].includes(type)) {
     throw new RagServiceError(
       `Invalid ingest type "${type}".`,
       "INVALID_INGEST_REQUEST",
@@ -149,7 +149,9 @@ app.post("/ingest", async (c) => {
   }
 
   if (
-    (ingestRequest.type === "knowledge" || ingestRequest.type === "project") &&
+    (ingestRequest.type === "knowledge" ||
+      ingestRequest.type === "project" ||
+      ingestRequest.type === "blog") &&
     !ingestRequest.documentId
   ) {
     throw new RagServiceError(

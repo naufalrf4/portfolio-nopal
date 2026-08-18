@@ -26,6 +26,7 @@ function sourceLabel(
 ): string {
   if (sourceType === "knowledge" && title) return `knowledge:${title}`;
   if (sourceType === "project") return `project:${sourceRef}`;
+  if (sourceType === "blog" && title) return `blog:${title}`;
   if (sourceType === "about") return "about:naufal";
   return `${sourceType}:${sourceRef}`;
 }
@@ -49,6 +50,10 @@ export function buildSourceMetadata(
     metadata.route = "/about";
     metadata.route_label = "Open about page";
     metadata.section = title ?? "About";
+  } else if (sourceType === "blog") {
+    metadata.route = "/blogs";
+    metadata.route_label = title ? `Read: ${title}` : "Open blogs page";
+    metadata.section = title ?? sourceRef;
   }
   return metadata;
 }
@@ -227,6 +232,7 @@ export function buildQueryAnalysisPrompt(
     "- Supported intents include general_assistance, general_portfolio, personal_profile, skills_question, experience_question, contact_question, project_question, freelance_quote, and freelance_services",
     "- Use workflow 'tool' for deterministic freelance pricing breakdowns and freelance profile/service questions that can be answered from structured profile data",
     "- Use workflow 'hybrid' when a tool answer should be combined with portfolio/project context or experience evidence",
+    "- Use workflow 'rag' for questions about published rates, pricing, metrics, statistics, or platform facts that may exist in portfolio knowledge documents, and only use freelance tools when the user asks to compute or request a custom quote",
     "- Use workflow 'rag' for portfolio knowledge questions and general chat",
     "- Set needsPortfolioContext to false for greetings, casual conversation, and general knowledge questions that do not require portfolio grounding",
     "- toolName must be empty when workflow is 'rag'",
@@ -253,7 +259,7 @@ export function fallbackQueryPlan(
 ): Record<string, unknown> {
   const normalized = question.toLowerCase();
   const queryLanguage =
-    ["bagaimana", "tolong", "saya", "buat", "harga"].some((m) => normalized.includes(m))
+    ["bagaimana", "tolong", "saya", "buat", "harga", "berapa", "tarif", "biaya"].some((m) => normalized.includes(m))
       ? "id"
       : "en";
   const answerLanguage = queryLanguage;
@@ -288,6 +294,7 @@ export function fallbackQueryPlan(
   ];
   const freelanceServiceKeywords = [
     "hourly rate", "rate card", "pricing model", "layanan freelance",
+    "tarif freelance", "berapa tarif", "tarif jasa", "biaya jasa",
     "freelance service", "services do you offer", "what services",
     "what can you build", "bisa bikin apa", "offer freelance",
     "freelance profile", "pricing notes",
@@ -299,6 +306,7 @@ export function fallbackQueryPlan(
   const calculatorKeywords = [
     "freelance", "rate", "pricing", "quote", "calculator",
     "price", "harga", "estimasi", "breakdown", "feature", "module", "modul",
+    "tarif", "biaya", "ongkos", "berapa harga",
   ];
   const portfolioKeywords = [
     "portfolio", "project", "proyek", "experience", "background", "skill",

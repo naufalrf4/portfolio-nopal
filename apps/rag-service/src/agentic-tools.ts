@@ -186,15 +186,29 @@ export async function executeSendMessage(
   return { success: true, message: "Message sent successfully!" };
 }
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const PLACEHOLDER_VALUES = new Set(["", "tbd", "you", "unknown", "n/a", "none", "unknown@unknown.com"]);
+
+function isPlaceholderValue(value: string): boolean {
+  return PLACEHOLDER_VALUES.has(value.trim().toLowerCase());
+}
+
 export async function executeCreateBooking(
   payload: Record<string, unknown>,
   adminApiUrl: string,
 ): Promise<{ success: boolean; message: string }> {
-  const slotId = String(payload.slotId ?? '');
+  const slotId = String(payload.slotId ?? '').trim();
   const name = String(payload.name ?? '').trim();
   const email = String(payload.email ?? '').trim();
   const notes = payload.notes != null ? String(payload.notes) : undefined;
   const phone = payload.phone != null ? String(payload.phone) : undefined;
+
+  if (isPlaceholderValue(slotId)) {
+    return { success: false, message: "Booking rejected: slotId is missing or a placeholder value." };
+  }
+  if (isPlaceholderValue(email) || !EMAIL_REGEX.test(email)) {
+    return { success: false, message: "Booking rejected: a valid email is required." };
+  }
 
   const res = await fetch(`${adminApiUrl.replace(/\/$/, "")}/api/v1/public/bookings`, {
     method: "POST",

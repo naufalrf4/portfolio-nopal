@@ -2,7 +2,6 @@ import postgres from "postgres";
 import { config } from "./config";
 
 const sql = postgres(config.databaseUrl, {
-  transform: postgres.camel,
   debug: config.logLevel === "DEBUG",
   max: 10,
   idle_timeout: 30,

@@ -85,15 +85,6 @@ export async function getKnowledgeDocById(
   return adminRequest("GET", `/api/v1/internal/knowledge/${documentId}`);
 }
 
-export async function getKnowledgeDocs(): Promise<
-  Array<{ id: string; filename: string; content: string; indexed: boolean }>
-> {
-  const result = await adminRequest<
-    Array<{ id: string; filename: string; content: string; indexed: boolean }>
-  >("GET", "/api/v1/internal/knowledge");
-  return Array.isArray(result) ? result : [];
-}
-
 export async function markKnowledgeDocIndexed(documentId: string): Promise<void> {
   await adminRequest("PATCH", `/api/v1/internal/knowledge/${documentId}/indexed`);
 }

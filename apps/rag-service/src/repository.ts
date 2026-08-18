@@ -9,6 +9,23 @@ function asJsonValue(value: Record<string, unknown>): Record<string, string | nu
   return value as Record<string, string | number | boolean | null>;
 }
 
+function asMetadataObject(value: unknown): Record<string, unknown> {
+  if (value && typeof value === "object" && !Array.isArray(value)) {
+    return value as Record<string, unknown>;
+  }
+  if (typeof value === "string") {
+    try {
+      const parsed: unknown = JSON.parse(value);
+      if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+        return parsed as Record<string, unknown>;
+      }
+    } catch {
+      // fall through to empty metadata
+    }
+  }
+  return {};
+}
+
 export function mergeRetrievedChunks(
   denseResults: RetrievedChunk[],
   lexicalResults: RetrievedChunk[],
@@ -143,8 +160,13 @@ export async function replaceChunks(
   await sql`DELETE FROM rag.chunks WHERE document_id = ${documentId}`;
 
   for (const chunk of chunks) {
+    if (chunk.embedding.length === 0) {
+      throw new Error(
+        `replaceChunks: chunk ${chunk.chunkIndex} for document ${documentId} has an empty embedding`,
+      );
+    }
     const embStr = formatEmbedding(chunk.embedding);
-    const metadataJson = JSON.stringify(chunk.metadata);
+    const metadataValue = asJsonValue(chunk.metadata);
     await sql.unsafe(
       `INSERT INTO rag.chunks (
         id, document_id, chunk_index, source_type, source_ref,
@@ -153,7 +175,7 @@ export async function replaceChunks(
         gen_random_uuid(), $1, $2,
         $3, $4, $5,
         $6, $7, $8,
-        $9, '${embStr}'::vector, now()
+        $9::jsonb, $10::vector, now()
       )`,
       [
         documentId,
@@ -164,7 +186,8 @@ export async function replaceChunks(
         chunk.content,
         chunk.tokenCount,
         chunk.checksum,
-        metadataJson,
+        metadataValue,
+        embStr,
       ],
     );
   }
@@ -233,6 +256,9 @@ export async function searchChunksHybrid(
   limit: number,
   visibilities: string[],
 ): Promise<RetrievedChunk[]> {
+  if (limit <= 0) {
+    throw new Error(`searchChunksHybrid: limit must be a positive integer, got ${limit}`);
+  }
   const candidateLimit = Math.max(limit * 3, limit);
   const denseResults = await searchChunksDense(queryEmbedding, candidateLimit, visibilities);
   const lexicalResults = await searchChunksLexical(queryText, candidateLimit, visibilities);
@@ -244,23 +270,26 @@ async function searchChunksDense(
   limit: number,
   visibilities: string[],
 ): Promise<RetrievedChunk[]> {
+  if (limit <= 0) {
+    throw new Error(`searchChunksDense: limit must be a positive integer, got ${limit}`);
+  }
   const embStr = formatEmbedding(queryEmbedding);
   const rows = await sql.unsafe(
     `
     SELECT
       c.source_type, c.source_ref, c.content, c.metadata,
-      1 - (c.embedding <=> '${embStr}'::vector) AS dense_score
+      1 - (c.embedding <=> $1::vector) AS dense_score
     FROM rag.chunks c
     JOIN rag.documents d ON c.document_id = d.id
-    WHERE c.visibility = ANY($1::text[]) AND d.status = 'ready'
-    ORDER BY c.embedding <=> '${embStr}'::vector
-    LIMIT $2
+    WHERE c.visibility = ANY($2::text[]) AND d.status = 'ready'
+    ORDER BY c.embedding <=> $1::vector
+    LIMIT $3
   `,
-    [visibilities, limit],
+    [embStr, visibilities, limit],
   );
 
   return rows.map((row: Record<string, unknown>) => {
-    const metadata = (row.metadata as Record<string, unknown>) ?? {};
+    const metadata = asMetadataObject(row.metadata);
     const denseScore = Math.max(0, Number(row.dense_score) || 0);
     return {
       source: String(
@@ -305,7 +334,7 @@ async function searchChunksLexical(
   );
 
   return rows.map((row: Record<string, unknown>) => {
-    const metadata = (row.metadata as Record<string, unknown>) ?? {};
+    const metadata = asMetadataObject(row.metadata);
     const lexicalScore = Math.max(0, Number(row.lexical_rank) || 0);
     return {
       source: String(

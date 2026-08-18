@@ -9,6 +9,7 @@ export interface LlmSlotConfig {
   baseUrl: string;
   apiKey: string;
   model: string;
+  dimensions?: number;
 }
 
 export interface FullLlmConfig {
@@ -109,6 +110,7 @@ class OpenAiCompatibleClient implements LlmClient {
           body: JSON.stringify({
             model: this.config.model,
             input: batch,
+            ...(this.config.dimensions ? { dimensions: this.config.dimensions } : {}),
           }),
           signal: controller.signal,
         });
@@ -315,7 +317,17 @@ export class LlmProvider {
       console.warn(
         `[LLM] Main provider failed (${String(mainErr)}), falling back.`,
       );
-      return this.fallback.generate(prompt, temperature);
+      try {
+        return await this.fallback.generate(prompt, temperature);
+      } catch (fallbackErr) {
+        if (fallbackErr instanceof Error) {
+          (fallbackErr as Error & { cause?: unknown }).cause = mainErr;
+        }
+        console.error(
+          `[LLM] Fallback provider also failed (${String(fallbackErr)}); main provider error was (${String(mainErr)}).`,
+        );
+        throw fallbackErr;
+      }
     }
   }
 

@@ -327,6 +327,10 @@ export function executeFeaturePricingQuote(
       matchedSubtotal: matchedTotal,
       missingFeatures,
       referenceCatalogSize: Object.keys(references).length,
+      referencedProjects: usedProjectReferences.map((ref) => ({
+        slug: ref.slug,
+        title: ref.title,
+      })),
       loadedFromIntentProfile: Object.keys(profileCatalog).length > 0,
     },
   };
@@ -407,6 +411,10 @@ export function executeFreelanceProfileLookup(
       completedProjects: completedProjects < 0 ? null : completedProjects,
       featurePricingCount: featurePricing.length,
       projectReferenceCount: projectReferences.length,
+      referencedProjects: projectReferences.map((ref) => ({
+        slug: ref.slug,
+        title: ref.title,
+      })),
     },
   };
 }
