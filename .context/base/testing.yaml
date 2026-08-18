@@ -1,7 +1,10 @@
 current_state:
   root:
-    ci: no CI workflow files found
+    ci: no CI workflow files found (no `.github/`)
     shared_test_command: none
+    build: 'bun run build (bun --filter chain over admin/public-astro/links-astro/ngl-svelte; excludes live-presence and rag-service)'
+    lint: 'bun run lint (admin + ngl-svelte filters)'
+    typecheck: 'bun run typecheck (admin filter)'
   admin:
     evidence:
       - bun run typecheck
@@ -39,10 +42,15 @@ current_state:
       - no automated test runner in manifest
   rag_service:
     evidence:
-      - cd apps/rag-service && bun run typecheck
-      - cd apps/rag-service/fastapi && uv run pytest
-      - cd apps/rag-service/fastapi && uv run ruff check .
+      - cd apps/rag-service && bun test (src/llm-provider.test.ts, src/agentic-tools.test.ts)
+      - cd apps/rag-service && bun x tsc --noEmit
       - cd apps/rag-service && bun run build
+    missing:
+      - no lint script in manifest
+  shared_packages:
+    evidence:
+      - cd packages/http && bun test (packages/http/__tests__/index.test.ts)
+      - cd packages/contracts && bun test (packages/contracts/__tests__/drift-check.test.ts)
 
 quality_gates_for_future_work:
   - Run the narrowest app-local verification that the touched app actually defines.
@@ -54,5 +62,5 @@ critical_paths:
   - Admin auth gating and admin-only dashboard routes.
   - Admin public APIs consumed by Astro and Svelte apps.
   - Live websocket presence compatibility between `apps/public-astro` and `apps/live-presence`.
-  - RAG `/chat` and `/ingest` contract compatibility.
+  - RAG `/chat`, `/chat/confirm`, and `/ingest` contract compatibility (TS/Hono runtime).
   - Public write flows using Turnstile and service-to-service tokens.

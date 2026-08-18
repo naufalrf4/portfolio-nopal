@@ -8,7 +8,7 @@ Authoritative AI control contract for this repository.
 - **Purpose:** coordinate five standalone apps that together power the portfolio ecosystem
 - **Architecture:** root repository shell with independent app runtimes under `apps/*`
 - **Execution Model:** Bun workspace monorepo — root `package.json` declares `"workspaces": ["apps/*","packages/*"]`; all apps + shared packages (`packages/tsconfig`, `packages/design-tokens`, `packages/http`, `packages/contracts`) install together into a single root `bun.lock`.
-- **Critical Domains:** Admin API authority, centralized Neon/Postgres ownership, legacy phase2 design parity, cross-app service boundaries, security hardening
+- **Critical Domains:** Admin API authority, centralized Postgres ownership, cross-app design contract parity (root `DESIGN.md`), cross-app service boundaries, security hardening
 
 ## 2. Technology Baseline
 
@@ -19,7 +19,7 @@ Authoritative AI control contract for this repository.
 - **Package Manager:** Bun workspaces at root — a single root `bun.lock` is the only lockfile (app-level `bun.lock` files were removed). Install everything with `bun install` from the root.
 - **Version Policy:** use versions resolved from manifests and lockfiles; never guess from memory
 - **State Management:** framework-native data fetching and app-local state; no shared root state layer
-- **Database / ORM:** centralized Neon/Postgres; Drizzle + `postgres` in Admin, `postgres` (postgres.js) + pgvector in the TS RAG service
+- **Database / ORM:** centralized Postgres (dockerized `pgvector/pgvector` locally, Dokploy-managed in production); Drizzle + `postgres` in Admin, `postgres` (postgres.js) + pgvector in the TS RAG service
 - **Testing Stack:** app-local build/type/lint commands plus `bun test` in the RAG service and shared packages; no unified root CI or test runner evidenced
 
 ## 3. Architecture and Structure Rules
@@ -33,9 +33,9 @@ Authoritative AI control contract for this repository.
 
 - **Install:** `bun install` at the root installs all workspace apps + packages into the single root `bun.lock`. Per-app installs are unnecessary.
 - **Dev:** root supports `bun run dev:all` for local multi-app startup via `./start-dev.sh`; app-local alternatives remain `cd apps/admin && bun run dev`, `cd apps/public-astro && bun run dev`, `cd apps/links-astro && bun run dev`, `cd apps/ngl-svelte && bun run dev`, or `cd apps/rag-service && bun run dev`
-- **Build:** root has no single build command; use `cd apps/admin && bun run build`, `cd apps/public-astro && bun run build`, `cd apps/links-astro && bun run build`, `cd apps/ngl-svelte && bun run build`, or `cd apps/rag-service && bun run build`
-- **Test:** root supports `bun run reset:seed` for the local reset + reseed + RAG ingest workflow via `./reset-seed-rag.sh`; for app tests use `cd apps/rag-service && bun test`, `cd packages/http && bun test`, or `cd packages/contracts && bun test`. Do not invent missing app test commands.
-- **Lint:** use `cd apps/admin && bun run lint` or `cd apps/ngl-svelte && bun run lint` (ngl also `bun run check`). Typecheck via `cd apps/admin && bun run typecheck` and `cd apps/rag-service && bun x tsc --noEmit`.
+- **Build:** root supports `bun run build` (bun `--filter` chain over admin, public-astro, links-astro, ngl-svelte, rag-service; live-presence has no build script). Per-app: `cd apps/admin && bun run build`, `cd apps/public-astro && bun run build`, `cd apps/links-astro && bun run build`, `cd apps/ngl-svelte && bun run build`, or `cd apps/rag-service && bun run build`
+- **Test:** root has no single test command. `bun run reset:seed` resets+reseeds Admin + RAG data via the dockerized flow (`scripts/docker-dev-reset-seed.sh`, needs `docker compose` up with `.env.docker.dev`); `bun run docker:dev:seed` reseeds without reset. For app tests use `cd apps/rag-service && bun test`, `cd packages/http && bun test`, or `cd packages/contracts && bun test`. Do not invent missing app test commands.
+- **Lint:** root supports `bun run lint` (admin + ngl-svelte filters) and `bun run typecheck` (admin + ngl-svelte check + rag-service filters); app-local: `cd apps/admin && bun run lint`, `cd apps/ngl-svelte && bun run lint` (ngl also `bun run check`). Typecheck also via `cd apps/admin && bun run typecheck` or `cd apps/rag-service && bun run typecheck` (use the app script, not raw `bun x tsc`, which can re-resolve the lockfile).
 
 ## 5. Git Workflow Rules
 
@@ -70,11 +70,12 @@ Authoritative AI control contract for this repository.
 - Self-learn: add a short factual rule here when a task reveals a recurring repo quirk, boundary, command caveat, or security constraint that future agents would otherwise rediscover.
 - Root `README.md` must not describe RAG as API-only; RAG is a direct database actor plus an Admin internal API consumer.
 - Public, Links, and NGL are standalone apps, but they are not allowed to bypass Admin for database access.
-- Legacy phase2 is the visual baseline until the user explicitly replaces it.
+- Visual authority is root `DESIGN.md`; the legacy phase2 neumorphic baseline was retired. Keep UI work on the shared `@naufalrf/design-tokens` (dark-first) and the DESIGN.md per-app scene/layout/motion contract.
+- `neu-*` class names in `admin` (and links/ngl markup) are a backwards-compatible naming layer over flat dark-first token values — do not "restore" neumorphism, and do not rename them outside an explicitly requested refactor.
 - Public-facing apps should expose their own `llms.txt` surface using the canonical structure from `apps/public-astro/public/llms.txt`, adapted to each app’s actual purpose and hostname; keep `llms-full.txt` removed unless the architecture intentionally changes.
 - Root now has local orchestration scripts: `bun run dev:all` starts all apps, and `bun run reset:seed` resets Admin + RAG data, seeds Admin from `data/`, then triggers proper Admin -> RAG ingest.
 - Root hook/tooling is Bun-aligned; remove stale pnpm lockfiles and pnpm-only root docs when updating repo shell docs.
-- Root deployment automation now includes interactive `deploy.py` (run via `uv run deploy.py`) for single-host Paramiko SSH deploys; keep it pull-based on the server and do not turn it into a push-to-server file sync workflow unless the deployment architecture is intentionally changed.
+- Root deployment is pull-based: `scripts/github_webhook_server.py` (HMAC-verified, port 9010) triggers `scripts/github-webhook-deploy.sh` which fetches/checks out `main` and runs `scripts/docker-prod-up.sh` + `scripts/docker-prod-migrate.sh`. Production Postgres is Dokploy-managed (`DB_HOST:-db`). Do not turn this into a push-to-server file sync workflow unless the deployment architecture is intentionally changed.
 
 ## graphify
 

@@ -14,7 +14,8 @@
 - `apps/public-astro` -> `apps/live-presence` websocket rooms for layout-wide cursor presence
 - `apps/links-astro/src/lib/api.ts` -> Admin public about and links endpoints
 - `apps/ngl-svelte/src/lib/api.ts` -> Admin public messages endpoint
-- `apps/admin/src/lib/services/ragIngest.ts` -> RAG `/ingest` endpoint using `X-Service-Token`
+- `apps/admin/src/lib/services/ragIngest.ts` -> RAG `/ingest` endpoint using `X-Service-Token` carrying `RAG_INGEST_SERVICE_TOKEN` (env alias `ADMIN_SERVICE_TOKEN` also accepted)
+- `apps/rag-service/src/admin-client.ts` -> Admin internal APIs using `X-Service-Token` carrying `ADMIN_INTERNAL_API_TOKEN`
 
 ## Boundary rules
 
@@ -30,5 +31,5 @@
 - `/api/v1/public/*` response envelopes and content models
 - `/api/v1/public/auth/sync`
 - `/api/v1/public/messages`
-- RAG `/chat` and `/ingest` request/response envelopes
-- `X-Service-Token` handling between Admin and RAG
+- RAG `/chat`, `/chat/confirm`, and `/ingest` request/response envelopes
+- `X-Service-Token` handling between Admin and RAG (`RAG_INGEST_SERVICE_TOKEN` for Admin->RAG, `ADMIN_INTERNAL_API_TOKEN` for RAG->Admin)

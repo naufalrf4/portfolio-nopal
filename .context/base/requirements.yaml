@@ -4,8 +4,9 @@ functional_requirements:
   - Maintain `apps/admin` as the primary dashboard, content authority, and API authority.
   - Route all `public-astro`, `links-astro`, and `ngl-svelte` data access through Admin HTTP APIs.
   - Keep `apps/live-presence` as an ephemeral websocket-only service for public-site presence rather than turning it into a persistence or Admin-proxy layer.
-  - Allow direct database access only for `apps/admin` and `apps/rag-service`, with RAG scoped to its approved retrieval and ingest responsibilities.
-  - Preserve page, component, and overall design direction from `../naufalrf-portfolio-phase2` across the unfinished apps.
+  - Allow direct database access only for `apps/admin` and `apps/rag-service`, with RAG scoped to its approved `rag`-schema retrieval/ingest responsibilities.
+  - Preserve the root `DESIGN.md` cross-app design contract and the shared `@naufalrf/design-tokens` system across the frontend apps; do not regress to the retired legacy phase2 neumorphic baseline.
+  - Keep the RAG service on the TypeScript/Bun/Hono runtime; the Python/FastAPI implementation was removed.
 
 quality_attributes:
   - Favor explicit service boundaries over convenience cross-calls.
@@ -14,13 +15,13 @@ quality_attributes:
   - Keep commands and workflow instructions app-local when the root does not define a shared command.
 
 non_goals:
-  - Do not invent a shared workspace package manager flow at the root.
+  - Do not invent a shared workspace package manager flow at the root (single root `bun install` / root `bun.lock` is the flow).
   - Do not add speculative feature requirements that are not evidenced yet.
   - Do not move non-admin frontend apps to direct database access.
-  - Do not treat manifest-declared root helpers as canonical if the backing script is missing.
+  - Do not treat manifest-declared root helpers as canonical if the backing script is missing (e.g. `reset:seed` without `reset-seed-rag.sh`).
 
 forbidden_changes:
-  - No direct Neon/Postgres access from `apps/public-astro`, `apps/links-astro`, or `apps/ngl-svelte`.
+  - No direct Postgres access from `apps/public-astro`, `apps/links-astro`, or `apps/ngl-svelte`.
   - No database access or Admin API proxying from `apps/live-presence`.
-  - No design reset that discards the legacy phase2 neumorphic baseline without explicit user direction.
+  - No deviation from the `DESIGN.md` token/visual contract (dark-first, shared tokens) without explicit user direction.
   - No silent expansion of root-level commands beyond what manifests and docs currently define.

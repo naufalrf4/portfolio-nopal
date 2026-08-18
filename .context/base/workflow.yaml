@@ -1,22 +1,23 @@
 root:
-  install: no single root install command; install each app from its own directory
-  dev: bun run dev:all
-  build: no single root build command
+  install: '`bun install` at the root installs all apps + shared packages into the single root `bun.lock`. Per-app installs are unnecessary.'
+  dev: 'bun run dev:all (alias `bun run dev`) -> `bash ./start-dev.sh`, starts all six local services'
+  build: 'bun run build -> bun --filter chain over admin, public-astro, links-astro, ngl-svelte (NOT live-presence or rag-service)'
   test: no single root test command
-  lint: no single root lint command
+  lint: 'bun run lint -> `bun run --filter admin lint && bun run --filter ngl-svelte lint`'
+  typecheck: 'bun run typecheck -> `bun run --filter admin typecheck`'
   hooks:
     pre_commit: bun run lint-staged
     commit_msg: bun run commitlint --edit "$1"
     lint_staged_config: .lintstagedrc.js
   helper_notes:
-    - '`bun run dev:all` is backed by `start-dev.sh` and starts six local services.'
-    - '`bun run reset:seed` is declared in `package.json`, but `reset-seed-rag.sh` is currently missing, so do not rely on it as a working root helper.'
-    - 'Docker development now uses `bun run docker:dev` with `.env.docker.dev`, plus `bun run docker:dev:migrate` and `bun run docker:dev:seed` for database bootstrap flows.'
-    - 'Docker production-like orchestration uses `bun run docker:prod` with `.env.docker.prod` and per-app multi-stage Dockerfiles.'
-
+    - '`bun run dev:all` works, backed by `start-dev.sh` (six local services incl. live-presence).'
+    - '`bun run reset:seed` is declared in `package.json` but `reset-seed-rag.sh` is missing — do NOT rely on it; the docker reset-seed flow is `bun run docker:dev:reset-seed`.'
+    - 'Docker dev: `bun run docker:dev` (+ `docker:dev:down`), bootstrap via `docker:dev:migrate` then `docker:dev:seed`; `docker:dev:reset-seed` resets Admin DB and reseeds.'
+    - 'Docker prod: `bun run docker:prod` (up), `docker:prod:migrate`, `docker:prod:bootstrap`; production DB is a Dokploy-managed postgres service reachable at `DB_HOST:-db`.'
+    - 'Deploy: GitHub webhook server (`scripts/github_webhook_server.py`, HMAC-verified, port 9010) triggers `scripts/github-webhook-deploy.sh` which pulls `main` and runs docker-prod-up + docker-prod-migrate. Pull-based only.'
 app_commands:
   admin:
-    install: cd apps/admin && bun install
+    install: none needed; root `bun install` covers it
     dev: cd apps/admin && bun run dev
     build: cd apps/admin && bun run build
     lint: cd apps/admin && bun run lint
@@ -28,40 +29,40 @@ app_commands:
       - cd apps/admin && bun run db:studio
       - cd apps/admin && bun run db:seed
   public_astro:
-    install: cd apps/public-astro && bun install
+    install: none needed; root `bun install` covers it
     dev: cd apps/public-astro && bun run dev
     build: cd apps/public-astro && bun run build
     preview: cd apps/public-astro && bun run preview
     lint: not defined in manifest
     test: not defined in manifest
   links_astro:
-    install: cd apps/links-astro && bun install
+    install: none needed; root `bun install` covers it
     dev: cd apps/links-astro && bun run dev
     build: cd apps/links-astro && bun run build
     preview: cd apps/links-astro && bun run preview
     lint: not defined in manifest
     test: not defined in manifest
   ngl_svelte:
-    install: cd apps/ngl-svelte && bun install
+    install: none needed; root `bun install` covers it
     dev: cd apps/ngl-svelte && bun run dev
     build: cd apps/ngl-svelte && bun run build
+    check: cd apps/ngl-svelte && bun run check
     lint: cd apps/ngl-svelte && bun run lint
-    typecheck: cd apps/ngl-svelte && bun run check
+    test: no dedicated automated test runner in manifest
   live_presence:
-    install: no install script defined; app currently has no dependency lockfile
+    install: none needed; root `bun install` covers it
     dev: cd apps/live-presence && bun run dev
     start: cd apps/live-presence && bun run start
     build: not defined in manifest
-    lint: not defined in manifest
-    test: not defined in manifest
+    test: none; verify via /health + websocket QA per app-local AGENTS.md
   rag_service:
-    install: cd apps/rag-service/fastapi && uv sync
+    install: none needed; root `bun install` covers it
     dev: cd apps/rag-service && bun run dev
     build: cd apps/rag-service && bun run build
-    typecheck: cd apps/rag-service && bun run typecheck
-    test: cd apps/rag-service/fastapi && uv run pytest
-    lint: cd apps/rag-service/fastapi && uv run ruff check .
-
+    typecheck: cd apps/rag-service && bun x tsc --noEmit
+    test: cd apps/rag-service && bun test
+    lint: not defined in manifest
+    db_bootstrap: cd apps/rag-service && bun run db:bootstrap
 docker_commands:
   dev:
     up: bun run docker:dev
@@ -71,27 +72,27 @@ docker_commands:
     reset_seed: bun run docker:dev:reset-seed
   prod:
     up: bun run docker:prod
+    migrate: bun run docker:prod:migrate
+    bootstrap: bun run docker:prod:bootstrap
   notes:
-    - Use `.env.docker.dev` or `.env.docker.prod` copied from the example files before running compose wrappers.
-    - Docker migrate first bootstraps the `rag` schema/vector extension through `apps/rag-service/fastapi/scripts/bootstrap_db.py`, then runs Admin Drizzle migrations.
-
+    - Use `.env.docker.dev` or `.env.docker.prod` copied from the committed examples before running compose wrappers.
+    - `docker:dev:migrate` first runs `rag-bootstrap` (`bun run db:bootstrap` — rag schema + vector extension), then Admin `db:migrate`.
+    - Dev compose mounts the whole repo (`.:/app`) with a shared `root-node-modules` volume; rag service runs the Bun TS stack, not the removed FastAPI runtime.
 git_process:
-  branch_strategy: not codified in the current repo; default to the user's current branch unless explicitly told otherwise
-  review_flow: not codified in the current repo shell; do not assume auto-PR creation
-  auto_commit: forbidden by default
-  auto_push: forbidden by default
-  push_identity: use only the user's identity
-  co_authors: forbidden unless the user explicitly asks
-
-ignored_local_artifacts:
-  - .agents/
-  - .agent-workspace/
-  - .agent-review/
-  - .evals/
-  - .reviews/
-  - .opencode/
-
+  branch_strategy: not codified in current repo; default user's current branch unless explicitly told otherwise
+  review_flow: not codified in current repo shell; do not assume auto-PR creation
+  auto_commit: forbidden default
+  auto_push: forbidden default
+  push_identity: use only user's identity
+  co_authors: forbidden unless user explicitly asks
+  ignored_local_artifacts:
+    - .agents/
+    - .agent-workspace/
+    - .agent-review/
+    - .evals/
+    - .reviews/
+    - .opencode/
 environment_rules:
-  - Keep env files per app; do not introduce a root runtime `.env`.
-  - Use app-local `.env.example` files as the source for required variables.
-  - Treat service tokens and database URLs as secrets that must never be committed.
+  - Keep env files per app; do not introduce root runtime `.env`.
+  - Use app-local `.env.example` files for variables; docker wrappers use `.env.docker.dev` / `.env.docker.prod`.
+  - Treat service tokens and database URLs as secrets; never commit them.

@@ -4,9 +4,9 @@ phases:
   - name: steering-and-boundaries
     goal: lock shared project truth, per-app agent contracts, and security guardrails
     status: in_progress
-  - name: legacy-design-parity
-    goal: bring public-facing pages and shared UI components into end-to-end parity with `../naufalrf-portfolio-phase2`
-    status: pending
+  - name: design-contract-parity
+    goal: align all four frontend apps with the root `DESIGN.md` cross-app design contract and shared `@naufalrf/design-tokens` (replaces the retired legacy phase2 neumorphic baseline)
+    status: in_progress
   - name: admin-and-api-hardening
     goal: stabilize Admin as content/API authority and tighten auth, CORS, token, and database access rules
     status: pending
@@ -17,16 +17,16 @@ phases:
     goal: keep the live websocket presence layer ephemeral, page-aware, and cleanly integrated with the public site without adding persistence or Admin coupling
     status: pending
   - name: rag-hardening
-    goal: keep RAG schema/database access least-privileged and preserve contract compatibility with Admin and public chat clients
+    goal: keep the TS/Bun/Hono RAG service's rag-schema/database access least-privileged and preserve contract compatibility with Admin and public chat clients
     status: pending
 
 known_dependencies:
   - Admin public APIs are upstream dependencies for Public, Links, and NGL.
   - '`apps/public-astro` presence UI depends on the websocket event contract exposed by `apps/live-presence`.'
   - Admin service-token and content contracts are upstream dependencies for RAG.
-  - Legacy phase2 design files are the baseline for future UI parity work.
+  - Root `DESIGN.md` + `packages/design-tokens/tokens.css` are the baseline for all UI work across the four frontend apps.
 
 known_unknowns:
-  - No root-level release or CI process is defined yet.
-  - App-level automated test coverage is uneven.
-  - Production deployment conventions are not fully captured in this repo shell.
+  - No root-level release or CI process is defined yet (deploy is webhook-triggered pull + docker compose; no CI checks).
+  - App-level automated test coverage is uneven (RAG has `bun test`; admin/public/links/ngl/live-presence have no dedicated runners).
+  - Production environment parity between Dokploy-managed Postgres and the local dockerized pgvector DB is assumed, not fully verified.

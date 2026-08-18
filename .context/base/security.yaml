@@ -34,15 +34,15 @@ current_observations:
       - ADMIN_INTERNAL_API_TOKEN for RAG -> Admin internal API calls
       - RAG_INGEST_SERVICE_TOKEN for Admin -> RAG ingest calls
       - Admin API URL backchannel
-    docs_surface: '`/docs` and `/redoc` stay disabled when `APP_ENV=production`'
-    ingress_headers: Caddy serves HSTS plus `Content-Security-Policy-Report-Only` and `Permissions-Policy` for staged browser hardening
+    docs_surface: no `/docs` or `/redoc` endpoints exist on the TS/Hono runtime; docs endpoints were removed with the FastAPI implementation
+    ingress_headers: Caddy (docker/caddy/Caddyfile) serves HSTS plus `Content-Security-Policy-Report-Only` and `Permissions-Policy` for staged browser hardening
     public_edge_exposure: raw `/chat` should stay internal-only behind the public Astro proxy rather than a dedicated public RAG hostname
 
 recommended_hardening_from_user_direction_and_reference_research:
-  - Use distinct Neon/Postgres roles for Admin, RAG, and migrations; do not share a single super-role.
+  - Use distinct Postgres roles for Admin, RAG, and migrations; do not share a single super-role.
   - Keep Public, Links, and NGL on API-only access.
   - Scope RAG database access to approved schemas/tables and least privilege.
-  - Prefer Neon connection pooling for direct actors.
+  - Prefer connection pooling for direct actors.
   - Restrict production database access with allowlists or equivalent network controls.
   - Keep service tokens and database URLs in secrets storage only.
   - Rotate service tokens and non-user credentials on a regular cadence.
@@ -53,7 +53,7 @@ recommended_hardening_from_user_direction_and_reference_research:
   - Keep production app containers non-root, read-only, and `no-new-privileges` unless a verified runtime requirement forces a narrower exception.
 
 database_policy:
-  centralized_database: Neon/Postgres
+  centralized_database: 'Postgres (pgvector image); local dev via dockerized `db` service, production via Dokploy-managed Postgres at `DB_HOST:-db`. Neon references were removed from compose and env examples.'
   direct_db_actors:
     - apps/admin
     - apps/rag-service
@@ -69,3 +69,4 @@ known_gaps_or_unverified_items:
   - No CI-enforced security checks were found.
   - No root-level healthcheck or automated verification command exists for `apps/live-presence`; current verification remains manual.
   - The hardening recommendations above come from the user's security-improvement direction plus external best-practice research, not from already-enforced repo policy.
+  - Production/development DB parity (Dokploy-managed Postgres vs local dockerized pgvector) is assumed, not verified.

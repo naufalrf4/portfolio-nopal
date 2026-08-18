@@ -16,7 +16,7 @@ Bun workspace monorepo for independent app repos under `apps/*` and shared packa
   - Next.js 16 app.
   - Primary content authority.
   - Hosts the admin dashboard plus `/api/v1/public`, `/api/v1/admin`, and `/api/v1/internal` routes.
-  - Uses Drizzle and `postgres` directly against the centralized Neon/Postgres database.
+  - Uses Drizzle and `postgres` directly against the centralized Postgres database.
 - `apps/public-astro`
   - Astro 5 + React public portfolio.
   - Reads portfolio content from Admin public APIs.
@@ -42,7 +42,7 @@ Bun workspace monorepo for independent app repos under `apps/*` and shared packa
 
 ## Database ownership
 
-- The repository uses one centralized Neon/Postgres database.
+- The repository uses one centralized Postgres database (dockerized `pgvector/pgvector` locally, Dokploy-managed in production).
 - Admin owns the primary application schema and operational content flows.
 - RAG is the only non-admin service allowed to connect directly to the database, and that access should stay scoped to RAG-specific schemas/tables plus explicitly approved reads.
 - Public, Links, and NGL stay API-only consumers.
@@ -59,9 +59,8 @@ Bun workspace monorepo for independent app repos under `apps/*` and shared packa
 
 ## Design baseline
 
-- The target visual language comes from `../naufalrf-portfolio-phase2`.
-- Current evidence already shows partial carryover in the Astro apps via `Neu*` components, light neumorphic surfaces, and shared palette choices.
-- Future UI work should preserve that baseline rather than introducing a new visual system ad hoc.
+- The visual authority is root `DESIGN.md` (dark-first, shared `@naufalrf/design-tokens`).
+- The legacy `../naufalrf-portfolio-phase2` neumorphic baseline was explicitly retired and replaced by DESIGN.md (commits `f70d51b`, `a61a7e9`, `cfaf77c`); `public-astro` renamed Neu* components to Card/Button/Badge/Input/Textarea and `admin` keeps `neu-*` names as a flat dark-first naming layer.
 
 ## Repo truth notes
 

@@ -1,55 +1,47 @@
-# Legacy Phase2 UI Baseline
+# Cross-App Design Contract (DESIGN.md)
 
-The unfinished apps in this repository should follow the design and page structure of `../naufalrf-portfolio-phase2` unless the user gives a newer design direction.
+The visual authority is root `DESIGN.md` — the single source of truth for all four frontend apps (`public-astro`, `links-astro`, `ngl-svelte`, `admin`). It replaced the legacy `../naufalrf-portfolio-phase2` neumorphic baseline; the user explicitly directed the migration (commits `f70d51b`, `a61a7e9`, `cfaf77c`).
 
-## Visual language
+## Token system
 
-- Light-mode neumorphism is the baseline.
-- Primary palette evidenced in legacy and partially mirrored now:
-  - background/surface: `#E0E5EC`
-  - primary accent: `#3B82F6`
-  - primary text: `#3D4852`
-- Fonts evidenced in legacy docs: Plus Jakarta Sans, DM Sans, and JetBrains Mono.
-- Motion should stay soft and utility-driven: fade, slide, zoom, shimmer, and reveal transitions.
+- One canonical CSS token source: `packages/design-tokens/tokens.css` (package `@naufalrf/design-tokens`).
+- All apps import it via `@import '@naufalrf/design-tokens';` in their entry CSS. No app-local color tokens; no hardcoded hex in UI.
+- **Dark-first.** Dark is the default; light is an optional `[data-theme='light']` toggle. Both pass WCAG AA.
+- Key tokens: `--bg` `#0f1115` / `--bg-elevated` / `--bg-card`, `--border` `#1c2029`, `--text-primary` `#e8eaed`, `--teal` `#3ed9c4` (primary accent), `--amber` `#f2a64c` (secondary accent), `--green` (availability dots), `--error`.
+- Typography: Space Grotesk (display), Inter (body), JetBrains Mono (meta/code) — mapped to `--font-display`, `--font-sans`, `--font-mono`.
+- Radii: `--radius-container` 16px, `--radius-card`/`--radius-base` 12px, `--radius-inner` 8px.
+- Shadows are flat dark-first (e.g. `0 2px 8px -2px rgba(0,0,0,0.3)`). No light neumorphic dual shadows (`rgba(163,177,198)` etc.).
 
-## Shared primitives to preserve
+## Per-app direction
 
-- `NeuButton`
-- `NeuCard`
-- `NeuBadge`
-- `Section`
-- Navbar / Footer / Mobile navigation patterns
-- Floating background shapes or similarly soft depth cues where already part of the design language
+| App | Direction |
+|---|---|
+| `public-astro` | Cinematic portfolio narrative, persistent WebGL scene (Track E), asymmetric editorial grids |
+| `links-astro` | Compact identity transmission panel, lightweight ambience |
+| `ngl-svelte` | Anonymous message terminal, restrained radar/signal field |
+| `admin` | Operational dashboard: persistent left nav, compact header, dense tables/forms. **NO WebGL, NO cinematic animation** |
 
-## Public-app page baseline
+## Motion rules
 
-Legacy public app evidence shows these pages and sections as the baseline:
+- `transform`/`opacity`/`filter` only — never animate layout properties.
+- `prefers-reduced-motion: reduce` collapses all motion to static.
+- No `window.addEventListener('scroll')`; use `useScroll()`/ScrollTrigger. Marquee max 1 per page.
+- Admin: instant hover border-color 150ms, skeleton shimmer (`neu-skeleton`), modal 200/150ms scale+fade. No scroll reveals, no parallax, no magnetic physics.
 
-- `/` homepage with hero, technical expertise, featured projects, latest articles, and guestbook
-- `/projects` list and `/projects/[slug]` detail pages
-- `/about`
-- `/blogs`
-- `/contact`
-- `/ai-chatbot`
-- auth error/sign-in pages and 404 states
+## Neu-naming debt (accepted, do not "fix")
 
-## Admin baseline
+- `neu-*` utility class names persist in `admin` (and links/ngl markup) as a backwards-compatible naming layer, but the values resolve flat dark-first tokens, not neumorphism. Renaming 100+ admin class references is deferred low-risk cosmetic debt.
+- `public-astro` renamed components NeuCard→Card, NeuButton→Button, NeuBadge→Badge, NeuInput→Input, NeuTextarea→Textarea; zero `neu` references remain there.
+- `graphify-out/` may contain stale `neumorphic_styles` node labels; they self-update on next `graphify update`.
 
-- Dashboard layout with sidebar, sticky header, bottom nav, and responsive content shell
-- Route-group-based admin pages for projects, messages, settings, analytics, and content operations
-- Consistent loading/error/empty-state handling per page
+## Functional preservation (non-negotiable during any visual work)
 
-## Current carryover already visible in this repo
-
-- `apps/public-astro/src/components/shared/NeuButton.tsx`
-- `apps/public-astro/src/pages/index.astro`
-- `apps/links-astro/src/pages/index.astro`
-- `apps/ngl-svelte/src/routes/+page.svelte`
-- `apps/admin/src/app/(dashboard)/layout.tsx`
+- Routing, all API routes/proxies, form submissions (contact/booking/guestbook/anonymous), Google sign-in, AI chat, analytics, SEO/structured data.
+- Admin RBAC and all CRUD/form/table flows.
+- Public/Links/NGL stay API-only consumers; Admin keeps API authority.
 
 ## Rules for future UI work
 
-- Prefer extending the existing `Neu*` vocabulary over introducing a second visual language.
-- Keep light neumorphic surfaces, rounded corners, and soft shadow depth consistent across apps.
-- Match legacy page coverage and section sequencing before inventing new layouts.
-- Preserve mobile navigation and responsive spacing patterns from the legacy baseline.
+- Extend the shared token vocabulary; never introduce a second visual language or app-local colors.
+- Track E (persistent WebGL scene in `public-astro`) is not yet implemented — current hero uses section-local effects; DESIGN.md section 8 lists it as accepted visual debt.
+- Verify token parity with `grep -E '^\s+--(bg|border|text|teal|amber|radius)' packages/design-tokens/tokens.css` before changing UI values.

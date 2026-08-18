@@ -3,10 +3,19 @@ repository:
   type: root-shell
   runtime:
     node: '>=22.0.0'
-  package_manager: none-at-root
+  package_manager: Bun workspaces at root; single root `bun.lock` is the only lockfile (app-level `bun.lock` files were removed)
   version_sources:
     - package manifests in each app
-    - app-local lockfiles (`bun.lock`, `uv.lock`)
+    - root `bun.lock`
+  root_scripts:
+    - dev / dev:all -> `bash ./start-dev.sh` (six local services)
+    - build -> `NODE_OPTIONS=--max-old-space-size=4096 bun run --filter admin build && ... --filter public-astro/links-astro/ngl-svelte build`
+    - lint -> `bun run --filter admin lint && bun run --filter ngl-svelte lint`
+    - typecheck -> `bun run --filter admin typecheck`
+    - reset:seed -> declared but backing `./reset-seed-rag.sh` is MISSING (broken)
+    - docker:dev / docker:dev:down / docker:dev:migrate / docker:dev:seed / docker:dev:reset-seed -> `scripts/docker-dev-*.sh`
+    - docker:prod / docker:prod:migrate / docker:prod:bootstrap -> `scripts/docker-prod-*.sh`
+    - lint-staged / commitlint hooks
 
 apps:
   admin:
@@ -14,38 +23,38 @@ apps:
     framework: Next.js 16.1.1
     language: TypeScript
     runtime: Bun + Node-compatible Next runtime
-    styling: Tailwind CSS 4 + Radix UI + custom neumorphic utility classes
-    database: Drizzle ORM 0.45.1 + postgres 3.4.8 against centralized Neon/Postgres
+    styling: Tailwind CSS 4 + Radix UI/shadcn; `neu-*` utility names retained as naming layer over flat dark-first token values
+    database: Drizzle ORM 0.45.1 + postgres 3.4.8 against the centralized Postgres
     auth: NextAuth 5 beta + Google OAuth allowlist
-    testing_stack: typecheck only evidenced in manifest; no dedicated test script found
-    lockfile: apps/admin/bun.lock
+    testing_stack: typecheck + lint + build in manifest; no dedicated automated test script
+    lockfile: none (root `bun.lock` only)
   public_astro:
     path: apps/public-astro
     framework: Astro 5.17.1 + React 19.2.4
     language: TypeScript
     runtime: Bun
-    styling: Tailwind CSS 4 + neumorphic React/Astro components + Framer Motion
+    styling: Tailwind CSS 4 + dark-first design tokens + Framer Motion; shared Neu* components renamed to Card/Button/Badge/Input/Textarea
     data_access: Admin public API + direct browser/server fetch to RAG service for chat
-    testing_stack: no lint or test script found in manifest
-    lockfile: apps/public-astro/bun.lock
+    testing_stack: build only in manifest; no lint or automated test script
+    lockfile: none (root `bun.lock` only)
   links_astro:
     path: apps/links-astro
     framework: Astro 5.17.1 + React 19.2.4
     language: TypeScript
     runtime: Bun
-    styling: Tailwind CSS 4 + neumorphic Astro components
+    styling: Tailwind CSS 4 + dark-first design tokens; `neu-*` class names in markup resolve shared token values
     data_access: Admin public API only
-    testing_stack: no lint or test script found in manifest
-    lockfile: apps/links-astro/bun.lock
+    testing_stack: build only in manifest; no lint or automated test script
+    lockfile: none (root `bun.lock` only)
   ngl_svelte:
     path: apps/ngl-svelte
     framework: SvelteKit 2.50.2 + Svelte 5.51.0
     language: TypeScript
     runtime: Bun + Vite
-    styling: Tailwind CSS 4 + custom neumorphic utility classes
+    styling: Tailwind CSS 4 + dark-first design tokens
     data_access: Admin public API only
-    testing_stack: svelte-check + eslint + prettier; no dedicated automated test runner found
-    lockfile: apps/ngl-svelte/bun.lock
+    testing_stack: svelte-check + eslint + prettier; no dedicated automated test runner
+    lockfile: none (root `bun.lock` only)
   live_presence:
     path: apps/live-presence
     framework: Bun native server/websocket runtime
@@ -53,17 +62,18 @@ apps:
     runtime: Bun
     styling: none
     data_access: no database or Admin API access; ephemeral websocket rooms only
-    testing_stack: no build, lint, or automated test script found; app-local AGENTS directs verification through `bun run start`, `/health`, and websocket QA
-    lockfile: no lockfile found
+    testing_stack: no build, lint, or automated test script; app-local AGENTS directs verification through `bun run start`, `/health`, and websocket QA
+    lockfile: none (root `bun.lock` only)
   rag_service:
     path: apps/rag-service
-    framework: FastAPI >=0.115,<1 with Uvicorn
-    language: Python 3.12+
-    wrapper_runtime: Bun scripts shelling into `fastapi/`
-    data_access: direct Postgres/pgvector access via SQLAlchemy async engine
-    ai_stack: Google Gemini via `google-genai`
-    testing_stack: pytest + pytest-asyncio + ruff in `fastapi/pyproject.toml`
-    lockfile: apps/rag-service/fastapi/uv.lock
+    framework: TypeScript on Bun + Hono (rewritten from Python FastAPI, commit 907aef6)
+    language: TypeScript
+    runtime: Bun
+    data_access: direct Postgres/pgvector access via `postgres` (postgres.js) on the `rag` schema
+    ai_stack: Google Gemini via REST provider modules (`src/llm-provider.ts`), configurable models/embedding
+    database_bootstrap: `bun run db:bootstrap` (src/db-bootstrap.ts) creates rag schema + vector extension
+    testing_stack: `bun test` (`src/llm-provider.test.ts`, `src/agentic-tools.test.ts`), `bun x tsc --noEmit`, `bun run build`
+    lockfile: none (root `bun.lock` only)
 
 shared_tooling:
   root_hooks:
@@ -72,3 +82,6 @@ shared_tooling:
     - lint-staged
     - root ESLint config
   ci: no `.github/workflows` directory found
+  deploy:
+    - GitHub webhook pull-based deploy: `scripts/github_webhook_server.py` (HMAC-verified) -> `scripts/github-webhook-deploy.sh` (fetch/checkout/pull + docker-prod-up + docker-prod-migrate)
+    - Docker/Dokploy: `docker-compose.prod.yml` runs all services; production Postgres is a Dokploy-managed `pgvector/pgvector` container (`DB_HOST:-db`)
