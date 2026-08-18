@@ -31,7 +31,7 @@ services:
       ADMIN_INTERNAL_API_TOKEN: ${ADMIN_INTERNAL_API_TOKEN}
       ADMIN_PUBLIC_API_ALLOWED_ORIGINS: ${ADMIN_PUBLIC_API_ALLOWED_ORIGINS}
       RAG_INGEST_SERVICE_TOKEN: ${RAG_INGEST_SERVICE_TOKEN}
-      FASTAPI_RAG_SERVICE_URL: http://rag:3005
+      RAG_SERVICE_URL: http://rag:3005
       NODE_ENV: development
       PORT: 3001
       GCS_PROJECT_ID: ${ADMIN_GCS_PROJECT_ID}
@@ -65,15 +65,16 @@ services:
 
   rag:
     build:
-      context: ./apps/rag-service
+      context: .
+      dockerfile: apps/rag-service/Dockerfile
       target: dev
-    working_dir: /app/fastapi
+    working_dir: /app/apps/rag-service
     environment:
       APP_ENV: development
       HOST: 0.0.0.0
       PORT: 3005
       LOG_LEVEL: ${RAG_LOG_LEVEL}
-      RAG_DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      RAG_DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
       ADMIN_API_URL: http://admin:3001
       ADMIN_INTERNAL_API_TOKEN: ${ADMIN_INTERNAL_API_TOKEN}
       RAG_INGEST_SERVICE_TOKEN: ${RAG_INGEST_SERVICE_TOKEN}
@@ -92,8 +93,8 @@ services:
     ports:
       - '${RAG_PORT:-3005}:3005'
     volumes:
-      - ./apps/rag-service/fastapi:/app/fastapi
-      - rag-venv-dev:/app/fastapi/.venv
+      - .:/app
+      - root-node-modules:/app/node_modules
     depends_on:
       db:
         condition: service_healthy
@@ -102,35 +103,17 @@ services:
 
   rag-bootstrap:
     build:
-      context: ./apps/rag-service
+      context: .
+      dockerfile: apps/rag-service/Dockerfile
       target: dev
-    working_dir: /app/fastapi
-    command: ['uv', 'run', 'python', 'scripts/bootstrap_db.py']
+    working_dir: /app/apps/rag-service
+    command: ['bun', 'run', 'db:bootstrap']
     environment:
-      PYTHONPATH: /app/fastapi
       APP_ENV: development
-      HOST: 0.0.0.0
-      PORT: 3005
-      LOG_LEVEL: ${RAG_LOG_LEVEL}
-      RAG_DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
-      ADMIN_API_URL: http://admin:3001
-      ADMIN_INTERNAL_API_TOKEN: ${ADMIN_INTERNAL_API_TOKEN}
-      RAG_INGEST_SERVICE_TOKEN: ${RAG_INGEST_SERVICE_TOKEN}
-      GEMINI_API_KEY: ${RAG_GEMINI_API_KEY}
-      EMBEDDING_MODEL: ${RAG_EMBEDDING_MODEL}
-      EMBEDDING_DIMENSION: ${RAG_EMBEDDING_DIMENSION}
-      CHAT_MODEL: ${RAG_CHAT_MODEL}
-      CONTEXT_MODEL: ${RAG_CONTEXT_MODEL}
-      ADMIN_API_TIMEOUT_MS: ${RAG_ADMIN_API_TIMEOUT_MS}
-      CORS_ORIGINS: ${RAG_CORS_ORIGINS}
-      CHUNK_TARGET_TOKENS: ${RAG_CHUNK_TARGET_TOKENS}
-      CHUNK_OVERLAP_TOKENS: ${RAG_CHUNK_OVERLAP_TOKENS}
-      INGESTION_BATCH_SIZE: ${RAG_INGESTION_BATCH_SIZE}
-      RETRIEVAL_LIMIT: ${RAG_RETRIEVAL_LIMIT}
-      CHAT_HISTORY_LIMIT: ${RAG_CHAT_HISTORY_LIMIT}
+      RAG_DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
     volumes:
-      - ./apps/rag-service/fastapi:/app/fastapi
-      - rag-venv-dev:/app/fastapi/.venv
+      - .:/app
+      - root-node-modules:/app/node_modules
     depends_on:
       db:
         condition: service_healthy
@@ -220,4 +203,3 @@ services:
 volumes:
   db-data-dev:
   root-node-modules:
-  rag-venv-dev:

@@ -4,7 +4,7 @@
   "description": "Meta repository for standalone apps under apps/*",
   "scripts": {
     "dev:all": "bash ./start-dev.sh",
-    "reset:seed": "bash ./reset-seed-rag.sh",
+    "reset:seed": "bash ./scripts/docker-dev-reset-seed.sh",
     "docker:dev": "bash ./scripts/docker-dev-up.sh",
     "docker:dev:down": "bash ./scripts/docker-dev-down.sh",
     "docker:dev:migrate": "bash ./scripts/docker-dev-migrate.sh",
@@ -16,9 +16,9 @@
     "lint-staged": "lint-staged",
     "commitlint": "commitlint",
     "dev": "bash ./start-dev.sh",
-    "build": "NODE_OPTIONS=--max-old-space-size=4096 bun run --filter admin build && bun run --filter public-astro build && bun run --filter links-astro build && bun run --filter ngl-svelte build",
+    "build": "NODE_OPTIONS=--max-old-space-size=4096 bun run --filter admin build && bun run --filter public-astro build && bun run --filter links-astro build && bun run --filter ngl-svelte build && bun run --filter rag-service build",
     "lint": "bun run --filter admin lint && bun run --filter ngl-svelte lint",
-    "typecheck": "bun run --filter admin typecheck"
+    "typecheck": "bun run --filter admin typecheck && bun run --filter ngl-svelte check && bun run --filter rag-service typecheck"
   },
   "devDependencies": {
     "@commitlint/cli": "^20.1.0",
