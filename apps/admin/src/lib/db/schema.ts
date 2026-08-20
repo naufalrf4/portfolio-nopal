@@ -35,7 +35,7 @@ const vector = customType<{
   config: { dimensions: number };
 }>({
   dataType(config) {
-    return `vector(${config?.dimensions ?? 768})`;
+    return `vector(${config?.dimensions ?? 1536})`;
   },
   toDriver(value) {
     return `[${value.join(',')}]`;
@@ -348,7 +348,7 @@ export const ragChunks = rag.table(
     metadata: jsonb()
       .default(sql`'{}'::jsonb`)
       .notNull(),
-    embedding: vector('embedding', { dimensions: 768 }).notNull(),
+    embedding: vector('embedding', { dimensions: 1536 }).notNull(),
     createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
@@ -801,12 +801,12 @@ export const llmSettings = pgTable('llm_settings', {
   fallbackModel: text('fallback_model'),
 
   // Embedding slot
-  embeddingProvider: text('embedding_provider').notNull().default('gemini'),
+  embeddingProvider: text('embedding_provider').notNull().default('openai-compatible'),
   embeddingBaseUrl: text('embedding_base_url').notNull().default(''),
   embeddingApiKey: text('embedding_api_key').notNull().default(''),
-  embeddingModel: text('embedding_model').notNull().default('gemini-embedding-001'),
+  embeddingModel: text('embedding_model').notNull().default('text-embedding-3-small'),
 
-  embeddingDimension: integer('embedding_dimension').notNull().default(768),
+  embeddingDimension: integer('embedding_dimension').notNull().default(1536),
 
   createdAt: timestamp({ precision: 3, mode: 'string' })
     .default(sql`CURRENT_TIMESTAMP`)

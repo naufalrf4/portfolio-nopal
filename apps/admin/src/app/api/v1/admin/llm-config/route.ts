@@ -86,7 +86,7 @@ async function handlePut(req: NextRequest) {
           embeddingBaseUrl: data.embeddingBaseUrl,
           embeddingApiKey: data.embeddingApiKey,
           embeddingModel: data.embeddingModel,
-          embeddingDimension: data.embeddingDimension ?? 768,
+          embeddingDimension: data.embeddingDimension ?? 1536,
           updatedAt: now,
         })
         .where(eq(llmSettings.id, existing.id));
@@ -108,7 +108,7 @@ async function handlePut(req: NextRequest) {
       embeddingBaseUrl: data.embeddingBaseUrl,
       embeddingApiKey: data.embeddingApiKey,
       embeddingModel: data.embeddingModel,
-      embeddingDimension: data.embeddingDimension ?? 768,
+      embeddingDimension: data.embeddingDimension ?? 1536,
       createdAt: now,
       updatedAt: now,
     });

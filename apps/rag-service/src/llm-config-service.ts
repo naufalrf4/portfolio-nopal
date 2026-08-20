@@ -152,7 +152,7 @@ export async function resolveLlmConfig(): Promise<FullLlmConfig> {
 }
 
 function buildEnvFallbackConfig(): FullLlmConfig {
-  if (!config.geminiApiKey) {
+  if (!config.openaiApiKey) {
     throw new RagServiceError(
       "No LLM API key configured (neither Admin config nor env).",
       "LLM_API_KEY_NOT_CONFIGURED",
@@ -161,15 +161,15 @@ function buildEnvFallbackConfig(): FullLlmConfig {
   }
   return {
     main: {
-      provider: "gemini",
-      baseUrl: "",
-      apiKey: config.geminiApiKey,
+      provider: "openai-compatible",
+      baseUrl: "https://api.openai.com",
+      apiKey: config.openaiApiKey,
       model: config.chatModel,
     },
     embedding: {
-      provider: "gemini",
-      baseUrl: "",
-      apiKey: config.geminiApiKey,
+      provider: "openai-compatible",
+      baseUrl: "https://api.openai.com",
+      apiKey: config.openaiApiKey,
       model: config.embeddingModel,
     },
   };

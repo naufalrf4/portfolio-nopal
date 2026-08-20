@@ -37,10 +37,11 @@ export const config = {
   adminInternalApiToken: env("ADMIN_INTERNAL_API_TOKEN", ""),
   ragIngestServiceToken: env("RAG_INGEST_SERVICE_TOKEN", ""),
 
-  geminiApiKey: env("GEMINI_API_KEY", ""),
-  embeddingModel: env("EMBEDDING_MODEL", "gemini-embedding-001"),
-  embeddingDimension: envInt("EMBEDDING_DIMENSION", 768),
-  chatModel: env("CHAT_MODEL", "gemini-2.5-flash"),
+  // ponytail: env fallback assumes OpenAI-compatible for embeddings; swap to GEMINI_API_KEY + gemini provider if reverting to Gemini embeddings.
+  openaiApiKey: env("OPENAI_API_KEY", ""),
+  embeddingModel: env("EMBEDDING_MODEL", "text-embedding-3-small"),
+  embeddingDimension: envInt("EMBEDDING_DIMENSION", 1536),
+  chatModel: env("CHAT_MODEL", "gpt-4o-mini"),
   adminApiTimeoutMs: envInt("ADMIN_API_TIMEOUT_MS", 5000),
 
   corsOrigins: env("CORS_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000")

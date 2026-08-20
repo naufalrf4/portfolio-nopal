@@ -50,8 +50,8 @@ export default function AISettingsPage() {
   const [main, setMain] = useState<SlotState>({ provider: 'gemini', baseUrl: '', apiKey: '', model: 'gemini-2.5-flash', modelOptions: [], loadingModels: false, existingApiKey: '' });
   const [fallback, setFallback] = useState<SlotState>({ provider: 'gemini', baseUrl: '', apiKey: '', model: '', modelOptions: [], loadingModels: false, existingApiKey: '' });
   const [fallbackEnabled, setFallbackEnabled] = useState(false);
-  const [embedding, setEmbedding] = useState<SlotState>({ provider: 'gemini', baseUrl: '', apiKey: '', model: 'gemini-embedding-001', modelOptions: [], loadingModels: false, existingApiKey: '' });
-  const [embeddingDim, setEmbeddingDim] = useState(768);
+  const [embedding, setEmbedding] = useState<SlotState>({ provider: 'openai-compatible', baseUrl: 'https://api.openai.com', apiKey: '', model: 'text-embedding-3-small', modelOptions: [], loadingModels: false, existingApiKey: '' });
+  const [embeddingDim, setEmbeddingDim] = useState(1536);
 
   // Load existing config
   useEffect(() => {
@@ -66,7 +66,7 @@ export default function AISettingsPage() {
           setFallback(prev => ({ ...prev, provider: d.fallbackProvider!, baseUrl: d.fallbackBaseUrl, apiKey: d.fallbackApiKey, model: d.fallbackModel, existingApiKey: d.fallbackApiKey }));
         }
         setEmbedding(prev => ({ ...prev, provider: d.embeddingProvider, baseUrl: d.embeddingBaseUrl, apiKey: d.embeddingApiKey, model: d.embeddingModel, existingApiKey: d.embeddingApiKey }));
-        setEmbeddingDim(d.embeddingDimension ?? 768);
+        setEmbeddingDim(d.embeddingDimension ?? 1536);
       })
       .catch(() => {});
   }, []);
@@ -291,7 +291,7 @@ export default function AISettingsPage() {
             <input
               type="number"
               value={embeddingDim}
-              onChange={e => setEmbeddingDim(Number(e.target.value) || 768)}
+              onChange={e => setEmbeddingDim(Number(e.target.value) || 1536)}
               className="w-full rounded-xl border border-[var(--line)] bg-[var(--bg-card)] px-4 py-2.5 text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--teal)]"
             />
           </div>
