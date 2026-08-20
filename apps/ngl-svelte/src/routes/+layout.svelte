@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { env } from '$env/dynamic/public';
 	import LivePresenceBadge from '$lib/LivePresenceBadge.svelte';
+	import ThemeToggler from '$lib/ThemeToggler.svelte';
 	import '../app.css';
 
 	const title = 'Anonymous Message - NaufalRF Portfolio';
@@ -54,6 +55,9 @@
 </svelte:head>
 
 <div class="ngl-root">
+	<div class="fixed right-4 top-4 z-50">
+	<ThemeToggler />
+	</div>
 	<LivePresenceBadge socketUrl={livePresenceSocketUrl} />
 	{@render children()}
 </div>

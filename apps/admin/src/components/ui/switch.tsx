@@ -11,12 +11,12 @@ function Switch({ className, ...props }: React.ComponentProps<typeof SwitchPrimi
       data-slot="switch"
       className={cn(
         'peer inline-flex h-7 w-14 shrink-0 items-center rounded-full',
-        'bg-[var(--bg-elevated)]',
+        'bg-[var(--bg)] border-[var(--border)]',
         'transition-all duration-300 ease-out',
         'outline-none',
         'shadow-neu-inset',
-        'data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-[var(--teal)] data-[state=checked]:to-[var(--amber)]',
-        'data-[state=checked]:shadow-neu-inset',
+        'data-[state=checked]:bg-[var(--teal)] data-[state=checked]:border-[var(--teal)]',
+        'data-[state=checked]:shadow-none',
         'focus-visible:ring-2 focus-visible:ring-[var(--teal)]/30 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-elevated)]',
         'disabled:cursor-not-allowed disabled:opacity-50',
         className
@@ -27,13 +27,11 @@ function Switch({ className, ...props }: React.ComponentProps<typeof SwitchPrimi
         data-slot="switch-thumb"
         className={cn(
           'pointer-events-none block h-5 w-5 rounded-full',
-          'bg-[var(--bg-elevated)]',
+          'bg-[var(--text-tertiary)]',
           'transition-all duration-300 ease-out',
-          'shadow-neu-extruded',
           'data-[state=unchecked]:translate-x-1',
           'data-[state=checked]:translate-x-8',
-          'data-[state=checked]:bg-[var(--bg-elevated)]',
-          'data-[state=checked]:shadow-neu-extruded',
+          'data-[state=checked]:bg-white',
           'hover:scale-105'
         )}
       />

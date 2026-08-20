@@ -26,7 +26,7 @@ const buttonVariants = cva(
           'active:shadow-neu-inset',
         ].join(' '),
         primary: [
-          'bg-gradient-to-r from-[var(--teal)] to-[var(--amber)] text-white',
+          'bg-[var(--teal)] text-white',
           'shadow-neu-extruded',
           'hover:translate-y-[-1px] hover:brightness-110',
           'hover:shadow-neu-extruded',
@@ -34,7 +34,7 @@ const buttonVariants = cva(
           'active:shadow-neu-inset',
         ].join(' '),
         destructive: [
-          'bg-gradient-to-r from-red-500 to-red-600 text-white',
+          'bg-[var(--error)] text-white',
           'shadow-neu-extruded',
           'hover:translate-y-[-1px] hover:brightness-110',
           'hover:shadow-neu-extruded',
@@ -42,7 +42,7 @@ const buttonVariants = cva(
           'active:shadow-neu-inset',
         ].join(' '),
         outline: [
-          'bg-transparent border-2 border-[#D1D5DB] text-foreground',
+          'bg-transparent border-[var(--border)] text-foreground',
           'shadow-neu-extruded',
           'hover:bg-[var(--bg-elevated)] hover:translate-y-[-1px]',
           'hover:shadow-neu-extruded',

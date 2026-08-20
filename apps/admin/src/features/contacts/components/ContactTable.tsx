@@ -29,17 +29,11 @@ export function ContactTable({
   const isAllSelected = selectedIds.size === contacts.length && contacts.length > 0;
 
   return (
-    <div
-      className="rounded-[var(--radius-container)] overflow-hidden bg-[var(--bg-elevated)]"
-      style={{
-        boxShadow:
-          '12px 12px 24px rgba(163, 177, 198, 0.6), -12px -12px 24px rgba(255, 255, 255, 0.5)',
-      }}
-    >
+    <div className="rounded-[var(--radius-container)] overflow-hidden border-[var(--border)] bg-[var(--bg-card)]">
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-[#A3B1C6]/20">
+            <tr className="border-b border-[var(--border)]">
               <th className="px-6 py-4 text-left">
                 <Checkbox checked={isAllSelected} onCheckedChange={onSelectAll} />
               </th>

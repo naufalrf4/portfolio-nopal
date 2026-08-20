@@ -16,7 +16,7 @@ function Checkbox({ className, ...props }: React.ComponentProps<typeof CheckboxP
         'transition-all duration-300 ease-out',
         'outline-none',
         'shadow-neu-inset',
-        'data-[state=checked]:bg-gradient-to-br data-[state=checked]:from-[var(--teal)] data-[state=checked]:to-[var(--amber)]',
+        'data-[state=checked]:bg-[var(--teal)]',
         'data-[state=checked]:shadow-neu-extruded',
         'focus-visible:ring-2 focus-visible:ring-[var(--teal)]/30 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-elevated)]',
         'disabled:cursor-not-allowed disabled:opacity-50',

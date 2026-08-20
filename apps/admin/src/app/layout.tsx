@@ -43,7 +43,14 @@ export default function RootLayout({
   const gaId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 
   return (
-    <html lang="en">
+    <html lang="en" data-theme="dark">
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){var t='dark';try{var s=localStorage.getItem('theme');if(s==='light'||s==='dark')t=s;}catch(e){}document.documentElement.dataset.theme=t;})();`,
+          }}
+        />
+      </head>
       <body className={`${plusJakarta.variable} ${dmSans.variable} antialiased`}>
         <SessionProvider>{children}</SessionProvider>
         {gaId && <GoogleAnalytics measurementId={gaId} />}

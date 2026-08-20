@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/layout/AppSidebar';
 import { BottomNav } from '@/components/layout/BottomNav';
+import { ThemeToggler } from '@/components/layout/ThemeToggler';
 import { isEmailAllowed } from '@/lib/auth-security';
 
 export default async function DashboardLayout({ children }: { children: ReactNode }) {
@@ -35,6 +36,7 @@ export default async function DashboardLayout({ children }: { children: ReactNod
             <div className="flex-1" />
 
             <div className="flex items-center gap-3">
+              <ThemeToggler />
               <div className="hidden md:flex items-center gap-2 text-sm text-muted-foreground">
                 <div className="h-2 w-2 rounded-full bg-success animate-pulse" />
                 <span>System Online</span>

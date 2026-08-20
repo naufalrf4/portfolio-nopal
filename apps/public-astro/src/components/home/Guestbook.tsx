@@ -228,7 +228,7 @@ export function Guestbook({
         <div className="mx-auto w-full max-w-7xl">
           <div className="mb-10 grid gap-8 lg:grid-cols-[1fr_360px] lg:items-start">
             <p className="max-w-xl text-base leading-relaxed text-text-secondary">
-              Every note left here stays public. Sign in with Google to add yours — the homepage only shows the latest few.
+              Every note left here stays public. Sign in with Google to add yours.
             </p>
             <div className="relative">
               {composerCard}
@@ -344,6 +344,18 @@ export function Guestbook({
               {success && <p className="mt-4 font-mono text-xs text-teal">{success}</p>}
               {error && <p className="mt-4 font-mono text-xs text-[var(--error)]">{error}</p>}
             </div>
+
+            <a
+              href="/guestbook"
+              className="group mt-6 inline-flex items-center gap-2 font-mono text-sm uppercase tracking-wide text-text-secondary transition-colors hover:text-text-primary"
+              data-analytics-button
+              data-entity-type="guestbook_view_all"
+              data-entity-id="guestbook"
+              data-entity-label="View all guestbook messages"
+            >
+              View all messages
+              <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
+            </a>
           </BlurFade>
         </div>
       </div>

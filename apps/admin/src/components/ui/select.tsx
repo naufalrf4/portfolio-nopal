@@ -32,7 +32,7 @@ function SelectTrigger({
       data-size={size}
       className={cn(
         'flex w-full items-center justify-between gap-2 whitespace-nowrap outline-none disabled:cursor-not-allowed disabled:opacity-50',
-        'bg-[var(--bg-elevated)] rounded-2xl h-12 px-4 text-base text-[var(--text-primary)]',
+        'bg-[var(--bg-card)] rounded-2xl h-12 px-4 text-base text-[var(--text-primary)]',
         'shadow-neu-extruded',
         'transition-all duration-300 ease-out',
         'hover:shadow-neu-extruded',
@@ -66,7 +66,7 @@ function SelectContent({
         data-slot="select-content"
         className={cn(
           'relative z-50 max-h-(--radix-select-content-available-height) min-w-[8rem] origin-(--radix-select-content-transform-origin) overflow-x-hidden overflow-y-auto',
-          'bg-[var(--bg-elevated)] rounded-2xl p-2',
+          'bg-[var(--bg-card)] rounded-2xl p-2',
           'shadow-neu-extruded',
           'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
           'data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
