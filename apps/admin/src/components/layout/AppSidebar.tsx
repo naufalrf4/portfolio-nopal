@@ -174,21 +174,25 @@ export function AppSidebar({ session }: AppSidebarProps) {
         collapsible="icon"
         className={cn(
           'bg-[var(--bg-elevated)] border-none',
-          'shadow-neu-extruded',
+          'neu-extruded-lg',
           'transition-all duration-300 ease-out',
           'overflow-hidden'
         )}
       >
-        <SidebarHeader className="p-4 pb-6">
+        <SidebarHeader className={cn('p-4 pb-6', isCollapsed && 'p-2 pb-4')}>
           <div className={cn('flex items-center gap-3', isCollapsed && 'justify-center')}>
             <div
               className={cn(
-                'flex h-10 w-10 shrink-0 items-center justify-center rounded-full',
+                'relative flex shrink-0 items-center justify-center rounded-full',
                 'bg-[var(--bg-elevated)]',
-                'shadow-neu-extruded'
+                'neu-extruded',
+                isCollapsed ? 'h-8 w-8' : 'h-10 w-10'
               )}
             >
-              <Lock className="h-5 w-5 text-[var(--teal)]" />
+              <Lock className={cn('text-[var(--teal)]', isCollapsed ? 'h-4 w-4' : 'h-5 w-5')} />
+              {isCollapsed && (
+                <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-success ring-2 ring-[var(--bg-elevated)] animate-pulse" />
+              )}
             </div>
 
             {!isCollapsed && (
@@ -197,23 +201,15 @@ export function AppSidebar({ session }: AppSidebarProps) {
                   NaufalRF Portfolio
                 </h1>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-[var(--text-secondary)] font-medium">Access Restricted</span>
-                  <span
-                    className={cn(
-                      'px-2 py-0.5 rounded-full text-[10px] font-semibold',
-                      'bg-gradient-to-r from-[var(--teal)] to-[var(--amber)]',
-                      'text-white shadow-sm'
-                    )}
-                  >
-                    Authorized
-                  </span>
+                  <div className="h-2 w-2 rounded-full bg-success animate-pulse" />
+                  <span className="text-xs text-[var(--text-secondary)] font-medium">System Online</span>
                 </div>
               </div>
             )}
           </div>
         </SidebarHeader>
 
-        <SidebarContent className="px-3 overflow-hidden">
+        <SidebarContent className={cn('overflow-hidden', isCollapsed ? 'px-0' : 'px-3')}>
           <SidebarGroup>
             <SidebarGroupContent>
               <SidebarMenu className="space-y-1.5">
@@ -232,37 +228,54 @@ export function AppSidebar({ session }: AppSidebarProps) {
                         'transition-all duration-300 ease-out',
                         'border-none outline-none',
                         'overflow-hidden',
-                        isCollapsed && 'w-full flex items-center justify-center',
                         isActive
                           ? cn(
                               'bg-[var(--bg-elevated)]',
-                              'shadow-neu-extruded',
+                              'neu-extruded',
                               'text-[var(--teal)] font-medium'
                             )
                           : cn(
                               'bg-transparent text-[var(--text-secondary)]',
                               'hover:bg-[var(--bg-elevated)]',
-                              'hover:shadow-neu-extruded-sm',
+                              'hover:neu-extruded-sm',
                               'hover:text-[var(--text-primary)]',
                               'hover:scale-[1.02]',
-                              'active:shadow-neu-extruded',
+                              'active:neu-extruded',
                               'active:scale-[0.98]'
                             )
                       )}
                     >
-                      <Link href={item.href} className="flex w-full items-center justify-between">
+                      <Link
+                        href={item.href}
+                        className={cn('flex w-full items-center', isCollapsed ? 'justify-center' : 'justify-between')}
+                      >
                         <div
                           className={cn(
                             'flex items-center gap-3',
                             isCollapsed && 'justify-center w-full'
                           )}
                         >
-                          <Icon
-                            className={cn(
-                              'h-5 w-5 shrink-0 transition-colors duration-300',
-                              isActive ? 'text-[var(--teal)]' : 'text-[var(--text-secondary)]'
+                          <span className="relative inline-flex shrink-0">
+                            <Icon
+                              className={cn(
+                                'h-5 w-5 shrink-0 transition-colors duration-300',
+                                isActive ? 'text-[var(--teal)]' : 'text-[var(--text-secondary)]'
+                              )}
+                            />
+                            {isCollapsed && showBadge && (
+                              <span
+                                className={cn(
+                                  'absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center',
+                                  'rounded-full text-[10px] font-bold text-white',
+                                  'bg-gradient-to-br from-[var(--teal)] to-[var(--amber)]',
+                                  'neu-extruded',
+                                  'animate-pulse'
+                                )}
+                              >
+                                {contactUpdatesCount > 9 ? '9+' : contactUpdatesCount}
+                              </span>
                             )}
-                          />
+                          </span>
                           {!isCollapsed && <span>{item.name}</span>}
                         </div>
                         {showBadge && !isCollapsed && <NeuBadge count={contactUpdatesCount} />}
@@ -271,26 +284,7 @@ export function AppSidebar({ session }: AppSidebarProps) {
                   );
 
                   return (
-                    <SidebarMenuItem key={item.name}>
-                      {isCollapsed && showBadge ? (
-                        <div className="relative flex items-center justify-center">
-                          {buttonContent}
-                          <span
-                            className={cn(
-                              'absolute right-0 top-0 flex h-4 w-4 items-center justify-center',
-                              'rounded-full text-[10px] font-bold text-white',
-                              'bg-gradient-to-br from-[var(--teal)] to-[var(--amber)]',
-                              'shadow-neu-extruded',
-                              'animate-pulse'
-                            )}
-                          >
-                            {contactUpdatesCount > 9 ? '9+' : contactUpdatesCount}
-                          </span>
-                        </div>
-                      ) : (
-                        buttonContent
-                      )}
-                    </SidebarMenuItem>
+                    <SidebarMenuItem key={item.name}>{buttonContent}</SidebarMenuItem>
                   );
                 })}
               </SidebarMenu>
@@ -298,10 +292,11 @@ export function AppSidebar({ session }: AppSidebarProps) {
           </SidebarGroup>
         </SidebarContent>
 
-        <SidebarFooter className="p-4 pt-6">
+        <SidebarFooter className={cn('p-4 pt-6', isCollapsed && 'p-1 pt-4')}>
           <div
             className={cn(
-              'rounded-2xl p-3',
+              'rounded-2xl',
+              isCollapsed ? 'p-1' : 'p-3',
               'bg-[var(--bg-elevated)]',
               'shadow-neu-extruded'
             )}
