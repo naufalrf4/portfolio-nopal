@@ -1,0 +1,23 @@
+{
+  "name": "slidedeck",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Modular, data-driven HTML slide deck template with present mode and one-slide-per-page A4 landscape export.",
+  "license": "MIT",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.1",
+    "tailwindcss": "^4.3.1",
+    "vite": "^8.0.16"
+  },
+  "dependencies": {
+    "@fontsource/inter": "^5.2.8",
+    "@fontsource/jetbrains-mono": "^5.2.8",
+    "@fontsource/space-grotesk": "^5.2.10"
+  }
+}

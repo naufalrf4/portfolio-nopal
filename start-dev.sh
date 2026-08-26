@@ -11,6 +11,7 @@ providers=(
   "links|$ROOT_DIR/apps/links-astro|bun run dev|http://localhost:3002"
   "ngl|$ROOT_DIR/apps/ngl-svelte|bun run dev|http://localhost:3003"
   "public|$ROOT_DIR/apps/public-astro|bun run dev|http://localhost:3000"
+  "slidedeck|$ROOT_DIR/apps/slidedeck|bun run dev|http://localhost:3007"
 )
 
 pids=()
