@@ -1,5 +1,5 @@
 {
-  "title": "ACME | Presentation",
+  "title": "Naufal Rizqullah Firdaus | Portfolio",
   "theme": "dark",
   "footerLogo": "",
   "slides": [
@@ -11,9 +11,9 @@
     "slides/06-grid.html",
     "slides/07-steps.html",
     "slides/08-compare.html",
-    "slides/13-media.html",
-    "slides/10-table.html",
     "slides/09-timeline.html",
+    "slides/10-table.html",
+    "slides/13-media.html",
     "slides/11-qna.html",
     "slides/12-closing.html"
   ]
