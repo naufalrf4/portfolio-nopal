@@ -13,6 +13,7 @@ import {
   normalizeLanguage,
 } from "./prompt-builder";
 import * as repository from "./repository";
+import { stageAction } from "./staged-action-repository";
 import { executeTool } from "./tool-service";
 import type {
   ChatLogMessage,
@@ -254,26 +255,37 @@ export async function chat(
   const sessionId = request.sessionId ?? crypto.randomUUID();
 
   // Check for agentic intent FIRST — short-circuit before expensive RAG
-  const pendingAction = detectAgenticIntent(request.message);
-  if (pendingAction !== null) {
-    return {
+  const detected = detectAgenticIntent(request.message);
+  if (detected !== null) {
+    const response: ChatResponse = {
       sessionId,
-      message: pendingAction.missingFields.length > 0
-        ? `I can help with that, but I need more information: ${pendingAction.missingFields.join(', ')}`
-        : `Ready to proceed: ${pendingAction.description}. Would you like me to confirm?`,
+      message: detected.missingFields.length > 0
+        ? `I can help with that, but I need more information: ${detected.missingFields.join(', ')}`
+        : `Ready to proceed: ${detected.description}. Would you like me to confirm?`,
       sources: [],
       citations: [],
       suggestedActions: [],
       metadata: {
         workflow: "agentic",
-        intent: pendingAction.tool,
+        intent: detected.tool,
         queryLanguage: "en",
         answerLanguage: "en",
         retrievalConfidence: 0,
         abstained: false,
       },
-      pendingAction,
     };
+
+    if (detected.missingFields.length === 0) {
+      const actionId = await stageAction(sessionId, detected);
+      response.pendingAction = {
+        actionId,
+        tool: detected.tool,
+        description: detected.description,
+        missingFields: [],
+      };
+    }
+
+    return response;
   }
 
   let history: ChatLogMessage[] = [];

@@ -375,6 +375,34 @@ export const ragChunks = rag.table(
   ]
 );
 
+export const ragStagedActions = rag.table(
+  'staged_actions',
+  {
+    id: uuid().primaryKey().defaultRandom().notNull(),
+    sessionId: varchar('session_id', { length: 64 }).notNull(),
+    tool: varchar({ length: 64 }).notNull(),
+    payload: jsonb()
+      .default(sql`'{}'::jsonb`)
+      .notNull(),
+    description: text().notNull(),
+    consumedAt: timestamp('consumed_at', { withTimezone: true, mode: 'string' }),
+    expiresAt: timestamp('expires_at', { withTimezone: true, mode: 'string' }).notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+  },
+  (table) => [
+    index('ix_rag_staged_actions_session_id').using(
+      'btree',
+      table.sessionId.asc().nullsLast().op('text_ops')
+    ),
+    index('ix_rag_staged_actions_expires_at').using(
+      'btree',
+      table.expiresAt.asc().nullsLast().op('timestamptz_ops')
+    ),
+  ]
+);
+
 export const ragIngestionRuns = rag.table(
   'ingestion_runs',
   {

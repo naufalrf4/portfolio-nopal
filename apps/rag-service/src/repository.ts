@@ -170,12 +170,12 @@ export async function replaceChunks(
     await sql.unsafe(
       `INSERT INTO rag.chunks (
         id, document_id, chunk_index, source_type, source_ref,
-        visibility, content, token_count, checksum, metadata, embedding, created_at
+        visibility, content, contextual_content, token_count, checksum, metadata, embedding, created_at
       ) VALUES (
         gen_random_uuid(), $1, $2,
         $3, $4, $5,
         $6, $7, $8,
-        $9::jsonb, $10::vector, now()
+        $9, $10::jsonb, $11::vector, now()
       )`,
       [
         documentId,
@@ -183,6 +183,12 @@ export async function replaceChunks(
         chunk.sourceType,
         chunk.sourceRef,
         chunk.visibility,
+        chunk.content,
+        // `contextual_content` is NOT NULL in the schema but has no dedicated
+        // read path anywhere downstream (chat-service.ts / prompt-builder.ts
+        // only ever select `content`). Populate it with the same value as
+        // `content` to satisfy the constraint without inventing semantics
+        // for a column nothing currently consumes.
         chunk.content,
         chunk.tokenCount,
         chunk.checksum,

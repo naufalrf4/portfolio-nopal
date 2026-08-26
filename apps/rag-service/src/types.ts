@@ -35,6 +35,13 @@ interface PendingAction {
   missingFields: string[];
 }
 
+interface StagedPendingAction {
+  actionId: string;
+  tool: string;
+  description: string;
+  missingFields: string[];
+}
+
 interface ChatResponse {
   sessionId: string;
   message: string;
@@ -42,13 +49,12 @@ interface ChatResponse {
   citations: Citation[];
   suggestedActions: SuggestedAction[];
   metadata: ChatMetadata;
-  pendingAction?: PendingAction;
+  pendingAction?: StagedPendingAction;
 }
 
 interface ConfirmRequest {
-  sessionId?: string;
-  tool: string;
-  payload: Record<string, unknown>;
+  sessionId: string;
+  actionId: string;
   confirm: boolean;
 }
 
@@ -177,6 +183,7 @@ export type {
   ChatMetadata,
   PendingAction,
   ChatResponse,
+  StagedPendingAction,
   ConfirmRequest,
   ConfirmResponse,
   IngestRequest,

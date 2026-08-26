@@ -1,6 +1,8 @@
+import { timingSafeEqual } from "node:crypto";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { config } from "./config";
+import { consumeAction } from "./staged-action-repository";
 import type { ChatRequest, ConfirmRequest, ConfirmResponse, IngestRequest, IngestResponse } from "./types";
 import { chat } from "./chat-service";
 import { ingest } from "./ingest-service";
@@ -8,6 +10,10 @@ import { RagServiceError } from "./errors";
 import { executeSubmitGuestbook, executeSendMessage, executeCreateBooking } from "./agentic-tools";
 
 const app = new Hono();
+
+const MAX_CHAT_MESSAGE_LENGTH = 2000;
+const SESSION_ID_PATTERN = /^[A-Za-z0-9_-]{8,64}$/;
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 app.use(
   "*",
@@ -26,7 +32,10 @@ app.use(
 function serviceTokenValid(token: string | null): boolean {
   if (!token) return false;
   const expected = config.ragIngestServiceToken || config.adminServiceToken;
-  return expected !== "" && token === expected;
+  if (expected === "") return false;
+  const a = Buffer.from(token);
+  const b = Buffer.from(expected);
+  return a.length === b.length && timingSafeEqual(a, b);
 }
 
 app.get("/health", (c) => {
@@ -49,13 +58,21 @@ app.post("/chat", async (c) => {
   const chatRequest: ChatRequest = {
     message: typeof raw.message === "string" ? raw.message.trim() : "",
   };
-  if (typeof raw.sessionId === "string") {
+  if (typeof raw.sessionId === "string" && SESSION_ID_PATTERN.test(raw.sessionId)) {
     chatRequest.sessionId = raw.sessionId;
   }
 
   if (!chatRequest.message) {
     throw new RagServiceError(
       "message is required.",
+      "INVALID_CHAT_REQUEST",
+      400,
+    );
+  }
+
+  if (chatRequest.message.length > MAX_CHAT_MESSAGE_LENGTH) {
+    throw new RagServiceError(
+      `message must be ${MAX_CHAT_MESSAGE_LENGTH} characters or less.`,
       "INVALID_CHAT_REQUEST",
       400,
     );
@@ -75,13 +92,19 @@ app.post("/chat/confirm", async (c) => {
   }
 
   const raw = body as Record<string, unknown>;
-  const tool = String(raw.tool ?? "");
+  const actionId = typeof raw.actionId === "string" ? raw.actionId : "";
+  const sessionId = typeof raw.sessionId === "string" ? raw.sessionId : "";
   const confirm = Boolean(raw.confirm);
-  const payload = (raw.payload ?? {}) as Record<string, unknown>;
 
-  if (!tool) {
-    throw new RagServiceError("tool is required.", "INVALID_CONFIRM_REQUEST", 400);
+  if (!UUID_PATTERN.test(actionId)) {
+    throw new RagServiceError("actionId is required.", "INVALID_CONFIRM_REQUEST", 400);
   }
+
+  if (!SESSION_ID_PATTERN.test(sessionId)) {
+    throw new RagServiceError("sessionId is required.", "INVALID_CONFIRM_REQUEST", 400);
+  }
+
+  const staged = await consumeAction(actionId, sessionId);
 
   if (!confirm) {
     const response: ConfirmResponse = {
@@ -91,17 +114,25 @@ app.post("/chat/confirm", async (c) => {
     return c.json(response);
   }
 
+  if (staged === null) {
+    throw new RagServiceError(
+      "This action is no longer available. Please ask again.",
+      "STAGED_ACTION_UNAVAILABLE",
+      409,
+    );
+  }
+
   const adminApiUrl = config.adminApiUrl;
 
   let result: { success: boolean; message: string };
-  if (tool === "submit_guestbook") {
-    result = await executeSubmitGuestbook(payload, adminApiUrl);
-  } else if (tool === "send_message") {
-    result = await executeSendMessage(payload, adminApiUrl);
-  } else if (tool === "create_booking") {
-    result = await executeCreateBooking(payload, adminApiUrl);
+  if (staged.tool === "submit_guestbook") {
+    result = await executeSubmitGuestbook(staged.payload, adminApiUrl);
+  } else if (staged.tool === "send_message") {
+    result = await executeSendMessage(staged.payload, adminApiUrl);
+  } else if (staged.tool === "create_booking") {
+    result = await executeCreateBooking(staged.payload, adminApiUrl);
   } else {
-    throw new RagServiceError(`Unknown tool: ${tool}`, "UNKNOWN_TOOL", 400);
+    throw new RagServiceError(`Unknown tool: ${staged.tool}`, "UNKNOWN_TOOL", 400);
   }
 
   const response: ConfirmResponse = result;

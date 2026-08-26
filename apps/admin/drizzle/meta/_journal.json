@@ -85,6 +85,13 @@
       "when": 1787193797082,
       "tag": "0011_skinny_dreadnoughts",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1787717888907,
+      "tag": "0012_lame_star_brand",
+      "breakpoints": true
     }
   ]
 }

@@ -127,12 +127,36 @@ export function stageCreateBooking(
 
 // ---- Admin public API executors (called after user confirms) ----
 
+const FIELD_LIMITS = {
+  guestbookMessage: 500,
+  messageContent: 500,
+  name: 100,
+  email: 255,
+  phone: 32,
+  notes: 1000,
+  slotId: 64,
+} as const;
+
+function tooLong(value: string, max: number): boolean {
+  return value.length > max;
+}
+
 export async function executeSubmitGuestbook(
   payload: Record<string, unknown>,
   adminApiUrl: string,
 ): Promise<{ success: boolean; message: string }> {
   const message = String(payload.message ?? '').trim();
   const guestbookToken = String(payload.guestbookToken ?? '');
+
+  if (!message) {
+    return { success: false, message: "Guestbook rejected: message is required." };
+  }
+  if (tooLong(message, FIELD_LIMITS.guestbookMessage)) {
+    return {
+      success: false,
+      message: `Guestbook rejected: message must be ${FIELD_LIMITS.guestbookMessage} characters or less.`,
+    };
+  }
 
   const res = await fetch(`${adminApiUrl.replace(/\/$/, "")}/api/v1/public/guestbook`, {
     method: "POST",
@@ -163,6 +187,16 @@ export async function executeSendMessage(
   adminApiUrl: string,
 ): Promise<{ success: boolean; message: string }> {
   const content = String(payload.content ?? '').trim();
+
+  if (!content) {
+    return { success: false, message: "Message rejected: content is required." };
+  }
+  if (tooLong(content, FIELD_LIMITS.messageContent)) {
+    return {
+      success: false,
+      message: `Message rejected: content must be ${FIELD_LIMITS.messageContent} characters or less.`,
+    };
+  }
 
   const res = await fetch(`${adminApiUrl.replace(/\/$/, "")}/api/v1/public/messages`, {
     method: "POST",
@@ -208,6 +242,18 @@ export async function executeCreateBooking(
   }
   if (isPlaceholderValue(email) || !EMAIL_REGEX.test(email)) {
     return { success: false, message: "Booking rejected: a valid email is required." };
+  }
+  if (isPlaceholderValue(name)) {
+    return { success: false, message: "Booking rejected: name is missing or a placeholder value." };
+  }
+  if (
+    tooLong(slotId, FIELD_LIMITS.slotId) ||
+    tooLong(name, FIELD_LIMITS.name) ||
+    tooLong(email, FIELD_LIMITS.email) ||
+    (phone != null && tooLong(phone, FIELD_LIMITS.phone)) ||
+    (notes != null && tooLong(notes, FIELD_LIMITS.notes))
+  ) {
+    return { success: false, message: "Booking rejected: one or more fields exceed the allowed length." };
   }
 
   const res = await fetch(`${adminApiUrl.replace(/\/$/, "")}/api/v1/public/bookings`, {
