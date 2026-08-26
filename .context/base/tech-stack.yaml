@@ -9,10 +9,10 @@ repository:
     - root `bun.lock`
   root_scripts:
     - dev / dev:all -> `bash ./start-dev.sh` (six local services)
-    - build -> `NODE_OPTIONS=--max-old-space-size=4096 bun run --filter admin build && ... --filter public-astro/links-astro/ngl-svelte build`
+    - build -> `NODE_OPTIONS=--max-old-space-size=4096 bun run --filter admin build && ... --filter public-astro/links-astro/ngl-svelte build && bun run --filter rag-service build` (covers all apps including rag-service)
     - lint -> `bun run --filter admin lint && bun run --filter ngl-svelte lint`
-    - typecheck -> `bun run --filter admin typecheck`
-    - reset:seed -> declared but backing `./reset-seed-rag.sh` is MISSING (broken)
+    - typecheck -> `bun run --filter admin typecheck && bun run --filter ngl-svelte typecheck && bun run --filter rag-service typecheck` (3 filters)
+    - reset:seed -> `bash ./scripts/docker-dev-reset-seed.sh`, exists and works
     - docker:dev / docker:dev:down / docker:dev:migrate / docker:dev:seed / docker:dev:reset-seed -> `scripts/docker-dev-*.sh`
     - docker:prod / docker:prod:migrate / docker:prod:bootstrap -> `scripts/docker-prod-*.sh`
     - lint-staged / commitlint hooks
@@ -70,7 +70,7 @@ apps:
     language: TypeScript
     runtime: Bun
     data_access: direct Postgres/pgvector access via `postgres` (postgres.js) on the `rag` schema
-    ai_stack: Google Gemini via REST provider modules (`src/llm-provider.ts`), configurable models/embedding
+    ai_stack: multi-provider (openai-compatible default, Gemini as alternate) via `src/llm-provider.ts`, configurable models/embedding
     database_bootstrap: `bun run db:bootstrap` (src/db-bootstrap.ts) creates rag schema + vector extension
     testing_stack: `bun test` (`src/llm-provider.test.ts`, `src/agentic-tools.test.ts`), `bun x tsc --noEmit`, `bun run build`
     lockfile: none (root `bun.lock` only)

@@ -18,7 +18,7 @@ non_goals:
   - Do not invent a shared workspace package manager flow at the root (single root `bun install` / root `bun.lock` is the flow).
   - Do not add speculative feature requirements that are not evidenced yet.
   - Do not move non-admin frontend apps to direct database access.
-  - Do not treat manifest-declared root helpers as canonical if the backing script is missing (e.g. `reset:seed` without `reset-seed-rag.sh`).
+  - Do not assume a manifest-declared root helper is missing without checking its backing script (e.g. `reset:seed` -> `bash ./scripts/docker-dev-reset-seed.sh`, which exists and works).
 
 forbidden_changes:
   - No direct Postgres access from `apps/public-astro`, `apps/links-astro`, or `apps/ngl-svelte`.

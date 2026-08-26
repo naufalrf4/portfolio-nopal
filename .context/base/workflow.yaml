@@ -1,17 +1,17 @@
 root:
   install: '`bun install` at the root installs all apps + shared packages into the single root `bun.lock`. Per-app installs are unnecessary.'
   dev: 'bun run dev:all (alias `bun run dev`) -> `bash ./start-dev.sh`, starts all six local services'
-  build: 'bun run build -> bun --filter chain over admin, public-astro, links-astro, ngl-svelte (NOT live-presence or rag-service)'
+  build: 'bun run build -> bun --filter chain over admin, public-astro, links-astro, ngl-svelte, and rag-service (covers all apps except live-presence)'
   test: no single root test command
   lint: 'bun run lint -> `bun run --filter admin lint && bun run --filter ngl-svelte lint`'
-  typecheck: 'bun run typecheck -> `bun run --filter admin typecheck`'
+  typecheck: 'bun run typecheck -> `bun run --filter admin typecheck && bun run --filter ngl-svelte typecheck && bun run --filter rag-service typecheck` (3 filters)'
   hooks:
     pre_commit: bun run lint-staged
     commit_msg: bun run commitlint --edit "$1"
     lint_staged_config: .lintstagedrc.js
   helper_notes:
     - '`bun run dev:all` works, backed by `start-dev.sh` (six local services incl. live-presence).'
-    - '`bun run reset:seed` is declared in `package.json` but `reset-seed-rag.sh` is missing — do NOT rely on it; the docker reset-seed flow is `bun run docker:dev:reset-seed`.'
+    - '`bun run reset:seed` -> `bash ./scripts/docker-dev-reset-seed.sh`, which exists and works; it is the same flow as `bun run docker:dev:reset-seed`.'
     - 'Docker dev: `bun run docker:dev` (+ `docker:dev:down`), bootstrap via `docker:dev:migrate` then `docker:dev:seed`; `docker:dev:reset-seed` resets Admin DB and reseeds.'
     - 'Docker prod: `bun run docker:prod` (up), `docker:prod:migrate`, `docker:prod:bootstrap`; production DB is a Dokploy-managed postgres service reachable at `DB_HOST:-db`.'
     - 'Deploy: GitHub webhook server (`scripts/github_webhook_server.py`, HMAC-verified, port 9010) triggers `scripts/github-webhook-deploy.sh` which pulls `main` and runs docker-prod-up + docker-prod-migrate. Pull-based only.'

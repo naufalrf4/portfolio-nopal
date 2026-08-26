@@ -29,11 +29,11 @@ Known contradiction(s) repaired during this run:
 2. `tech-stack.yaml` / `workflow.yaml` / `testing.yaml` described `apps/rag-service` as Python FastAPI with `uv`, `pytest`, `/docs`/`/redoc`, and a `fastapi/` directory. Evidence: commit `907aef6` rewrote it to TypeScript on Bun + Hono (`bun test`, `bun run db:bootstrap`, `bun x tsc --noEmit`); the `fastapi/` dir and asyncpg URLs are gone. All rag entries corrected.
 3. `workflow.yaml` claimed no root build/install commands and per-app installs. Evidence: root `package.json` now declares `dev`, `build` (bun --filter chain), `lint`, `typecheck`, `docker:*` scripts; single root `bun.lock` is the only lockfile. Corrected.
 4. AGENTS.md + old context claimed deployment via interactive `deploy.py` (Paramiko SSH). Evidence: `deploy.py` does not exist; deployment is now a GitHub webhook server (`scripts/github_webhook_server.py`, HMAC-verified) triggering pull-based `scripts/github-webhook-deploy.sh` -> `docker-prod-up` + `docker-prod-migrate`, with production DB as Dokploy-managed Postgres. AGENTS.md and workflow corrected.
-5. Old context claimed `bun run reset:seed` was merely missing its backing script. Still true, but AGENTS.md asserted the script `./reset-seed-rag.sh` exists — it does not. AGENTS.md corrected; `reset:seed` remains declared-but-broken.
+5. Old context claimed `bun run reset:seed` was missing its backing script. Reality: root `package.json` `reset:seed` -> `bash ./scripts/docker-dev-reset-seed.sh`, which exists and works. Corrected.
 6. `docker-compose.dev.yml` rag service was still FastAPI-era (`working_dir /app/fastapi`, `postgresql+asyncpg://` URL, `uv run python scripts/bootstrap_db.py`, `rag-venv-dev` volume) while prod was already migrated to the Bun/Hono stack. Repaired the dev compose rag + rag-bootstrap services to match the prod pattern (postgres:// URL, `bun run db:bootstrap`, repo mount, root-node-modules volume) and removed the stale `rag-venv-dev` volume.
 7. `base/security.yaml` + `architecture.md` + `overview.md` said "centralized Neon/Postgres". Evidence: dev and prod compose both run dockerized `pgvector/pgvector` Postgres (prod Dokploy-managed at `DB_HOST:-db`); no Neon references remain in compose or env examples. Corrected.
 
 Current repair notes:
 
 - Root steering docs now treat `apps/live-presence` as a sixth standalone app in the shell rather than leaving it implicit in `PROGRESS.md` only.
-- Root workflow truth now distinguishes between the working helper `bun run dev:all` and the currently broken manifest entry `bun run reset:seed`, whose backing `reset-seed-rag.sh` file is missing.
+- Root workflow truth now confirms `bun run dev:all` and `bun run reset:seed` (-> `bash ./scripts/docker-dev-reset-seed.sh`) are both working helpers.

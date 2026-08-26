@@ -2,9 +2,9 @@ current_state:
   root:
     ci: no CI workflow files found (no `.github/`)
     shared_test_command: none
-    build: 'bun run build (bun --filter chain over admin/public-astro/links-astro/ngl-svelte; excludes live-presence and rag-service)'
+    build: 'bun run build (bun --filter chain over admin/public-astro/links-astro/ngl-svelte/rag-service; excludes live-presence)'
     lint: 'bun run lint (admin + ngl-svelte filters)'
-    typecheck: 'bun run typecheck (admin filter)'
+    typecheck: 'bun run typecheck (admin + ngl-svelte + rag-service filters)'
   admin:
     evidence:
       - bun run typecheck
@@ -47,7 +47,32 @@ current_state:
       - cd apps/rag-service && bun run build
     missing:
       - no lint script in manifest
-  shared_packages:
+  e2e_suite:
+  evidence:
+    - bun run test:e2e (root, e2e/runner.ts - starts only the services each feature needs, reuses ones already up, stops what it started)
+    - bun run test:e2e <feature> (single feature, e.g. admin-cron)
+    - bun run test:e2e:specs (services already running, orchestration skipped)
+    - bun run --cwd e2e typecheck
+  layout:
+    - e2e/features/<feature>/manifest.ts declares name + required services (runner imports this, no side effects)
+    - e2e/features/<feature>/<feature>.spec.ts holds the checks and re-exports the manifest
+    - e2e/helpers/{env,http,ws,services}.ts are shared; env.ts loads .env.docker.dev + app .env files and maps ADMIN_* to *
+  covers:
+    - admin-auth - admin tier gated, POST /api/v1/admin/messages never reaches handler unauthenticated
+    - admin-cron - cleanup-chatlogs fail-closed without valid bearer secret
+    - public-write - contact/analytics/guestbook schema bounds
+    - ip-spoofing - client forwarding headers cannot dictate trusted client IP
+    - presence - origin enforcement, oversized frames ignored, /health only {ok:true}
+    - rag-chat - ingest auth, chat input bounds, agentic guardrails
+    - webhook - unsigned payload rejected, body size capped
+  skips_by_design:
+    - specs needing CRON_SECRET or PORTFOLIO_WEBHOOK_SECRET skip with the reason printed when unset
+    - webhook server is not started by the runner
+    - ipHash HMAC output (needs DB read), presence participant caps (needs load harness), real Google OAuth
+  not_in_scope:
+    - no browser/Playwright, no CI workflow - this suite is a local pre-deploy gate only
+
+shared_packages:
     evidence:
       - cd packages/http && bun test (packages/http/__tests__/index.test.ts)
       - cd packages/contracts && bun test (packages/contracts/__tests__/drift-check.test.ts)
