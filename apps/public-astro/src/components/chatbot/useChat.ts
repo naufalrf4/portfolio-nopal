@@ -207,6 +207,10 @@ export function useChat(): UseChat {
     async (messageId: string, confirm: boolean) => {
       const message = messages.find((m) => m.id === messageId);
       if (!message?.pendingAction) return;
+      if (!sessionId) {
+        setError('Chat session expired. Please send your request again.');
+        return;
+      }
 
       // Clear the pendingAction from the message immediately
       setMessages((prev) =>
@@ -220,12 +224,7 @@ export function useChat(): UseChat {
       setConfirmingMessageId(messageId);
 
       try {
-        const result = await confirmAction(
-          action.tool,
-          action.payload,
-          confirm,
-          sessionId ?? undefined,
-        );
+        const result = await confirmAction(action.actionId, confirm, sessionId);
 
         // Add result as a new assistant message
         const resultMessage: Message = {

@@ -9,8 +9,8 @@ const RATE_LIMIT_CONFIG = {
   windowMs: 60 * 1000,
 };
 
-export const POST: APIRoute = async ({ request }) => {
-  const rateLimitState = getRateLimitState(`chat-confirm:${getClientIp(request)}`, RATE_LIMIT_CONFIG);
+export const POST: APIRoute = async ({ request, clientAddress }) => {
+  const rateLimitState = getRateLimitState(`chat-confirm:${clientAddress || getClientIp(request)}`, RATE_LIMIT_CONFIG);
 
   if (!rateLimitState.allowed) {
     const headers = new Headers({
@@ -37,7 +37,7 @@ export const POST: APIRoute = async ({ request }) => {
     const body = await request.json();
     const response = await fetch(`${RAG_SERVICE_URL}/chat/confirm`, {
       method: 'POST',
-      headers: buildSubmissionProxyHeaders({ request, sourcePath: '/ai-chatbot' }),
+      headers: buildSubmissionProxyHeaders({ request, sourcePath: '/ai-chatbot', clientAddress }),
       body: JSON.stringify(body),
     });
 

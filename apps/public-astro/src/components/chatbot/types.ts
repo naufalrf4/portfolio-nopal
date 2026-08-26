@@ -36,8 +36,8 @@ export interface ChatMetadata {
 }
 
 export interface PendingAction {
+  actionId: string;
   tool: string;
-  payload: Record<string, unknown>;
   description: string;
   missingFields: string[];
 }

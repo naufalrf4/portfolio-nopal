@@ -65,10 +65,9 @@ export async function sendChatMessage({ request }: SendChatMessageOptions): Prom
 }
 
 export async function confirmAction(
-  tool: string,
-  payload: Record<string, unknown>,
+  actionId: string,
   confirm: boolean,
-  sessionId?: string,
+  sessionId: string,
 ): Promise<{ success: boolean; message: string }> {
   const endpoint = '/api/rag/chat/confirm';
   const { signal, cleanup } = createAbortSignal(CHAT_REQUEST_TIMEOUT_MS);
@@ -77,7 +76,7 @@ export async function confirmAction(
     const response = await fetch(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ tool, payload, confirm, sessionId }),
+      body: JSON.stringify({ actionId, confirm, sessionId }),
       signal,
     });
 
