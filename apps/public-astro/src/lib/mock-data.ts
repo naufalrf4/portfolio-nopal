@@ -157,7 +157,7 @@ export const MOCK_ACHIEVEMENTS: Achievement[] = [
   },
   {
     id: 'ach-3',
-    name: 'Hackathon Finalist — Automation Track',
+    name: 'Hackathon Finalist, Automation Track',
     location: 'Bandung, Indonesia',
     monthYear: 'Mar 2026',
     photos: [],
@@ -171,7 +171,7 @@ export const MOCK_ACHIEVEMENTS: Achievement[] = [
 export const MOCK_GUESTBOOK: GuestbookEntry[] = [
   {
     id: 'gb-1',
-    message: 'Clean portfolio — the realtime cursors are a nice touch.',
+    message: 'Clean portfolio, the realtime cursors are a nice touch.',
     createdAt: '2026-07-28T09:00:00.000Z',
     user: { name: 'Rizky', image: null },
   },

@@ -108,13 +108,13 @@ export function TechnicalExpertise() {
             <BlurFade delay={0.1} inView>
               <div className="flex flex-col gap-5">
                 <span className="font-mono text-xs uppercase tracking-[0.25em] text-teal">
-                  01 — Domains & Stack
+                  01 / Domains & Stack
                 </span>
                 <h2 className="font-display text-4xl font-bold tracking-tight text-text-primary md:text-5xl lg:text-6xl">
                   Technical Expertise
                 </h2>
                 <p className="max-w-md text-base leading-relaxed text-text-secondary">
-                  Integrated systems across software, cloud, IoT, and AI — spun into a single rotating stack.
+                  I work across software, cloud, IoT, and AI, using one connected stack to bring them together.
                 </p>
                 <div className="flex items-baseline gap-3 font-mono text-xs uppercase tracking-widest text-text-tertiary">
                   <span className="text-3xl font-bold text-teal md:text-4xl">
