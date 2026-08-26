@@ -25,7 +25,7 @@ export function BlogsContent({ initialBlogs }: BlogsContentProps) {
 
   return (
     <div>
-      {/* Filter by source */}
+      {}
       {sources.length > 2 && (
         <div className="mb-8">
           <Card className="p-4">

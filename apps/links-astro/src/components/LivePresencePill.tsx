@@ -67,7 +67,6 @@ function buildGuestIdentity() {
       }
     }
   } catch {
-    // Ignore broken storage and regenerate.
   }
 
   const alias = `Guest_${Math.random().toString(36).slice(2, 6)}`;
@@ -195,7 +194,6 @@ export function LivePresencePill({ socketUrl, pagePath, pageLabel }: LivePresenc
             );
           }
         } catch {
-          // Ignore invalid frames.
         }
       });
 

@@ -20,11 +20,9 @@ async function bootstrap(): Promise<void> {
       console.log("[bootstrap] rag schema already exists.");
     }
 
-    // Enable pgvector if not already
     await sql.unsafe("CREATE EXTENSION IF NOT EXISTS vector");
     console.log("[bootstrap] vector extension ready.");
 
-    // Verify the core tables exist (Admin owns schema; this is a connectivity check)
     const tableCheck = await sql`
       SELECT tablename FROM pg_catalog.pg_tables
       WHERE schemaname = 'rag'

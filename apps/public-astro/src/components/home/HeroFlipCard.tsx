@@ -16,7 +16,6 @@ export function HeroFlipCard({ about }: HeroFlipCardProps) {
 
   const [flipped, setFlipped] = useState(false);
 
-  // Tilt springs for the photo face
   const ref = useRef<HTMLDivElement | null>(null);
   const rx = useMotionValue(0);
   const ry = useMotionValue(0);
@@ -26,7 +25,6 @@ export function HeroFlipCard({ about }: HeroFlipCardProps) {
 
   const fullName = about.fullName?.trim() || 'NaufalRF';
 const role = about.roles?.[0] ?? 'System & Automation Engineer';
-
 
   function handleMove(e: React.PointerEvent<HTMLDivElement>) {
     if (!tiltEnabled || !ref.current || !flipped) return;
@@ -50,7 +48,6 @@ const role = about.roles?.[0] ?? 'System & Automation Engineer';
     }
   }
 
-  // Terminal boot: whoami → cat identity → feh (image viewer) → auto-flip to photo
   const cmdWhoami = 'whoami';
   const outWhoami = 'visitor';
   const cmdCat = 'cat ~/identity.txt';
@@ -76,7 +73,6 @@ const role = about.roles?.[0] ?? 'System & Automation Engineer';
     const timers: ReturnType<typeof setTimeout>[] = [];
     const intervals: ReturnType<typeof setInterval>[] = [];
 
-    // type a command char by char, then run `done`
     function typeCmd(cmd: string, set: (s: string) => void, done: () => void, speed = 95) {
       let i = 0;
       const iv = setInterval(() => {
@@ -90,17 +86,14 @@ const role = about.roles?.[0] ?? 'System & Automation Engineer';
       intervals.push(iv);
     }
 
-    // Phase 1: window opens
     timers.push(setTimeout(() => setBooted(true), 350));
 
-    // Phase 2: whoami → output `visitor`
     timers.push(
       setTimeout(() => {
         typeCmd(cmdWhoami, setLine1Cmd, () => {
           timers.push(
             setTimeout(() => {
               setLine1Out(true);
-              // Phase 3: cat identity.txt → name + role
               timers.push(
                 setTimeout(() => {
                   typeCmd(cmdCat, setLine2Cmd, () => {
@@ -109,7 +102,6 @@ const role = about.roles?.[0] ?? 'System & Automation Engineer';
                         setTimeout(() => {
                           setIdentityLines((prev) => [...prev, line]);
                           if (li === 1) {
-                            // Phase 4: feh photo.jpg → open image → flip
                             timers.push(
                               setTimeout(() => {
                                 typeCmd(cmdFeh, setLine3Cmd, () => {
@@ -134,7 +126,6 @@ const role = about.roles?.[0] ?? 'System & Automation Engineer';
       timers.forEach(clearTimeout);
       intervals.forEach(clearInterval);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reduceMotion, fullName, role]);
 
   return (
@@ -160,12 +151,12 @@ const role = about.roles?.[0] ?? 'System & Automation Engineer';
         animate={{ rotateY: flipped ? 180 : 0 }}
         transition={reduceMotion ? { duration: 0 } : { duration: 0.8, ease: [0.34, 1.3, 0.64, 1] }}
       >
-        {/* FRONT FACE: Terminal */}
+        {}
         <div
           className="absolute inset-0 overflow-hidden rounded-2xl border border-line bg-bg shadow-[0_24px_60px_-24px_rgba(0,0,0,0.7)]"
           style={{ backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden' }}
         >
-          {/* Top bar */}
+          {}
           <div className="flex h-9 shrink-0 items-center gap-1.5 border-b border-line/60 bg-bg-elevated/50 px-3">
             <div className="h-2 w-2 rounded-full bg-[#ff5f57]" />
             <div className="h-2 w-2 rounded-full bg-[#febc2e]" />
@@ -173,7 +164,7 @@ const role = about.roles?.[0] ?? 'System & Automation Engineer';
             <span className="ml-2 truncate font-mono text-[9px] text-text-tertiary">nopal: ~</span>
           </div>
 
-          {/* Terminal body — boots open, then types */}
+          {}
           <div className="p-4 font-mono text-[11px] leading-[1.8] text-text-secondary sm:p-5 sm:text-xs">
             <AnimatePresence>
               {booted && (
@@ -182,7 +173,7 @@ const role = about.roles?.[0] ?? 'System & Automation Engineer';
                   animate={{ opacity: 1, scaleY: 1 }}
                   transition={{ duration: 0.3, ease: 'easeOut' }}
                 >
-                  {/* Line 1: whoami → visitor */}
+                  {}
                   <div className="flex items-center gap-2">
                     <span className="shrink-0 text-teal">nopal:~$</span>
                     <span className="text-text-primary">
@@ -198,7 +189,7 @@ const role = about.roles?.[0] ?? 'System & Automation Engineer';
                     </motion.div>
                   )}
 
-                  {/* Line 2: cat identity.txt → name + role */}
+                  {}
                   {(line1Out) && (
                     <div className="mt-1 flex items-center gap-2">
                       <span className="shrink-0 text-teal">nopal:~$</span>
@@ -222,7 +213,7 @@ const role = about.roles?.[0] ?? 'System & Automation Engineer';
                     </motion.div>
                   ))}
 
-                  {/* Line 3: feh photo.jpg → opens image → flip */}
+                  {}
                   {identityLines.length === 2 && (
                     <div className="mt-1 flex items-center gap-2">
                       <span className="shrink-0 text-teal">nopal:~$</span>
@@ -240,7 +231,7 @@ const role = about.roles?.[0] ?? 'System & Automation Engineer';
           </div>
         </div>
 
-        {/* BACK FACE: Photo */}
+        {}
         <div
           className="absolute inset-0"
           style={{ backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden', transform: 'rotateY(180deg)', transformStyle: 'preserve-3d' }}
@@ -249,17 +240,17 @@ const role = about.roles?.[0] ?? 'System & Automation Engineer';
             className="relative h-full w-full overflow-hidden rounded-2xl border border-line bg-bg-card shadow-[0_24px_60px_-24px_rgba(0,0,0,0.7)]"
             style={tiltEnabled && flipped ? { rotateX: rxs, rotateY: rys, transformStyle: 'preserve-3d' } : undefined}
           >
-            {/* Teal accent spine */}
+            {}
             <div className="absolute inset-y-0 left-0 z-20 w-1 bg-gradient-to-b from-teal via-teal/40 to-transparent" />
 
-            {/* Photo */}
+            {}
             <div className="absolute inset-0">
               {about.avatarUrl ? (
                 <img
                   src={about.avatarUrl}
                   alt={fullName}
                   loading="eager"
-                  className="h-full w-full object-cover grayscale opacity-90 transition-all duration-700 ease-out group-hover:scale-[1.03] group-hover:grayscale-0 group-hover:opacity-100"
+                  className="h-full w-full object-cover opacity-90 transition-all duration-700 ease-out group-hover:scale-[1.03] group-hover:opacity-100"
                 />
               ) : (
                 <div className="flex h-full w-full items-center justify-center bg-bg-elevated">
@@ -271,8 +262,7 @@ const role = about.roles?.[0] ?? 'System & Automation Engineer';
               <div className="absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-bg/95 via-bg/40 to-transparent" />
             </div>
 
-
-            {/* Bottom identity plate */}
+            {}
             <div className="absolute inset-x-0 bottom-0 z-20 border-t border-line/60 bg-bg/60 px-5 py-4 backdrop-blur-sm" style={{ transform: 'translateZ(50px)' }}>
               <p className="font-display text-lg font-bold leading-tight text-text-primary">
                 {fullName}

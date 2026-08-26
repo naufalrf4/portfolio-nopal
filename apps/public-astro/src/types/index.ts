@@ -1,4 +1,3 @@
-// ── Re-exports from shared contracts ──
 export type {
   AboutData,
   Skill,
@@ -18,10 +17,7 @@ export type {
   ApiEnvelope,
 } from '@naufalrf/contracts';
 
-// Admin's "Blog" is the same shape; rename for local consumption
 export type { Blog as BlogLink } from '@naufalrf/contracts';
-
-// ── Locally merged types (public-astro uses union of list + detail shapes) ──
 
 export interface ProjectImage {
   id: string;
@@ -31,7 +27,6 @@ export interface ProjectImage {
   caption: string | null;
 }
 
-/** Local merged Project: list item fields + optional detail-only fields */
 export interface Project {
   id: string;
   title: string;

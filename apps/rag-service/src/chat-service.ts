@@ -200,8 +200,6 @@ function messageToPayload(msg: ChatLogMessage): Record<string, unknown> {
   return payload;
 }
 
-// ---- agentic intent detection ----
-
 const AGENTIC_PATTERNS: Array<{
   regex: RegExp;
   handler: (msg: string) => PendingAction | null;
@@ -209,7 +207,6 @@ const AGENTIC_PATTERNS: Array<{
   {
     regex: /\b(post|write|add|make)\s+(to\s+)?(the\s+)?guestbook\b|\bguestbook entry\b|\btulis\s+guestbook\b/i,
     handler: (msg) => {
-      // Extract the message from the user's request
       const match = msg.match(/[""]([^""]{1,500})[""]|'([^']{1,500})'/);
       const content = match ? (match[1] ?? match[2]) : msg.replace(/\b(post|write|add|make)\s+(to\s+)?(the\s+)?guestbook\b|\bguestbook entry\b|\btulis\s+guestbook\b/gi, '').trim();
       if (!content || content.length < 3) return null;
@@ -245,8 +242,6 @@ function detectAgenticIntent(message: string): PendingAction | null {
   return null;
 }
 
-// ---- chat ----
-
 export async function chat(
   request: ChatRequest,
   preferredLanguage?: string,
@@ -254,7 +249,6 @@ export async function chat(
   const startedAt = performance.now();
   const sessionId = request.sessionId ?? crypto.randomUUID();
 
-  // Check for agentic intent FIRST — short-circuit before expensive RAG
   const detected = detectAgenticIntent(request.message);
   if (detected !== null) {
     const response: ChatResponse = {

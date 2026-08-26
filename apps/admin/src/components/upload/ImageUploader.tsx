@@ -22,7 +22,7 @@ export function ImageUploader({
   folder,
   onUpload,
   accept = 'image/*',
-  maxSize = 10 * 1024 * 1024, // 10MB default
+  maxSize = 10 * 1024 * 1024, 
   multiple = false,
   disabled = false,
 }: ImageUploaderProps) {

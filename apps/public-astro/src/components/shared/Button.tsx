@@ -21,12 +21,10 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           'inline-flex items-center justify-center font-medium rounded-lg transition-all duration-300 ease-out',
           'disabled:opacity-50 disabled:cursor-not-allowed',
 
-          // Sizes
           size === 'sm' && 'px-4 py-2 text-sm',
           size === 'md' && 'px-6 py-3 text-base',
           size === 'lg' && 'px-8 py-4 text-lg',
 
-          // Variants
           variant === 'default' &&
             'bg-bg-elevated text-text-primary border border-line hover:border-line-hover hover:text-teal hover:-translate-y-0.5 active:translate-y-0',
 

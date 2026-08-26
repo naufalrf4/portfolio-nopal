@@ -5,8 +5,7 @@ import { PublicSignInForm } from '../../components/auth/PublicSignInForm';
 const callbackUrl = Astro.url.searchParams.get('callbackUrl') || '/';
 
 const title = 'Guestbook Sign In';
-const description = 'Sign in with Google to use the guestbook through the Admin-integrated public user flow.';
----
+const description = 'Sign in with Google to use the guestbook through the Admin-integrated public user flow.';---
 
 <PageLayout title={title} description={description} canonicalUrl="/auth/signin">
   <section class="min-h-screen px-4 py-12 sm:px-6 md:py-16 lg:px-8">

@@ -3,7 +3,7 @@ import { NEUMORPHIC_STYLES } from '../constants/blogs.constants';
 import { formatDate } from '@/lib/utils/date';
 import { truncateUrl } from '@/lib/utils/string';
 import { BlogLinkIcon, ExternalLinkIcon, EditIcon, TrashIcon } from './Icons';
-import { NeumorphicToggle } from './NeumorphicToggle';
+import { NeumorphicToggle } from './Toggle';
 
 interface BlogCardProps {
   blogLink: BlogLink;

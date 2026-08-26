@@ -20,12 +20,8 @@ interface HeroSectionProps {
   about: AboutData;
 }
 
-// Greetings restricted to Latin scripts — Space Grotesk has no CJK/Arabic/Devanagari
-// glyphs, so non-Latin entries render as tofu boxes (□). Add a fallback font before
-// re-adding ja/ko/zh/hi/fa.
 const GREETINGS = {
   en: "Hi, I'm",
-  id: 'Halo, saya',
   ms: 'Hai, saya',
   de: 'Hallo, ich bin',
   nl: 'Hallo, ik ben',
@@ -102,15 +98,15 @@ export function HeroSection({ about }: HeroSectionProps) {
       data-scene="terrain"
       className="relative min-h-[100dvh] overflow-hidden"
     >
-      {/* Centered content container — aligns hero with every other section gutter */}
+      {}
       <div className="relative z-10 mx-auto flex min-h-[100dvh] w-full max-w-7xl items-stretch px-4 sm:px-6 lg:px-8">
-      {/* Left column — oversized headline identity field */}
+      {}
       <motion.div
         className="relative z-10 flex w-full flex-col justify-center py-24 md:w-[62%] md:pr-10 lg:pr-16"
         style={{ opacity: contentOpacity }}
       >
 
-        {/* Oversized editorial headline */}
+        {}
         <motion.h1
           className="mb-6 max-w-3xl font-display text-[clamp(2.75rem,7vw,5.5rem)] font-bold leading-[0.9] tracking-[-0.04em] text-text-primary"
           style={{ y: contentY }}
@@ -132,7 +128,7 @@ export function HeroSection({ about }: HeroSectionProps) {
           <span className="text-teal">.</span>
         </motion.h1>
 
-        {/* Role line — left-aligned, mono teal */}
+        {}
         <motion.div
           className="mb-6 flex h-10 items-center md:h-12"
           style={{ y: contentY }}
@@ -152,7 +148,7 @@ export function HeroSection({ about }: HeroSectionProps) {
           </p>
         </motion.div>
 
-        {/* Bio paragraph — max-w-2xl, left-aligned */}
+        {}
         <motion.p
           className="mb-10 max-w-2xl text-base leading-relaxed text-text-secondary md:text-lg lg:text-xl"
           style={{ y: contentY }}
@@ -163,7 +159,7 @@ export function HeroSection({ about }: HeroSectionProps) {
           {heroBio}
         </motion.p>
 
-        {/* CTAs + availability — left-aligned */}
+        {}
         <motion.div
           className="flex flex-col items-start gap-4"
           style={{ y: contentY }}
@@ -212,15 +208,15 @@ export function HeroSection({ about }: HeroSectionProps) {
         </motion.div>
       </motion.div>
 
-      {/* Right column — telemetry rail (monochrome, narrow) */}
-      {/* Right column — 3D ID card + telemetry rail */}
+      {}
+      {}
       <div className="pointer-events-auto relative z-10 hidden w-[38%] flex-col items-center justify-center gap-6 border-l border-line/60 bg-bg-elevated/20 px-8 py-24 backdrop-blur-sm md:flex lg:w-[32%] lg:px-12">
-        {/* Subtle vertical tick marks along the left edge */}
+        {}
         <div className="absolute left-0 top-0 h-full w-[1px] overflow-hidden opacity-30">
           <div className="h-full w-full bg-[linear-gradient(to_bottom,transparent_50%,var(--border)_50%)] bg-[length:1px_12px]" />
         </div>
 
-        {/* 3D ID card — focal point */}
+        {}
         <motion.div
           className="flex w-full justify-center"
           initial={reduceMotion ? false : { opacity: 0, y: 24 }}
@@ -230,7 +226,7 @@ export function HeroSection({ about }: HeroSectionProps) {
           <HeroFlipCard about={about} />
         </motion.div>
 
-        {/* Social links — compact, right-aligned */}
+        {}
         {socialLinks.length > 0 && (
           <motion.div
             className="flex items-center justify-center gap-2"
@@ -267,7 +263,7 @@ export function HeroSection({ about }: HeroSectionProps) {
       </div>
       </div>
 
-      {/* HeroScene CSS background — constrained to content container so far L/R edges keep a clean gutter */}
+      {}
       <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden="true">
         <div className="relative mx-auto h-full w-full max-w-7xl overflow-hidden px-4 sm:px-6 lg:px-8">
           <div className="absolute inset-x-4 inset-y-0 sm:inset-x-6 lg:inset-x-8">
@@ -279,7 +275,7 @@ export function HeroSection({ about }: HeroSectionProps) {
         <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[var(--bg)] to-transparent" />
       </div>
 
-      {/* Bottom fade into page background */}
+      {}
       <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-32 bg-gradient-to-t from-[var(--bg)] to-transparent" />
     </section>
   );

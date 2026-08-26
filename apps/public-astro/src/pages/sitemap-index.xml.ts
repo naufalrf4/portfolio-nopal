@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro';
 import { getProjects } from '../lib/api';
 
-const STATIC_ROUTES = ['', '/about', '/projects', '/blogs', '/contact', '/ai-chatbot'];
+const STATIC_ROUTES = ['', '/about', '/projects', '/publications', '/contact', '/ai-chatbot'];
 
 function createSitemapEntry(url: string, changefreq: string, priority: string): string {
   return `<url><loc>${url}</loc><changefreq>${changefreq}</changefreq><priority>${priority}</priority></url>`;

@@ -16,7 +16,7 @@ export default function ContactDetailLoading() {
       </div>
 
       <div className="space-y-6">
-        {/* Header card skeleton */}
+        {}
         <div
           className="rounded-[var(--radius-container)] p-6 animate-pulse"
           style={{
@@ -67,7 +67,7 @@ export default function ContactDetailLoading() {
           </div>
         </div>
 
-        {/* Message card skeleton */}
+        {}
         <div
           className="rounded-[var(--radius-container)] p-6 animate-pulse"
           style={{
@@ -95,7 +95,7 @@ export default function ContactDetailLoading() {
           </div>
         </div>
 
-        {/* Actions skeleton */}
+        {}
         <div className="flex gap-3">
           {[1, 2].map((i) => (
             <div

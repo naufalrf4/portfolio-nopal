@@ -3,21 +3,16 @@ import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface PageHeroProps {
-  /** Small mono eyebrow text above the H1 (e.g. "Projects"). Preferred over icon. */
   eyebrow?: string;
-  /** Optional icon — legacy pattern, shown in a card above the title. */
   icon?: LucideIcon;
   title: string;
   description?: string;
-  /** Optional subcopy rendered under the description. */
   subcopy?: string;
   className?: string;
-  /** Center align (default true for icon pattern, false for eyebrow pattern). */
   centered?: boolean;
 }
 
 export function PageHero({ eyebrow, icon: Icon, title, description, subcopy, className, centered }: PageHeroProps) {
-  // Eyebrow pattern: left-aligned editorial header (preferred per plan).
   if (eyebrow) {
     const align = centered ?? false;
     return (
@@ -51,7 +46,6 @@ export function PageHero({ eyebrow, icon: Icon, title, description, subcopy, cla
     );
   }
 
-  // Legacy icon pattern: centered header with icon card.
   return (
     <header className={cn('mb-12 text-center homepage-reveal', className)}>
       <div className="mb-6 flex flex-col items-center gap-6">

@@ -57,7 +57,6 @@ export async function waitForHealthy(url: string, timeoutMs = 90_000): Promise<b
       const res = await probe(url, { timeoutMs: 3_000 });
       if (res.status < 500) return true;
     } catch {
-      // service not accepting connections yet
     }
     await new Promise((resolve) => setTimeout(resolve, 250));
   }

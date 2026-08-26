@@ -18,7 +18,7 @@ export function LatestArticles({ blogs }: LatestArticlesProps) {
   return (
     <section data-scene="flow" className="relative w-full border-t border-line py-16 md:py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Right-aligned header with offset — different from left-H2 pattern */}
+        {}
         <BlurFade direction="left" offset={24} className="mb-10 flex-col items-end">
           <span className="font-mono text-xs uppercase tracking-[0.25em] text-teal mb-4">03 — Field Notes</span>
           <h2 className="text-right font-display text-3xl font-bold tracking-tight text-text-primary md:text-5xl lg:text-6xl">
@@ -29,7 +29,7 @@ export function LatestArticles({ blogs }: LatestArticlesProps) {
               Notes from building, breaking, and shipping systems.
             </p>
             <a
-              href="/blogs"
+              href="/publications"
               className="group inline-flex items-center gap-2 font-mono text-sm uppercase tracking-wide text-text-secondary transition-colors hover:text-text-primary"
               aria-label="View all articles"
             >
@@ -57,7 +57,7 @@ export function LatestArticles({ blogs }: LatestArticlesProps) {
           </div>
         ) : (
           <div className="grid gap-12 lg:grid-cols-[2fr_1fr] lg:gap-16">
-            {/* Lead Article (Dominant) */}
+            {}
             {selected && (
               <BlurFade direction="up" offset={20} className="lg:-ml-8 lg:pr-4">
                 <ThreeDCard maxTilt={6} className="group">
@@ -107,7 +107,7 @@ export function LatestArticles({ blogs }: LatestArticlesProps) {
               </BlurFade>
             )}
 
-            {/* Index List (Compact) */}
+            {}
             <div className="flex flex-col border-t border-line lg:border-l lg:border-t-0 lg:pl-8">
               {rest.map((blog) => {
                 const originalIndex = latestBlogs.findIndex((b) => b.id === blog.id);

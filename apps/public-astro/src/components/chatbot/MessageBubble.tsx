@@ -58,7 +58,7 @@ export function MessageBubble({
       >
         <MarkdownMessage content={message.content} isUser={isUser} isStreaming={isStreaming} />
 
-        {/* Pending Action Confirmation Card */}
+        {}
         {!isUser && pendingAction && (
           <div className="mt-3 rounded-xl border border-[var(--teal)]/40 bg-[var(--teal-soft)] p-3">
             <p className="text-sm font-medium text-[var(--teal)] mb-2">

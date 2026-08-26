@@ -1,16 +1,4 @@
-// ──────────────────────────────────────────────────────────────────────────
-// @naufalrf/contracts — pure types derived from Admin API producer shapes
-// ──────────────────────────────────────────────────────────────────────────
-// Source of truth: apps/admin/src/app/api/v1/public/*/route.ts
-//                        apps/admin/src/lib/api/responses/index.ts
-//
-// DO NOT add fallback data, endpoint URLs, or runtime logic.
-// Keep fields and optionality EXACTLY as Admin returns them.
-// ──────────────────────────────────────────────────────────────────────────
 
-// ─── About ───────────────────────────────────────────────────────────────
-// Source: GET /api/v1/public/about
-//         apps/admin/src/app/api/v1/public/about/route.ts
 
 export interface Skill {
   name: string;
@@ -53,10 +41,6 @@ export interface AboutData {
   socialLinks: SocialLink[];
 }
 
-// ─── Projects ────────────────────────────────────────────────────────────
-// Sources: GET /api/v1/public/projects  (list)
-//          GET /api/v1/public/projects/[slug] (detail)
-
 export interface ProjectImage {
   id: string;
   url: string;
@@ -65,7 +49,6 @@ export interface ProjectImage {
   caption: string | null;
 }
 
-/** Shape returned by GET /projects (list) — images are a subset of full ProjectImage */
 export interface ProjectListItem {
   id: string;
   title: string;
@@ -81,7 +64,6 @@ export interface ProjectListItem {
   images: ProjectImage[];
 }
 
-/** Shape returned by GET /projects/[slug] (detail) — full projectImages row */
 export interface ProjectDetailImage {
   id: string;
   projectId: string;
@@ -93,7 +75,6 @@ export interface ProjectDetailImage {
   createdAt: string;
 }
 
-/** Shape returned by GET /projects/[slug] — superset of ProjectListItem */
 export interface ProjectDetail {
   id: string;
   title: string;
@@ -122,10 +103,6 @@ export interface ProjectsResponse {
   meta: ProjectsMeta;
 }
 
-// ─── Profile Links ───────────────────────────────────────────────────────
-// Source: GET /api/v1/public/links
-//         apps/admin/src/app/api/v1/public/links/route.ts
-
 export interface ProfileLink {
   id: string;
   label: string;
@@ -136,10 +113,6 @@ export interface ProfileLink {
   createdAt: string;
   updatedAt: string;
 }
-
-// ─── Blogs ───────────────────────────────────────────────────────────────
-// Source: GET /api/v1/public/blogs
-//         apps/admin/src/app/api/v1/public/blogs/route.ts
 
 export interface Blog {
   id: string;
@@ -156,10 +129,6 @@ export interface BlogsResponse {
   blogs: Blog[];
   meta: { total: number };
 }
-
-// ─── Achievements ────────────────────────────────────────────────────────
-// Source: GET /api/v1/public/achievements
-//         apps/admin/src/app/api/v1/public/achievements/route.ts
 
 export interface Achievement {
   id: string;
@@ -178,10 +147,6 @@ export interface AchievementsResponse {
   meta: { total: number };
 }
 
-// ─── Guestbook ───────────────────────────────────────────────────────────
-// Source: GET /api/v1/public/guestbook
-//         apps/admin/src/app/api/v1/public/guestbook/route.ts
-
 export interface GuestbookUser {
   name: string | null;
   image: string | null;
@@ -197,10 +162,6 @@ export interface GuestbookEntry {
 export interface GuestbookResponse {
   entries: GuestbookEntry[];
 }
-
-// ─── Messages (NGL) ──────────────────────────────────────────────────────
-// Source: POST /api/v1/public/messages
-//         apps/admin/src/app/api/v1/public/messages/route.ts
 
 export interface MessagePayload {
   content: string;
@@ -218,10 +179,6 @@ export interface MessageResponse {
   error?: MessageError;
 }
 
-// ─── Contact Form ────────────────────────────────────────────────────────
-// Source: POST /api/v1/public/contact
-//         apps/admin/src/app/api/v1/public/contact/route.ts
-
 export interface ContactSubmissionInput {
   name: string;
   email: string;
@@ -231,10 +188,6 @@ export interface ContactSubmissionInput {
   timezone?: string;
 }
 
-// ─── Bookings ────────────────────────────────────────────────────────────
-// Sources: POST /api/v1/public/bookings
-//          GET  /api/v1/public/bookings/available
-
 export interface BookingSlotItem {
   id: string;
   date: string;
@@ -243,7 +196,6 @@ export interface BookingSlotItem {
   duration: number;
 }
 
-/** date-grouped availability: { "2026-08-01": [BookingSlotItem, ...] } */
 export type BookingAvailability = Record<string, BookingSlotItem[]>;
 
 export interface BookingSubmissionInput {
@@ -269,13 +221,6 @@ export interface BookingResult {
   createdAt: string;
 }
 
-// ─── Envelope ────────────────────────────────────────────────────────────
-// Source: apps/admin/src/lib/api/responses/index.ts
-//
-// Every Admin public API response is wrapped in this top-level shape.
-//   Success: { success: true, data: T, message?: string }
-//   Error:   { success: false, error: { message: string, code?: string, details?: unknown } }
-
 export interface ApiSuccessEnvelope<T = unknown> {
   success: true;
   data: T;
@@ -293,8 +238,6 @@ export interface ApiErrorEnvelope {
 
 export type ApiEnvelope<T = unknown> = ApiSuccessEnvelope<T> | ApiErrorEnvelope;
 
-// ─── Type re-exports for consumer convenience ────────────────────────────
-
 export type {
-  ProjectListItem as Project, // legacy alias — most consumers use this as "Project"
+  ProjectListItem as Project, 
 };

@@ -2,15 +2,11 @@ import * as React from 'react';
 import { cn } from '@/lib/utils';
 
 interface ShineBorderProps extends React.HTMLAttributes<HTMLDivElement> {
-  /** Border width in px. @default 1 */
   borderWidth?: number;
-  /** Animation duration in seconds. @default 14 */
   duration?: number;
-  /** Shine color — single color or array. @default teal */
   shineColor?: string | string[];
 }
 
-/** Animated gradient shine border (adapted from MagicUI shine-border). */
 export function ShineBorder({
   borderWidth = 1,
   duration = 14,

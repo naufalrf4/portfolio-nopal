@@ -36,15 +36,9 @@ const SYNC_KEYS = [
   'guestbook_token',
 ] as const;
 
-/** Home preview keeps only the freshest entries. */
 const HOME_PREVIEW_COUNT = 6;
-/** Page mode trims nothing — it shows every entry in full. */
 const HOME_ROWS = 2;
 
-/**
- * Split entries into up to `rowCount` rows, front-filled so no row is
- * noticeably shorter than the others.
- */
 function buildRows(entries: readonly GuestbookEntry[], rowCount: number): GuestbookEntry[][] {
   const count = entries.length;
   if (count === 0) return [];
@@ -61,10 +55,6 @@ function buildRows(entries: readonly GuestbookEntry[], rowCount: number): Guestb
   return out.filter((row) => row.length > 0);
 }
 
-/**
- * How many times to duplicate a row's card set inside the marquee so the
- * track is always wider than the lane and the loop never shows a gap.
- */
 function repeatForRow(cardCount: number): number {
   if (cardCount <= 0) return 4;
   return Math.max(4, Math.ceil(6 / cardCount));
@@ -221,7 +211,6 @@ export function Guestbook({
     />
   );
 
-  // ----- Page mode: static grid, natural card height, no marquee -----
   if (isPageMode) {
     return (
       <Section id="guestbook" scene="signal" className="relative w-full py-8">
@@ -278,12 +267,11 @@ export function Guestbook({
     );
   }
 
-  // ----- Home mode: composer on the right, marquee preview on the left -----
   return (
     <Section id="guestbook" scene="signal" className="relative w-full overflow-hidden border-t border-line py-16 lg:py-24">
       <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid items-center gap-16 lg:grid-cols-[1.4fr_1fr] lg:gap-20">
-          {/* Marquee preview (left on desktop) */}
+          {}
           <BlurFade delay={0.2} inView className="order-2 w-full min-w-0 lg:order-1">
             {homeRows.length === 0 ? (
               <div className="flex h-32 w-full items-center justify-center rounded-2xl border border-dashed border-line">
@@ -324,7 +312,7 @@ export function Guestbook({
             )}
           </BlurFade>
 
-          {/* Composer side (right on desktop) */}
+          {}
           <BlurFade delay={0.4} inView className="order-1 flex flex-col justify-center lg:order-2">
             <div className="mb-8 flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-sm bg-text-primary text-bg">

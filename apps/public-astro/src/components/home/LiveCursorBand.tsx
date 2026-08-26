@@ -1,6 +1,6 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { Activity, MousePointer2 } from 'lucide-react';
-import { motion, useReducedMotion } from 'framer-motion';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { Activity } from 'lucide-react';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { useLiveCursorPresence } from './useLiveCursorPresence';
 import { useAstroPathname } from '@/lib/useAstroPathname';
 
@@ -27,6 +27,7 @@ export function LiveCursorBand({ currentPath, socketUrl }: LiveCursorBandProps) 
   });
 
   const participants = useMemo(() => (self ? [self, ...others] : others), [others, self]);
+  const lastPositions = useRef(new Map());
   const participantList = useMemo(
     () =>
       overviewParticipants
@@ -173,60 +174,100 @@ export function LiveCursorBand({ currentPath, socketUrl }: LiveCursorBandProps) 
       <div className="pointer-events-none fixed inset-0 z-[45] overflow-hidden" aria-hidden="true">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,var(--teal-soft),transparent_24%),radial-gradient(circle_at_bottom_right,var(--amber-soft),transparent_26%)]" />
 
-        {participants.map((participant, index) => {
-          const docX = participant.x * Math.max(documentMetrics.width, 1);
-          const docY = participant.y * Math.max(documentMetrics.height, 1);
-          const left = `${docX - documentMetrics.scrollX}px`;
-          const top = `${docY - documentMetrics.scrollY}px`;
-          const isSelf = participant.id === self?.id;
-          const sectionLabel = participant.sectionLabel || participant.pageLabel;
-          const showLabel = !isSelf;
+        <AnimatePresence>
+          {participants.map((participant, index) => {
+            const docX = participant.x * Math.max(documentMetrics.width, 1);
+            const docY = participant.y * Math.max(documentMetrics.height, 1);
+            const posX = docX - documentMetrics.scrollX;
+            const posY = docY - documentMetrics.scrollY;
+            const isSelf = participant.id === self?.id;
+            const sectionLabel = participant.sectionLabel || participant.pageLabel;
+            const showLabel = !isSelf;
 
-          return (
-            <motion.div
-              key={participant.id}
-              className="pointer-events-none absolute"
-              style={{ left, top, x: '-50%', y: '-50%', zIndex: isSelf ? 30 : 20 + index }}
-              animate={
-                reduceMotion ? undefined : { scale: participant.isTouching ? 1.08 : 1, opacity: 1 }
-              }
-              transition={{ type: 'spring', stiffness: 260, damping: 24, mass: 0.7 }}
-            >
-              <div className="relative flex flex-col items-center gap-2">
-                <div className="relative">
-                  <div
-                    className="absolute inset-[-10px] rounded-full bg-[radial-gradient(circle,var(--teal-glow),transparent_72%)] blur-md"
-                    aria-hidden="true"
-                  />
-                  <div
-                    className="relative h-6 w-6 rounded-[18px_18px_18px_4px] border border-line-hover shadow-[0_8px_20px_rgba(0,0,0,0.35)]"
-                    style={{ background: participant.color }}
-                  >
-                    <MousePointer2
-                      size={12}
-                      className="absolute left-[5px] top-[4px] text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]"
+            const last = lastPositions.current.get(participant.id);
+            const deltaX = last ? posX - last.x : 0;
+            const deltaY = last ? posY - last.y : 0;
+            const distance = Math.min(Math.hypot(deltaX, deltaY), 34);
+            const trailAngle = distance > 1 ? (Math.atan2(deltaY, deltaX) * 180) / Math.PI : 0;
+            const trailOpacity = reduceMotion ? 0 : Math.min(distance / 34, 1) * 0.7;
+            lastPositions.current.set(participant.id, { x: posX, y: posY });
+
+            return (
+              <motion.div
+                key={participant.id}
+                className="pointer-events-none absolute left-0 top-0"
+                style={{ zIndex: isSelf ? 30 : 20 + index }}
+                initial={reduceMotion ? false : { opacity: 0, scale: 0.4, x: posX, y: posY }}
+                animate={{
+                  x: posX,
+                  y: posY,
+                  scale: participant.isTouching ? 1.08 : 1,
+                  opacity: 1,
+                }}
+                exit={reduceMotion ? undefined : { opacity: 0, scale: 0.4 }}
+                transition={
+                  reduceMotion
+                    ? { duration: 0 }
+                    : {
+                        x: { type: 'spring', stiffness: 300, damping: 30, mass: 0.6 },
+                        y: { type: 'spring', stiffness: 300, damping: 30, mass: 0.6 },
+                        scale: { type: 'spring', stiffness: 260, damping: 24, mass: 0.7 },
+                        opacity: { duration: 0.25, ease: [0.22, 1, 0.36, 1] },
+                      }
+                }
+              >
+                <div className="relative flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-2">
+                  <div className="relative h-6 w-6">
+                    {trailOpacity > 0 && (
+                      <div
+                        className="absolute left-1/2 top-1/2 h-[2px] w-6 origin-left"
+                        style={{
+                          transform: `translate(-2px, -1px) rotate(${trailAngle + 180}deg)`,
+                          background: `linear-gradient(to right, ${participant.color}, transparent)`,
+                          opacity: trailOpacity,
+                        }}
+                        aria-hidden="true"
+                      />
+                    )}
+                    <div
+                      className="absolute inset-[-10px] rounded-full blur-md"
+                      style={{
+                        background: `radial-gradient(circle, color-mix(in srgb, ${participant.color} 55%, transparent), transparent 72%)`,
+                      }}
+                      aria-hidden="true"
+                    />
+                    <svg
+                      viewBox="0 0 24 24"
+                      className="relative h-6 w-6 drop-shadow-[0_2px_6px_rgba(0,0,0,0.4)]"
+                      aria-hidden="true"
+                    >
+                      <path
+                        d="M12 2 L14.3 9.7 L22 12 L14.3 14.3 L12 22 L9.7 14.3 L2 12 L9.7 9.7 Z"
+                        fill={participant.color}
+                      />
+                      <circle cx="12" cy="12" r="1.6" fill="white" />
+                    </svg>
+                    <div
+                      className={
+                        participant.isTouching
+                          ? 'absolute inset-[-10px] rounded-full border border-teal/60 animate-ping'
+                          : 'absolute inset-[-10px] rounded-full border border-transparent'
+                      }
                     />
                   </div>
-                  <div
-                    className={
-                      participant.isTouching
-                        ? 'absolute inset-[-10px] rounded-full border border-teal/60 animate-ping'
-                        : 'absolute inset-[-10px] rounded-full border border-transparent'
-                    }
-                  />
-                </div>
-                {showLabel && (
-                  <div className="rounded-full border border-line bg-bg-card/90 px-3 py-1.5 text-[11px] font-semibold text-text-primary backdrop-blur-md">
-                    <div>{participant.name}</div>
-                    <div className="mt-0.5 font-mono text-[9px] font-medium uppercase tracking-[0.18em] text-text-tertiary">
-                      {sectionLabel}
+                  {showLabel && (
+                    <div className="rounded-full border border-line bg-bg-card/90 px-3 py-1.5 text-[11px] font-semibold text-text-primary backdrop-blur-md">
+                      <div>{participant.name}</div>
+                      <div className="mt-0.5 font-mono text-[9px] font-medium uppercase tracking-[0.18em] text-text-tertiary">
+                        {sectionLabel}
+                      </div>
                     </div>
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          );
-        })}
+                  )}
+                </div>
+              </motion.div>
+            );
+          })}
+        </AnimatePresence>
       </div>
 
       <motion.div
@@ -243,7 +284,7 @@ export function LiveCursorBand({ currentPath, socketUrl }: LiveCursorBandProps) 
           >
             <span className="inline-flex items-center gap-2 rounded-full bg-bg-elevated px-2 py-1 md:px-2.5">
               <span
-                className={`h-2.5 w-2.5 rounded-full ${status === 'connected' ? 'bg-teal shadow-[0_0_12px_var(--teal)]' : status === 'connecting' ? 'bg-amber shadow-[0_0_10px_var(--amber)]' : 'bg-text-tertiary shadow-none'}`}
+                className={`h-2.5 w-2.5 rounded-full transition-[background-color,box-shadow] duration-500 ease-out ${status === 'connected' ? 'bg-teal shadow-[0_0_12px_var(--teal)]' : status === 'connecting' ? 'bg-amber shadow-[0_0_10px_var(--amber)]' : 'bg-text-tertiary shadow-none'}`}
               />
               <Activity size={11} className="hidden text-teal md:block" />
               <span className="md:hidden">{totalParticipants} Online</span>

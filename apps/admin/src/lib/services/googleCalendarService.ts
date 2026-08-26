@@ -49,9 +49,6 @@ export type GoogleCalendarConnectionResult = {
   defaultCalendarName: string | null;
 };
 
-// Thrown when a Google API call fails because the stored refresh token has
-// been revoked or expired, so callers can distinguish this from "not
-// connected" (no refresh token at all) instead of surfacing a generic 500.
 export class GoogleCalendarAuthError extends Error {
   constructor(message = 'Google Calendar authorization has been revoked or expired.') {
     super(message);

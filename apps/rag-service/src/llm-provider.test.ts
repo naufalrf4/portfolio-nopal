@@ -136,7 +136,6 @@ describe("LLM Provider Abstraction", () => {
           usageMetadata: { promptTokenCount: 5, candidatesTokenCount: 2 },
         },
       });
-      // Use the mock server as baseUrl so the gemini client hits it
       const client = createLlmClient({
         provider: "gemini",
         baseUrl: mock.url,

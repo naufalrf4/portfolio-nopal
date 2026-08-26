@@ -4,7 +4,6 @@ import { describeResponse, postJson, probe } from '../../helpers/http';
 import { available } from '../../helpers/services';
 export { manifest } from './manifest';
 
-
 const ready = await available('rag');
 
 describe.if(ready)('rag health', () => {

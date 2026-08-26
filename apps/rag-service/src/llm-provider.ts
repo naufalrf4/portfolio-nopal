@@ -1,7 +1,5 @@
 import { RagServiceError } from "./errors";
 
-// ---- types ----
-
 export type ProviderType = "openai-compatible" | "gemini";
 
 export interface LlmSlotConfig {
@@ -24,14 +22,10 @@ export interface GenerateResult {
   completionTokens: number;
 }
 
-// ---- interface ----
-
 export interface LlmClient {
   generate(prompt: string, temperature?: number): Promise<GenerateResult>;
   embed(texts: string[]): Promise<number[][]>;
 }
-
-// ---- 0penAI-compatible adapter ----
 
 class OpenAiCompatibleClient implements LlmClient {
   constructor(private readonly config: LlmSlotConfig) {}
@@ -152,13 +146,10 @@ class OpenAiCompatibleClient implements LlmClient {
   }
 }
 
-// ---- Gem1ni adapter ----
-
 class GeminiClient implements LlmClient {
   constructor(private readonly config: LlmSlotConfig) {}
 
   private get effectiveBaseUrl(): string {
-    // Use provided baseUrl, or default to Google REST endpoint
     if (this.config.baseUrl) {
       return this.config.baseUrl.replace(/\/$/, "");
     }
@@ -288,8 +279,6 @@ class GeminiClient implements LlmClient {
   }
 }
 
-// ---- factory ----
-
 export function createLlmClient(slot: LlmSlotConfig): LlmClient {
   if (slot.provider === "gemini") {
     return new GeminiClient(slot);
@@ -308,7 +297,6 @@ export class LlmProvider {
     this.embedding = createLlmClient(config.embedding);
   }
 
-  /** Generate with main→fallback retry on failure. */
   async generate(prompt: string, temperature = 0.2): Promise<GenerateResult> {
     try {
       return await this.main.generate(prompt, temperature);

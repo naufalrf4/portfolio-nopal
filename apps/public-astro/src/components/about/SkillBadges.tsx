@@ -12,7 +12,6 @@ export const SkillBadges: FC<SkillBadgesProps> = ({ skills }) => {
     return null;
   }
 
-  // Group skills by category
   const groupedSkills = skills.reduce<Record<string, Skill[]>>((acc, skill) => {
     const category = skill.category || 'Other';
     if (!acc[category]) {

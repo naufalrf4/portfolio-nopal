@@ -9,7 +9,6 @@ interface ProjectCardProps {
 export function ProjectCard({ project }: ProjectCardProps) {
   const title = project.title?.trim() || 'Untitled Project';
   const techStack = project.techStack ?? [];
-  // Use imageUrl first, fallback to first image from images array, then fallback to gradient
   const thumbnailUrl = project.imageUrl || project.images?.[0]?.url;
 
   return (

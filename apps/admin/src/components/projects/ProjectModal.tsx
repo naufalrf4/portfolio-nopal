@@ -196,7 +196,7 @@ export function ProjectModal({ isOpen, onClose, onSuccess, project }: ProjectMod
       }
     >
       <form id="project-form" onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
-        {/* Title and Slug */}
+        {}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="title">Title *</Label>
@@ -222,7 +222,7 @@ export function ProjectModal({ isOpen, onClose, onSuccess, project }: ProjectMod
           </div>
         </div>
 
-        {/* Summary */}
+        {}
         <div className="space-y-2">
           <Label htmlFor="summary">Summary *</Label>
           <Textarea
@@ -248,7 +248,7 @@ export function ProjectModal({ isOpen, onClose, onSuccess, project }: ProjectMod
           />
         </div>
 
-        {/* Category and Tech Stack */}
+        {}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="category">Category *</Label>
@@ -275,7 +275,7 @@ export function ProjectModal({ isOpen, onClose, onSuccess, project }: ProjectMod
           </div>
         </div>
 
-        {/* URLs */}
+        {}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="liveUrl">Live URL</Label>
@@ -301,7 +301,7 @@ export function ProjectModal({ isOpen, onClose, onSuccess, project }: ProjectMod
           </div>
         </div>
 
-        {/* Settings Section */}
+        {}
         <div
           className="p-4 sm:p-6 rounded-2xl bg-[var(--bg-elevated)]"
           style={{
@@ -311,7 +311,7 @@ export function ProjectModal({ isOpen, onClose, onSuccess, project }: ProjectMod
           <h4 className="text-sm font-semibold text-[var(--text-primary)] mb-4">Settings</h4>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* Checkboxes */}
+            {}
             <div className="space-y-3">
               <label className="flex items-center space-x-3 cursor-pointer group">
                 <div className="relative">
@@ -352,7 +352,7 @@ export function ProjectModal({ isOpen, onClose, onSuccess, project }: ProjectMod
               </label>
             </div>
 
-            {/* Order */}
+            {}
             <div className="space-y-2">
               <Label htmlFor="order">Display Order</Label>
               <div className="flex items-center gap-2">

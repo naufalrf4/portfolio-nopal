@@ -1,31 +1,4 @@
-/**
- * CONTRACT DRIFT CHECK — @naufalrf/contracts
- *
- * ## How drift detection works:
- *
- * This file contains LITERAL fixture objects that exactly mirror what
- * the real Admin API route handlers return. Each fixture is annotated
- * with `satisfies ContractType`.
- *
- * **If an Admin route handler changes its output shape WITHOUT updating
- * @naufalrf/contracts**, then updating this fixture to match the new
- * Admin output will FAIL the `satisfies` check because the contract
- * type no longer matches what the Admin actually sends.
- *
- * ## When Admin changes its API:
- * 1. The developer updates the Admin route handler
- * 2. They MUST also update these fixtures to match Admin's new shape
- * 3. If contracts haven't been updated, `satisfies` will fail → DRIFT DETECTED
- * 4. Developer updates contracts AND fixtures together
- *
- * ## Drift-proof demonstration:
- * If you change `fullName` to `displayName` in contracts/src/index.ts,
- * this file will FAIL to compile because the fixtures still assign
- * `fullName` but the contract expects `displayName`.
- *
- * Run: `bun test` — 8 tests pass (contract shapes valid)
- * Fail test: change contracts → re-run tests → compile errors in fixtures
- */
+
 
 import { describe, it, expect } from 'bun:test';
 import type {
@@ -40,10 +13,6 @@ import type {
   MessageResponse,
   ApiSuccessEnvelope,
 } from '@naufalrf/contracts';
-
-// ─── Fixtures mirroring actual Admin API shapes ──────────────────────────
-// Each satisfies the contract type. If Admin's route output changes,
-// these fixtures must be updated → satisfies check catches drift.
 
 type Availability = 'available' | 'busy' | 'unavailable' | null;
 
@@ -186,8 +155,6 @@ const envelopeFixture = {
   message: 'ok',
 } satisfies ApiSuccessEnvelope<AboutData>;
 
-// ─── Tests — verify fixtures match contracts ─────────────────────────────
-
 describe('contract drift fixtures', () => {
   it('AboutData: fullName, skills, experience, socialLinks all present', () => {
     expect(aboutFixture.fullName).toBe('Full Name');
@@ -200,7 +167,6 @@ describe('contract drift fixtures', () => {
   it('ProjectListItem: images are nested (not full ProjectImage)', () => {
     expect(projectListItemFixture.images).toHaveLength(1);
     expect(projectListItemFixture.images[0]!.url).toBe('https://example.com/img.jpg');
-    // ProjectListItem images DON'T have projectId/key/createdAt
     expect((projectListItemFixture.images[0]! as Record<string, unknown>).projectId).toBeUndefined();
   });
 

@@ -53,8 +53,6 @@ function chunkText(
     for (let pos = 0; pos < paragraph.length; ) {
       const slice = paragraph.slice(pos, pos + targetTokens * 4);
       rawChunks.push(slice.trim());
-      // Guarantee forward progress even if overlap misconfiguration slips past
-      // config-level validation (belt-and-suspenders against an infinite loop).
       const step = Math.max(targetTokens * 4 - overlapTokens * 4, targetTokens);
       pos += step;
     }

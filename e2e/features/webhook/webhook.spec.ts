@@ -5,7 +5,6 @@ import { describeResponse, probe } from '../../helpers/http';
 import { available } from '../../helpers/services';
 export { manifest } from './manifest';
 
-
 const missing = requireEnv(['WEBHOOK_SECRET']);
 const ready = missing ? false : await available('webhook');
 

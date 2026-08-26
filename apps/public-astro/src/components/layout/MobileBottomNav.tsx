@@ -17,7 +17,7 @@ const navItems = [
   { href: '/', label: 'Home', icon: Home },
   { href: '/about', label: 'About', icon: User },
   { href: '/projects', label: 'Projects', icon: FolderKanban },
-  { href: '/blogs', label: 'Blogs', icon: FileText },
+  { href: '/publications', label: 'Publication', icon: FileText },
   { href: '/contact', label: 'Contact', icon: Mail },
 ];
 
@@ -29,7 +29,6 @@ export function MobileBottomNav({ currentPath }: MobileBottomNavProps) {
   const pathname = useAstroPathname(currentPath);
   const [otherOpen, setOtherOpen] = useState(false);
 
-  // Helper to check active state
   const isActive = (href: string) => {
     if (href === '/') return pathname === '/';
     return pathname.startsWith(href);

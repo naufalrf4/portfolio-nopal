@@ -4,16 +4,10 @@ import { cn } from '@/lib/utils';
 interface TiltProps {
   children: ReactNode;
   className?: string;
-  /** Max rotation in degrees */
   max?: number;
-  /** Lift on hover in px */
   lift?: number;
 }
 
-/**
- * 3D tilt-follow-mouse wrapper. Pure CSS transform, no re-renders.
- * Disabled for touch devices and prefers-reduced-motion.
- */
 export function Tilt({ children, className, max = 5, lift = 4 }: TiltProps) {
   const ref = useRef<HTMLDivElement | null>(null);
 

@@ -5,8 +5,7 @@ import { AuthErrorContent } from '../../components/auth/AuthErrorContent';
 const message = Astro.url.searchParams.get('message') || '';
 
 const title = 'Auth Error';
-const description = 'Something went wrong while signing in for the public guestbook flow.';
----
+const description = 'Something went wrong while signing in for the public guestbook flow.';---
 
 <PageLayout title={title} description={description} canonicalUrl="/auth/error">
   <section class="min-h-screen px-4 py-12 sm:px-6 md:py-16 lg:px-8">

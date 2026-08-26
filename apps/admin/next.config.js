@@ -4,7 +4,6 @@ import { fileURLToPath } from 'node:url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const WORKSPACE_ROOT = path.resolve(__dirname, '../..');
 
-/** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
   output: 'standalone',

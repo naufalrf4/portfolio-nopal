@@ -4,21 +4,18 @@ import { ProjectsGrid } from '../../components/projects/ProjectsGrid';
 import { getProjects } from '../../lib/api';
 import { PageHero } from '@/components/shared';
 
-// Fetch all projects for client-side filtering
 const { projects } = await getProjects();
 
 const title = "Projects";
-const description = 'Explore integrated system projects by Naufal Rizqullah Firdaus across automation engineering, IoT development, cloud-backed software, and AI workflows shaped by real operational constraints.';
-
----
+const description = 'Explore integrated system projects by Naufal Rizqullah Firdaus across automation engineering, IoT development, cloud-backed software, and AI workflows shaped by real operational constraints.';---
 
 <PageLayout
   title={title}
   description={description}
   canonicalUrl="https://naufalrf.net/projects"
 >
-  <div class="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-7xl mx-auto">
+  <div class="min-h-screen px-4 py-12 sm:px-6 md:py-16 lg:px-8">
+    <div class="mx-auto max-w-7xl">
       <PageHero
         eyebrow="Projects"
         title="Things I've built"

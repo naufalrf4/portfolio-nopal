@@ -15,7 +15,6 @@ interface IconCloudProps {
   icons?: React.ReactNode[];
   images?: string[];
   showControl?: boolean;
-  /** Canvas square size in px. @default 400 */
   size?: number;
 }
 
@@ -23,12 +22,6 @@ function easeOutCubic(t: number): number {
   return 1 - Math.pow(1 - t, 3);
 }
 
-/**
- * Interactive 3D rotating cloud of tech icons on a <canvas> (adapted from MagicUI
- * icon-cloud). Icons sit on a Fibonacci sphere; it auto-rotates toward the cursor,
- * can be dragged to spin, and clicked to snap an icon to the front. Honors
- * prefers-reduced-motion by pausing auto-rotation.
- */
 export function IconCloud({ icons, images, showControl = true, size = 400 }: IconCloudProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [iconPositions, setIconPositions] = useState<Icon[]>([]);
@@ -50,7 +43,6 @@ export function IconCloud({ icons, images, showControl = true, size = 400 }: Ico
   const iconCanvasesRef = useRef<HTMLCanvasElement[]>([]);
   const imagesLoadedRef = useRef<boolean[]>([]);
 
-  // Pause auto-rotation if user prefers reduced motion
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     if (mediaQuery.matches) setIsPaused(true);
@@ -59,7 +51,6 @@ export function IconCloud({ icons, images, showControl = true, size = 400 }: Ico
     return () => mediaQuery.removeEventListener('change', handleChange);
   }, []);
 
-  // Build offscreen icon canvases once when icons/images change
   useEffect(() => {
     if (!icons && !images) return;
     const items = icons ?? images ?? [];
@@ -103,13 +94,10 @@ export function IconCloud({ icons, images, showControl = true, size = 400 }: Ico
     iconCanvasesRef.current = newIconCanvases;
   }, [icons, images]);
 
-  // Sphere radius scales with the canvas so icons fill ~42% of the half-width instead of a
-  // hardcoded 100px that left large dead margins on bigger canvases.
   const radius = size * 0.45;
-  const depthBase = radius * 2; // perspective divisor tied to radius
-  const iconRadius = size * 0.05; // click hit-test radius, ~20px at 400px
+  const depthBase = radius * 2; 
+  const iconRadius = size * 0.05; 
 
-  // Initial positions on a Fibonacci sphere
   useEffect(() => {
     const items = icons ?? images ?? [];
     const newIcons: Icon[] = [];
@@ -203,7 +191,6 @@ export function IconCloud({ icons, images, showControl = true, size = 400 }: Ico
 
   const handleMouseUp = () => setIsDragging(false);
 
-  // Render loop
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext('2d');
@@ -234,7 +221,6 @@ export function IconCloud({ icons, images, showControl = true, size = 400 }: Ico
           };
         }
 
-        // First pass: compute projected positions for lines + icons
         const projected: { x: number; y: number; scale: number; opacity: number; index: number }[] = [];
         iconPositions.forEach((icon, index) => {
           const cosX = Math.cos(rotationRef.current.x);
@@ -252,7 +238,6 @@ export function IconCloud({ icons, images, showControl = true, size = 400 }: Ico
           projected.push({ x: rotatedX, y: rotatedY, scale, opacity, index });
         });
 
-        // Second pass: connect lines between nearby icons (drawn first so icons overlay)
         const connectDist = radius * 1.1;
         ctx.save();
         ctx.lineWidth = 1;
@@ -275,7 +260,6 @@ export function IconCloud({ icons, images, showControl = true, size = 400 }: Ico
         }
         ctx.restore();
 
-        // Third pass: icons
         projected.forEach(({ x: rotatedX, y: rotatedY, scale, opacity, index }) => {
           ctx.save();
           ctx.translate(canvas.width / 2 + rotatedX, canvas.height / 2 + rotatedY);

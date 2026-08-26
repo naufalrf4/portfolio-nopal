@@ -5,7 +5,6 @@ import { describeResponse, postJson } from '../../helpers/http';
 import { available } from '../../helpers/services';
 export { manifest } from './manifest';
 
-
 describe('proxy header contract', () => {
   test('client x-forwarded-for is dropped without a trusted socket address', () => {
     const headers = buildProxyHeaders(

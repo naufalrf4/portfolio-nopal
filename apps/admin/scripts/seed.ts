@@ -973,9 +973,6 @@ async function resetPublicContentTables(runtime: AdminRuntime) {
 
 async function triggerRagIngest() {
   const ragUrl = process.env.RAG_SERVICE_URL || 'http://127.0.0.1:3005';
-  // ADMIN_SERVICE_TOKEN is a legacy fallback shared across two auth directions
-  // (outbound admin auth + inbound rag ingest auth). Prefer setting
-  // RAG_INGEST_SERVICE_TOKEN (and ADMIN_INTERNAL_API_TOKEN) explicitly instead.
   const serviceToken = process.env.RAG_INGEST_SERVICE_TOKEN || process.env.ADMIN_SERVICE_TOKEN;
 
   if (!serviceToken) {

@@ -10,7 +10,6 @@ interface NumberTickerProps extends ComponentPropsWithoutRef<'span'> {
   decimalPlaces?: number;
 }
 
-/** Animated number counter (adapted from MagicUI number-ticker). */
 export function NumberTicker({
   value,
   startValue = 0,

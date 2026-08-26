@@ -40,7 +40,6 @@ export async function sendChatMessage({ request }: SendChatMessageOptions): Prom
         );
       }
 
-      // RAG returns ChatResponse shape directly (raw pass-through via proxy)
       const data: ChatResponse = await response.json();
       return data;
     } finally {

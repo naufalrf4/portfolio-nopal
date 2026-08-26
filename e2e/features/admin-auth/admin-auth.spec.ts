@@ -4,7 +4,6 @@ import { describeResponse, postJson, probe, type Probe } from '../../helpers/htt
 import { available } from '../../helpers/services';
 export { manifest } from './manifest';
 
-
 const ready = await available('admin');
 
 function expectGated(res: Probe): void {

@@ -4,9 +4,6 @@ import { safeAuth } from '@/lib/auth';
 import type { Session } from 'next-auth';
 import { unauthorizedResponse, forbiddenResponse } from '../responses';
 
-// ADMIN_SERVICE_TOKEN is a legacy fallback shared across two auth directions
-// (outbound admin auth + inbound rag ingest auth). Prefer setting
-// ADMIN_INTERNAL_API_TOKEN (and RAG_INGEST_SERVICE_TOKEN) explicitly instead.
 const ADMIN_INTERNAL_API_TOKEN =
   process.env.ADMIN_INTERNAL_API_TOKEN || process.env.ADMIN_SERVICE_TOKEN;
 

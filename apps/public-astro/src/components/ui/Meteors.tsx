@@ -11,7 +11,6 @@ interface MeteorsProps {
   className?: string;
 }
 
-/** Diagonal meteor streaks for section backgrounds (adapted from MagicUI meteors). */
 export const Meteors = ({
   number = 20,
   minDelay = 0.2,
@@ -47,7 +46,7 @@ export const Meteors = ({
             className
           )}
         >
-          {/* Meteor tail */}
+          {}
           <div className="pointer-events-none absolute top-1/2 -z-10 h-px w-12.5 -translate-y-1/2 bg-linear-to-r from-teal/50 to-transparent" />
         </span>
       ))}

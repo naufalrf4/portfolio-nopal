@@ -9,11 +9,6 @@ type Theme = 'light' | 'dark';
 const THEME_KEY = 'theme';
 const DURATION = 550;
 
-/**
- * Same circular clip-path reveal as public-astro's AnimatedThemeToggler.
- * Theme is driven by `data-theme` on <html> + localStorage('theme')
- * (inline init script lives in app/layout.tsx).
- */
 export function ThemeToggler({ className }: { className?: string }) {
   const [isDark, setIsDark] = useState(true);
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -48,7 +43,6 @@ export function ThemeToggler({ className }: { className?: string }) {
       try {
         localStorage.setItem(THEME_KEY, next);
       } catch {
-        /* private mode */
       }
     };
 

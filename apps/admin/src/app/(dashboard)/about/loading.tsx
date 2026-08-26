@@ -12,7 +12,7 @@ export default function AboutLoading() {
       />
 
       <div className="mt-6">
-        {/* Tabs skeleton */}
+        {}
         <div className="mb-6 flex gap-2 flex-wrap">
           {['Personal Info', 'Bio', 'Skills', 'Experience', 'Social Links'].map((tab) => (
             <div
@@ -35,7 +35,7 @@ export default function AboutLoading() {
           ))}
         </div>
 
-        {/* Content card skeleton */}
+        {}
         <div
           className="rounded-[var(--radius-container)] p-8 animate-pulse"
           style={{
@@ -44,7 +44,7 @@ export default function AboutLoading() {
           }}
         >
           <div className="space-y-6">
-            {/* Title skeleton */}
+            {}
             <div
               className="h-6 w-48 rounded"
               style={{
@@ -52,7 +52,7 @@ export default function AboutLoading() {
               }}
             />
 
-            {/* Form fields skeleton */}
+            {}
             {[1, 2, 3, 4].map((i) => (
               <div key={i} className="space-y-2">
                 <div
@@ -71,7 +71,7 @@ export default function AboutLoading() {
               </div>
             ))}
 
-            {/* Button skeleton */}
+            {}
             <div
               className="h-12 w-32 rounded-2xl"
               style={{

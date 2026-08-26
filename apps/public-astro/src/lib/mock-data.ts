@@ -1,7 +1,3 @@
-// ── Mock fixtures for local development without Admin + DB ───────────────
-// Active only when PUBLIC_MOCK_DATA=true. Shapes match the merged local
-// types used by the homepage components (see src/types/index.ts and
-// packages/contracts/src/index.ts).
 import type {
   AboutData,
   Project,

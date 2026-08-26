@@ -78,8 +78,7 @@ const websiteSchema = {
   name: SITE_NAME,
   url: siteUrl,
   description,
-};
----
+};---
 
 <!doctype html>
 <html lang="en" class="scroll-smooth" data-theme="dark">
@@ -93,7 +92,7 @@ const websiteSchema = {
             var stored = localStorage.getItem('theme');
             if (stored === 'light' || stored === 'dark') theme = stored;
           } catch (e) {
-            /* ignore */
+            
           }
           document.documentElement.dataset.theme = theme;
         }

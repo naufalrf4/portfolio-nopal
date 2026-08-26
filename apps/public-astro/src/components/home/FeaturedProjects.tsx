@@ -19,7 +19,7 @@ export function FeaturedProjects({ projects }: FeaturedProjectsProps) {
   return (
     <section data-scene="circuit" className="relative w-full border-t border-line py-16 md:py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Right-aligned header — breaks the left-top pattern */}
+        {}
         <BlurFade direction="left" offset={24} className="mb-10 flex-col items-end">
           <span className="font-mono text-xs uppercase tracking-[0.25em] text-teal mb-4">
             02 — Selected Work
@@ -29,7 +29,7 @@ export function FeaturedProjects({ projects }: FeaturedProjectsProps) {
           </h2>
         </BlurFade>
 
-        {/* Compact 3-col grid */}
+        {}
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {featuredProjects.map((project, index) => {
             const thumbnailUrl = project.imageUrl || project.images?.[0]?.url;
@@ -106,7 +106,7 @@ export function FeaturedProjects({ projects }: FeaturedProjectsProps) {
           })}
         </div>
 
-        {/* CTA — left-aligned, breaking the center pattern */}
+        {}
         <BlurFade direction="up" offset={24} delay={0.1} className="mt-16">
           <a href="/projects">
             <Button variant="primary" size="md" className="min-w-[200px] group">

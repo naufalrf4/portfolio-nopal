@@ -27,11 +27,6 @@ interface BlurFadeProps extends MotionProps {
 
 const getFilter = (v: Variants[string]) => (typeof v === 'function' ? undefined : v.filter);
 
-/**
- * Scroll-reveal that blurs + fades + translates content into view (adapted from
- * MagicUI blur-fade). The single scroll-reveal primitive — use it instead of
- * ad-hoc `whileInView` blocks for a consistent reveal across the site.
- */
 export function BlurFade({
   children,
   className,

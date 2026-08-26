@@ -207,7 +207,7 @@ export function AchievementsTab() {
     <div className="space-y-6 relative min-h-[400px]">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-[var(--text-primary)]">Achievements</h2>
-        {/* Desktop: Show button in header */}
+        {}
         <Button
           onClick={() => setIsModalOpen(true)}
           className="hidden md:flex bg-[var(--teal)] hover:bg-[#2563EB] text-white"
@@ -228,7 +228,7 @@ export function AchievementsTab() {
               !achievement.visible && 'opacity-60'
             )}
           >
-            {/* Photo */}
+            {}
             {achievement.photos.length > 0 && (
               <div className="relative aspect-video bg-gradient-to-br from-[var(--teal)]/5 to-[#8B5CF6]/5">
                 <Image
@@ -246,7 +246,7 @@ export function AchievementsTab() {
               </div>
             )}
 
-            {/* Content */}
+            {}
             <div className="p-4">
               <div className="flex items-start justify-between gap-2 mb-2">
                 <div className="flex items-center gap-2">
@@ -269,7 +269,7 @@ export function AchievementsTab() {
                 </p>
               )}
 
-              {/* Actions */}
+              {}
               <div className="flex items-center justify-end gap-1 pt-2 border-t border-[#D1D5DB]">
                 <button
                   onClick={() => handlePreview(achievement)}
@@ -330,7 +330,7 @@ export function AchievementsTab() {
         )}
       </div>
 
-      {/* Mobile: Floating Action Button */}
+      {}
       <button
         onClick={() => setIsModalOpen(true)}
         className={cn(
@@ -461,7 +461,7 @@ export function AchievementsTab() {
         </form>
       </ResponsiveModal>
 
-      {/* Delete Confirmation Modal */}
+      {}
       <ResponsiveModal
         open={isDeleteModalOpen}
         onOpenChange={(open) => {
@@ -506,7 +506,7 @@ export function AchievementsTab() {
         </div>
       </ResponsiveModal>
 
-      {/* Preview Modal */}
+      {}
       <ResponsiveModal
         open={isPreviewModalOpen}
         onOpenChange={(open) => {
@@ -535,7 +535,7 @@ export function AchievementsTab() {
       >
         {previewAchievement && (
           <div className="space-y-6">
-            {/* Photo Carousel */}
+            {}
             {previewAchievement.photos.length > 0 && (
               <div className="space-y-4">
                 <div
@@ -590,7 +590,7 @@ export function AchievementsTab() {
                   )}
                 </div>
 
-                {/* Thumbnails */}
+                {}
                 {previewAchievement.photos.length > 1 && (
                   <div className="flex gap-2 overflow-x-auto pb-2">
                     {previewAchievement.photos.map((photo, idx) => (
@@ -618,7 +618,7 @@ export function AchievementsTab() {
               </div>
             )}
 
-            {/* Info */}
+            {}
             <div className="flex flex-wrap gap-3">
               <div
                 className={cn(
@@ -640,7 +640,7 @@ export function AchievementsTab() {
               </div>
             </div>
 
-            {/* Description */}
+            {}
             {previewAchievement.description && (
               <div className={cn('rounded-xl p-4', neumorphicInset)}>
                 <p className="text-[var(--text-secondary)] leading-relaxed whitespace-pre-line">

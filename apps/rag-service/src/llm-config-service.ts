@@ -47,8 +47,6 @@ export async function fetchLlmConfigFromAdmin(): Promise<AdminLlmConfigResponse>
     return cached;
   }
 
-  // Single-flight: concurrent callers await the same in-progress refresh
-  // instead of each triggering a redundant admin-API round-trip.
   if (fetchInFlight !== null) {
     return fetchInFlight;
   }

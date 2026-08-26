@@ -15,8 +15,7 @@ const {
   canonicalUrl,
 } = Astro.props;
 
-const formattedTitle = title === SITE_NAME ? SITE_NAME : `${title} - ${SITE_NAME}`;
----
+const formattedTitle = title === SITE_NAME ? SITE_NAME : `${title} - ${SITE_NAME}`;---
 
 <!doctype html>
 <html lang="en" data-theme="dark">
@@ -29,7 +28,7 @@ const formattedTitle = title === SITE_NAME ? SITE_NAME : `${title} - ${SITE_NAME
           var stored = localStorage.getItem('theme');
           if (stored === 'light' || stored === 'dark') theme = stored;
         } catch (e) {
-          /* ignore */
+          
         }
         document.documentElement.dataset.theme = theme;
       })();

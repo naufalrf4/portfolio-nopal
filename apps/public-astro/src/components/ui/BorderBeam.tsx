@@ -2,28 +2,19 @@ import { motion, type MotionStyle, type Transition } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 interface BorderBeamProps {
-  /** Size of the beam (px). @default 50 */
   size?: number;
-  /** Duration of one loop (s). @default 6 */
   duration?: number;
-  /** Start delay (s). @default 0 */
   delay?: number;
-  /** Beam gradient start color. @default teal */
   colorFrom?: string;
-  /** Beam gradient end color. @default teal-soft */
   colorTo?: string;
   transition?: Transition;
   className?: string;
   style?: React.CSSProperties;
-  /** Reverse the travel direction. @default false */
   reverse?: boolean;
-  /** Initial offset 0-100. @default 0 */
   initialOffset?: number;
-  /** Border width (px). @default 1 */
   borderWidth?: number;
 }
 
-/** A beam of light that travels the element border (adapted from MagicUI border-beam). */
 export const BorderBeam = ({
   className,
   size = 50,

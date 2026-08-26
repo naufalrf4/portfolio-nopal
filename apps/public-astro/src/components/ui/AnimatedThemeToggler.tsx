@@ -5,9 +5,7 @@ import { cn } from '@/lib/utils';
 type Theme = 'light' | 'dark';
 
 interface AnimatedThemeTogglerProps extends React.ComponentPropsWithoutRef<'button'> {
-  /** Clip reveal duration in ms. @default 400 */
   duration?: number;
-  /** Expand the reveal from the viewport center instead of the button. @default false */
   fromCenter?: boolean;
 }
 
@@ -22,13 +20,6 @@ function applyThemeAttr(theme: Theme) {
   document.documentElement.dataset.theme = theme;
 }
 
-/**
- * Theme toggle with a circular clip-path reveal via the View Transitions API
- * (adapted from MagicUI's animated-theme-toggler). This app drives theme through
- * `data-theme` on <html> + `localStorage('theme')` (set inline in BaseLayout), so
- * the toggler reads/writes `dataset.theme` rather than toggling a `dark` class.
- * Falls back to an instant swap when View Transitions are unsupported.
- */
 export function AnimatedThemeToggler({
   className,
   duration = 550,
@@ -86,7 +77,6 @@ export function AnimatedThemeToggler({
       try {
         localStorage.setItem(THEME_KEY, next);
       } catch {
-        /* private mode */
       }
     };
 
@@ -108,8 +98,6 @@ export function AnimatedThemeToggler({
     };
 
     isTransitioningRef.current = true;
-    // Apply the DOM attribute synchronously (cheap) so the snapshot captures the
-    // new theme; React state syncs the icon after, not during, the transition.
     const transition = document.startViewTransition(() => {
       applyTheme();
     });

@@ -103,7 +103,7 @@ export function TechnicalExpertise() {
     <section data-scene="circuit" className="relative w-full border-t border-teal/30 py-16 md:py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-8">
-          {/* Left column — heading, stats, grouped stack */}
+          {}
           <div className="flex flex-col gap-10">
             <BlurFade delay={0.1} inView>
               <div className="flex flex-col gap-5">
@@ -156,7 +156,7 @@ export function TechnicalExpertise() {
             </div>
           </div>
 
-          {/* Right column — interactive 3D icon cloud */}
+          {}
           <BlurFade delay={0.3} inView className="flex w-full items-center justify-center lg:justify-end">
             <div className="relative overflow-hidden rounded-2xl border border-line bg-bg-card p-4">
               <IconCloud size={400} images={[...cloudIcons]} />

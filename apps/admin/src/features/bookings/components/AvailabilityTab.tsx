@@ -188,7 +188,6 @@ export function AvailabilityTab() {
         setIsDeleteSlotModalOpen(false);
         fetchData();
       } else {
-        // Handle different error structures
         let errorMsg = 'Failed to delete slot';
         if (typeof data.error === 'string') {
           errorMsg = data.error;
@@ -236,7 +235,6 @@ export function AvailabilityTab() {
     const slotsArray = Array.isArray(slots) ? slots : [];
 
     slotsArray.forEach((slot) => {
-      // Defensive: check if slot and date exist
       if (!slot || !slot.date) {
         console.warn('⚠️ Invalid slot:', slot);
         return;
@@ -251,7 +249,6 @@ export function AvailabilityTab() {
 
     Object.keys(grouped).forEach((date) => {
       grouped[date].sort((a, b) => {
-        // Defensive: handle missing startTime
         const aTime = a.startTime || '';
         const bTime = b.startTime || '';
         return aTime.localeCompare(bTime);

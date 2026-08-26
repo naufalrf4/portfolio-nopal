@@ -5,7 +5,6 @@ import { available } from '../../helpers/services';
 export { manifest } from './manifest';
 import { connect, isAlive, wait } from '../../helpers/ws';
 
-
 const ready = await available('presence');
 const WS_URL = `${env.PRESENCE_URL.replace(/^http/, 'ws')}/ws`;
 

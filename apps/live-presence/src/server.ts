@@ -199,7 +199,6 @@ function broadcastState(roomId: string): void {
       try {
         socket.send(message);
       } catch {
-        // Ignore send failures for individual sockets (e.g. already closing).
       }
     }
   }
@@ -221,7 +220,6 @@ function broadcastOverview(): void {
     try {
       socket.send(message);
     } catch {
-      // Ignore send failures for individual sockets (e.g. already closing).
     }
   }
 }

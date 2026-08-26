@@ -37,7 +37,6 @@ export function AnalyticsSummaryCard() {
           setData(payload.data);
         }
       } catch {
-        // Ignore dashboard summary fetch failures here.
       } finally {
         setLoading(false);
       }

@@ -21,7 +21,6 @@
     --color-teal: var(--teal);
     --color-amber: var(--amber);
 
-    /* Legacy color aliases so existing utility classes keep resolving */
     --color-background: var(--bg);
     --color-surface: var(--bg-elevated);
     --color-foreground: var(--text-primary);
@@ -67,7 +66,6 @@
 }
 
 @layer utilities {
-  /* ==== MagicUI animation utilities ==== */
   .animate-marquee {
     animation: marquee var(--duration, 40s) linear infinite;
   }
@@ -81,19 +79,16 @@
     animation: shine var(--duration, 14s) linear infinite;
   }
 
-  /* ==== Card / border system ==== */
   .card-base {
     background-color: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: var(--radius-card);
   }
 
-  /* Glass CTA — frosted teal glass with edge refraction, used on the landing CTA */
   .glass-cta {
     position: relative;
     overflow: hidden;
     color: #ffffff;
-    /* thin teal wash so the moving stars behind show through and get blurred */
     background: color-mix(in srgb, var(--teal) 14%, transparent);
     -webkit-backdrop-filter: blur(10px) saturate(1.35);
     backdrop-filter: blur(10px) saturate(1.35);
@@ -143,7 +138,6 @@
       0 8px 32px -12px var(--teal-glow);
   }
 
-  /* Mono tag (tech stack, dates, status) */
   .mono-tag {
     font-family: 'JetBrains Mono', monospace;
     font-size: 0.72rem;
@@ -163,7 +157,6 @@
     border-color: var(--border-hover);
   }
 
-  /* ==== Hero background: dot grid + drifting glows ==== */
   .hero-dot-grid {
     background-image: radial-gradient(circle, var(--border) 1px, transparent 1px);
     background-size: 26px 26px;
@@ -183,18 +176,13 @@
     filter: blur(48px);
     animation: hero-drift-b 32s ease-in-out infinite alternate;
   }
-  /* Persistent WebGL scene: anchor the fade to the centered max-w-7xl (1280px) column so
-     the ambient backdrop tracks the content on ANY width. On ultrawide the grid no longer
-     bleeds across the whole viewport (no seam/border band); on narrow screens it keeps a
-     ~5vw gutter. Fade start/end are the greater of a vw gutter or the content-column edge. */
+
   .scene-layer {
     --scene-fade-start: max(2vw, calc(50% - 860px));
     --scene-fade-end: max(4vw, calc(50% - 780px));
     -webkit-mask-image: linear-gradient(to right, transparent 0, transparent var(--scene-fade-start), black var(--scene-fade-end), black calc(100% - var(--scene-fade-end)), transparent calc(100% - var(--scene-fade-start)), transparent 100%);
     mask-image: linear-gradient(to right, transparent 0, transparent var(--scene-fade-start), black var(--scene-fade-end), black calc(100% - var(--scene-fade-end)), transparent calc(100% - var(--scene-fade-start)), transparent 100%);
   }
-  /* Inner pages: dim the ambient scene so bright lines/nodes don't cut through
-     card and body text (home hero keeps full scene presence). */
   body[data-page='inner'] .scene-layer {
     opacity: 0.65;
   }
@@ -203,8 +191,6 @@
   }
 
   .scene-fallback {
-    /* Static natural-star snapshot: layered radial-gradient specks in the same
-       blue-white / warm palette as the WebGL starfield, denser toward center. */
     background-image:
       radial-gradient(circle, rgba(207, 216, 255, 0.9) 0.5px, transparent 1px),
       radial-gradient(circle, rgba(255, 255, 255, 0.8) 0.5px, transparent 1px),
@@ -221,7 +207,6 @@
     display: block !important;
   }
 
-  /* Huge outlined parallax word behind section headings */
   .ghost-text {
     font-family: 'Space Grotesk', sans-serif;
     font-weight: 700;
@@ -233,7 +218,6 @@
     opacity: 0.55;
   }
 
-  /* Live status readout */
   .status-dot {
     width: 7px;
     height: 7px;
@@ -243,7 +227,6 @@
     animation: status-pulse 2s ease-in-out infinite;
   }
 
-  /* ==== Animations (kept API-compatible) ==== */
   .animate-in {
     animation: animate-in 0.3s ease-out forwards;
   }
@@ -335,7 +318,6 @@
     transform: translateY(-2px);
   }
 
-  /* ==== Scroll reveal (IntersectionObserver, one-shot) ==== */
   [data-reveal] {
     opacity: 0;
     transform: translateY(24px);
@@ -349,7 +331,6 @@
     transition-delay: var(--reveal-delay, 0s);
   }
 
-  /* Hide horizontal scrollbars on carousels */
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
@@ -358,7 +339,6 @@
     display: none;
   }
 
-  /* Safe area padding for mobile bottom nav */
   .safe-area-pb {
     padding-bottom: env(safe-area-inset-bottom, 20px);
   }
@@ -608,7 +588,6 @@
   }
 }
 
-/* ==== MagicUI / Aceternity adapted keyframes ==== */
 @keyframes marquee {
   from {
     transform: translateX(0);
@@ -653,13 +632,11 @@
   }
 }
 
-/* ==== View-Transition theme reveal (AnimatedThemeToggler) ==== */
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation: none;
   mix-blend-mode: normal;
 }
-/* New snapshot expands via clip-path on top of the old one. Old stays put below. */
 ::view-transition-old(root) {
   z-index: 1;
 }
@@ -681,7 +658,6 @@
   }
 }
 
-/* ==== Form defaults ==== */
 ::placeholder {
   color: var(--text-tertiary);
   opacity: 1;

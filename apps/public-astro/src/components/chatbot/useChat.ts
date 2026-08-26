@@ -90,7 +90,6 @@ function persistMessages(messages: Message[]) {
       )
     );
   } catch {
-    // Ignore storage write failures.
   }
 }
 
@@ -102,7 +101,6 @@ function clearStoredMessages() {
   try {
     window.localStorage.removeItem(MESSAGE_STORAGE_KEY);
   } catch {
-    // Ignore storage removal failures.
   }
 }
 
@@ -212,7 +210,6 @@ export function useChat(): UseChat {
         return;
       }
 
-      // Clear the pendingAction from the message immediately
       setMessages((prev) =>
         prev.map((m) =>
           m.id === messageId ? { ...m, pendingAction: undefined } : m
@@ -226,7 +223,6 @@ export function useChat(): UseChat {
       try {
         const result = await confirmAction(action.actionId, confirm, sessionId);
 
-        // Add result as a new assistant message
         const resultMessage: Message = {
           id: generateId(),
           role: 'assistant',

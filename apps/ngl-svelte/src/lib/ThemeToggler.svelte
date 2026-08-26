@@ -1,9 +1,5 @@
 <script lang="ts">
-	/**
-	 * Same circular clip-path reveal as public-astro's AnimatedThemeToggler.
-	 * Theme is driven by `data-theme` on <html> + localStorage('theme')
-	 * (inline init script lives in app.html).
-	 */
+
 	const THEME_KEY = 'theme';
 	const DURATION = 550;
 
@@ -31,7 +27,6 @@
 		try {
 			localStorage.setItem(THEME_KEY, next);
 		} catch {
-			/* private mode */
 		}
 	}
 

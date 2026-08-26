@@ -4,7 +4,6 @@ import { describeResponse, postJson } from '../../helpers/http';
 import { available } from '../../helpers/services';
 export { manifest } from './manifest';
 
-
 const ready = await available('admin');
 
 describe.if(ready)('public contact bounds', () => {

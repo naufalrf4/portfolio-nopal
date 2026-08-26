@@ -8,7 +8,6 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
   ({ label, error, className, id, ...props }, ref) => {
-    // Generate an ID if not provided, for accessibility
     const inputId = id || (label ? label.toLowerCase().replace(/\s+/g, '-') : undefined);
 
     return (

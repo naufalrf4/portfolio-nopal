@@ -12,15 +12,12 @@ import type {
 } from '../types';
 import { MOCK_ABOUT, MOCK_ACHIEVEMENTS, MOCK_BLOGS, MOCK_GUESTBOOK, MOCK_PROJECTS } from './mock-data';
 
-// ── App-local configuration ──────────────────────────────────────────────
-
 const API_BASE =
   (typeof process !== 'undefined' ? process.env.ADMIN_API_URL?.trim() : undefined) ||
   import.meta.env.ADMIN_API_URL?.trim() ||
   'http://localhost:3001';
 const API_TIMEOUT_MS = 5000;
 
-// Set PUBLIC_MOCK_DATA=true to render the landing page with fixture data and no Admin/DB.
 const USE_MOCK =
   (typeof process !== 'undefined' ? process.env.PUBLIC_MOCK_DATA?.trim() : undefined) === 'true' ||
   import.meta.env.PUBLIC_MOCK_DATA?.trim() === 'true';
@@ -41,16 +38,12 @@ const FALLBACK_ABOUT: AboutData = {
   socialLinks: [],
 };
 
-// ── ApiClientError (thin rename of shared HttpError for existing catch clauses) ──
-
 class ApiClientError extends HttpError {
   constructor(message: string, cause?: unknown) {
     super(message, cause);
     this.name = 'ApiClientError';
   }
 }
-
-// ── Core fetchers ────────────────────────────────────────────────────────
 
 async function apiFetch<T>(endpoint: string): Promise<T> {
   const url = `${API_BASE}${endpoint}`;
@@ -105,8 +98,6 @@ async function localApiFetch<T>(endpoint: string, init?: FetchRequestInit): Prom
   return json as T;
 }
 
-// ── Query-param builder (app-local) ──────────────────────────────────────
-
 async function requestProjects(params?: {
   featured?: boolean;
   category?: string;
@@ -121,8 +112,6 @@ async function requestProjects(params?: {
   const endpoint = query ? `/api/v1/public/projects?${query}` : '/api/v1/public/projects';
   return apiFetch<ProjectsResponse>(endpoint);
 }
-
-// ── Exported functions (app-local fallbacks preserved) ───────────────────
 
 export async function getProjects(params?: {
   featured?: boolean;

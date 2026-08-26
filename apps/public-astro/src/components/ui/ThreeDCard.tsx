@@ -11,25 +11,16 @@ import { cn } from '@/lib/utils';
 interface ThreeDCardProps {
   children: React.ReactNode;
   className?: string;
-  /** Max tilt in degrees (per axis). @default 12 */
   maxTilt?: number;
-  /** Show a pointer-tracking glare highlight. @default true */
   glare?: boolean;
 }
 
 interface CardItemProps {
   children: React.ReactNode;
   className?: string;
-  /** Depth in px — children pop out along Z inside the tilted plane. @default 0 */
   translateZ?: number;
 }
 
-/**
- * Reusable 3D tilt-on-pointer card (formalized from HeroIdCard's spring pattern,
- * the same technique as Aceternity's 3d-card-effect). Pointer-driven rotateX/rotateY
- * with springs, preserve-3d so <CardItem translateZ> children pop out. Disabled on
- * touch + reduced-motion (renders a static card).
- */
 export function ThreeDCard({ children, className, maxTilt = 12, glare = true }: ThreeDCardProps) {
   const reduceMotion = useReducedMotion() ?? false;
   const isTouch =
@@ -91,7 +82,6 @@ export function ThreeDCard({ children, className, maxTilt = 12, glare = true }: 
   );
 }
 
-/** Child of ThreeDCard that pops out along the Z axis when the card tilts. */
 export function CardItem({ children, className, translateZ = 0 }: CardItemProps) {
   return (
     <div className={cn('[transform-style:preserve-3d]', className)} style={{ transform: `translateZ(${translateZ}px)` }}>

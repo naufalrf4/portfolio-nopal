@@ -12,19 +12,16 @@ const turnstileSiteKey =
 
 const title = 'Contact';
 const description =
-  'Reach out to Naufal Rizqullah Firdaus for system integration, automation, IoT, cloud, or AI workflow conversations, hiring, collaboration, speaking, and engineering opportunities across Indonesia or remote teams.';
----
+  'Reach out to Naufal Rizqullah Firdaus for system integration, automation, IoT, cloud, or AI workflow conversations, hiring, collaboration, speaking, and engineering opportunities across Indonesia or remote teams.';---
 
 <PageLayout title={title} description={description}>
-  <div class="pt-20 md:pt-24">
-    <div class="px-4 pt-6 sm:px-6 lg:px-8">
-      <div class="mx-auto max-w-7xl">
-        <PageHero
-          eyebrow="Get in touch"
-          title="Let's build something"
-          description="Send a direct message, ask a question, or book a call about integrated systems, automation workflows, IoT platforms, AI-enabled operations, speaking, or collaboration opportunities."
-        />
-      </div>
+  <div class="px-4 py-12 sm:px-6 md:py-16 lg:px-8">
+    <div class="mx-auto max-w-7xl">
+      <PageHero
+        eyebrow="Get in touch"
+        title="Let's build something"
+        description="Send a direct message, ask a question, or book a call about integrated systems, automation workflows, IoT platforms, AI-enabled operations, speaking, or collaboration opportunities."
+      />
     </div>
     <ContactContent client:load aboutData={aboutData} turnstileSiteKey={turnstileSiteKey} />
   </div>

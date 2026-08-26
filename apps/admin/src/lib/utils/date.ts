@@ -10,6 +10,14 @@ const JAKARTA_DATE_TIME_FORMATTER = new Intl.DateTimeFormat('en-US', {
   hour12: false,
 });
 
+const JAKARTA_CLOCK_FORMATTER = new Intl.DateTimeFormat('en-GB', {
+  timeZone: JAKARTA_TIME_ZONE,
+  hour: '2-digit',
+  minute: '2-digit',
+  second: '2-digit',
+  hour12: false,
+});
+
 function getValidDate(date: string | Date | null | undefined): Date | null {
   if (!date) {
     return null;
@@ -167,6 +175,26 @@ export function isYesterday(date: string | Date | null | undefined): boolean {
 
   yesterday.setUTCDate(yesterday.getUTCDate() - 1);
   return formatJakartaKey(yesterday) === dateKey;
+}
+
+/**
+ * Formats a moment as a live Jakarta (WIB) clock string, e.g. "14:32:07 WIB"
+ * or, with `showSeconds` false, "14:32 WIB". Always timezone-correct via
+ * Intl.DateTimeFormat, regardless of the host's locale/timezone.
+ */
+export function formatJakartaTime(
+  date: string | Date | null | undefined = new Date(),
+  showSeconds = true
+): string {
+  const dateObj = getValidDate(date) ?? new Date();
+  const parts = JAKARTA_CLOCK_FORMATTER.formatToParts(dateObj);
+  const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+
+  const time = showSeconds
+    ? `${values.hour}:${values.minute}:${values.second}`
+    : `${values.hour}:${values.minute}`;
+
+  return `${time} WIB`;
 }
 
 export function isFuture(date: string | Date | null | undefined): boolean {

@@ -20,7 +20,6 @@ function asMetadataObject(value: unknown): Record<string, unknown> {
         return parsed as Record<string, unknown>;
       }
     } catch {
-      // fall through to empty metadata
     }
   }
   return {};
@@ -184,11 +183,6 @@ export async function replaceChunks(
         chunk.sourceRef,
         chunk.visibility,
         chunk.content,
-        // `contextual_content` is NOT NULL in the schema but has no dedicated
-        // read path anywhere downstream (chat-service.ts / prompt-builder.ts
-        // only ever select `content`). Populate it with the same value as
-        // `content` to satisfy the constraint without inventing semantics
-        // for a column nothing currently consumes.
         chunk.content,
         chunk.tokenCount,
         chunk.checksum,

@@ -1,0 +1,25 @@
+---
+import { BlogsContent } from '@/components/blogs';
+import { PageHero } from '@/components/shared';
+import PageLayout from '@/layouts/PageLayout.astro';
+import { getBlogs } from '@/lib/api';
+
+const { blogs } = await getBlogs();
+
+const title = 'Publication';
+const description =
+  'Articles, engineering notes, and published journals or thesis work from Naufal Rizqullah Firdaus, covering automation, IoT, cloud software, and AI.';---
+
+<PageLayout title={title} description={description}>
+  <div class="min-h-screen px-4 py-12 sm:px-6 md:py-16 lg:px-8">
+    <div class="mx-auto max-w-7xl">
+      <PageHero
+        eyebrow="Writing"
+        title="Publication"
+        description="Articles, notes, and published work, from engineering write-ups to journals and thesis papers."
+      />
+
+      <BlogsContent initialBlogs={blogs} client:load />
+    </div>
+  </div>
+</PageLayout>

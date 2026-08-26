@@ -26,7 +26,7 @@ const socialLinks = filterPublicSocialLinks(about.socialLinks).map((link) => ({
 const quickLinks = [
   { href: '/about', label: 'About' },
   { href: '/projects', label: 'Projects' },
-  { href: '/blogs', label: 'Blogs' },
+  { href: '/publications', label: 'Publication' },
   { href: '/ai-chatbot', label: 'AI Assistant' },
   { href: '/contact', label: 'Contact' },
 ];
@@ -35,8 +35,7 @@ interface Props {
   className?: string;
 }
 
-const { className } = Astro.props;
----
+const { className } = Astro.props;---
 
 <footer
   class:list={[

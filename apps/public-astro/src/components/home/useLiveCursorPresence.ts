@@ -52,7 +52,6 @@ function resolveRoomId(currentPath: string): string {
   return `public${currentPath.replace(/[^a-zA-Z0-9/_-]/g, '')}`;
 }
 
-// ── Singleton store ──────────────────────────────────────────────────
 export interface PresenceState {
   status: Status;
   self: LiveCursorParticipant | null;
@@ -260,7 +259,6 @@ async function connect(identity: LiveCursorIdentity): Promise<void> {
         });
       }
     } catch {
-      // Ignore invalid frames.
     }
   });
 
@@ -304,8 +302,6 @@ function disconnect(): void {
   setState(INITIAL_STATE);
 }
 
-// ── Public API ───────────────────────────────────────────────────────
-
 function subscribe(listener: () => void): () => void {
   store.listeners.add(listener);
   return () => {
@@ -321,17 +317,11 @@ function getServerSnapshot(): PresenceState {
   return INITIAL_STATE;
 }
 
-/**
- * Live cursor presence — subscribes to a SINGLE shared socket connection.
- * Multiple hook instances (LiveCursorBand + PresenceChip) share the same socket.
- * The first mount initializes the connection; the last unmount tears it down.
- */
 export function useLiveCursorPresence(currentPath: string, socketUrl: string) {
   const state = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
   const initializedRef = useRef(false);
 
   useEffect(() => {
-    // Track mount count so we only disconnect when the LAST subscriber unmounts.
     store.mountRefCount += 1;
     store.currentPath = currentPath;
     store.socketUrl = socketUrl;
@@ -341,7 +331,6 @@ export function useLiveCursorPresence(currentPath: string, socketUrl: string) {
       setState({ identity });
     }
 
-    // Kick off connection on first mount.
     if (!initializedRef.current) {
       initializedRef.current = true;
       const identity = store.state.identity || resolveLiveCursorIdentity();
@@ -360,11 +349,9 @@ export function useLiveCursorPresence(currentPath: string, socketUrl: string) {
     };
   }, [currentPath, socketUrl]);
 
-  // If path changes while we're mounted, reconnect with new room.
   useEffect(() => {
     if (store.currentPath !== currentPath && store.state.identity) {
       store.currentPath = currentPath;
-      // Reconnect to new room
       const identity = store.state.identity;
       const oldSocket = store.socket;
       if (oldSocket?.readyState === WebSocket.OPEN) {

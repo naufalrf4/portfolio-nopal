@@ -9,11 +9,6 @@ export interface SocialLink {
   icon?: string;
 }
 
-/**
- * Links-page view model, normalized from the full Admin AboutData contract.
- * The Admin contract includes linkedin through socialLinks[].platform;
- * this local shape keeps the links app's existing reduced view model.
- */
 export interface AboutData {
   fullName: string;
   tagline: string | null;

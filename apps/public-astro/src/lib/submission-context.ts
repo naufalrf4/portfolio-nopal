@@ -19,7 +19,6 @@ interface ProxyHeadersOptions {
   clientAddress?: string;
 }
 
-/** thin wrapper preserving the public-astro call-site signature */
 export function buildSubmissionProxyHeaders({ request, sourcePath, timezone, clientAddress }: ProxyHeadersOptions): Headers {
   return buildProxyHeaders('public-astro', sourcePath, request.headers, timezone, clientAddress);
 }

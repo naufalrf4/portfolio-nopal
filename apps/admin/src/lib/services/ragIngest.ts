@@ -16,9 +16,6 @@ export interface RagIngestResult {
   errorMessage?: string;
 }
 
-// ADMIN_SERVICE_TOKEN is a legacy fallback shared across two auth directions
-// (outbound admin auth + inbound rag ingest auth). Prefer setting
-// RAG_INGEST_SERVICE_TOKEN (and ADMIN_INTERNAL_API_TOKEN) explicitly instead.
 const RAG_INGEST_SERVICE_TOKEN =
   process.env.RAG_INGEST_SERVICE_TOKEN || process.env.ADMIN_SERVICE_TOKEN || '';
 const RAG_SERVICE_URL = process.env.RAG_SERVICE_URL || 'http://localhost:3005';
@@ -104,10 +101,6 @@ export async function dispatchRagIngest(request: RagIngestRequest): Promise<RagI
   }
 }
 
-/**
- * Fire-and-forget RAG ingest dispatch for content mutations.
- * Never throws and never blocks the admin save flow; failures are logged only.
- */
 export function queueRagIngest(request: RagIngestRequest): void {
   void dispatchRagIngest(request)
     .then((result) => {

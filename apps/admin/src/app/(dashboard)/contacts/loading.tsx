@@ -12,7 +12,7 @@ export default function ContactsLoading() {
       />
 
       <div className="mt-6 space-y-6">
-        {/* Tabs skeleton */}
+        {}
         <div className="flex gap-2 flex-wrap">
           {['Submissions', 'Settings'].map((tab) => (
             <div
@@ -35,7 +35,7 @@ export default function ContactsLoading() {
           ))}
         </div>
 
-        {/* Table/Card skeleton */}
+        {}
         <div
           className="rounded-[var(--radius-container)] p-6 animate-pulse"
           style={{
@@ -44,7 +44,7 @@ export default function ContactsLoading() {
           }}
         >
           <div className="space-y-4">
-            {/* Table header skeleton */}
+            {}
             <div className="grid grid-cols-4 gap-4 pb-4 border-b border-[#CBD5E0]">
               {['Name', 'Email', 'Subject', 'Date'].map((col) => (
                 <div
@@ -57,7 +57,7 @@ export default function ContactsLoading() {
               ))}
             </div>
 
-            {/* Table rows skeleton */}
+            {}
             {[1, 2, 3, 4, 5].map((i) => (
               <div key={i} className="grid grid-cols-4 gap-4 py-4">
                 {[1, 2, 3, 4].map((j) => (
@@ -74,7 +74,7 @@ export default function ContactsLoading() {
           </div>
         </div>
 
-        {/* Pagination skeleton */}
+        {}
         <div className="flex justify-between items-center">
           <div
             className="h-4 w-32 rounded"

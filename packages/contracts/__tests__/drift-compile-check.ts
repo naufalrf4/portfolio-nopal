@@ -1,17 +1,5 @@
-/**
- * DRIFT CHECK — compile-time only (not a test runner file)
- *
- * Run: npx tsc --noEmit
- *
- * If Admin changes its route handler output shape WITHOUT updating
- * @naufalrf/contracts, this file will FAIL to compile.
- *
- * Proof: rename `fullName` → `displayName` in contracts/src/index.ts,
- * then run `npx tsc --noEmit`. This file assigns `fullName` which no
- * longer exists on the AboutData contract → compile error.
- */
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
 import type {
   AboutData,
   ProjectListItem,
@@ -25,7 +13,6 @@ import type {
   ApiSuccessEnvelope,
 } from '@naufalrf/contracts';
 
-// --- AboutData (matching Admin's GET /api/v1/public/about) ---
 const _d1: AboutData = {
   fullName: '',
   tagline: null,
@@ -42,7 +29,6 @@ const _d1: AboutData = {
   socialLinks: [],
 };
 
-// --- ProjectListItem (Admin's GET /api/v1/public/projects) ---
 const _d2: ProjectListItem = {
   id: '',
   title: '',
@@ -58,7 +44,6 @@ const _d2: ProjectListItem = {
   images: [],
 };
 
-// --- ProjectDetail (Admin's GET /api/v1/public/projects/[slug]) ---
 const _d3: ProjectDetail = {
   id: '',
   title: '',
@@ -77,7 +62,6 @@ const _d3: ProjectDetail = {
   images: [],
 };
 
-// --- ProfileLink (Admin's GET /api/v1/public/links) ---
 const _d4: ProfileLink = {
   id: '',
   label: '',
@@ -89,7 +73,6 @@ const _d4: ProfileLink = {
   updatedAt: '',
 };
 
-// --- Blog (Admin's GET /api/v1/public/blogs) ---
 const _d5: Blog = {
   id: '',
   url: '',
@@ -101,7 +84,6 @@ const _d5: Blog = {
   publishedAt: '',
 };
 
-// --- Achievement (Admin's GET /api/v1/public/achievements) ---
 const _d6: Achievement = {
   id: '',
   name: '',
@@ -114,7 +96,6 @@ const _d6: Achievement = {
   createdAt: '',
 };
 
-// --- GuestbookEntry (Admin's GET /api/v1/public/guestbook) ---
 const _d7: GuestbookEntry = {
   id: '',
   message: '',
@@ -122,19 +103,15 @@ const _d7: GuestbookEntry = {
   user: { name: null, image: null },
 };
 
-// --- GuestbookResponse ---
 const _d8: GuestbookResponse = { entries: [] };
 
-// --- MessageResponse (Admin's POST /api/v1/public/messages) ---
 const _d9: MessageResponse = { success: false };
 
-// --- ApiSuccessEnvelope ---
 const _d10: ApiSuccessEnvelope<AboutData> = {
   success: true,
   data: _d1,
 };
 
-// Prevent tree-shaking
 void _d1;
 void _d2;
 void _d3;

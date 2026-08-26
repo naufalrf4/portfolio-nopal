@@ -17,7 +17,6 @@
   --color-teal: var(--teal);
   --color-amber: var(--amber);
 
-  /* Aliases */
   --color-background: var(--bg);
   --color-surface: var(--bg-elevated);
   --color-foreground: var(--text-primary);

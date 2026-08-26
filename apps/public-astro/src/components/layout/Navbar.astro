@@ -6,12 +6,10 @@ import { PresenceChip } from '@/components/shared';
 
 const currentPath = Astro.url.pathname;
 
-// Helper to check active state
 const isActive = (href: string) => {
   if (href === '/') return currentPath === '/';
   return currentPath.startsWith(href);
-};
----
+};---
 
 <header id="site-header" class="sticky top-0 z-50 px-4 pt-4 transition-[padding] duration-300">
   <nav
@@ -114,8 +112,7 @@ const isActive = (href: string) => {
     background-color: var(--teal-soft);
   }
 
-
-  /* Shrink state on scroll */
+  
   :global(#site-header.is-scrolled) {
     padding-top: 0.5rem;
   }
@@ -225,7 +222,6 @@ const isActive = (href: string) => {
       document.removeEventListener('keydown', handleDocumentKeydown);
     };
   }
-
 
   function bindHeaderShrink() {
     const header = document.getElementById('site-header');

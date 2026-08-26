@@ -25,7 +25,7 @@ export default function AboutError({
             boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
           }}
         >
-          {/* Icon well */}
+          {}
           <div className="flex justify-center mb-6">
             <div
               className="rounded-2xl p-4 w-16 h-16 flex items-center justify-center"
@@ -38,7 +38,7 @@ export default function AboutError({
             </div>
           </div>
 
-          {/* Error message */}
+          {}
           <h2
             className="text-2xl font-bold mb-2"
             style={{
@@ -56,7 +56,7 @@ export default function AboutError({
             {error.message || 'An unexpected error occurred while loading the about page.'}
           </p>
 
-          {/* Retry button */}
+          {}
           <button
             onClick={reset}
             className="inline-flex items-center justify-center gap-2 rounded-2xl px-6 py-3 text-base font-semibold transition-all duration-300 hover:-translate-y-[1px] active:translate-y-[0.5px]"

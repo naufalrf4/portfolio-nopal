@@ -1,24 +1,18 @@
 
-// ---- types ----
 
 export type AgenticToolName = "submit_guestbook" | "send_message" | "create_booking";
 
 export interface PendingAction {
   tool: AgenticToolName;
-  /** Staged payload that will be sent to Admin public API on confirmation. */
   payload: Record<string, unknown>;
-  /** Human-readable description shown in chat. */
   description: string;
-  /** Required fields that are still missing. */
   missingFields: string[];
 }
 
 export interface ToolStageResult {
   pendingAction: PendingAction;
-  message: string; // What to show the user in chat
+  message: string; 
 }
-
-// ---- tool implementations ----
 
 export function stageSubmitGuestbook(
   message: string,
@@ -125,8 +119,6 @@ export function stageCreateBooking(
   };
 }
 
-// ---- Admin public API executors (called after user confirms) ----
-
 const FIELD_LIMITS = {
   guestbookMessage: 500,
   messageContent: 500,
@@ -164,7 +156,6 @@ export async function executeSubmitGuestbook(
     body: JSON.stringify({
       message,
       guestbookToken,
-      // turnstileToken: empty — the confirmation click IS the user verification
       turnstileToken: "",
     }),
   });

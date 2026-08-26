@@ -24,20 +24,15 @@ export const config = {
   port: envInt("PORT", 3005),
   logLevel: env("LOG_LEVEL", "INFO"),
 
-  // DB — uses postgres.js so no asyncpg:// prefix; just postgres://
   databaseUrl: env(
     "RAG_DATABASE_URL",
     "postgres://postgres:postgres@localhost:5432/naufalrf_portfolio",
   ),
   adminApiUrl: env("ADMIN_API_URL", "http://localhost:3001"),
-  // ADMIN_SERVICE_TOKEN is a legacy fallback shared across two auth directions
-  // (outbound admin auth + inbound rag ingest auth). Prefer setting
-  // ADMIN_INTERNAL_API_TOKEN and RAG_INGEST_SERVICE_TOKEN explicitly instead.
   adminServiceToken: env("ADMIN_SERVICE_TOKEN", ""),
   adminInternalApiToken: env("ADMIN_INTERNAL_API_TOKEN", ""),
   ragIngestServiceToken: env("RAG_INGEST_SERVICE_TOKEN", ""),
 
-  // ponytail: env fallback assumes OpenAI-compatible for embeddings; swap to GEMINI_API_KEY + gemini provider if reverting to Gemini embeddings.
   openaiApiKey: env("OPENAI_API_KEY", ""),
   embeddingModel: env("EMBEDDING_MODEL", "text-embedding-3-small"),
   chatModel: env("CHAT_MODEL", "gpt-4o-mini"),

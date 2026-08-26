@@ -14,7 +14,7 @@ export const NAV_ITEMS = [
   { href: '/', label: 'Home', icon: Home },
   { href: '/about', label: 'About', icon: User },
   { href: '/projects', label: 'Projects', icon: FolderKanban },
-  { href: '/blogs', label: 'Blogs', icon: FileText },
+  { href: '/publications', label: 'Publication', icon: FileText },
   { href: '/contact', label: 'Contact', icon: Mail },
 ] as const;
 

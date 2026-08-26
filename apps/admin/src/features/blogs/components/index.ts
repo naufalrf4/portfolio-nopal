@@ -2,7 +2,7 @@ export { BlogCard } from './BlogCard';
 export { CreateBlogModal } from './CreateBlogModal';
 export { EditBlogModal } from './EditBlogModal';
 export { DeleteConfirmModal } from './DeleteConfirmModal';
-export { NeumorphicToggle } from './NeumorphicToggle';
+export { NeumorphicToggle } from './Toggle';
 export { SkeletonCard } from './SkeletonCard';
 export {
   BlogLinkIcon,

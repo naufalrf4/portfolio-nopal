@@ -811,24 +811,19 @@ export const achievements = pgTable(
   ]
 );
 
-// LLM AI Settings — single-row table for multi-provider LLM configuration.
-// apiKey fields store provider API keys (treat as secrets).
 export const llmSettings = pgTable('llm_settings', {
   id: text().primaryKey().notNull(),
 
-  // Main slot
   mainProvider: text('main_provider').notNull().default('gemini'),
   mainBaseUrl: text('main_base_url').notNull().default(''),
   mainApiKey: text('main_api_key').notNull().default(''),
   mainModel: text('main_model').notNull().default('gemini-2.5-flash'),
 
-  // Fallback slot (optional)
   fallbackProvider: text('fallback_provider'),
   fallbackBaseUrl: text('fallback_base_url'),
   fallbackApiKey: text('fallback_api_key'),
   fallbackModel: text('fallback_model'),
 
-  // Embedding slot
   embeddingProvider: text('embedding_provider').notNull().default('openai-compatible'),
   embeddingBaseUrl: text('embedding_base_url').notNull().default(''),
   embeddingApiKey: text('embedding_api_key').notNull().default(''),

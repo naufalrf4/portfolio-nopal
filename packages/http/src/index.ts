@@ -14,14 +14,10 @@ function normalizeHeaderValue(
   return normalized ? normalized.slice(0, maxLength) : null;
 }
 
-// --- Exports (1–6) ---
-
-/** 1. Check if an error is an abort/timeout */
 export function isAbortError(error: unknown): boolean {
   return error instanceof Error && (error.name === 'AbortError' || error.name === 'TimeoutError');
 }
 
-/** 2. Create an AbortSignal that fires after timeoutMs */
 export function createAbortSignal(
   timeoutMs: number,
 ): { signal: AbortSignal; cleanup: () => void } {
@@ -33,7 +29,6 @@ export function createAbortSignal(
   };
 }
 
-/** 3. Base HTTP error with optional cause */
 export class HttpError extends Error {
   cause?: unknown;
 
@@ -44,7 +39,6 @@ export class HttpError extends Error {
   }
 }
 
-/** 4. Extract a human-readable message from any error shape */
 export function getErrorMessage(
   error: unknown,
   fallback = 'An unexpected error occurred',
@@ -63,14 +57,6 @@ export function getErrorMessage(
   return fallback;
 }
 
-/**
- * 5. Build proxy headers for forwarding to Admin.
- *
- * @param sourceApp   - identity string e.g. "public-astro", "links-astro", "ngl-svelte"
- * @param sourcePath  - path on the consuming app e.g. "/contact" or "/"
- * @param requestHeaders - inbound request Headers to forward x-forwarded-for, user-agent, etc.
- * @param timezone    - optional IANA timezone from consumer
- */
 export function buildProxyHeaders(
   sourceApp: string,
   sourcePath: string,
@@ -108,8 +94,6 @@ export function buildProxyHeaders(
   return headers;
 }
 
-// --- 6. Admin API envelope types + unwrap ---
-
 export interface AdminApiSuccessEnvelope<T = unknown> {
   success: true;
   data: T;
@@ -131,10 +115,6 @@ export type AdminApiEnvelope<T = unknown> =
   | AdminApiSuccessEnvelope<T>
   | AdminApiErrorEnvelope;
 
-/**
- * Unwrap a successful Admin API envelope.
- * Throws HttpError for non-ok responses or when `success !== true`.
- */
 export function isSuccessEnvelope<T>(
   json: unknown,
 ): json is AdminApiSuccessEnvelope<T> {

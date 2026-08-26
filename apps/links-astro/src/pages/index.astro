@@ -53,8 +53,7 @@ const websiteLinks = links.filter(
   (link) => !isSocialProfileLink(link) && !socialLinkUrls.has(normalizeUrl(link.url))
 );
 const presenceSocketUrl =
-  process.env.PUBLIC_CURSOR_WS_URL?.trim() || import.meta.env.PUBLIC_CURSOR_WS_URL?.trim() || 'ws://localhost:3006/ws';
----
+  process.env.PUBLIC_CURSOR_WS_URL?.trim() || import.meta.env.PUBLIC_CURSOR_WS_URL?.trim() || 'ws://localhost:3006/ws';---
 
 <BaseLayout
   title="Links"
