@@ -72,3 +72,15 @@ h1, h2, h3, h4, h5, h6 {
 .homepage-reveal { animation-name: homepageReveal; animation-duration: 0.82s; }
 .homepage-reveal-soft { animation-name: homepageReveal; animation-duration: 0.72s; }
 .homepage-reveal-pop { animation-name: homepageRevealPop; animation-duration: 0.78s; }
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+::view-transition-old(root) {
+  z-index: 1;
+}
+::view-transition-new(root) {
+  z-index: 9999;
+}

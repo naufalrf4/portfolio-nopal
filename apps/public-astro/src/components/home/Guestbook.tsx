@@ -7,6 +7,7 @@ import type { GuestbookEntry } from '@/types';
 import { BlurFade } from '@/components/ui/BlurFade';
 import { Marquee } from '@/components/ui/Marquee';
 import { BorderBeam } from '@/components/ui/BorderBeam';
+import { PageHero } from '@/components/shared/PageHero';
 import {
   clearStoredGuestbookUser,
   getStoredGuestbookUser,
@@ -18,6 +19,9 @@ interface GuestbookProps {
   initialEntries?: GuestbookEntry[];
   turnstileSiteKey: string;
   mode?: 'home' | 'page';
+  heroEyebrow?: string;
+  heroTitle?: string;
+  heroDescription?: string;
 }
 
 interface GuestbookResponse {
@@ -77,6 +81,9 @@ export function Guestbook({
   initialEntries = [],
   turnstileSiteKey,
   mode = 'home',
+  heroEyebrow,
+  heroTitle,
+  heroDescription,
 }: GuestbookProps) {
   const [entries, setEntries] = useState<GuestbookEntry[]>(initialEntries);
   const [user, setUser] = useState<StoredGuestbookUser | null>(null);
@@ -216,9 +223,14 @@ export function Guestbook({
       <Section id="guestbook" scene="signal" className="relative w-full py-8">
         <div className="mx-auto w-full max-w-7xl">
           <div className="mb-10 grid gap-8 lg:grid-cols-[1fr_360px] lg:items-start">
-            <p className="max-w-xl text-base leading-relaxed text-text-secondary">
-              Every note left here stays public. Sign in with Google to add yours.
-            </p>
+            {heroTitle && (
+              <PageHero
+                eyebrow={heroEyebrow}
+                title={heroTitle}
+                description={heroDescription}
+                className="mb-0 md:mb-0"
+              />
+            )}
             <div className="relative">
               {composerCard}
               {success && <p className="mt-4 font-mono text-xs text-teal">{success}</p>}
