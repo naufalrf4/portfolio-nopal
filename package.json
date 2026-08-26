@@ -16,7 +16,7 @@
     "lint-staged": "lint-staged",
     "commitlint": "commitlint",
     "dev": "bash ./start-dev.sh",
-    "build": "NODE_OPTIONS=--max-old-space-size=4096 bun run --filter admin build && bun run --filter public-astro build && bun run --filter links-astro build && bun run --filter ngl-svelte build && bun run --filter rag-service build && bun run --filter slidedeck build",
+    "build": "NODE_OPTIONS=--max-old-space-size=4096 bun run --filter admin build && bun run --filter slidedeck build && bash scripts/sync-slidedeck.sh && bun run --filter public-astro build && bun run --filter links-astro build && bun run --filter ngl-svelte build && bun run --filter rag-service build",
     "lint": "bun run --filter admin lint && bun run --filter ngl-svelte lint",
     "typecheck": "bun run --filter admin typecheck && bun run --filter ngl-svelte check && bun run --filter rag-service typecheck",
     "test:e2e": "bun run e2e/runner.ts",

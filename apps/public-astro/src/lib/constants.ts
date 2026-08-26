@@ -8,6 +8,7 @@ import {
   MessageCircleQuestion,
   Link2,
   Bot,
+  Presentation,
 } from 'lucide-react';
 
 export const NAV_ITEMS = [
@@ -20,6 +21,7 @@ export const NAV_ITEMS = [
 
 export const OTHER_LINKS = [
   { href: '/ai-chatbot', label: 'AI Assistant', icon: Bot, external: false },
+  { href: '/portfolio', label: 'Portfolio', icon: Presentation, external: false },
   { href: 'https://ngl.naufalrf.net', label: 'NGL', icon: MessageCircleQuestion, external: true },
   { href: 'https://links.naufalrf.net', label: 'Links', icon: Link2, external: true },
 ] as const;

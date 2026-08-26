@@ -10,11 +10,27 @@ async function loadText(url) {
 
 async function boot() {
   const deck = $("#deck");
+  let decksIndex;
+  try {
+    decksIndex = await fetch("decks-index.json", { cache: "no-cache" }).then((r) => r.json());
+  } catch (e) {
+    deck.innerHTML = `<p style="padding:40px;font-family:sans-serif">Failed to load decks-index.json — serve over HTTP, not file://</p>`;
+    return;
+  }
+
+  const requestedSlug = new URLSearchParams(location.search).get("deck");
+  const slug = requestedSlug || decksIndex[0]?.slug;
+
+  if (!slug || !decksIndex.some((d) => d.slug === slug)) {
+    deck.innerHTML = `<p style="padding:40px;font-family:sans-serif">Deck "${slug || ""}" not found — check the ?deck= query param.</p>`;
+    return;
+  }
+
   let manifest;
   try {
-    manifest = await fetch("manifest.json", { cache: "no-cache" }).then((r) => r.json());
+    manifest = await fetch(`decks/${slug}/manifest.json`, { cache: "no-cache" }).then((r) => r.json());
   } catch (e) {
-    deck.innerHTML = `<p style="padding:40px;font-family:sans-serif">Failed to load manifest.json — serve over HTTP, not file://</p>`;
+    deck.innerHTML = `<p style="padding:40px;font-family:sans-serif">Failed to load decks/${slug}/manifest.json — serve over HTTP, not file://</p>`;
     return;
   }
 
@@ -29,7 +45,7 @@ async function boot() {
   const total = manifest.slides.length;
   const frags = await Promise.all(
     manifest.slides.map((path) =>
-      loadText(path).catch(
+      loadText(`decks/${slug}/${path}`).catch(
         (e) => `<section class="slide"><div class="pad"><p style="padding:40px">${path}: ${e.message}</p></div></section>`,
       ),
     ),
