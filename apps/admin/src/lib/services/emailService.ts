@@ -1,4 +1,5 @@
 import { EMAIL_CONFIG, getEmailTransporter, isEmailConfigured } from '@/lib/email/config';
+import { logger } from '@/lib/utils/logger';
 import {
   contactConfirmationTemplate,
   contactReplyTemplate,
@@ -30,13 +31,13 @@ class EmailServiceError extends Error {
 export class EmailService {
   private async sendEmail(to: string, subject: string, html: string): Promise<void> {
     if (!isEmailConfigured()) {
-      console.warn(`[EmailService] SMTP not configured, skipping email: ${subject}`);
+      logger.warn('SMTP not configured, skipping email', { subject });
       throw new EmailServiceError(`SMTP not configured, cannot send email: ${subject}`);
     }
 
     const transporter = getEmailTransporter();
     if (!transporter) {
-      console.warn(`[EmailService] Email transporter unavailable, skipping email: ${subject}`);
+      logger.warn('Email transporter unavailable, skipping email', { subject });
       throw new EmailServiceError(`Email transporter unavailable, cannot send email: ${subject}`);
     }
 
@@ -55,9 +56,9 @@ export class EmailService {
   async sendContactConfirmation(to: string, data: ContactConfirmationData): Promise<void> {
     try {
       await this.sendEmail(to, 'Message received', contactConfirmationTemplate(data));
-      console.log(`[EmailService] Contact confirmation sent to ${to}`);
+      logger.info('Contact confirmation sent', { to });
     } catch (error) {
-      console.error('[EmailService] Failed to send contact confirmation:', error);
+      logger.error('Failed to send contact confirmation', error, { to });
       throw new EmailServiceError('Failed to send confirmation email', error);
     }
   }
@@ -72,9 +73,9 @@ export class EmailService {
         `New contact message: ${data.contact.subject || data.contact.name}`,
         adminContactNotificationTemplate(data)
       );
-      console.log(`[EmailService] Admin contact notification sent to ${to}`);
+      logger.info('Admin contact notification sent', { to });
     } catch (error) {
-      console.error('[EmailService] Failed to send admin contact notification:', error);
+      logger.error('Failed to send admin contact notification', error, { to });
       throw new EmailServiceError('Failed to send admin notification email', error);
     }
   }
@@ -82,9 +83,9 @@ export class EmailService {
   async sendContactReply(to: string, data: ContactReplyData): Promise<void> {
     try {
       await this.sendEmail(to, data.replySubject, contactReplyTemplate(data));
-      console.log(`[EmailService] Contact reply sent to ${to}`);
+      logger.info('Contact reply sent', { to });
     } catch (error) {
-      console.error('[EmailService] Failed to send contact reply:', error);
+      logger.error('Failed to send contact reply', error, { to });
       throw new EmailServiceError('Failed to send contact reply email', error);
     }
   }
@@ -92,9 +93,9 @@ export class EmailService {
   async sendBookingConfirmation(to: string, data: BookingConfirmationData): Promise<void> {
     try {
       await this.sendEmail(to, 'Booking request received', bookingConfirmationTemplate(data));
-      console.log(`[EmailService] Booking confirmation sent to ${to}`);
+      logger.info('Booking confirmation sent', { to });
     } catch (error) {
-      console.error('[EmailService] Failed to send booking confirmation:', error);
+      logger.error('Failed to send booking confirmation', error, { to });
       throw new EmailServiceError('Failed to send booking confirmation email', error);
     }
   }
@@ -109,9 +110,9 @@ export class EmailService {
         `New booking request: ${data.booking.name}`,
         adminBookingNotificationTemplate(data)
       );
-      console.log(`[EmailService] Admin booking notification sent to ${to}`);
+      logger.info('Admin booking notification sent', { to });
     } catch (error) {
-      console.error('[EmailService] Failed to send admin booking notification:', error);
+      logger.error('Failed to send admin booking notification', error, { to });
       throw new EmailServiceError('Failed to send admin booking notification email', error);
     }
   }
@@ -119,9 +120,9 @@ export class EmailService {
   async sendBookingConfirmed(to: string, data: BookingStatusUpdateData): Promise<void> {
     try {
       await this.sendEmail(to, 'Booking confirmed', bookingConfirmedTemplate(data));
-      console.log(`[EmailService] Booking confirmed email sent to ${to}`);
+      logger.info('Booking confirmed email sent', { to });
     } catch (error) {
-      console.error('[EmailService] Failed to send booking confirmed email:', error);
+      logger.error('Failed to send booking confirmed email', error, { to });
       throw new EmailServiceError('Failed to send booking confirmed email', error);
     }
   }
@@ -129,9 +130,9 @@ export class EmailService {
   async sendBookingRejected(to: string, data: BookingStatusUpdateData): Promise<void> {
     try {
       await this.sendEmail(to, 'Booking update', bookingRejectedTemplate(data));
-      console.log(`[EmailService] Booking rejected email sent to ${to}`);
+      logger.info('Booking rejected email sent', { to });
     } catch (error) {
-      console.error('[EmailService] Failed to send booking rejected email:', error);
+      logger.error('Failed to send booking rejected email', error, { to });
       throw new EmailServiceError('Failed to send booking rejected email', error);
     }
   }

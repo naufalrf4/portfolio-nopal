@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button';
 interface SignInFormProps {
   callbackUrl?: string;
   mode?: 'admin' | 'public';
-  /** When the env-gated demo Credentials provider is active, show email/password log in. */
   demoAuthEnabled?: boolean;
 }
 

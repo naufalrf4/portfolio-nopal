@@ -399,7 +399,7 @@ export async function generateMessageImage({
           <div class="footer-card">
             <div class="footer-cta">Send me anonymous messages too!</div>
             <div class="footer-url-container">
-              <span class="footer-url">ngl.naufalrf.tech</span>
+              <span class="footer-url">ngl.naufalrf.net</span>
             </div>
           </div>
         </div>

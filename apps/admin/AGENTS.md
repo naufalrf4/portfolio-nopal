@@ -76,7 +76,6 @@ Authoritative AI control contract for this repository.
 - Remove stale Prisma config/runtime references when touched, but keep `_prisma_migrations` compatibility history unless the migration strategy is intentionally changed end to end.
 - RAG seeding must go through Admin content exports plus `POST /ingest` with `type: all`; do not bypass Admin by pushing raw files directly into RAG.
 - Public API CORS is request-scoped from `ADMIN_PUBLIC_API_ALLOWED_ORIGINS` in `src/proxy.ts`; keep the allowlist explicit and do not reintroduce wildcard browser origins.
-- For trusted reverse-proxy deployments, set `AUTH_TRUST_HOST=true` in env instead of hardcoding `trustHost` in `src/lib/auth.ts`.
 - `src/lib/api/middleware/auth.ts` should prefer `ADMIN_INTERNAL_API_TOKEN` for internal service auth, while `src/lib/services/ragIngest.ts` and `scripts/seed.ts` should prefer `RAG_INGEST_SERVICE_TOKEN`; `ADMIN_SERVICE_TOKEN` is legacy fallback only.
 - Anonymous public POST routes (`contact`, `messages`, `guestbook`, `bookings`, `auth/sync`, and `analytics`) should keep aligned in-memory rate limiting; do not leave one write surface unthrottled while hardening another.
 - Guestbook posting authority must come from the signed token minted in `src/app/api/v1/public/auth/complete/route.ts` and verified in `src/app/api/v1/public/guestbook/route.ts`; do not fall back to trusting client-stored email identity.

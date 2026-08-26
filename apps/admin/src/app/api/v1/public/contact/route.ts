@@ -17,11 +17,11 @@ import { createId } from '@paralleldrive/cuid2';
 import { getSubmissionContext } from '@/lib/api/submission-context';
 
 const createContactSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
-  email: z.string().email('Invalid email'),
-  subject: z.string().optional(),
-  message: z.string().min(1, 'Message is required'),
-  turnstileToken: z.string().optional(),
+  name: z.string().min(1, 'Name is required').max(100),
+  email: z.string().email('Invalid email').max(255),
+  subject: z.string().max(200).optional(),
+  message: z.string().min(1, 'Message is required').max(5000),
+  turnstileToken: z.string().max(2048).optional(),
 });
 
 const RATE_LIMIT_CONFIG = {

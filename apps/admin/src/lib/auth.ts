@@ -33,11 +33,6 @@ function readProfileImage(profile: unknown, fallbackImage?: string | null) {
   return fallbackImage ?? null;
 }
 
-// Local demo sign-in bypass: Credentials provider that only activates when both
-// DEMO_AUTH_ENABLED=true and DEMO_AUTH_PASSWORD are set. It still enforces the
-// ADMIN_EMAILS allowlist, so it never grants access outside allowlisted emails.
-// ponytail: keep this env-gated; upgrade path is removing it once real OAuth is
-// configured in every environment that needs sign-in.
 export function isDemoAuthEnabled(): boolean {
   return process.env.DEMO_AUTH_ENABLED === 'true' && Boolean(process.env.DEMO_AUTH_PASSWORD);
 }
@@ -47,7 +42,6 @@ function createAuthConfig(authCallbacks: AuthDbCallbacks) {
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-      allowDangerousEmailAccountLinking: true,
     }),
   ];
 

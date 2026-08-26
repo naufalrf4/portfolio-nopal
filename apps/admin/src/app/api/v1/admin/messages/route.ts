@@ -64,4 +64,4 @@ async function handlePost(req: NextRequest) {
 }
 
 export const GET = withAdminAuth(handleGet);
-export const POST = handlePost;
+export const POST = withAdminAuth(handlePost);

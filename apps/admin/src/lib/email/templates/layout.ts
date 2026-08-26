@@ -222,7 +222,7 @@ export function emailLayout({ preheader, content }: EmailLayoutOptions): string 
         <div class="footer-card">
           <strong>NaufalRF Portfolio</strong><br />
           Booking updates, inbox replies, and portfolio support<br />
-          <a href="https://naufalrf.tech">naufalrf.tech</a>
+          <a href="https://naufalrf.net">naufalrf.net</a>
         </div>
       </div>
     </div>

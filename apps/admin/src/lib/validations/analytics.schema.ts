@@ -18,7 +18,15 @@ export const publicAnalyticsEventSchema = z.object({
   entityType: z.string().min(1).max(50),
   entityId: z.string().min(1).max(255).optional().nullable(),
   userSession: z.string().min(1).max(255).optional().nullable(),
-  data: z.record(z.string(), z.union([z.string(), z.number(), z.boolean(), z.null()])).optional(),
+  data: z
+    .record(
+      z.string().max(64),
+      z.union([z.string().max(500), z.number(), z.boolean(), z.null()]),
+    )
+    .refine((value) => Object.keys(value).length <= 20, {
+      message: 'data must contain 20 keys or fewer',
+    })
+    .optional(),
 });
 
 export type CreateAnalyticsEventInput = z.infer<typeof createAnalyticsEventSchema>;

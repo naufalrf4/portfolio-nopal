@@ -17,10 +17,10 @@ function parseSmtpSecure(): boolean {
 let cachedTransporter: Transporter | null | undefined;
 
 export const EMAIL_CONFIG = {
-  from: process.env.EMAIL_FROM?.trim() || 'NaufalRF Portfolio <noreply@naufalrf.tech>',
+  from: process.env.EMAIL_FROM?.trim() || 'NaufalRF Portfolio <noreply@naufalrf.net>',
   adminDashboardUrl: process.env.NEXTAUTH_URL || 'http://localhost:3001',
   publicSiteUrl:
-    process.env.PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_SITE_URL || 'https://naufalrf.tech',
+    process.env.PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_SITE_URL || 'https://naufalrf.net',
 } as const;
 
 export function isEmailConfigured(): boolean {

@@ -36,27 +36,21 @@ function normalizeHeaderValue(value: string | null, maxLength: number): string |
 }
 
 function getClientIp(request: NextRequest): string {
-  const candidates = [
-    request.headers.get('true-client-ip'),
-    request.headers.get('cf-connecting-ip'),
-    request.headers.get('x-real-ip'),
-    request.headers.get('x-vercel-forwarded-for'),
-    request.headers.get('x-forwarded-for'),
-  ];
-
-  for (const candidate of candidates) {
-    if (!candidate) {
-      continue;
-    }
-
-    const firstIp = candidate
+  const forwarded = request.headers.get('x-forwarded-for');
+  if (forwarded) {
+    const hops = forwarded
       .split(',')
       .map((segment) => segment.trim())
-      .find(Boolean);
-
-    if (firstIp) {
-      return firstIp;
+      .filter(Boolean);
+    const trusted = hops[hops.length - 1];
+    if (trusted) {
+      return trusted;
     }
+  }
+
+  const directIp = normalizeHeaderValue(request.headers.get('x-real-ip'), 64);
+  if (directIp) {
+    return directIp;
   }
 
   return 'unknown';
