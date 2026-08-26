@@ -105,14 +105,29 @@ describe('buildProxyHeaders', () => {
 
   it('forwards request headers', () => {
     const reqHeaders = new Headers({
-      'x-forwarded-for': '1.2.3.4',
       'user-agent': 'test/1.0',
       'x-irrelevant': 'skip',
     });
     const h = buildProxyHeaders('app', '/', reqHeaders);
-    expect(h.get('x-forwarded-for')).toBe('1.2.3.4');
     expect(h.get('user-agent')).toBe('test/1.0');
     expect(h.get('x-irrelevant')).toBeNull();
+  });
+
+  it('drops client-supplied x-forwarded-for when no trusted socket address is given', () => {
+    const reqHeaders = new Headers({ 'x-forwarded-for': '9.9.9.9' });
+    const h = buildProxyHeaders('app', '/', reqHeaders);
+    expect(h.get('x-forwarded-for')).toBeNull();
+  });
+
+  it('appends the trusted socket address as the last hop', () => {
+    const reqHeaders = new Headers({ 'x-forwarded-for': '9.9.9.9' });
+    const h = buildProxyHeaders('app', '/', reqHeaders, undefined, '1.2.3.4');
+    expect(h.get('x-forwarded-for')).toBe('9.9.9.9, 1.2.3.4');
+  });
+
+  it('sets the socket address alone when no inbound chain exists', () => {
+    const h = buildProxyHeaders('app', '/', new Headers(), undefined, '1.2.3.4');
+    expect(h.get('x-forwarded-for')).toBe('1.2.3.4');
   });
 
   it('truncates long values', () => {

@@ -1,8 +1,5 @@
 const FORWARDED_HEADER_NAMES = [
   'x-forwarded-for',
-  'x-real-ip',
-  'x-vercel-forwarded-for',
-  'cf-connecting-ip',
   'user-agent',
   'accept-language',
   'referer',
@@ -79,6 +76,7 @@ export function buildProxyHeaders(
   sourcePath: string,
   requestHeaders?: Headers,
   timezone?: string,
+  clientAddress?: string,
 ): Headers {
   const headers = new Headers({
     'Content-Type': 'application/json',
@@ -87,13 +85,19 @@ export function buildProxyHeaders(
   });
 
   if (requestHeaders) {
-    // ponytail: per-header maxLength differs across consumers (referer=512, others=255);
-    // normalize to the longest needed (512) which is safe for all header values.
     for (const headerName of FORWARDED_HEADER_NAMES) {
       const maxLen = headerName === 'referer' ? 512 : 255;
       const value = normalizeHeaderValue(requestHeaders.get(headerName), maxLen);
       if (value) headers.set(headerName, value);
     }
+  }
+
+  const socketIp = normalizeHeaderValue(clientAddress, 64);
+  const inboundChain = headers.get('x-forwarded-for');
+  if (socketIp) {
+    headers.set('x-forwarded-for', inboundChain ? `${inboundChain}, ${socketIp}` : socketIp);
+  } else if (inboundChain) {
+    headers.delete('x-forwarded-for');
   }
 
   const normalizedTimezone = normalizeHeaderValue(timezone, 100);

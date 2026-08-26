@@ -18,7 +18,9 @@
     "dev": "bash ./start-dev.sh",
     "build": "NODE_OPTIONS=--max-old-space-size=4096 bun run --filter admin build && bun run --filter public-astro build && bun run --filter links-astro build && bun run --filter ngl-svelte build && bun run --filter rag-service build",
     "lint": "bun run --filter admin lint && bun run --filter ngl-svelte lint",
-    "typecheck": "bun run --filter admin typecheck && bun run --filter ngl-svelte check && bun run --filter rag-service typecheck"
+    "typecheck": "bun run --filter admin typecheck && bun run --filter ngl-svelte check && bun run --filter rag-service typecheck",
+    "test:e2e": "bun run e2e/runner.ts",
+    "test:e2e:specs": "bun test e2e/features"
   },
   "devDependencies": {
     "@commitlint/cli": "^20.1.0",
@@ -38,6 +40,7 @@
   },
   "workspaces": [
     "apps/*",
-    "packages/*"
+    "packages/*",
+    "e2e"
   ]
 }

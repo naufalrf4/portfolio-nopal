@@ -18,7 +18,7 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'media.naufalrf.tech',
+        hostname: 'media.naufalrf.net',
         pathname: '/**',
       },
       {

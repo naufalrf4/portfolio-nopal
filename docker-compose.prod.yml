@@ -44,6 +44,18 @@ services:
       GA_SERVICE_ACCOUNT: ${ADMIN_GA_SERVICE_ACCOUNT}
     expose:
       - '3001'
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://127.0.0.1:3001/').then(r=>{if(r.status>=500) throw new Error('unhealthy '+r.status)})",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
     read_only: true
     tmpfs:
       - /tmp
@@ -135,6 +147,18 @@ services:
       CHAT_HISTORY_LIMIT: ${RAG_CHAT_HISTORY_LIMIT}
     expose:
       - '3005'
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'bun',
+          '-e',
+          "fetch('http://127.0.0.1:3005/health').then(r=>{if(!r.ok) throw new Error('unhealthy '+r.status)})",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
     read_only: true
     tmpfs:
       - /tmp
@@ -202,6 +226,18 @@ services:
       PORT: 3000
     expose:
       - '3000'
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'bun',
+          '-e',
+          "fetch('http://127.0.0.1:3000/').then(r=>{if(r.status>=500) throw new Error('unhealthy '+r.status)})",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
     read_only: true
     tmpfs:
       - /tmp
@@ -239,6 +275,18 @@ services:
       PORT: 3002
     expose:
       - '3002'
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'bun',
+          '-e',
+          "fetch('http://127.0.0.1:3002/').then(r=>{if(r.status>=500) throw new Error('unhealthy '+r.status)})",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
     read_only: true
     tmpfs:
       - /tmp
@@ -273,6 +321,18 @@ services:
       PORT: 3003
     expose:
       - '3003'
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://127.0.0.1:3003/').then(r=>{if(r.status>=500) throw new Error('unhealthy '+r.status)})",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
     read_only: true
     tmpfs:
       - /tmp

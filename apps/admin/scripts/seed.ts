@@ -143,7 +143,7 @@ const PUBLIC_PROFILE = {
   shortBio:
     'Computer Engineering student focused on web development, IoT systems, and AI-powered solutions that are practical, scalable, and easy to use.',
   bio: 'My name is Naufal, and I am a Computer Engineering student with a strong focus on web development, the Internet of Things (IoT), and artificial intelligence (AI). Through practical projects, technology competitions, and internships, I have gained hands-on expertise in building full-stack applications, integrating IoT devices with cloud platforms, and designing data-driven smart solutions.\n\nI have experience in end-to-end system architecture, collaborative teamwork, and technology research, with a deep interest in how AI and IoT can enhance efficiency and unlock new opportunities for innovation. Flexible and analytical, I am committed to delivering functional, impactful, and sustainable solutions.',
-  email: 'contact@naufalrf.tech',
+  email: 'contact@naufalrf.net',
   phone: '+62 859-7494-0903',
   location: 'Depok, Indonesia',
   availabilityStatus: 'available' as const,
@@ -655,35 +655,35 @@ const PROFILE_LINKS: Array<
 > = [
   {
     label: 'About Me',
-    url: 'https://naufalrf.tech/about',
+    url: 'https://naufalrf.net/about',
     icon: 'website',
     order: 0,
     visible: true,
   },
   {
     label: 'Featured Projects',
-    url: 'https://naufalrf.tech/projects',
+    url: 'https://naufalrf.net/projects',
     icon: 'code',
     order: 1,
     visible: true,
   },
   {
     label: 'AI Chat About Naufal',
-    url: 'https://naufalrf.tech/ai-chatbot',
+    url: 'https://naufalrf.net/ai-chatbot',
     icon: 'code',
     order: 2,
     visible: true,
   },
   {
     label: 'Read Blogs',
-    url: 'https://naufalrf.tech/blogs',
+    url: 'https://naufalrf.net/blogs',
     icon: 'blog',
     order: 3,
     visible: true,
   },
   {
     label: 'Get In Touch',
-    url: 'https://naufalrf.tech/contact',
+    url: 'https://naufalrf.net/contact',
     icon: 'website',
     order: 4,
     visible: true,
@@ -697,7 +697,7 @@ const PROFILE_LINKS: Array<
   },
   {
     label: 'Email Me',
-    url: 'mailto:contact@naufalrf.tech',
+    url: 'mailto:contact@naufalrf.net',
     icon: 'website',
     order: 6,
     visible: true,

@@ -6,7 +6,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - '${DB_PORT:-5432}:5432'
+      - '127.0.0.1:${DB_PORT:-5432}:5432'
     volumes:
       - db-data-dev:/var/lib/postgresql/data
       - ./docker/postgres/init:/docker-entrypoint-initdb.d:ro
@@ -55,7 +55,7 @@ services:
       GA_PROPERTY_ID: ${ADMIN_GA_PROPERTY_ID}
       GA_SERVICE_ACCOUNT: ${ADMIN_GA_SERVICE_ACCOUNT}
     ports:
-      - '${ADMIN_PORT:-3001}:3001'
+      - '127.0.0.1:${ADMIN_PORT:-3001}:3001'
     volumes:
       - .:/app
       - root-node-modules:/app/node_modules
@@ -91,7 +91,7 @@ services:
       RETRIEVAL_LIMIT: ${RAG_RETRIEVAL_LIMIT}
       CHAT_HISTORY_LIMIT: ${RAG_CHAT_HISTORY_LIMIT}
     ports:
-      - '${RAG_PORT:-3005}:3005'
+      - '127.0.0.1:${RAG_PORT:-3005}:3005'
     volumes:
       - .:/app
       - root-node-modules:/app/node_modules
@@ -133,7 +133,7 @@ services:
       PUBLIC_CURSOR_WS_URL: ${PRESENCE_PUBLIC_WS_URL}
       SITE_URL: ${PUBLIC_SITE_CANONICAL_URL}
     ports:
-      - '${PUBLIC_PORT:-3000}:3000'
+      - '127.0.0.1:${PUBLIC_PORT:-3000}:3000'
     volumes:
       - .:/app
       - root-node-modules:/app/node_modules
@@ -155,7 +155,7 @@ services:
       ADMIN_API_URL: http://admin:3001
       SITE_URL: ${LINKS_SITE_URL}
     ports:
-      - '${LINKS_PORT:-3002}:3002'
+      - '127.0.0.1:${LINKS_PORT:-3002}:3002'
     volumes:
       - .:/app
       - root-node-modules:/app/node_modules
@@ -176,7 +176,7 @@ services:
       HOST: 0.0.0.0
       PORT: 3003
     ports:
-      - '${NGL_PORT:-3003}:3003'
+      - '127.0.0.1:${NGL_PORT:-3003}:3003'
     volumes:
       - .:/app
       - root-node-modules:/app/node_modules
@@ -195,7 +195,7 @@ services:
       PORT: 3006
       ALLOWED_ORIGINS: ${PRESENCE_ALLOWED_ORIGINS}
     ports:
-      - '${PRESENCE_PORT:-3006}:3006'
+      - '127.0.0.1:${PRESENCE_PORT:-3006}:3006'
     volumes:
       - .:/app
       - root-node-modules:/app/node_modules

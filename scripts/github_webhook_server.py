@@ -14,6 +14,7 @@ from pathlib import Path
 HOST = os.environ.get("PORTFOLIO_WEBHOOK_HOST", "127.0.0.1")
 PORT = int(os.environ.get("PORTFOLIO_WEBHOOK_PORT", "9010"))
 SECRET = os.environ["PORTFOLIO_WEBHOOK_SECRET"]
+MAX_BODY_BYTES = 5 * 1024 * 1024
 EXPECTED_EVENT = os.environ.get("PORTFOLIO_WEBHOOK_EVENT", "push")
 EXPECTED_REF = os.environ.get("PORTFOLIO_WEBHOOK_REF", "refs/heads/main")
 REPO_DIR = Path(os.environ.get("PORTFOLIO_WEBHOOK_REPO_DIR", "/opt/portfolio-nopal"))
@@ -54,7 +55,7 @@ def verify_signature(body: bytes, signature: str | None) -> bool:
 
 def mark_delivery(delivery_id: str) -> bool:
     DELIVERY_DIR.mkdir(parents=True, exist_ok=True)
-    marker = DELIVERY_DIR / delivery_id
+    marker = DELIVERY_DIR / hashlib.sha256(delivery_id.encode("utf-8")).hexdigest()
     try:
         marker.touch(exist_ok=False)
     except FileExistsError:
@@ -95,7 +96,22 @@ class Handler(BaseHTTPRequestHandler):
             )
             return
 
-        content_length = int(self.headers.get("Content-Length", "0"))
+        try:
+            content_length = int(self.headers.get("Content-Length", "0"))
+        except ValueError:
+            json_response(
+                self, HTTPStatus.BAD_REQUEST, {"ok": False, "error": "invalid_length"}
+            )
+            return
+
+        if content_length <= 0 or content_length > MAX_BODY_BYTES:
+            json_response(
+                self,
+                HTTPStatus.REQUEST_ENTITY_TOO_LARGE,
+                {"ok": False, "error": "invalid_length"},
+            )
+            return
+
         body = self.rfile.read(content_length)
 
         if not verify_signature(body, self.headers.get("X-Hub-Signature-256")):

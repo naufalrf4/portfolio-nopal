@@ -20,7 +20,7 @@ Authoritative AI control contract for this repository.
 - **Version Policy:** use versions resolved from `package.json` and `bun.lock`; never guess from memory
 - **State Management:** request-scoped service state plus database-backed retrieval and ingest records
 - **Database / ORM:** centralized Neon/Postgres via postgres.js direct; Admin Drizzle owns schema migrations
-- **Embedding/Chat:** Google Gemini API (`GEMINI_API_KEY`)
+- **Embedding/Chat:** multi-provider via `src/llm-provider.ts`; default is openai-compatible (`OPENAI_API_KEY`, `text-embedding-3-small` embedding, `gpt-4o-mini` chat), with Google Gemini (`GEMINI_API_KEY`) supported as an alternate provider through the same abstraction
 - **Testing Stack:** `bun run typecheck`, `bun run build`
 
 ## 3. Architecture and Structure Rules

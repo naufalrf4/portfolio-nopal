@@ -13,6 +13,6 @@ export default defineConfig({
   vite: {
     plugins: [tailwindcss()],
   },
-  site: process.env.SITE_URL || 'https://links.naufalrf.tech',
+  site: process.env.SITE_URL || 'https://links.naufalrf.net',
   server: { port: 3002 },
 });
