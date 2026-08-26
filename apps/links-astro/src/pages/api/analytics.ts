@@ -2,7 +2,7 @@ import type { APIRoute } from 'astro';
 import { buildAnalyticsProxyHeaders } from '../../lib/analytics';
 
 const ADMIN_API_URL = import.meta.env.ADMIN_API_URL || 'http://localhost:3001';
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, clientAddress }) => {
   try {
     const body = await request.json();
     const timezone =
@@ -14,7 +14,7 @@ export const POST: APIRoute = async ({ request }) => {
 
     const response = await fetch(`${ADMIN_API_URL}/api/v1/public/analytics`, {
       method: 'POST',
-      headers: buildAnalyticsProxyHeaders({ request, sourcePath, timezone }),
+      headers: buildAnalyticsProxyHeaders({ request, sourcePath, timezone, clientAddress }),
       body: JSON.stringify(body),
     });
 

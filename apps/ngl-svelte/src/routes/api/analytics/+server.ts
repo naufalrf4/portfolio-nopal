@@ -3,7 +3,7 @@ import type { RequestHandler } from './$types';
 import { buildProxyHeaders } from '@naufalrf/http';
 
 const adminApiUrl = env.ADMIN_API_URL ?? 'http://localhost:3001';
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, getClientAddress }) => {
 	try {
 		const body = await request.json();
 		const timezone =
@@ -15,7 +15,13 @@ export const POST: RequestHandler = async ({ request }) => {
 
 		const response = await fetch(`${adminApiUrl}/api/v1/public/analytics`, {
 			method: 'POST',
-			headers: buildProxyHeaders('ngl-svelte', sourcePath, request.headers, timezone),
+			headers: buildProxyHeaders(
+				'ngl-svelte',
+				sourcePath,
+				request.headers,
+				timezone,
+				getClientAddress()
+			),
 			body: JSON.stringify(body)
 		});
 

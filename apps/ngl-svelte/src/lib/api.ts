@@ -14,12 +14,19 @@ export async function submitMessage(payload: MessagePayload): Promise<MessageRes
 
 export async function submitMessageWithContext(
 	payload: MessagePayload,
-	requestHeaders: Headers
+	requestHeaders: Headers,
+	clientAddress?: string
 ): Promise<MessageResult> {
 	const { signal, cleanup } = createAbortSignal(API_TIMEOUT_MS);
 
 	try {
-		const headers = buildProxyHeaders('ngl-svelte', '/', requestHeaders, payload.timezone);
+		const headers = buildProxyHeaders(
+			'ngl-svelte',
+			'/',
+			requestHeaders,
+			payload.timezone,
+			clientAddress
+		);
 
 		const response = await fetch(`${adminApiUrl}/api/v1/public/messages`, {
 			method: 'POST',

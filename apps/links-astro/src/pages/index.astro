@@ -28,7 +28,7 @@ try {
   links = pageData.links;
 } catch (error) {
   console.error('Failed to load profile links', error);
-  errorMessage = error instanceof Error ? error.message : 'Failed to load links. Please try again later.';
+  errorMessage = 'Failed to load links. Please try again later.';
 }
 
 const allSocialLinks: SocialLink[] = links
@@ -59,7 +59,7 @@ const presenceSocketUrl =
 <BaseLayout
   title="Links"
   description="A central hub of official links by Naufal Rizqullah Firdaus including portfolio, GitHub, LinkedIn, automation projects, IoT systems, blogs, and contact details."
-  canonicalUrl="https://links.naufalrf.tech"
+  canonicalUrl="https://links.naufalrf.net"
 >
   <Fragment slot="head">
     <script
@@ -69,7 +69,7 @@ const presenceSocketUrl =
         '@type': 'Person',
         name: aboutData.fullName || 'Naufal Rizqullah Firdaus',
         alternateName: 'NaufalRF',
-        url: 'https://links.naufalrf.tech',
+        url: 'https://links.naufalrf.net',
         description:
           aboutData.bio ||
           'Official profile links for Naufal Rizqullah Firdaus, full-stack engineer and builder of web, automation, and AI-powered systems.',

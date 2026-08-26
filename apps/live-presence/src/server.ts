@@ -1,6 +1,11 @@
 const PORT = Number(process.env.PORT || 3006);
 const ROOM_ID = 'public-home';
 const IDLE_TTL_MS = 15000;
+const MAX_SOCKETS = 500;
+const MAX_ROOMS = 32;
+const MAX_ROOM_PARTICIPANTS = 200;
+const MAX_MESSAGE_BYTES = 4096;
+const KNOWN_ROOM_IDS = new Set(['public-home', 'links-home', 'ngl-home']);
 const CLEANUP_INTERVAL_MS = 5000;
 
 const isProduction = process.env.NODE_ENV === 'production';
@@ -12,7 +17,7 @@ const allowedOrigins =
   configuredAllowedOrigins.length > 0
     ? configuredAllowedOrigins
     : isProduction
-      ? ['https://naufalrf.tech', 'https://links.naufalrf.tech', 'https://ngl.naufalrf.tech']
+      ? ['https://naufalrf.net', 'https://links.naufalrf.net', 'https://ngl.naufalrf.net']
       : [
           'http://localhost:3000',
           'http://127.0.0.1:3000',
@@ -102,7 +107,7 @@ const sockets = new Set<PresenceSocket>();
 function createCorsHeaders(origin: string | null): HeadersInit {
   return {
     'Access-Control-Allow-Origin':
-      origin && isAllowedOrigin(origin) ? origin : 'https://naufalrf.tech',
+      origin && isAllowedOrigin(origin) ? origin : 'https://naufalrf.net',
     Vary: 'Origin',
   };
 }
@@ -155,7 +160,13 @@ function sanitizeRoomId(value: string | undefined): string {
   }
 
   const safe = trimmed.replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 64);
-  return safe || ROOM_ID;
+  if (!safe) {
+    return ROOM_ID;
+  }
+  if (KNOWN_ROOM_IDS.has(safe)) {
+    return safe;
+  }
+  return roomParticipants.size >= MAX_ROOMS ? ROOM_ID : safe;
 }
 
 function isAllowedOrigin(origin: string | null): boolean {
@@ -223,6 +234,10 @@ function joinRoom(socket: PresenceSocket, payload: JoinPayload): void {
   }
 
   const room = getRoom(roomId);
+  if (!room.has(socket.data.socketId) && room.size >= MAX_ROOM_PARTICIPANTS) {
+    return;
+  }
+
   const participant: PresenceParticipant = {
     id: socket.data.socketId,
     name: sanitizeName(payload.name),
@@ -332,15 +347,16 @@ const server = Bun.serve<ConnectionData>({
     }
 
     if (url.pathname === '/health') {
-      return Response.json(
-        { ok: true, roomCount: roomParticipants.size, port: PORT },
-        { headers: createCorsHeaders(origin) }
-      );
+      return Response.json({ ok: true }, { headers: createCorsHeaders(origin) });
     }
 
     if (url.pathname === '/ws') {
       if (!isAllowedOrigin(origin)) {
         return new Response('Forbidden', { status: 403 });
+      }
+
+      if (sockets.size >= MAX_SOCKETS) {
+        return new Response('Too many connections', { status: 503 });
       }
 
       const upgraded = server.upgrade(req, {
@@ -364,8 +380,13 @@ const server = Bun.serve<ConnectionData>({
     message(socket: PresenceSocket, rawMessage: unknown) {
       let parsed: ClientMessage;
 
+      const raw = String(rawMessage);
+      if (raw.length > MAX_MESSAGE_BYTES) {
+        return;
+      }
+
       try {
-        parsed = JSON.parse(String(rawMessage)) as ClientMessage;
+        parsed = JSON.parse(raw) as ClientMessage;
       } catch {
         return;
       }

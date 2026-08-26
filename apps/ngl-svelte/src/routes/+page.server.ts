@@ -2,7 +2,7 @@ import { fail, type Actions } from '@sveltejs/kit';
 import { submitMessageWithContext } from '$lib/api';
 
 export const actions: Actions = {
-	default: async ({ request }) => {
+	default: async ({ request, getClientAddress }) => {
 		const formData = await request.formData();
 		const content = formData.get('content');
 		const turnstileToken = formData.get('turnstileToken');
@@ -32,7 +32,8 @@ export const actions: Actions = {
 				turnstileToken,
 				timezone: typeof timezone === 'string' ? timezone.trim() || undefined : undefined
 			},
-			request.headers
+			request.headers,
+			getClientAddress()
 		);
 
 		if (!result.success) {

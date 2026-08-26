@@ -7,7 +7,7 @@
 	const title = 'Anonymous Message - NaufalRF Portfolio';
 	const description =
 		'Send anonymous messages, feedback, or questions to Naufal Rizqullah Firdaus regarding his work, projects, or engineering approach in a safe and open way.';
-	const canonicalUrl = 'https://ngl.naufalrf.tech';
+	const canonicalUrl = 'https://ngl.naufalrf.net';
 	const ogDescription =
 		'An open space to share feedback or questions anonymously with Naufal Rizqullah Firdaus to support transparency and continuous improvement.';
 	const gaMeasurementId = env.PUBLIC_GA_MEASUREMENT_ID ?? '';
@@ -56,7 +56,7 @@
 
 <div class="ngl-root">
 	<div class="fixed right-4 top-4 z-50">
-	<ThemeToggler />
+		<ThemeToggler />
 	</div>
 	<LivePresenceBadge socketUrl={livePresenceSocketUrl} />
 	{@render children()}
