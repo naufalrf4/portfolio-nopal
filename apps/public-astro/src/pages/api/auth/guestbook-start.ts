@@ -3,16 +3,16 @@ import type { APIRoute } from 'astro';
 const ADMIN_PUBLIC_URL =
   process.env.ADMIN_PUBLIC_URL?.trim() ||
   import.meta.env.ADMIN_PUBLIC_URL?.trim() ||
-  'https://admin.naufalrf.tech';
+  'https://admin.naufalrf.net';
 
 const PUBLIC_SITE_URL =
   process.env.PUBLIC_SITE_URL?.trim() ||
   import.meta.env.PUBLIC_SITE_URL?.trim() ||
-  'https://naufalrf.tech';
+  'https://naufalrf.net';
 
 export const GET: APIRoute = async ({ request, url }) => {
   const callbackUrl = url.searchParams.get('callbackUrl') || '/';
-  const nextUrl = callbackUrl.startsWith('/') ? callbackUrl : '/';
+  const nextUrl = callbackUrl.startsWith('/') && !callbackUrl.startsWith('//') ? callbackUrl : '/';
   const requestOrigin = (() => {
     try {
       return new URL(request.url).origin;

@@ -8,7 +8,7 @@ function createSitemapEntry(url: string, changefreq: string, priority: string): 
 }
 
 export const GET: APIRoute = async () => {
-  const siteUrl = import.meta.env.SITE_URL || 'https://naufalrf.tech';
+  const siteUrl = import.meta.env.SITE_URL || 'https://naufalrf.net';
   const { projects } = await getProjects();
 
   const staticEntries = STATIC_ROUTES.map((route, index) =>

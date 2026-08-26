@@ -17,10 +17,10 @@ export const MOCK_ABOUT: AboutData = {
   shortBio:
     'System & Automation Engineer based in Depok, building integrated systems across software, cloud, IoT, and AI workflows for real-world operations.',
   bio: 'System & Automation Engineer based in Depok, building integrated systems across software, cloud, IoT, and AI workflows for real-world operations.',
-  email: 'hello@naufalrf.tech',
+  email: 'hello@naufalrf.net',
   location: 'Depok, Indonesia',
   avatarUrl: null,
-  resumeUrl: 'https://naufalrf.tech/resume.pdf',
+  resumeUrl: 'https://naufalrf.net/resume.pdf',
   availabilityStatus: 'available',
   skills: [
     { name: 'TypeScript', level: 5, category: 'Language' },
@@ -66,7 +66,7 @@ export const MOCK_PROJECTS: Project[] = [
     summary: 'Live cursor presence and state sync across apps over a Bun WebSocket service.',
     category: 'Realtime',
     techStack: ['Bun', 'WebSocket', 'TypeScript'],
-    liveUrl: 'https://naufalrf.tech',
+    liveUrl: 'https://naufalrf.net',
     repoUrl: 'https://github.com/naufalrf',
     imageUrl: 'https://placehold.co/800x500/0f172a/3ed9c4?text=Presence',
     featured: true,
@@ -94,7 +94,7 @@ export const MOCK_PROJECTS: Project[] = [
     summary: 'Grounded AI chat over portfolio content using pgvector retrieval and a Hono service.',
     category: 'AI',
     techStack: ['Bun', 'Hono', 'pgvector', 'LangChain'],
-    liveUrl: 'https://naufalrf.tech/ai-chatbot',
+    liveUrl: 'https://naufalrf.net/ai-chatbot',
     repoUrl: null,
     imageUrl: 'https://placehold.co/800x500/0f172a/3ed9c4?text=RAG+Chat',
     featured: true,
@@ -106,7 +106,7 @@ export const MOCK_PROJECTS: Project[] = [
 export const MOCK_BLOGS: BlogLink[] = [
   {
     id: 'blog-1',
-    url: 'https://blog.naufalrf.tech/building-realtime-presence',
+    url: 'https://blog.naufalrf.net/building-realtime-presence',
     title: 'Building a Realtime Presence Layer with Bun WebSockets',
     description: 'How I designed ephemeral cursor presence across three apps without touching the DB.',
     imageUrl: 'https://placehold.co/800x500/0f172a/3ed9c4?text=Blog+1',
@@ -116,7 +116,7 @@ export const MOCK_BLOGS: BlogLink[] = [
   },
   {
     id: 'blog-2',
-    url: 'https://blog.naufalrf.tech/rag-grounding-that-works',
+    url: 'https://blog.naufalrf.net/rag-grounding-that-works',
     title: 'RAG Grounding That Actually Abstains',
     description: 'Retrieval confidence thresholds and hybrid fallbacks for a portfolio chat that stays honest.',
     imageUrl: 'https://placehold.co/800x500/0f172a/3ed9c4?text=Blog+2',
@@ -126,7 +126,7 @@ export const MOCK_BLOGS: BlogLink[] = [
   },
   {
     id: 'blog-3',
-    url: 'https://blog.naufalrf.tech/esp32-mqtt-lessons',
+    url: 'https://blog.naufalrf.net/esp32-mqtt-lessons',
     title: 'Lessons from an ESP32 MQTT Rollout',
     description: 'Reliability, backoff, and dashboard design for field-deployed sensor telemetry.',
     imageUrl: 'https://placehold.co/800x500/0f172a/3ed9c4?text=Blog+3',

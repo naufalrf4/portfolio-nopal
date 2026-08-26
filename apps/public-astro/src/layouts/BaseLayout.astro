@@ -39,7 +39,7 @@ const {
 const title = rawTitle === SITE_NAME ? SITE_NAME : `${rawTitle} - ${SITE_NAME}`;
 
 const currentPath = Astro.url.pathname;
-const siteUrl = process.env.SITE_URL?.trim() || import.meta.env.SITE_URL || 'https://naufalrf.tech';
+const siteUrl = process.env.SITE_URL?.trim() || import.meta.env.SITE_URL || 'https://naufalrf.net';
 const canonical = canonicalUrl || new URL(currentPath, siteUrl).href;
 const presenceSocketUrl =
   process.env.PUBLIC_CURSOR_WS_URL?.trim() || import.meta.env.PUBLIC_CURSOR_WS_URL?.trim() || 'ws://localhost:3006/ws';

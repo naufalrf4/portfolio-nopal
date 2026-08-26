@@ -92,7 +92,7 @@ const isActive = (href: string) => {
         </div>
 
         <AnimatedThemeToggler client:load className="ml-1" />
-        <PresenceChip client:load currentPath={currentPath} socketUrl={import.meta.env.PRESENCE_SOCKET_URL ?? 'ws://localhost:3006/ws'} />
+        <PresenceChip client:load currentPath={currentPath} socketUrl={import.meta.env.PUBLIC_CURSOR_WS_URL?.trim() || 'ws://localhost:3006/ws'} />
       </div>
     </div>
   </nav>

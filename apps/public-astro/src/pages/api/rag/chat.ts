@@ -9,10 +9,10 @@ const RATE_LIMIT_CONFIG = {
   windowMs: 60 * 1000,
 };
 
-async function proxy(request: Request, body: unknown): Promise<Response> {
+async function proxy(request: Request, body: unknown, clientAddress: string): Promise<Response> {
   const response = await fetch(`${RAG_SERVICE_URL}/chat`, {
     method: 'POST',
-    headers: buildSubmissionProxyHeaders({ request, sourcePath: '/ai-chatbot' }),
+    headers: buildSubmissionProxyHeaders({ request, sourcePath: '/ai-chatbot', clientAddress }),
     body: JSON.stringify(body),
   });
 
@@ -25,8 +25,8 @@ async function proxy(request: Request, body: unknown): Promise<Response> {
   });
 }
 
-export const POST: APIRoute = async ({ request }) => {
-  const rateLimitState = getRateLimitState(`chat:${getClientIp(request)}`, RATE_LIMIT_CONFIG);
+export const POST: APIRoute = async ({ request, clientAddress }) => {
+  const rateLimitState = getRateLimitState(`chat:${clientAddress || getClientIp(request)}`, RATE_LIMIT_CONFIG);
 
   if (!rateLimitState.allowed) {
     const headers = new Headers({
@@ -51,7 +51,7 @@ export const POST: APIRoute = async ({ request }) => {
 
   try {
     const body = await request.json();
-    const response = await proxy(request, body);
+    const response = await proxy(request, body, clientAddress);
     applyRateLimitHeaders(response.headers, rateLimitState);
     return response;
   } catch {

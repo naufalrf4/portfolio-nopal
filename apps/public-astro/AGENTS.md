@@ -70,7 +70,7 @@ Authoritative AI control contract for this repository.
 
 - Self-learn: add a short factual rule here when a task reveals a recurring public-site quirk, API contract caveat, or design constraint.
 - `src/lib/api.ts` is the authoritative Admin API client for public content reads.
-- `src/components/shared/NeuButton.tsx` is a current carryover from the legacy phase2 design vocabulary.
+- Legacy `NeuButton.tsx` and other Neu* components have already been renamed to Card/Button/Badge/Input/Textarea; no phase2 carryover file remains in `src/components/shared/`.
 - `src/pages/api/auth/sync.ts` proxies auth sync requests to Admin and should remain an API boundary, not a database shortcut.
 - Project detail `content` from Admin may arrive as plain text/markdown or serialized Tiptap JSON, so public renderers must support both formats safely.
 - Public project detail pages now consume only the simplified slug contract (`summary`, `description`, `content`, `images`) and must not depend on legacy `contexts` payloads.

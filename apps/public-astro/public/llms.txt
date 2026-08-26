@@ -2,7 +2,7 @@
 
 > Canonical machine-readable profile of Naufal Rizqullah Firdaus — a System & Automation Engineer from Indonesia focused on building integrated systems across software, cloud, IoT, and AI workflows, with a strong emphasis on real-world applications and system reliability.
 
-Base URL: https://naufalrf.tech/
+Base URL: https://naufalrf.net/
 Last Updated: 2026
 
 ---
@@ -167,27 +167,27 @@ This site is intended for:
 
 ### Core Pages
 
-- https://naufalrf.tech/
+- https://naufalrf.net/
   Overview and entry point to portfolio
 
-- https://naufalrf.tech/about
+- https://naufalrf.net/about
   Background, achievements, skills, and experience
 
-- https://naufalrf.tech/projects
+- https://naufalrf.net/projects
   Project case studies and engineering work
 
-- https://naufalrf.tech/blogs
+- https://naufalrf.net/blogs
   Writing, notes, and technical insights
 
-- https://naufalrf.tech/contact
+- https://naufalrf.net/contact
   Contact and collaboration entry point
 
 ### Supporting Pages
 
-- https://naufalrf.tech/guestbook
+- https://naufalrf.net/guestbook
   Public messages and interactions
 
-- https://naufalrf.tech/ai-chatbot
+- https://naufalrf.net/ai-chatbot
   Site-aware assistant for answering questions about this portfolio
 
 ---
