@@ -32,21 +32,19 @@ async function handleGet() {
       return successResponse(null, 'No LLM config found');
     }
 
-    const maskApiKey = (key: string) => (key.length > 8 ? `${key.slice(0, 4)}...${key.slice(-4)}` : '••••');
-
     return successResponse({
       id: row.id,
       mainProvider: row.mainProvider,
       mainBaseUrl: row.mainBaseUrl,
-      mainApiKey: row.mainApiKey ? maskApiKey(row.mainApiKey) : '',
+      mainApiKeySet: row.mainApiKey.length > 0,
       mainModel: row.mainModel,
       fallbackProvider: row.fallbackProvider ?? null,
       fallbackBaseUrl: row.fallbackBaseUrl ?? '',
-      fallbackApiKey: row.fallbackApiKey ? maskApiKey(row.fallbackApiKey) : '',
+      fallbackApiKeySet: (row.fallbackApiKey ?? '').length > 0,
       fallbackModel: row.fallbackModel ?? '',
       embeddingProvider: row.embeddingProvider,
       embeddingBaseUrl: row.embeddingBaseUrl,
-      embeddingApiKey: row.embeddingApiKey ? maskApiKey(row.embeddingApiKey) : '',
+      embeddingApiKeySet: row.embeddingApiKey.length > 0,
       embeddingModel: row.embeddingModel,
       embeddingDimension: row.embeddingDimension,
     });
@@ -67,8 +65,11 @@ async function handlePut(req: NextRequest) {
     const data = validation.data;
     const now = new Date().toISOString();
 
-    const existingRows = await db.select({ id: llmSettings.id }).from(llmSettings).limit(1);
+    const existingRows = await db.select().from(llmSettings).limit(1);
     const existing = existingRows[0];
+
+    const keepExisting = (incoming: string | undefined, current: string | null | undefined) =>
+      incoming && incoming.length > 0 ? incoming : (current ?? '');
 
     if (existing) {
       await db
@@ -76,15 +77,17 @@ async function handlePut(req: NextRequest) {
         .set({
           mainProvider: data.mainProvider,
           mainBaseUrl: data.mainBaseUrl,
-          mainApiKey: data.mainApiKey,
+          mainApiKey: keepExisting(data.mainApiKey, existing?.mainApiKey),
           mainModel: data.mainModel,
           fallbackProvider: data.fallbackProvider ?? null,
           fallbackBaseUrl: data.fallbackBaseUrl ?? null,
-          fallbackApiKey: data.fallbackApiKey ?? null,
+          fallbackApiKey: data.fallbackProvider
+            ? keepExisting(data.fallbackApiKey, existing?.fallbackApiKey)
+            : null,
           fallbackModel: data.fallbackModel ?? null,
           embeddingProvider: data.embeddingProvider,
           embeddingBaseUrl: data.embeddingBaseUrl,
-          embeddingApiKey: data.embeddingApiKey,
+          embeddingApiKey: keepExisting(data.embeddingApiKey, existing?.embeddingApiKey),
           embeddingModel: data.embeddingModel,
           embeddingDimension: data.embeddingDimension ?? 1536,
           updatedAt: now,

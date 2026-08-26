@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { KnowledgeTable } from '@/components/knowledge';
 import { ChatLogsTable } from '@/components/chat-logs';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { AiConfigTab } from '@/features/knowledge/components';
 
 interface KnowledgeDoc {
   id: string;
@@ -54,7 +55,7 @@ export function KnowledgePageContent() {
   const [loading, setLoading] = useState(true);
   const [chatLogsLoading, setChatLogsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [activeTab, setActiveTab] = useState<'documents' | 'chat-logs'>('documents');
+  const [activeTab, setActiveTab] = useState<'documents' | 'chat-logs' | 'ai-config'>('documents');
 
   const fetchDocs = useCallback(async () => {
     try {
@@ -168,7 +169,7 @@ export function KnowledgePageContent() {
           { label: 'Pending', value: pendingCount, variant: 'warning' },
         ]}
         actions={
-          activeTab !== 'chat-logs' ? (
+          activeTab === 'documents' || activeTab === 'chat-logs' ? (
             <div className="flex items-center gap-2">
               <Button variant="ghost" size="icon" onClick={handleRefresh} disabled={refreshing}>
                 <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
@@ -187,9 +188,10 @@ export function KnowledgePageContent() {
       />
 
       <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as typeof activeTab)}>
-        <TabsList className="mb-6 grid w-full max-w-xl grid-cols-2">
+        <TabsList className="mb-6 grid w-full max-w-xl grid-cols-3">
           <TabsTrigger value="documents">Knowledge Documents</TabsTrigger>
           <TabsTrigger value="chat-logs">Chat Logs</TabsTrigger>
+          <TabsTrigger value="ai-config">AI Config</TabsTrigger>
         </TabsList>
 
         <TabsContent value="documents">
@@ -203,6 +205,10 @@ export function KnowledgePageContent() {
 
         <TabsContent value="chat-logs">
           <ChatLogsTable logs={logs} loading={chatLogsLoading} onDelete={handleDeleteLog} />
+        </TabsContent>
+
+        <TabsContent value="ai-config">
+          <AiConfigTab />
         </TabsContent>
       </Tabs>
     </PageWrapper>
