@@ -2,8 +2,7 @@ import type { BlogLink } from '../types/blogs.types';
 import { NEUMORPHIC_STYLES } from '../constants/blogs.constants';
 import { formatDate } from '@/lib/utils/date';
 import { truncateUrl } from '@/lib/utils/string';
-import { BlogLinkIcon, ExternalLinkIcon, EditIcon, TrashIcon } from './Icons';
-import { NeumorphicToggle } from './Toggle';
+import { Switch } from '@/components/ui/switch';
 
 interface BlogCardProps {
   blogLink: BlogLink;
@@ -77,7 +76,11 @@ export function BlogCard({ blogLink, onEdit, onDelete, onToggleVisibility }: Blo
 
       <div className="mt-5 pt-4 border-t border-[#D1D5DB]/50 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <NeumorphicToggle checked={blogLink.visible} onChange={onToggleVisibility} />
+          <Switch
+            checked={blogLink.visible}
+            onCheckedChange={onToggleVisibility}
+            aria-label={blogLink.visible ? 'Hide blog' : 'Show blog'}
+          />
           <span
             className="text-sm font-medium"
             style={{
