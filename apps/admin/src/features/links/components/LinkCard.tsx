@@ -1,6 +1,7 @@
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { Pencil, Trash2, Eye, EyeOff, ExternalLink } from 'lucide-react';
+import { Pencil, Trash2, ExternalLink } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
 import type { ProfileLink } from '../types/links.types';
 import { getIconData } from '../utils/links.utils';
 
@@ -73,19 +74,14 @@ export function LinkCard({ link, index, onEdit, onDelete, onToggleVisibility }: 
 
       <div className="flex items-center justify-between pt-4 border-t border-[var(--text-secondary)]/10">
         <div className="flex items-center gap-3">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button
-                onClick={onToggleVisibility}
-                className={`p-1.5 rounded-lg transition-colors ${
-                  link.visible ? 'text-[var(--teal)]' : 'text-[var(--text-secondary)]/40 hover:text-[var(--teal)]'
-                }`}
-              >
-                {link.visible ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
-              </button>
-            </TooltipTrigger>
-            <TooltipContent>{link.visible ? 'Hide link' : 'Show link'}</TooltipContent>
-          </Tooltip>
+          <Switch
+            checked={link.visible}
+            onCheckedChange={onToggleVisibility}
+            aria-label={link.visible ? 'Hide link' : 'Show link'}
+          />
+          <span className="text-xs text-[var(--text-secondary)]">
+            {link.visible ? 'Visible' : 'Hidden'}
+          </span>
         </div>
         <Badge variant="outline" className="capitalize text-xs">
           {link.icon || 'custom'}

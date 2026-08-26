@@ -1,5 +1,6 @@
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Eye, EyeOff, Star, Pencil, Trash2, Wrench, ExternalLink, Github, Hash } from './Icons';
+import { Star, Pencil, Trash2, Wrench, ExternalLink, Github, Hash } from './Icons';
+import { Switch } from '@/components/ui/switch';
 import { getCategoryIcon } from '../utils/projects.utils';
 import type { ProjectCardProps } from '../types/projects.types';
 
@@ -129,19 +130,14 @@ export function ProjectCard({
 
         <div className="flex items-center justify-between pt-4 border-t border-[#A3B1C6]/20">
           <div className="flex items-center gap-2">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button
-                  onClick={onToggleVisibility}
-                  className={`p-2 rounded-xl transition-colors ${
-                    project.visible ? 'text-[var(--teal)]' : 'text-[var(--text-secondary)]'
-                  }`}
-                >
-                  {project.visible ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
-                </button>
-              </TooltipTrigger>
-              <TooltipContent>{project.visible ? 'Visible' : 'Hidden'}</TooltipContent>
-            </Tooltip>
+            <Switch
+              checked={project.visible}
+              onCheckedChange={onToggleVisibility}
+              aria-label={project.visible ? 'Hide project' : 'Show project'}
+            />
+            <span className="text-xs text-[var(--text-secondary)]">
+              {project.visible ? 'Visible' : 'Hidden'}
+            </span>
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
