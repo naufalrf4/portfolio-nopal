@@ -19,6 +19,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { IngestButton } from './IngestButton';
 import { DeleteConfirmModal } from './DeleteConfirmModal';
 import { cn } from '@/lib/utils';
+import { formatDateTime } from '@/lib/utils/date';
 
 interface KnowledgeDoc {
   id: string;
@@ -62,13 +63,7 @@ export function KnowledgeTable({ docs, loading, onDelete, onIngest }: KnowledgeT
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
+    return formatDateTime(dateString);
   };
 
   if (loading) {

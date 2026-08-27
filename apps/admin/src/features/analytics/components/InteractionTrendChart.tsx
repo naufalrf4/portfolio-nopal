@@ -2,6 +2,7 @@
 
 import { Card } from '@/components/ui/card';
 import type { InteractionTrendPoint } from '../types/analytics.types';
+import { formatDateKeyShort } from '@/lib/utils/date';
 
 export function InteractionTrendChart({
   data,
@@ -66,10 +67,7 @@ export function InteractionTrendChart({
                   />
                 </div>
                 <span className="text-[10px] text-[var(--text-secondary)] [writing-mode:vertical-rl] rotate-180">
-                  {new Date(item.date).toLocaleDateString('en-US', {
-                    month: 'short',
-                    day: 'numeric',
-                  })}
+                  {formatDateKeyShort(item.date)}
                 </span>
               </div>
             ))}
