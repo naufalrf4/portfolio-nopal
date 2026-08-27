@@ -9,17 +9,12 @@ import type {
   CopyFromWeekInput,
   SlotsQueryInput,
 } from '@/lib/validations/booking-slots.schema';
+import { addDaysToDateKey, diffInDaysBetweenKeys, toDateKey } from '@/lib/utils/date';
 
 export class BookingSlotsService {
   async getSlotsByDateRange(query: SlotsQueryInput) {
-    const startDate = new Date(query.startDate);
-    const endDate = new Date(query.endDate);
-
-    startDate.setHours(0, 0, 0, 0);
-    endDate.setHours(23, 59, 59, 999);
-
-    const startDateStr = startDate.toISOString().split('T')[0];
-    const endDateStr = endDate.toISOString().split('T')[0];
+    const startDateStr = toDateKey(query.startDate);
+    const endDateStr = toDateKey(query.endDate);
 
     const slots = await db.query.bookingSlots.findMany({
       where: and(gte(bookingSlots.date, startDateStr), lte(bookingSlots.date, endDateStr)),
@@ -107,9 +102,7 @@ export class BookingSlotsService {
   }
 
   async createSlot(data: CreateBookingSlotInput) {
-    const slotDate = new Date(data.date);
-    slotDate.setHours(0, 0, 0, 0);
-    const dateStr = slotDate.toISOString().split('T')[0];
+    const dateStr = toDateKey(data.date);
 
     const [existingSlot] = await db
       .select()
@@ -158,9 +151,7 @@ export class BookingSlotsService {
 
     for (const slotData of data.slots) {
       try {
-        const slotDate = new Date(slotData.date);
-        slotDate.setHours(0, 0, 0, 0);
-        const dateStr = slotDate.toISOString().split('T')[0];
+        const dateStr = toDateKey(slotData.date);
 
         const [existingSlot] = await db
           .select()
@@ -284,18 +275,9 @@ export class BookingSlotsService {
   }
 
   async copyFromWeek(data: CopyFromWeekInput) {
-    const sourceStart = new Date(data.sourceStartDate);
-    const targetStart = new Date(data.targetStartDate);
-
-    sourceStart.setHours(0, 0, 0, 0);
-    targetStart.setHours(0, 0, 0, 0);
-
-    const sourceEnd = new Date(sourceStart);
-    sourceEnd.setDate(sourceEnd.getDate() + 6);
-    sourceEnd.setHours(23, 59, 59, 999);
-
-    const sourceStartStr = sourceStart.toISOString().split('T')[0];
-    const sourceEndStr = sourceEnd.toISOString().split('T')[0];
+    const sourceStartStr = toDateKey(data.sourceStartDate);
+    const targetStartStr = toDateKey(data.targetStartDate);
+    const sourceEndStr = addDaysToDateKey(sourceStartStr, 6);
 
     const sourceSlots = await db
       .select()
@@ -315,14 +297,8 @@ export class BookingSlotsService {
     };
 
     for (const slot of sourceSlots) {
-      const slotDate = new Date(slot.date);
-      const dayOffset = Math.floor(
-        (slotDate.getTime() - sourceStart.getTime()) / (1000 * 60 * 60 * 24)
-      );
-
-      const targetDate = new Date(targetStart);
-      targetDate.setDate(targetDate.getDate() + dayOffset);
-      const targetDateStr = targetDate.toISOString().split('T')[0];
+      const dayOffset = diffInDaysBetweenKeys(sourceStartStr, slot.date);
+      const targetDateStr = addDaysToDateKey(targetStartStr, dayOffset);
 
       const [existingSlot] = await db
         .select()
