@@ -174,7 +174,7 @@ export function LocationMap({
           )}
         </div>
         <div
-          className="neu-inset rounded-2xl bg-[var(--bg-elevated)] flex items-center justify-center"
+          className="surface-sunken rounded-2xl bg-[var(--bg-elevated)] flex items-center justify-center"
           style={{ height }}
         >
           <div className="flex flex-col items-center gap-3 p-8 text-center">
@@ -209,7 +209,7 @@ export function LocationMap({
 
       {loading ? (
         <div
-          className="neu-inset rounded-2xl bg-[var(--bg-elevated)] flex items-center justify-center"
+          className="surface-sunken rounded-2xl bg-[var(--bg-elevated)] flex items-center justify-center"
           style={{ height }}
         >
           <div className="flex flex-col items-center gap-3">
@@ -219,7 +219,7 @@ export function LocationMap({
         </div>
       ) : (
         <div
-          className="relative neu-inset rounded-2xl overflow-hidden bg-[var(--bg-elevated)]"
+          className="relative surface-sunken rounded-2xl overflow-hidden bg-[var(--bg-elevated)]"
           style={{ height }}
         >
           <Map
@@ -243,7 +243,7 @@ export function LocationMap({
                 }}
               >
                 <div
-                  className="cursor-pointer transform transition-transform hover:scale-110 rounded-full bg-[var(--teal)] flex items-center justify-center text-white text-xs font-bold shadow-lg border-2 border-white"
+                  className="cursor-pointer transform transition-transform hover:scale-110 rounded-full bg-[var(--teal)] flex items-center justify-center text-on-accent text-xs font-bold shadow-lg border-2 border-bg"
                   style={{
                     width: `${getMarkerSize(stat.count)}px`,
                     height: `${getMarkerSize(stat.count)}px`,
@@ -287,7 +287,7 @@ export function LocationMap({
               <button
                 key={stat.countryCode}
                 onClick={() => handleMarkerClick(stat)}
-                className={`w-full neu-extruded rounded-xl p-3 flex items-center gap-3 transition-all duration-200 hover:-translate-y-[1px] hover:shadow-neu-extruded ${
+                className={`w-full surface-raised rounded-xl p-3 flex items-center gap-3 transition-all duration-200 hover:-translate-y-[1px] hover:shadow-surface-raised ${
                   selectedCountry === stat.countryCode ? 'ring-2 ring-[var(--teal)]' : ''
                 }`}
               >
@@ -296,7 +296,7 @@ export function LocationMap({
                   <div className="text-sm font-medium text-[var(--text-primary)]">{stat.country}</div>
                   {stat.city && <div className="text-xs text-[var(--text-secondary)]">{stat.city}</div>}
                 </div>
-                <div className="rounded-full bg-[var(--teal)] text-white text-xs font-bold px-3 py-1">
+                <div className="rounded-full bg-[var(--teal)] text-on-accent text-xs font-bold px-3 py-1">
                   {stat.count}
                 </div>
               </button>

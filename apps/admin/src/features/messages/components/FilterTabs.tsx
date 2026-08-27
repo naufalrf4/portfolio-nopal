@@ -1,4 +1,4 @@
-import { NEUMORPHIC_SHADOWS, COLORS, FILTER_TABS } from '../constants/messages.constants';
+import { SURFACE_SHADOWS, COLORS, FILTER_TABS } from '../constants/messages.constants';
 import type { FilterTab } from '../types/messages.types';
 
 interface FilterTabsProps {
@@ -20,7 +20,7 @@ export function FilterTabs({ activeTab, onTabChange, totalCount, unreadCount }: 
       className="p-2 rounded-2xl mb-8 inline-flex flex-wrap gap-2"
       style={{
         backgroundColor: COLORS.background,
-        boxShadow: NEUMORPHIC_SHADOWS.inset,
+        boxShadow: SURFACE_SHADOWS.inset,
       }}
     >
       {FILTER_TABS.map((tab) => {
@@ -32,7 +32,7 @@ export function FilterTabs({ activeTab, onTabChange, totalCount, unreadCount }: 
             className="relative py-3 px-4 sm:px-6 rounded-xl font-medium transition-all duration-200 text-sm sm:text-base"
             style={{
               backgroundColor: activeTab === tab.key ? COLORS.background : 'transparent',
-              boxShadow: activeTab === tab.key ? NEUMORPHIC_SHADOWS.extrudedSm : 'none',
+              boxShadow: activeTab === tab.key ? SURFACE_SHADOWS.extrudedSm : 'none',
               color: activeTab === tab.key ? COLORS.accent : COLORS.muted,
             }}
           >

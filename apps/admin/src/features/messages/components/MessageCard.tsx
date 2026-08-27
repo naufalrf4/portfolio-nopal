@@ -1,7 +1,7 @@
 import { Mail, MailOpen, Check, Trash2 } from 'lucide-react';
 import { formatDateTime } from '@/lib/utils/date';
 import { truncate } from '@/lib/utils/string';
-import { NEUMORPHIC_SHADOWS, COLORS } from '../constants/messages.constants';
+import { SURFACE_SHADOWS, COLORS } from '../constants/messages.constants';
 import type { AnonymousMessage } from '../types/messages.types';
 
 interface MessageCardProps {
@@ -18,7 +18,7 @@ export function MessageCard({ message, onSelect, onToggleRead, onDelete }: Messa
       className="rounded-[var(--radius-container)] p-6 cursor-pointer transition-all duration-200 hover:scale-[1.01] relative overflow-hidden group"
       style={{
         backgroundColor: COLORS.background,
-        boxShadow: NEUMORPHIC_SHADOWS.extruded,
+        boxShadow: SURFACE_SHADOWS.extruded,
         borderLeft: !message.read ? `4px solid ${COLORS.amber}` : '4px solid transparent',
       }}
     >
@@ -34,7 +34,7 @@ export function MessageCard({ message, onSelect, onToggleRead, onDelete }: Messa
           className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 transition-transform duration-200 group-hover:scale-105"
           style={{
             backgroundColor: COLORS.background,
-            boxShadow: NEUMORPHIC_SHADOWS.inset,
+            boxShadow: SURFACE_SHADOWS.inset,
           }}
         >
           {message.read ? (
@@ -72,7 +72,7 @@ export function MessageCard({ message, onSelect, onToggleRead, onDelete }: Messa
             className="p-2 rounded-xl transition-all duration-200 hover:scale-110"
             style={{
               backgroundColor: COLORS.background,
-              boxShadow: NEUMORPHIC_SHADOWS.extrudedSm,
+              boxShadow: SURFACE_SHADOWS.extrudedSm,
               color: COLORS.foreground,
             }}
             title={message.read ? 'Mark as unread' : 'Mark as read'}
@@ -84,8 +84,8 @@ export function MessageCard({ message, onSelect, onToggleRead, onDelete }: Messa
             className="p-2 rounded-xl transition-all duration-200 hover:scale-110"
             style={{
               backgroundColor: COLORS.background,
-              boxShadow: NEUMORPHIC_SHADOWS.extrudedSm,
-              color: '#ef4444',
+              boxShadow: SURFACE_SHADOWS.extrudedSm,
+              color: 'var(--error)',
             }}
             title="Delete message"
           >

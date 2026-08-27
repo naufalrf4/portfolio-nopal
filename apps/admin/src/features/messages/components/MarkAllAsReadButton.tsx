@@ -1,5 +1,5 @@
 import { CheckCheck } from 'lucide-react';
-import { NEUMORPHIC_SHADOWS, COLORS } from '../constants/messages.constants';
+import { SURFACE_SHADOWS, COLORS } from '../constants/messages.constants';
 
 interface MarkAllAsReadButtonProps {
   onClick: () => void;
@@ -14,7 +14,7 @@ export function MarkAllAsReadButton({ onClick, disabled }: MarkAllAsReadButtonPr
       className="flex items-center gap-2 py-3 px-6 rounded-2xl font-medium transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50"
       style={{
         backgroundColor: COLORS.background,
-        boxShadow: NEUMORPHIC_SHADOWS.extrudedSm,
+        boxShadow: SURFACE_SHADOWS.extrudedSm,
         color: COLORS.accent,
       }}
     >

@@ -148,7 +148,7 @@ export function MessageDetailModal({
     >
       {message && (
         <div className="space-y-4">
-          <div className="neu-inset rounded-2xl p-4 sm:p-6 bg-[var(--bg-elevated)]">
+          <div className="surface-sunken rounded-2xl p-4 sm:p-6 bg-[var(--bg-elevated)]">
             <p className="text-base sm:text-lg text-[var(--text-primary)] whitespace-pre-wrap break-words leading-relaxed">
               {message.content}
             </p>
@@ -161,22 +161,22 @@ export function MessageDetailModal({
                 Security Information
               </h5>
             </div>
-            <div className="neu-inset rounded-xl p-3 sm:p-4 bg-[var(--bg-elevated)]">
+            <div className="surface-sunken rounded-xl p-3 sm:p-4 bg-[var(--bg-elevated)]">
               <div className="flex flex-col gap-3">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                   <span className="text-xs sm:text-sm text-[var(--text-secondary)]">IP Hash:</span>
-                  <code className="text-xs font-mono bg-[#d4dce6] px-2 py-1 rounded text-[var(--text-primary)] break-all">
+                  <code className="text-xs font-mono bg-bg-elevated px-2 py-1 rounded text-[var(--text-primary)] break-all">
                     ...{message.ipHash.substring(message.ipHash.length - 12)}
                   </code>
                 </div>
-                <Separator className="bg-[#d4dce6]" />
+                <Separator className="bg-bg-elevated" />
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-xs sm:text-sm text-[var(--text-secondary)]">Status:</span>
                   <Badge variant={message.read ? 'outline' : 'default'} className="text-xs">
                     {message.read ? 'Read' : 'Unread'}
                   </Badge>
                 </div>
-                <Separator className="bg-[#d4dce6]" />
+                <Separator className="bg-bg-elevated" />
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-xs sm:text-sm text-[var(--text-secondary)]">Received:</span>
                   <span className="text-xs sm:text-sm text-[var(--text-primary)] font-medium">
@@ -193,9 +193,9 @@ export function MessageDetailModal({
                 <MapPin className="h-4 w-4 text-[var(--text-secondary)]" />
                 <h5 className="text-xs sm:text-sm font-semibold text-[var(--text-primary)]">Location</h5>
               </div>
-              <div className="neu-extruded rounded-xl p-3 sm:p-4 bg-[var(--bg-elevated)]">
+              <div className="surface-raised rounded-xl p-3 sm:p-4 bg-[var(--bg-elevated)]">
                 <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-                  <div className="w-12 h-12 rounded-full flex items-center justify-center neu-inset bg-[var(--bg-elevated)]">
+                  <div className="w-12 h-12 rounded-full flex items-center justify-center surface-sunken bg-[var(--bg-elevated)]">
                     {message.countryCode && (
                       <span className="text-2xl">
                         {message.countryCode === 'US'

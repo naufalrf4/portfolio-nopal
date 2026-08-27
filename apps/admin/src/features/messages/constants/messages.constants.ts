@@ -1,6 +1,6 @@
 import type { FilterTab } from '../types/messages.types';
 
-export const NEUMORPHIC_SHADOWS = {
+export const SURFACE_SHADOWS = {
   extruded: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
   inset: 'inset 0 1px 4px rgba(0, 0, 0, 0.25)',
   extrudedSm: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',

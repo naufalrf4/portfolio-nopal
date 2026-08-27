@@ -1,4 +1,4 @@
-import { NEUMORPHIC_SHADOWS, COLORS } from '../constants/messages.constants';
+import { SURFACE_SHADOWS, COLORS } from '../constants/messages.constants';
 
 export function SkeletonCard() {
   return (
@@ -6,7 +6,7 @@ export function SkeletonCard() {
       className="rounded-[var(--radius-container)] p-6 animate-pulse"
       style={{
         backgroundColor: COLORS.background,
-        boxShadow: NEUMORPHIC_SHADOWS.extruded,
+        boxShadow: SURFACE_SHADOWS.extruded,
       }}
     >
       <div className="flex items-start gap-4">
@@ -14,7 +14,7 @@ export function SkeletonCard() {
           className="w-12 h-12 rounded-full"
           style={{
             backgroundColor: COLORS.background,
-            boxShadow: NEUMORPHIC_SHADOWS.inset,
+            boxShadow: SURFACE_SHADOWS.inset,
           }}
         />
         <div className="flex-1 space-y-3">
@@ -22,21 +22,21 @@ export function SkeletonCard() {
             className="h-4 rounded-full w-3/4"
             style={{
               backgroundColor: COLORS.background,
-              boxShadow: NEUMORPHIC_SHADOWS.insetSm,
+              boxShadow: SURFACE_SHADOWS.insetSm,
             }}
           />
           <div
             className="h-4 rounded-full w-1/2"
             style={{
               backgroundColor: COLORS.background,
-              boxShadow: NEUMORPHIC_SHADOWS.insetSm,
+              boxShadow: SURFACE_SHADOWS.insetSm,
             }}
           />
           <div
             className="h-3 rounded-full w-1/4"
             style={{
               backgroundColor: COLORS.background,
-              boxShadow: NEUMORPHIC_SHADOWS.insetSm,
+              boxShadow: SURFACE_SHADOWS.insetSm,
             }}
           />
         </div>

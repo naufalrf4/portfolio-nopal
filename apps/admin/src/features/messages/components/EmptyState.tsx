@@ -1,5 +1,5 @@
 import { MessageSquare } from 'lucide-react';
-import { NEUMORPHIC_SHADOWS, COLORS } from '../constants/messages.constants';
+import { SURFACE_SHADOWS, COLORS } from '../constants/messages.constants';
 import type { FilterTab } from '../types/messages.types';
 
 interface EmptyStateProps {
@@ -29,14 +29,14 @@ export function EmptyState({ activeTab }: EmptyStateProps) {
       className="rounded-[var(--radius-container)] p-12 text-center"
       style={{
         backgroundColor: COLORS.background,
-        boxShadow: NEUMORPHIC_SHADOWS.extruded,
+        boxShadow: SURFACE_SHADOWS.extruded,
       }}
     >
       <div
         className="w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center"
         style={{
           backgroundColor: COLORS.background,
-          boxShadow: NEUMORPHIC_SHADOWS.inset,
+          boxShadow: SURFACE_SHADOWS.inset,
         }}
       >
         <MessageSquare className="w-10 h-10" style={{ color: COLORS.muted }} />
