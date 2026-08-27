@@ -39,7 +39,7 @@ export function SearchBar({ searchQuery, onSearchChange, viewMode, onViewModeCha
           onClick={() => onViewModeChange('grid')}
           className={`p-2.5 rounded-lg transition-all duration-200 ${
             viewMode === 'grid'
-              ? 'bg-[var(--bg-elevated)] shadow-neu-extruded-sm text-[var(--teal)]'
+              ? 'bg-[var(--bg-elevated)] shadow-surface-raised-sm text-[var(--teal)]'
               : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
           }`}
         >
@@ -49,7 +49,7 @@ export function SearchBar({ searchQuery, onSearchChange, viewMode, onViewModeCha
           onClick={() => onViewModeChange('table')}
           className={`p-2.5 rounded-lg transition-all duration-200 ${
             viewMode === 'table'
-              ? 'bg-[var(--bg-elevated)] shadow-neu-extruded-sm text-[var(--teal)]'
+              ? 'bg-[var(--bg-elevated)] shadow-surface-raised-sm text-[var(--teal)]'
               : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
           }`}
         >

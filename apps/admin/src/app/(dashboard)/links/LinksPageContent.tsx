@@ -86,7 +86,7 @@ export function LinksPageContent({ embedded = false }: { embedded?: boolean }) {
     <TooltipProvider>
       <>
         {embedded ? (
-          <div className="mb-6 flex flex-col gap-4 rounded-[28px] bg-[#E7ECF2] p-5 shadow-neu-extruded md:flex-row md:items-center md:justify-between">
+          <div className="mb-6 flex flex-col gap-4 rounded-[28px] bg-bg-elevated p-5 shadow-surface-raised md:flex-row md:items-center md:justify-between">
             <div>
               <h2 className="text-xl font-semibold text-[var(--text-primary)]">Profile Links</h2>
               <p className="mt-1 text-sm text-[var(--text-secondary)]">

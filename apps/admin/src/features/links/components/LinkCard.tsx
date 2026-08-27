@@ -14,7 +14,7 @@ interface LinkCardProps {
 }
 
 export function LinkCard({ link, index, onEdit, onDelete, onToggleVisibility }: LinkCardProps) {
-  const { icon: IconComponent, color } = getIconData(link.icon);
+  const { icon: IconComponent } = getIconData(link.icon);
 
   return (
     <div
@@ -26,20 +26,16 @@ export function LinkCard({ link, index, onEdit, onDelete, onToggleVisibility }: 
     >
       <div className="flex items-start justify-between mb-4">
         <div
-          className="w-14 h-14 rounded-2xl flex items-center justify-center"
-          style={{
-            background: `linear-gradient(135deg, ${color} 0%, ${color}CC 100%)`,
-            boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
-          }}
+          className="w-14 h-14 rounded-2xl flex items-center justify-center border border-line-strong bg-accent text-accent-foreground"
         >
-          <IconComponent className="h-7 w-7 text-white" />
+          <IconComponent className="h-7 w-7" />
         </div>
         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
           <Tooltip>
             <TooltipTrigger asChild>
               <button
                 onClick={onEdit}
-                className="p-2 rounded-xl bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:text-[var(--teal)] transition-all duration-200 hover:shadow-neu-extruded-sm"
+                className="p-2 rounded-xl bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:text-[var(--teal)] transition-all duration-200 hover:shadow-surface-raised-sm"
               >
                 <Pencil className="h-4 w-4" />
               </button>
@@ -50,7 +46,7 @@ export function LinkCard({ link, index, onEdit, onDelete, onToggleVisibility }: 
             <TooltipTrigger asChild>
               <button
                 onClick={onDelete}
-                className="p-2 rounded-xl bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:text-red-500 transition-all duration-200 hover:shadow-neu-extruded-sm"
+                className="p-2 rounded-xl bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:text-destructive transition-all duration-200 hover:shadow-surface-raised-sm"
               >
                 <Trash2 className="h-4 w-4" />
               </button>

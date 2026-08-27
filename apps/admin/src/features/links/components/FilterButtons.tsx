@@ -23,7 +23,7 @@ export function FilterButtons({ filterMode, onFilterChange, stats }: FilterButto
         onClick={() => onFilterChange('all')}
         className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
           filterMode === 'all'
-            ? 'bg-[var(--bg-elevated)] shadow-neu-extruded-sm text-[var(--teal)]'
+            ? 'bg-[var(--bg-elevated)] shadow-surface-raised-sm text-[var(--teal)]'
             : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
         }`}
       >
@@ -33,7 +33,7 @@ export function FilterButtons({ filterMode, onFilterChange, stats }: FilterButto
         onClick={() => onFilterChange('visible')}
         className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
           filterMode === 'visible'
-            ? 'bg-[var(--bg-elevated)] shadow-neu-extruded-sm text-[var(--teal)]'
+            ? 'bg-[var(--bg-elevated)] shadow-surface-raised-sm text-[var(--teal)]'
             : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
         }`}
       >
@@ -44,7 +44,7 @@ export function FilterButtons({ filterMode, onFilterChange, stats }: FilterButto
         onClick={() => onFilterChange('hidden')}
         className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
           filterMode === 'hidden'
-            ? 'bg-[var(--bg-elevated)] shadow-neu-extruded-sm text-[var(--text-secondary)]'
+            ? 'bg-[var(--bg-elevated)] shadow-surface-raised-sm text-[var(--text-secondary)]'
             : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
         }`}
       >

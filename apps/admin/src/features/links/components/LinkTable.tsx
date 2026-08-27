@@ -44,7 +44,7 @@ export function LinkTable({ links, onEdit, onDelete, onToggleVisibility }: LinkT
         </TableHeader>
         <TableBody>
           {links.map((link) => {
-            const { icon: IconComponent, color } = getIconData(link.icon);
+            const { icon: IconComponent } = getIconData(link.icon);
             return (
               <TableRow
                 key={link.id}
@@ -56,13 +56,9 @@ export function LinkTable({ links, onEdit, onDelete, onToggleVisibility }: LinkT
                 <TableCell>
                   <div className="flex items-center gap-3">
                     <div
-                      className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-                      style={{
-                        background: `linear-gradient(135deg, ${color} 0%, ${color}CC 100%)`,
-                        boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
-                      }}
+                      className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border border-line-strong bg-accent text-accent-foreground"
                     >
-                      <IconComponent className="h-5 w-5 text-white" />
+                      <IconComponent className="h-5 w-5" />
                     </div>
                     <Badge variant="outline" className="capitalize">
                       {link.icon || 'custom'}
@@ -105,7 +101,7 @@ export function LinkTable({ links, onEdit, onDelete, onToggleVisibility }: LinkT
                           variant="ghost"
                           size="icon-sm"
                           onClick={() => onDelete(link)}
-                          className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                          className="text-destructive hover:text-destructive hover:bg-destructive/10"
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>

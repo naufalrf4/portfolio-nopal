@@ -1,5 +1,5 @@
 export type { ProfileLink, FormData, ViewMode, FilterMode } from './types/links.types';
-export { NEUMORPHIC_STYLES, ICON_OPTIONS, INITIAL_FORM_DATA } from './constants/links.constants';
+export { SURFACE_STYLES, ICON_OPTIONS, INITIAL_FORM_DATA } from './constants/links.constants';
 export { getIconData } from './utils/links.utils';
 export { useLinks } from './hooks';
 export {
