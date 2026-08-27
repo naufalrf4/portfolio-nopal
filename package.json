@@ -32,6 +32,7 @@
     "eslint-plugin-react": "^7.37.5",
     "globals": "^17.4.0",
     "lint-staged": "^16.2.6",
+    "playwright": "^1.62.1",
     "prettier": "^3.6.2",
     "prettier-plugin-svelte": "^3.4.1"
   },
