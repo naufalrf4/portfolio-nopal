@@ -2,8 +2,8 @@ import { MessageSquare } from 'lucide-react';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { PageWrapper } from '@/components/layout/PageWrapper';
 
-const NEUMORPHIC_STYLES = {
-  background: 'linear-gradient(145deg, #1a1d29 0%, #13151f 100%)',
+const SURFACE_STYLES = {
+  background: 'var(--bg-elevated)',
   shadows: {
     small:
       '6px 6px 12px rgba(0, 0, 0, 0.4), -6px -6px 12px rgba(255, 255, 255, 0.02), inset 1px 1px 2px rgba(255, 255, 255, 0.05)',
@@ -16,8 +16,8 @@ function SkeletonCard({ index }: { index: number }) {
     <div
       className="rounded-[var(--radius-base)] p-6 animate-pulse"
       style={{
-        background: NEUMORPHIC_STYLES.background,
-        boxShadow: NEUMORPHIC_STYLES.shadows.small,
+        background: SURFACE_STYLES.background,
+        boxShadow: SURFACE_STYLES.shadows.small,
         animationDelay: `${index * 50}ms`,
       }}
     >
@@ -26,7 +26,7 @@ function SkeletonCard({ index }: { index: number }) {
           className="w-12 h-12 rounded-full"
           style={{
             background: 'rgba(107, 114, 128, 0.3)',
-            boxShadow: NEUMORPHIC_STYLES.shadows.inset,
+            boxShadow: SURFACE_STYLES.shadows.inset,
           }}
         />
         <div className="flex-1">
@@ -96,8 +96,8 @@ export default function GuestbookLoading() {
       <div
         className="rounded-[var(--radius-base)] p-2 mb-8 inline-flex gap-2"
         style={{
-          background: NEUMORPHIC_STYLES.background,
-          boxShadow: NEUMORPHIC_STYLES.shadows.inset,
+          background: SURFACE_STYLES.background,
+          boxShadow: SURFACE_STYLES.shadows.inset,
         }}
       >
         {['All', 'Visible', 'Hidden'].map((label) => (

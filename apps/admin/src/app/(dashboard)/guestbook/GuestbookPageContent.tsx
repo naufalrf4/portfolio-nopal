@@ -8,7 +8,7 @@ import {
   EntryCard,
   LoadingState,
   EmptyState,
-  NEUMORPHIC_STYLES,
+  SURFACE_STYLES,
   FILTER_BUTTONS,
 } from '@/features/guestbook';
 
@@ -45,8 +45,8 @@ export function GuestbookPanel({ showHeader = false }: GuestbookPanelProps) {
       <div
         className="rounded-[var(--radius-base)] p-2 mb-8 inline-flex gap-2"
         style={{
-          background: NEUMORPHIC_STYLES.background,
-          boxShadow: NEUMORPHIC_STYLES.shadows.inset,
+          background: SURFACE_STYLES.background,
+          boxShadow: SURFACE_STYLES.shadows.inset,
         }}
       >
         {FILTER_BUTTONS.map((btn) => (
@@ -55,9 +55,9 @@ export function GuestbookPanel({ showHeader = false }: GuestbookPanelProps) {
             onClick={() => setFilter(btn.key)}
             className="px-6 py-3 rounded-[18px] font-medium transition-all duration-300"
             style={{
-              background: filter === btn.key ? NEUMORPHIC_STYLES.background : 'transparent',
-              color: filter === btn.key ? NEUMORPHIC_STYLES.accent : NEUMORPHIC_STYLES.muted,
-              boxShadow: filter === btn.key ? NEUMORPHIC_STYLES.shadows.small : 'none',
+              background: filter === btn.key ? SURFACE_STYLES.background : 'transparent',
+              color: filter === btn.key ? SURFACE_STYLES.accent : SURFACE_STYLES.muted,
+              boxShadow: filter === btn.key ? SURFACE_STYLES.shadows.small : 'none',
             }}
           >
             {btn.label}{' '}
@@ -66,9 +66,9 @@ export function GuestbookPanel({ showHeader = false }: GuestbookPanelProps) {
               style={{
                 background:
                   filter === btn.key
-                    ? 'linear-gradient(135deg, var(--teal) 0%, var(--teal) 100%)'
+                    ? 'var(--teal)'
                     : 'rgba(107, 114, 128, 0.2)',
-                color: filter === btn.key ? 'white' : NEUMORPHIC_STYLES.muted,
+                color: filter === btn.key ? 'white' : SURFACE_STYLES.muted,
               }}
             >
               {btn.key === 'all' && entries.length}

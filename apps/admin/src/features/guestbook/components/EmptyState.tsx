@@ -1,4 +1,4 @@
-import { NEUMORPHIC_STYLES } from '../constants/guestbook.constants';
+import { SURFACE_STYLES } from '../constants/guestbook.constants';
 import { BookOpenIcon } from './Icons';
 import type { FilterType } from '../types/guestbook.types';
 
@@ -21,23 +21,23 @@ export function EmptyState({ filter }: EmptyStateProps) {
     <div
       className="rounded-[var(--radius-container)] p-12 text-center"
       style={{
-        background: NEUMORPHIC_STYLES.background,
-        boxShadow: NEUMORPHIC_STYLES.shadows.extruded,
+        background: SURFACE_STYLES.background,
+        boxShadow: SURFACE_STYLES.shadows.extruded,
       }}
     >
       <div
         className="w-24 h-24 rounded-full mx-auto mb-6 flex items-center justify-center"
         style={{
-          background: NEUMORPHIC_STYLES.background,
-          boxShadow: NEUMORPHIC_STYLES.shadows.inset,
+          background: SURFACE_STYLES.background,
+          boxShadow: SURFACE_STYLES.shadows.inset,
         }}
       >
         <BookOpenIcon />
       </div>
-      <h3 className="text-xl font-semibold mb-2" style={{ color: NEUMORPHIC_STYLES.foreground }}>
+      <h3 className="text-xl font-semibold mb-2" style={{ color: SURFACE_STYLES.foreground }}>
         No guestbook entries yet
       </h3>
-      <p className="max-w-md mx-auto" style={{ color: NEUMORPHIC_STYLES.muted }}>
+      <p className="max-w-md mx-auto" style={{ color: SURFACE_STYLES.muted }}>
         {getMessage()}
       </p>
     </div>

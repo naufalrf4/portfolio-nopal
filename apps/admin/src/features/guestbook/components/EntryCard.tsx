@@ -2,7 +2,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { formatDateTime } from '@/lib/utils/date';
 import { getInitials } from '@/lib/utils/string';
-import { NEUMORPHIC_STYLES } from '../constants/guestbook.constants';
+import { SURFACE_STYLES } from '../constants/guestbook.constants';
 import { EyeIcon, EyeOffIcon, TrashIcon } from './Icons';
 import { DeleteConfirmModal } from './DeleteConfirmModal';
 import type { GuestbookEntry } from '../types/guestbook.types';
@@ -40,8 +40,8 @@ export function EntryCard({ entry, index, onToggleVisibility, onDelete }: EntryC
       <div
         className="rounded-[var(--radius-container)] p-6 transition-all duration-300 hover:-translate-y-1"
         style={{
-          background: NEUMORPHIC_STYLES.background,
-          boxShadow: NEUMORPHIC_STYLES.shadows.extruded,
+          background: SURFACE_STYLES.background,
+          boxShadow: SURFACE_STYLES.shadows.extruded,
           opacity: 0,
           animation: `fadeInUp 0.5s ease-out ${index * 100}ms forwards`,
         }}
@@ -50,8 +50,8 @@ export function EntryCard({ entry, index, onToggleVisibility, onDelete }: EntryC
           <div
             className="w-14 h-14 rounded-full flex-shrink-0 flex items-center justify-center overflow-hidden"
             style={{
-              background: NEUMORPHIC_STYLES.background,
-              boxShadow: NEUMORPHIC_STYLES.shadows.inset,
+              background: SURFACE_STYLES.background,
+              boxShadow: SURFACE_STYLES.shadows.inset,
             }}
           >
             {entry.user.image ? (
@@ -63,12 +63,7 @@ export function EntryCard({ entry, index, onToggleVisibility, onDelete }: EntryC
                 className="w-full h-full object-cover"
               />
             ) : (
-              <div
-                className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm"
-                style={{
-                  background: 'linear-gradient(135deg, var(--teal) 0%, var(--teal) 100%)',
-                }}
-              >
+              <div className="w-10 h-10 rounded-full flex items-center justify-center border border-line-strong bg-accent text-accent-foreground font-semibold text-sm">
                 {getInitials(entry.user.name, entry.user.email)}
               </div>
             )}
@@ -76,26 +71,26 @@ export function EntryCard({ entry, index, onToggleVisibility, onDelete }: EntryC
 
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
-              <h3 className="font-medium truncate" style={{ color: NEUMORPHIC_STYLES.foreground }}>
+              <h3 className="font-medium truncate" style={{ color: SURFACE_STYLES.foreground }}>
                 {entry.user.name || 'Anonymous'}
               </h3>
               {entry.reactions.length > 0 && (
                 <span
                   className="px-2 py-0.5 rounded-full text-xs font-medium"
                   style={{
-                    background: NEUMORPHIC_STYLES.background,
-                    boxShadow: NEUMORPHIC_STYLES.shadows.inset,
-                    color: NEUMORPHIC_STYLES.accent,
+                    background: SURFACE_STYLES.background,
+                    boxShadow: SURFACE_STYLES.shadows.inset,
+                    color: SURFACE_STYLES.accent,
                   }}
                 >
                   {entry.reactions.length} reactions
                 </span>
               )}
             </div>
-            <p className="text-sm leading-relaxed mb-3" style={{ color: NEUMORPHIC_STYLES.muted }}>
+            <p className="text-sm leading-relaxed mb-3" style={{ color: SURFACE_STYLES.muted }}>
               {entry.message}
             </p>
-            <p className="text-sm" style={{ color: NEUMORPHIC_STYLES.muted }}>
+            <p className="text-sm" style={{ color: SURFACE_STYLES.muted }}>
               {formatDateTime(entry.createdAt)}
             </p>
           </div>
@@ -112,26 +107,24 @@ export function EntryCard({ entry, index, onToggleVisibility, onDelete }: EntryC
               onClick={() => onToggleVisibility(entry.id, entry.visible)}
               className="relative w-14 h-8 rounded-full transition-all duration-300"
               style={{
-                background: NEUMORPHIC_STYLES.background,
-                boxShadow: NEUMORPHIC_STYLES.shadows.inset,
+                background: SURFACE_STYLES.background,
+                boxShadow: SURFACE_STYLES.shadows.inset,
               }}
             >
               <span
-                className="absolute top-1 w-6 h-6 rounded-full transition-all duration-300 flex items-center justify-center"
+                className={`absolute top-1 w-6 h-6 rounded-full transition-all duration-300 flex items-center justify-center border border-line-strong ${
+                  entry.visible
+                    ? 'bg-accent text-accent-foreground shadow-sm'
+                    : 'bg-card text-muted-foreground'
+                }`}
                 style={{
                   left: entry.visible ? '30px' : '4px',
-                  background: entry.visible
-                    ? 'linear-gradient(135deg, var(--teal) 0%, #319795 100%)'
-                    : NEUMORPHIC_STYLES.background,
-                  boxShadow: entry.visible
-                    ? '3px 3px 8px rgba(56,178,172,0.4)'
-                    : '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
                 }}
               >
                 {entry.visible ? <EyeIcon /> : <EyeOffIcon />}
               </span>
             </button>
-            <span className="text-sm" style={{ color: NEUMORPHIC_STYLES.muted }}>
+            <span className="text-sm" style={{ color: SURFACE_STYLES.muted }}>
               {entry.visible ? 'Visible' : 'Hidden'}
             </span>
           </div>
@@ -140,8 +133,8 @@ export function EntryCard({ entry, index, onToggleVisibility, onDelete }: EntryC
             onClick={() => setDeleteModalOpen(true)}
             className="p-3 rounded-2xl transition-all duration-200 hover:scale-95 group"
             style={{
-              background: NEUMORPHIC_STYLES.background,
-              boxShadow: NEUMORPHIC_STYLES.shadows.small,
+              background: SURFACE_STYLES.background,
+              boxShadow: SURFACE_STYLES.shadows.small,
             }}
           >
             <TrashIcon />

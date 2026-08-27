@@ -1,4 +1,4 @@
-export const NEUMORPHIC_STYLES = {
+export const SURFACE_STYLES = {
   background: 'var(--bg-elevated)',
   foreground: 'var(--text-primary)',
   muted: 'var(--text-secondary)',
