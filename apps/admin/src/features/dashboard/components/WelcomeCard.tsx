@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Sparkles } from 'lucide-react';
-import { NEU_INSET_SHADOW } from '../constants';
+import { SUNKEN_SHADOW } from '../constants';
 
 export interface WelcomeCardProps {
   delay?: number;
@@ -37,8 +37,8 @@ export function WelcomeCard({ delay = 0, userName }: WelcomeCardProps) {
       <div className="relative z-10">
         <div className="flex items-center gap-3 mb-2">
           <div
-            className="w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br from-blue-400/20 to-cyan-500/20"
-            style={{ boxShadow: NEU_INSET_SHADOW }}
+            className="w-10 h-10 rounded-xl flex items-center justify-center tile-tint-blue"
+            style={{ boxShadow: SUNKEN_SHADOW }}
           >
             <Sparkles className="w-5 h-5 text-blue-500" />
           </div>

@@ -2,13 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import { Card } from '@/components/ui/card';
-import { NEU_INSET_SHADOW } from '../constants';
+import { SUNKEN_SHADOW } from '../constants';
 import type { StatCardProps } from '../types';
 
 export function StatCard({
   icon,
   iconColor,
-  iconBgGradient,
+  tone,
   title,
   total,
   primaryStat,
@@ -33,6 +33,13 @@ export function StatCard({
     }
   };
 
+  const TONE_TINT_CLASS: Record<StatCardProps['tone'], string> = {
+    blue: 'tile-tint-blue',
+    purple: 'tile-tint-purple',
+    emerald: 'tile-tint-emerald',
+    amber: 'tile-tint-amber',
+  };
+
   return (
     <Card
       data-hoverable="true"
@@ -43,8 +50,8 @@ export function StatCard({
       <div className="space-y-3 lg:space-y-0 lg:flex lg:items-start lg:gap-5">
         <div className="flex items-center justify-between lg:block lg:flex-none">
           <div
-            className={`w-10 h-10 lg:w-14 lg:h-14 rounded-xl lg:rounded-2xl flex items-center justify-center flex-shrink-0 ${iconBgGradient}`}
-            style={{ boxShadow: NEU_INSET_SHADOW }}
+            className={`w-10 h-10 lg:w-14 lg:h-14 rounded-xl lg:rounded-2xl flex items-center justify-center flex-shrink-0 ${TONE_TINT_CLASS[tone]}`}
+            style={{ boxShadow: SUNKEN_SHADOW }}
           >
             <div className={iconColor}>{icon}</div>
           </div>

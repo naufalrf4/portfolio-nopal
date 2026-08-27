@@ -12,7 +12,7 @@ export async function DashboardStatsGrid({ stats }: DashboardStatsGridProps) {
       <StatCard
         icon={<MessageSquare className="w-6 h-6" />}
         iconColor="text-blue-500"
-        iconBgGradient="bg-gradient-to-br from-blue-400/20 to-cyan-500/20"
+        tone="blue"
         title="Guestbook"
         total={stats.guestbook.total}
         primaryStat={{
@@ -31,7 +31,7 @@ export async function DashboardStatsGrid({ stats }: DashboardStatsGridProps) {
       <StatCard
         icon={<Mail className="w-6 h-6" />}
         iconColor="text-purple-500"
-        iconBgGradient="bg-gradient-to-br from-purple-400/20 to-pink-500/20"
+        tone="purple"
         title="Messages (NGL)"
         total={stats.messages.total}
         primaryStat={{
@@ -50,7 +50,7 @@ export async function DashboardStatsGrid({ stats }: DashboardStatsGridProps) {
       <StatCard
         icon={<Send className="w-6 h-6" />}
         iconColor="text-emerald-500"
-        iconBgGradient="bg-gradient-to-br from-emerald-400/20 to-teal-500/20"
+        tone="emerald"
         title="Contact Forms"
         total={stats.contacts.total}
         primaryStat={{
@@ -69,7 +69,7 @@ export async function DashboardStatsGrid({ stats }: DashboardStatsGridProps) {
       <StatCard
         icon={<Calendar className="w-6 h-6" />}
         iconColor="text-amber-500"
-        iconBgGradient="bg-gradient-to-br from-amber-400/20 to-orange-500/20"
+        tone="amber"
         title="Book a Call"
         total={stats.bookings.total}
         primaryStat={{

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Globe2, TrendingUp, MousePointerClick } from 'lucide-react';
-import { NEU_INSET_SHADOW } from '../constants';
+import { SUNKEN_SHADOW } from '../constants';
 
 type AnalyticsSummary = {
   overview: {
@@ -11,6 +11,15 @@ type AnalyticsSummary = {
     totalClicks: number;
     uniqueCountries: number;
   };
+};
+
+type Tone = 'blue' | 'purple' | 'emerald' | 'amber';
+
+const TONE_TINT_CLASS: Record<Tone, string> = {
+  blue: 'tile-tint-blue',
+  purple: 'tile-tint-purple',
+  emerald: 'tile-tint-emerald',
+  amber: 'tile-tint-amber',
 };
 
 export function AnalyticsSummaryCard() {
@@ -52,19 +61,19 @@ export function AnalyticsSummaryCard() {
       label: 'Submissions',
       value: data?.overview.totalSubmissions ?? 0,
       icon: TrendingUp,
-      color: 'text-blue-500',
+      tone: 'blue' as const,
     },
     {
       label: 'Tracked Clicks',
       value: data?.overview.totalClicks ?? 0,
       icon: MousePointerClick,
-      color: 'text-emerald-500',
+      tone: 'emerald' as const,
     },
     {
       label: 'Countries',
       value: data?.overview.uniqueCountries ?? 0,
       icon: Globe2,
-      color: 'text-violet-500',
+      tone: 'purple' as const,
     },
   ];
 
@@ -77,10 +86,10 @@ export function AnalyticsSummaryCard() {
       <div className="flex items-center justify-between flex-wrap gap-6">
         <div className="flex items-center gap-4">
           <div
-            className="w-12 h-12 rounded-xl flex items-center justify-center bg-gradient-to-br from-blue-400/20 to-cyan-500/20"
-            style={{ boxShadow: NEU_INSET_SHADOW }}
+            className="w-12 h-12 rounded-xl flex items-center justify-center tile-tint-blue"
+            style={{ boxShadow: SUNKEN_SHADOW }}
           >
-            <TrendingUp className="w-6 h-6 text-blue-500" />
+            <TrendingUp className="w-6 h-6" />
           </div>
           <div>
             <p className="text-sm font-medium text-[var(--text-secondary)]">Analytics Overview</p>
@@ -96,13 +105,13 @@ export function AnalyticsSummaryCard() {
             return (
               <div
                 key={item.label}
-                className="rounded-2xl bg-white/60 px-4 py-3 shadow-neu-extruded"
+                className={`rounded-2xl px-4 py-3 shadow-surface-raised ${TONE_TINT_CLASS[item.tone]}`}
               >
-                <div className="flex items-center gap-2 text-xs font-medium text-[var(--text-secondary)]">
-                  <Icon className={`h-4 w-4 ${item.color}`} />
+                <div className="flex items-center gap-2 text-xs font-medium">
+                  <Icon className="h-4 w-4" />
                   <span>{item.label}</span>
                 </div>
-                <p className="mt-2 text-xl font-bold text-[var(--text-primary)]">{item.value}</p>
+                <p className="mt-2 text-xl font-bold">{item.value}</p>
               </div>
             );
           })}

@@ -10,7 +10,7 @@ export interface Stats {
 export interface StatCardProps {
   icon: ReactNode;
   iconColor: string;
-  iconBgGradient: string;
+  tone: 'blue' | 'purple' | 'emerald' | 'amber';
   title: string;
   total: number;
   primaryStat?: { label: string; value: number; variant: 'success' | 'warning' | 'muted' };

@@ -33,7 +33,7 @@ function DashboardStatsContent() {
         <StatCard
           icon={<Send className="w-5 h-5 lg:w-6 lg:h-6" />}
           iconColor="text-emerald-500"
-          iconBgGradient="bg-gradient-to-br from-emerald-400/20 to-teal-500/20"
+          tone="emerald"
           title="Contact Center"
           total={(stats?.contacts.total ?? 0) + (stats?.bookings.total ?? 0)}
           primaryStat={{
@@ -52,7 +52,7 @@ function DashboardStatsContent() {
         <StatCard
           icon={<Mail className="w-5 h-5 lg:w-6 lg:h-6" />}
           iconColor="text-purple-500"
-          iconBgGradient="bg-gradient-to-br from-purple-400/20 to-pink-500/20"
+          tone="purple"
           title="NGL Inbox"
           total={stats?.messages.total ?? 0}
           primaryStat={{
@@ -71,7 +71,7 @@ function DashboardStatsContent() {
         <StatCard
           icon={<MessageSquare className="w-5 h-5 lg:w-6 lg:h-6" />}
           iconColor="text-blue-500"
-          iconBgGradient="bg-gradient-to-br from-blue-400/20 to-cyan-500/20"
+          tone="blue"
           title="Guestbook"
           total={stats?.guestbook.total ?? 0}
           primaryStat={{
@@ -90,7 +90,7 @@ function DashboardStatsContent() {
         <StatCard
           icon={<Calendar className="w-5 h-5 lg:w-6 lg:h-6" />}
           iconColor="text-amber-500"
-          iconBgGradient="bg-gradient-to-br from-amber-400/20 to-orange-500/20"
+          tone="amber"
           title="Bookings"
           total={stats?.bookings.total ?? 0}
           primaryStat={{
