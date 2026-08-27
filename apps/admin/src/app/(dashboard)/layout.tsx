@@ -31,8 +31,8 @@ export default async function DashboardLayout({ children }: { children: ReactNod
         </div>
 
         <SidebarInset className="w-full bg-background">
-          <header className="sticky top-0 z-40 hidden md:flex h-16 shrink-0 items-center gap-4 bg-background/80 backdrop-blur-md px-4 md:px-6 lg:px-8">
-            <SidebarTrigger className="neu-icon-btn h-10 w-10 text-foreground/70 hover:text-foreground" />
+          <header className="sticky top-0 z-40 hidden md:flex h-16 shrink-0 items-center gap-4 glass-bar px-4 md:px-6 lg:px-8">
+            <SidebarTrigger className="icon-btn h-10 w-10 text-foreground/70 hover:text-foreground" />
 
             <div className="flex-1" />
 
@@ -42,7 +42,7 @@ export default async function DashboardLayout({ children }: { children: ReactNod
             </div>
           </header>
 
-          <div className="neu-divider mx-4 md:mx-6 lg:mx-8 hidden md:block" />
+          <div className="divider-line mx-4 md:mx-6 lg:mx-8 hidden md:block" />
 
           <main className="flex-1 p-4 pb-24 md:p-6 md:pb-8 lg:p-8">
             <div className="mx-auto max-w-7xl">{children}</div>

@@ -24,7 +24,7 @@ export default async function PublicGuestbookSignInPage({
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <div className="w-full max-w-md">
-        <div className="neu-card p-8 space-y-6">
+        <div className="panel-card p-8 space-y-6">
           <div className="space-y-2 text-center">
             <h1 className="font-[family-name:var(--font-plus-jakarta)] text-3xl font-bold text-foreground">
               Guestbook Sign In

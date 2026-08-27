@@ -188,7 +188,7 @@ export function KnowledgePageContent() {
       />
 
       <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as typeof activeTab)}>
-        <TabsList className="mb-6 grid w-full max-w-xl grid-cols-3">
+        <TabsList className="mb-6 flex-wrap">
           <TabsTrigger value="documents">Knowledge Documents</TabsTrigger>
           <TabsTrigger value="chat-logs">Chat Logs</TabsTrigger>
           <TabsTrigger value="ai-config">AI Config</TabsTrigger>

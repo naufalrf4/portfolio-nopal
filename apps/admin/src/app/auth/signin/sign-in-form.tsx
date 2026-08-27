@@ -55,7 +55,7 @@ export function SignInForm({ callbackUrl, mode = 'admin', demoAuthEnabled = fals
       <Button
         onClick={handleGoogleSignIn}
         disabled={isLoading || demoLoading}
-        className="neu-button w-full py-6 text-base font-semibold"
+        className="btn-base w-full py-6 text-base font-semibold"
       >
         <svg className="mr-2 h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
           <path

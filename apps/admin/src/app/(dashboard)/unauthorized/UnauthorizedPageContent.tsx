@@ -19,7 +19,7 @@ export function UnauthorizedPageContent({ userEmail }: UnauthorizedPageContentPr
         className={cn(
           'max-w-lg w-full p-8 rounded-3xl',
           'bg-[var(--bg-elevated)]',
-          'shadow-neu-extruded'
+          'shadow-surface-raised'
         )}
       >
         <div className="flex flex-col items-center text-center space-y-6">
@@ -27,10 +27,10 @@ export function UnauthorizedPageContent({ userEmail }: UnauthorizedPageContentPr
             className={cn(
               'flex h-20 w-20 items-center justify-center rounded-full',
               'bg-[var(--bg-elevated)]',
-              'shadow-neu-extruded'
+              'shadow-surface-raised'
             )}
           >
-            <Lock className="h-10 w-10 text-[#EF4444]" />
+            <Lock className="h-10 w-10 text-destructive" />
           </div>
 
           <div className="space-y-2">
@@ -48,7 +48,7 @@ export function UnauthorizedPageContent({ userEmail }: UnauthorizedPageContentPr
             className={cn(
               'w-full p-4 rounded-2xl',
               'bg-[var(--bg-elevated)]',
-              'shadow-neu-extruded'
+              'shadow-surface-raised'
             )}
           >
             <p className="text-sm text-[var(--text-secondary)]">Account email:</p>
@@ -60,12 +60,12 @@ export function UnauthorizedPageContent({ userEmail }: UnauthorizedPageContentPr
             type="button"
             className={cn(
               'w-full py-3 px-6 rounded-2xl',
-              'bg-[var(--bg-elevated)] text-[#EF4444] font-semibold',
+              'bg-[var(--bg-elevated)] text-destructive font-semibold',
               'transition-all duration-300 ease-out',
-              'shadow-neu-extruded',
-              'hover:shadow-neu-extruded',
+              'shadow-surface-raised',
+              'hover:shadow-surface-raised',
               'hover:scale-[1.02]',
-              'active:shadow-neu-extruded',
+              'active:shadow-surface-raised',
               'active:scale-[0.98]'
             )}
           >

@@ -26,7 +26,7 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <div className="w-full max-w-md">
-        <div className="neu-card p-8 space-y-6">
+        <div className="panel-card p-8 space-y-6">
           <div className="space-y-2 text-center">
             <h1 className="font-[family-name:var(--font-plus-jakarta)] text-3xl font-bold text-foreground">
               Admin Dashboard
@@ -37,7 +37,7 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
           </div>
 
           {params.error && (
-            <div className="neu-shadow-inset bg-destructive/10 text-destructive rounded-xl p-4 text-sm text-center">
+            <div className="surface-sunken bg-destructive/10 text-destructive rounded-xl p-4 text-sm text-center">
               {params.error === 'access_denied' && 'Access denied. Admin privileges required.'}
               {params.error === 'unauthorized' && 'You do not have admin privileges.'}
               {params.error === 'OAuthAccountNotLinked' &&
