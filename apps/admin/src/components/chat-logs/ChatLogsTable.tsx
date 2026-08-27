@@ -125,7 +125,7 @@ export function ChatLogsTable({ logs, loading, onDelete }: ChatLogsTableProps) {
           className={cn(
             'mx-auto w-16 h-16 rounded-full flex items-center justify-center mb-4',
             'bg-[var(--bg-elevated)]',
-            'shadow-neu-inset'
+            'shadow-surface-sunken'
           )}
         >
           <MessageSquare className="h-8 w-8 text-[var(--text-secondary)]" />
@@ -143,7 +143,7 @@ export function ChatLogsTable({ logs, loading, onDelete }: ChatLogsTableProps) {
       <Card className="overflow-hidden">
         <Table>
           <TableHeader>
-            <TableRow className="border-b border-[#D1D9E6]">
+            <TableRow className="border-b border-line">
               <TableHead className="text-[var(--text-secondary)]">Session ID</TableHead>
               <TableHead className="text-[var(--text-secondary)]">Messages</TableHead>
               <TableHead className="text-[var(--text-secondary)]">Last Activity</TableHead>
@@ -155,7 +155,7 @@ export function ChatLogsTable({ logs, loading, onDelete }: ChatLogsTableProps) {
             {logs.map((log) => (
               <TableRow
                 key={log.id}
-                className="border-b border-[#D1D9E6]/50 hover:bg-[var(--bg-elevated)]/50 transition-colors cursor-pointer"
+                className="border-b border-line/50 hover:bg-[var(--bg-elevated)]/50 transition-colors cursor-pointer"
                 onClick={() => router.push(`/chat-logs/${log.id}`)}
               >
                 <TableCell className="font-mono text-sm text-[var(--text-primary)]">

@@ -81,7 +81,7 @@ export function ChatConversation({
             className={cn(
               'flex flex-wrap gap-4 text-sm text-[var(--text-secondary)] p-4 rounded-xl',
               'bg-[var(--bg-elevated)]',
-              'shadow-neu-inset'
+              'shadow-surface-sunken'
             )}
           >
             <div className="flex items-center gap-2">

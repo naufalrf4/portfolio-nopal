@@ -68,7 +68,7 @@ function SortableImage({
       className={cn(
         'group relative rounded-[16px] overflow-hidden',
         'bg-[var(--bg-elevated)]',
-        'shadow-neu-extruded',
+        'shadow-surface-raised',
         isDragging && 'opacity-50 z-50'
       )}
     >
@@ -84,8 +84,8 @@ function SortableImage({
           {...listeners}
           className={cn(
             'absolute top-2 left-2 p-2 rounded-full cursor-grab active:cursor-grabbing',
-            'bg-[var(--bg-elevated)]/90 backdrop-blur-sm',
-            'shadow-neu-extruded',
+            'bg-bg-elevated border border-line-strong',
+            'shadow-surface-raised',
             'opacity-0 group-hover:opacity-100 transition-opacity'
           )}
         >
@@ -96,11 +96,11 @@ function SortableImage({
           <div
             className={cn(
               'absolute top-2 right-2 p-2 rounded-full',
-              'bg-gradient-to-br from-[var(--teal)] to-[var(--amber)]',
-              'shadow-neu-extruded-sm'
+              'bg-accent text-accent-foreground border border-line-strong',
+              'shadow-surface-raised-sm'
             )}
           >
-            <Star className="h-4 w-4 text-white fill-white" />
+            <Star className="h-4 w-4 fill-current" />
           </div>
         )}
 

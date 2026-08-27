@@ -323,8 +323,8 @@ export function ProjectModal({ isOpen, onClose, onSuccess, project }: ProjectMod
                     onChange={handleInputChange}
                     className="sr-only peer"
                   />
-                  <div className="w-11 h-6 rounded-full bg-[var(--bg-elevated)] shadow-neu-inset-sm peer-checked:bg-[var(--amber)] peer-checked:shadow-neu-inset-sm transition-all duration-300"></div>
-                  <div className="absolute left-1 top-1 w-4 h-4 rounded-full bg-[var(--bg-elevated)] shadow-neu-extruded peer-checked:translate-x-5 peer-checked:bg-white transition-all duration-300"></div>
+                  <div className="w-11 h-6 rounded-full bg-[var(--bg-elevated)] shadow-surface-sunken-sm peer-checked:bg-[var(--amber)] peer-checked:shadow-surface-sunken-sm transition-all duration-300"></div>
+                  <div className="absolute left-1 top-1 w-4 h-4 rounded-full bg-[var(--bg-elevated)] shadow-surface-raised peer-checked:translate-x-5 peer-checked:bg-white transition-all duration-300"></div>
                 </div>
                 <span className="text-sm font-medium text-[var(--text-primary)] flex items-center gap-1.5">
                   <Star className="h-4 w-4 text-[var(--amber)]" fill="currentColor" />
@@ -342,8 +342,8 @@ export function ProjectModal({ isOpen, onClose, onSuccess, project }: ProjectMod
                     onChange={handleInputChange}
                     className="sr-only peer"
                   />
-                  <div className="w-11 h-6 rounded-full bg-[var(--bg-elevated)] shadow-neu-inset-sm peer-checked:bg-[var(--teal)] peer-checked:shadow-neu-inset-sm transition-all duration-300"></div>
-                  <div className="absolute left-1 top-1 w-4 h-4 rounded-full bg-[var(--bg-elevated)] shadow-neu-extruded peer-checked:translate-x-5 peer-checked:bg-white transition-all duration-300"></div>
+                  <div className="w-11 h-6 rounded-full bg-[var(--bg-elevated)] shadow-surface-sunken-sm peer-checked:bg-[var(--teal)] peer-checked:shadow-surface-sunken-sm transition-all duration-300"></div>
+                  <div className="absolute left-1 top-1 w-4 h-4 rounded-full bg-[var(--bg-elevated)] shadow-surface-raised peer-checked:translate-x-5 peer-checked:bg-white transition-all duration-300"></div>
                 </div>
                 <span className="text-sm font-medium text-[var(--text-primary)] flex items-center gap-1.5">
                   <Eye className="h-4 w-4 text-[var(--teal)]" />
@@ -361,7 +361,7 @@ export function ProjectModal({ isOpen, onClose, onSuccess, project }: ProjectMod
                   onClick={() =>
                     setFormData((prev) => ({ ...prev, order: Math.max(0, prev.order - 1) }))
                   }
-                  className="w-9 h-9 flex items-center justify-center rounded-xl bg-[var(--bg-elevated)] text-[var(--text-primary)] text-lg font-semibold shadow-neu-extruded hover:shadow-neu-extruded active:shadow-neu-extruded transition-all duration-200"
+                  className="w-9 h-9 flex items-center justify-center rounded-xl bg-[var(--bg-elevated)] text-[var(--text-primary)] text-lg font-semibold shadow-surface-raised hover:shadow-surface-raised active:shadow-surface-raised transition-all duration-200"
                 >
                   −
                 </button>
@@ -372,12 +372,12 @@ export function ProjectModal({ isOpen, onClose, onSuccess, project }: ProjectMod
                   value={formData.order}
                   onChange={handleInputChange}
                   min="0"
-                  className="w-16 text-center px-2 py-2 rounded-xl bg-[var(--bg-elevated)] text-[var(--text-primary)] font-semibold shadow-neu-inset-sm focus:outline-none focus:ring-2 focus:ring-[var(--teal)] transition-all"
+                  className="w-16 text-center px-2 py-2 rounded-xl bg-[var(--bg-elevated)] text-[var(--text-primary)] font-semibold shadow-surface-sunken-sm focus:outline-none focus:ring-2 focus:ring-[var(--teal)] transition-all"
                 />
                 <button
                   type="button"
                   onClick={() => setFormData((prev) => ({ ...prev, order: prev.order + 1 }))}
-                  className="w-9 h-9 flex items-center justify-center rounded-xl bg-[var(--bg-elevated)] text-[var(--text-primary)] text-lg font-semibold shadow-neu-extruded hover:shadow-neu-extruded active:shadow-neu-extruded transition-all duration-200"
+                  className="w-9 h-9 flex items-center justify-center rounded-xl bg-[var(--bg-elevated)] text-[var(--text-primary)] text-lg font-semibold shadow-surface-raised hover:shadow-surface-raised active:shadow-surface-raised transition-all duration-200"
                 >
                   +
                 </button>

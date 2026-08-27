@@ -86,7 +86,7 @@ function ProgressBar({ progress, state }: { progress: number; state: UploadState
         <span
           className={cn(
             'font-medium',
-            isError && 'text-red-500',
+            isError && 'text-destructive',
             isSuccess && 'text-emerald-500',
             !isError && !isSuccess && 'text-[var(--text-primary)]'
           )}
@@ -99,15 +99,15 @@ function ProgressBar({ progress, state }: { progress: number; state: UploadState
         className={cn(
           'h-2 w-full rounded-full overflow-hidden',
           'bg-[var(--bg-elevated)]',
-          'shadow-neu-inset'
+          'shadow-surface-sunken'
         )}
       >
         <div
           className={cn(
             'h-full rounded-full transition-all duration-300 ease-out',
-            isError && 'bg-gradient-to-r from-red-500 to-red-400',
-            isSuccess && 'bg-gradient-to-r from-emerald-500 to-emerald-400',
-            !isError && !isSuccess && 'bg-gradient-to-r from-[var(--teal)] to-[var(--amber)]'
+            isError && 'bg-destructive',
+            isSuccess && 'bg-emerald-500',
+            !isError && !isSuccess && 'bg-accent'
           )}
           style={{ width: `${progress}%` }}
         />
@@ -345,7 +345,7 @@ export function FileUpload({
         className={cn(
           'rounded-[var(--radius-base)] p-4',
           'bg-[var(--bg-elevated)]',
-          'shadow-neu-extruded',
+          'shadow-surface-raised',
           'transition-all duration-300'
         )}
       >
@@ -402,21 +402,21 @@ export function FileUpload({
                 'relative rounded-[20px] border-2 border-dashed p-6 sm:p-8',
                 'transition-all duration-300 ease-out',
                 'bg-[var(--bg-elevated)]',
-                'shadow-neu-inset',
+                'shadow-surface-sunken',
+                isDragActive &&
                 isDragActive &&
                   isDragAccept && [
-                    'border-[var(--teal)] bg-[var(--teal)]/5',
-                    'shadow-neu-inset',
+                    'border-accent bg-accent/5',
+                    'shadow-surface-sunken',
                     'scale-[1.01]',
                   ],
                 isDragActive &&
                   isDragReject && [
-                    'border-red-500 bg-red-50/50',
-                    'shadow-neu-inset',
+                    'border-destructive bg-destructive/10',
+                    'shadow-surface-sunken',
                   ],
-                !isDragActive && !hasError && 'border-[var(--text-secondary)]/20 hover:border-[var(--teal)]/40',
-                hasError && 'border-red-400/60',
-                (disabled || isUploading) && 'opacity-60 cursor-not-allowed',
+                !isDragActive && !hasError && 'border-line hover:border-line-strong',
+                hasError && 'border-destructive/60',
                 !disabled && !isUploading && 'cursor-pointer hover:scale-[1.005]'
               )}
             >
@@ -429,7 +429,7 @@ export function FileUpload({
                       className={cn(
                         'rounded-full p-4',
                         'bg-[var(--bg-elevated)]',
-                        'shadow-neu-extruded'
+                        'shadow-surface-raised'
                       )}
                     >
                       <Loader2 className="h-8 w-8 animate-spin text-[var(--teal)]" />
@@ -444,13 +444,13 @@ export function FileUpload({
                       className={cn(
                         'rounded-full p-4',
                         'bg-[var(--bg-elevated)]',
-                        'shadow-neu-extruded'
+                        'shadow-surface-raised'
                       )}
                     >
-                      <AlertCircle className="h-8 w-8 text-red-500" />
+                      <AlertCircle className="h-8 w-8 text-destructive" />
                     </div>
                     <div className="space-y-2">
-                      <p className="text-red-500 font-medium">Upload failed</p>
+                      <p className="text-destructive font-medium">Upload failed</p>
                       {errorMessage && <p className="text-[var(--text-secondary)] text-sm">{errorMessage}</p>}
                       <Button
                         type="button"
@@ -473,7 +473,7 @@ export function FileUpload({
                       className={cn(
                         'rounded-full p-4',
                         'bg-[var(--bg-elevated)]',
-                        'shadow-neu-extruded'
+                        'shadow-surface-raised'
                       )}
                     >
                       <CheckCircle2 className="h-8 w-8 text-emerald-500" />
@@ -486,10 +486,10 @@ export function FileUpload({
                       className={cn(
                         'rounded-full p-4',
                         'bg-[var(--bg-elevated)]',
-                        'shadow-neu-extruded',
+                        'shadow-surface-raised',
                         'transition-all duration-300',
                         isDragActive &&
-                          'scale-110 shadow-neu-extruded'
+                          'scale-110 shadow-surface-raised'
                       )}
                     >
                       <Upload
@@ -562,7 +562,7 @@ export function FileUpload({
           className={cn(
             'relative rounded-[20px] overflow-hidden',
             'bg-[var(--bg-elevated)]',
-            'shadow-neu-inset',
+            'shadow-surface-sunken',
             'p-3'
           )}
         >
@@ -587,14 +587,14 @@ export function FileUpload({
                   className={cn(
                     'flex items-center gap-3 p-4 rounded-[16px]',
                     'bg-[var(--bg-elevated)]',
-                    'shadow-neu-extruded'
+                    'shadow-surface-raised'
                   )}
                 >
                   <div
                     className={cn(
                       'rounded-xl p-2.5',
                       'bg-[var(--bg-elevated)]',
-                      'shadow-neu-extruded'
+                      'shadow-surface-raised'
                     )}
                   >
                     <FileText className="h-6 w-6 text-red-500" />
@@ -611,14 +611,14 @@ export function FileUpload({
                   className={cn(
                     'flex items-center gap-3 p-4 rounded-[16px]',
                     'bg-[var(--bg-elevated)]',
-                    'shadow-neu-extruded'
+                    'shadow-surface-raised'
                   )}
                 >
                   <div
                     className={cn(
                       'rounded-xl p-2.5',
                       'bg-[var(--bg-elevated)]',
-                      'shadow-neu-extruded'
+                      'shadow-surface-raised'
                     )}
                   >
                     {imageLoadError ? (
@@ -645,7 +645,7 @@ export function FileUpload({
               size="icon-sm"
               onClick={handleClear}
               disabled={disabled}
-              className="shrink-0 text-[var(--text-secondary)] hover:text-red-500 hover:bg-red-50/50"
+              className="shrink-0 text-[var(--text-secondary)] hover:text-destructive hover:bg-destructive/10"
               aria-label="Remove file"
             >
               <X className="h-4 w-4" />

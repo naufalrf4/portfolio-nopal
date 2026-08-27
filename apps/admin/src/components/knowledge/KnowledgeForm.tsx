@@ -164,7 +164,7 @@ export function KnowledgeForm({ doc, onSubmit, isSubmitting }: KnowledgeFormProp
 
               <TabsContent value="upload" className="mt-4">
                 <div className="space-y-4">
-                  <div className="border-2 border-dashed border-[#D1D9E6] rounded-lg p-6 text-center">
+                  <div className="border-2 border-dashed border-line rounded-lg p-6 text-center">
                     <Input
                       type="file"
                       accept=".pdf,.md,.docx,.doc,.txt,.rtf,.json"

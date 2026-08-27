@@ -95,7 +95,7 @@ export function KnowledgeTable({ docs, loading, onDelete, onIngest }: KnowledgeT
           className={cn(
             'mx-auto w-16 h-16 rounded-full flex items-center justify-center mb-4',
             'bg-[var(--bg-elevated)]',
-            'shadow-neu-inset'
+            'shadow-surface-sunken'
           )}
         >
           <FileText className="h-8 w-8 text-[var(--text-secondary)]" />
@@ -114,7 +114,7 @@ export function KnowledgeTable({ docs, loading, onDelete, onIngest }: KnowledgeT
       <Card className="overflow-hidden">
         <Table>
           <TableHeader>
-            <TableRow className="border-b border-[#D1D9E6]">
+            <TableRow className="border-b border-line">
               <TableHead className="text-[var(--text-secondary)]">Filename</TableHead>
               <TableHead className="text-[var(--text-secondary)]">Status</TableHead>
               <TableHead className="text-[var(--text-secondary)] hidden md:table-cell">Content Preview</TableHead>
@@ -126,7 +126,7 @@ export function KnowledgeTable({ docs, loading, onDelete, onIngest }: KnowledgeT
             {docs.map((doc) => (
               <TableRow
                 key={doc.id}
-                className="border-b border-[#D1D9E6]/50 hover:bg-[var(--bg-elevated)]/50 transition-colors"
+                className="border-b border-line/50 hover:bg-[var(--bg-elevated)]/50 transition-colors"
               >
                 <TableCell className="font-medium text-[var(--text-primary)]">
                   <div className="flex items-center gap-2">

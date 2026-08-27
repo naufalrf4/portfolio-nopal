@@ -32,7 +32,7 @@ export function DeleteConfirmModal({
       size="sm"
     >
       <div className="flex flex-col items-center text-center space-y-6">
-        <div className="neu-inset w-16 h-16 rounded-full flex items-center justify-center">
+        <div className="surface-sunken w-16 h-16 rounded-full flex items-center justify-center">
           <AlertTriangle className="h-8 w-8 text-red-500" />
         </div>
 

@@ -152,7 +152,7 @@ export function ImageUploader({
                 className={cn(
                   'rounded-full p-4',
                   'bg-[var(--bg-elevated)]',
-                  'shadow-neu-extruded'
+                  'shadow-surface-raised'
                 )}
               >
                 <Upload className="h-8 w-8 text-[var(--teal)]" />
@@ -169,7 +169,7 @@ export function ImageUploader({
         </div>
 
         {previewUrls.length > 0 && (
-          <div className="mt-4 grid grid-cols-4 gap-2">
+          <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-2">
             {previewUrls.map((url, index) => (
               <div key={index} className="relative aspect-square rounded-lg overflow-hidden">
                 <img

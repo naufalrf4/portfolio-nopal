@@ -37,7 +37,7 @@ export function MessageBubble({ message }: MessageBubbleProps) {
         <div
           className={cn(
             'px-4 py-2 rounded-xl text-sm text-[var(--text-secondary)] bg-[var(--bg-elevated)]',
-            'shadow-neu-inset'
+            'shadow-surface-sunken'
           )}
         >
           <span className="italic">{message.content}</span>
@@ -58,8 +58,8 @@ export function MessageBubble({ message }: MessageBubbleProps) {
           'flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center',
           'bg-[var(--bg-elevated)]',
           isUser
-            ? 'shadow-neu-extruded'
-            : 'shadow-neu-inset'
+            ? 'shadow-surface-raised'
+            : 'shadow-surface-sunken'
         )}
       >
         {isUser ? (
@@ -75,8 +75,8 @@ export function MessageBubble({ message }: MessageBubbleProps) {
             'px-4 py-3 rounded-2xl',
             'bg-[var(--bg-elevated)]',
             isUser
-              ? 'shadow-neu-extruded rounded-tr-sm'
-              : 'shadow-neu-inset rounded-tl-sm'
+              ? 'shadow-surface-raised rounded-tr-sm'
+              : 'shadow-surface-sunken rounded-tl-sm'
           )}
         >
           <p className="text-[var(--text-primary)] whitespace-pre-wrap break-words">{message.content}</p>
