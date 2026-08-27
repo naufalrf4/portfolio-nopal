@@ -197,3 +197,139 @@ export function isFuture(date: string | Date | null | undefined): boolean {
   const now = toJakartaDate(new Date());
   return Boolean(targetDate && now && targetDate.getTime() > now.getTime());
 }
+
+export const JAKARTA_TIMEZONE = JAKARTA_TIME_ZONE;
+export const JAKARTA_UTC_OFFSET_MINUTES = 420;
+
+const JAKARTA_DATE_KEY_FORMATTER = new Intl.DateTimeFormat('en-CA', {
+  timeZone: JAKARTA_TIME_ZONE,
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+});
+
+const DATE_KEY_LABEL_FORMATTER = new Intl.DateTimeFormat('en-US', {
+  timeZone: 'UTC',
+  weekday: 'long',
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+
+const DATE_KEY_SHORT_FORMATTER = new Intl.DateTimeFormat('en-US', {
+  timeZone: 'UTC',
+  month: 'short',
+  day: 'numeric',
+});
+
+export function getJakartaDateKey(date: string | Date = new Date()): string {
+  return JAKARTA_DATE_KEY_FORMATTER.format(getValidDate(date) ?? new Date());
+}
+
+export function addDaysToDateKey(dateKey: string, days: number): string {
+  const [year, month, day] = dateKey.split('-').map(Number);
+
+  if ([year, month, day].some((value) => !Number.isFinite(value))) {
+    throw new Error(`Invalid date key: ${dateKey}`);
+  }
+
+  return new Date(Date.UTC(year, month - 1, day + days)).toISOString().slice(0, 10);
+}
+
+export function jakartaWallClockToInstant(dateKey: string, time = '00:00'): Date {
+  const [year, month, day] = dateKey.split('-').map(Number);
+  const [hours, minutes] = time.split(':').map(Number);
+
+  if ([year, month, day, hours, minutes].some((value) => !Number.isFinite(value))) {
+    throw new Error(`Invalid Jakarta wall clock: ${dateKey} ${time}`);
+  }
+
+  return new Date(
+    Date.UTC(year, month - 1, day, hours, minutes, 0) - JAKARTA_UTC_OFFSET_MINUTES * 60_000
+  );
+}
+
+export function instantToJakartaWallClock(date: Date): string {
+  return new Date(date.getTime() + JAKARTA_UTC_OFFSET_MINUTES * 60_000)
+    .toISOString()
+    .slice(0, 19);
+}
+
+export function formatJakartaDateKeyLabel(dateKey: string): string {
+  return DATE_KEY_LABEL_FORMATTER.format(new Date(`${dateKey}T00:00:00Z`));
+}
+
+export function formatDateKeyShort(dateKey: string): string {
+  return DATE_KEY_SHORT_FORMATTER.format(new Date(`${dateKey}T00:00:00Z`));
+}
+
+export function toDateKey(value: string | Date): string {
+  if (typeof value === 'string') {
+    const matched = /^\d{4}-\d{2}-\d{2}/.exec(value);
+    if (matched) {
+      return matched[0];
+    }
+  }
+
+  return getJakartaDateKey(value);
+}
+
+export function diffInDaysBetweenKeys(fromKey: string, toKey: string): number {
+  const from = new Date(`${fromKey}T00:00:00Z`).getTime();
+  const to = new Date(`${toKey}T00:00:00Z`).getTime();
+
+  if (!Number.isFinite(from) || !Number.isFinite(to)) {
+    throw new Error(`Invalid date key range: ${fromKey} -> ${toKey}`);
+  }
+
+  return Math.round((to - from) / 86_400_000);
+}
+
+const JAKARTA_HOUR_FORMATTER = new Intl.DateTimeFormat('en-GB', {
+  timeZone: JAKARTA_TIME_ZONE,
+  hour: '2-digit',
+  hour12: false,
+});
+
+export function getJakartaHour(date: string | Date = new Date()): number {
+  return Number(JAKARTA_HOUR_FORMATTER.format(getValidDate(date) ?? new Date()));
+}
+
+export function subtractDaysFromNow(days: number): Date {
+  return new Date(Date.now() - days * 86_400_000);
+}
+
+export function getDateKeyWeekday(dateKey: string): number {
+  const parsed = new Date(`${dateKey}T00:00:00Z`);
+
+  if (Number.isNaN(parsed.getTime())) {
+    throw new Error(`Invalid date key: ${dateKey}`);
+  }
+
+  return parsed.getUTCDay();
+}
+
+export function getWeekStartKey(dateKey: string): string {
+  return addDaysToDateKey(dateKey, -getDateKeyWeekday(dateKey));
+}
+
+export function getJakartaMonthKey(date: string | Date = new Date()): string {
+  return getJakartaDateKey(date).slice(0, 7);
+}
+
+export function monthKeyToCalendarDate(monthKey: string): Date | null {
+  if (!/^\d{4}-\d{2}$/.test(monthKey)) {
+    return null;
+  }
+
+  const [year, month] = monthKey.split('-').map(Number);
+  return new Date(year, month - 1, 1);
+}
+
+export function calendarDateToMonthKey(date: Date | null): string {
+  if (!date || Number.isNaN(date.getTime())) {
+    return '';
+  }
+
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+}
