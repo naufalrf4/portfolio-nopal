@@ -27,7 +27,7 @@ export default function ContactsLoading() {
                 <div
                   className="h-4 w-20 rounded"
                   style={{
-                    background: '#A0AEC0',
+                    background: 'var(--text-secondary)',
                   }}
                 />
               </div>
@@ -45,13 +45,13 @@ export default function ContactsLoading() {
         >
           <div className="space-y-4">
             {}
-            <div className="grid grid-cols-4 gap-4 pb-4 border-b border-[#CBD5E0]">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pb-4 border-b border-line">
               {['Name', 'Email', 'Subject', 'Date'].map((col) => (
                 <div
                   key={col}
                   className="h-4 rounded"
                   style={{
-                    background: '#A0AEC0',
+                    background: 'var(--text-secondary)',
                   }}
                 />
               ))}
@@ -59,13 +59,13 @@ export default function ContactsLoading() {
 
             {}
             {[1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="grid grid-cols-4 gap-4 py-4">
+              <div key={i} className="grid grid-cols-2 sm:grid-cols-4 gap-4 py-4">
                 {[1, 2, 3, 4].map((j) => (
                   <div
                     key={j}
                     className="h-4 rounded"
                     style={{
-                      background: '#CBD5E0',
+                      background: 'var(--border)',
                     }}
                   />
                 ))}
@@ -79,7 +79,7 @@ export default function ContactsLoading() {
           <div
             className="h-4 w-32 rounded"
             style={{
-              background: '#A0AEC0',
+              background: 'var(--text-secondary)',
             }}
           />
           <div className="flex gap-2">

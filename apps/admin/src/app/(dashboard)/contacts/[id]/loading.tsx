@@ -29,20 +29,20 @@ export default function ContactDetailLoading() {
               <div
                 className="h-6 w-48 rounded"
                 style={{
-                  background: '#A0AEC0',
+                  background: 'var(--text-secondary)',
                 }}
               />
               <div
                 className="h-4 w-64 rounded"
                 style={{
-                  background: '#CBD5E0',
+                  background: 'var(--border)',
                 }}
               />
             </div>
             <div
               className="h-8 w-20 rounded-2xl"
               style={{
-                background: '#CBD5E0',
+                background: 'var(--border)',
               }}
             />
           </div>
@@ -53,13 +53,13 @@ export default function ContactDetailLoading() {
                 <div
                   className="h-4 w-4 rounded"
                   style={{
-                    background: '#A0AEC0',
+                    background: 'var(--text-secondary)',
                   }}
                 />
                 <div
                   className="h-4 w-40 rounded"
                   style={{
-                    background: '#CBD5E0',
+                    background: 'var(--border)',
                   }}
                 />
               </div>
@@ -78,7 +78,7 @@ export default function ContactDetailLoading() {
           <div
             className="h-6 w-32 rounded mb-4"
             style={{
-              background: '#A0AEC0',
+              background: 'var(--text-secondary)',
             }}
           />
           <div className="space-y-2">
@@ -87,7 +87,7 @@ export default function ContactDetailLoading() {
                 key={i}
                 className="h-4 rounded"
                 style={{
-                  background: '#CBD5E0',
+                  background: 'var(--border)',
                   width: i === 5 ? '60%' : '100%',
                 }}
               />
@@ -102,7 +102,7 @@ export default function ContactDetailLoading() {
               key={i}
               className="h-10 w-32 rounded-2xl"
               style={{
-                background: '#6C63FF',
+                background: 'var(--teal)',
                 boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
               }}
             />

@@ -52,7 +52,7 @@ export function ContactTable({
               <TooltipProvider key={contact.id}>
                 <tr
                   className={cn(
-                    'border-b border-[#A3B1C6]/10 last:border-0 cursor-pointer transition-colors',
+                    'border-b border-line/10 last:border-0 cursor-pointer transition-colors',
                     !contact.read && 'bg-[var(--teal)]/5'
                   )}
                   onClick={(e) => {

@@ -185,7 +185,7 @@ export function ContactDetailModal({
             <p className="text-[var(--text-primary)] whitespace-pre-wrap">{contact.message}</p>
           </div>
 
-          <div className="flex items-center justify-between pt-4 border-t border-[#A3B1C6]/20">
+          <div className="flex items-center justify-between pt-4 border-t border-line/20">
             <div className="flex items-center gap-2 text-sm text-[var(--text-secondary)]">
               <Clock className="h-4 w-4" />
               <span>

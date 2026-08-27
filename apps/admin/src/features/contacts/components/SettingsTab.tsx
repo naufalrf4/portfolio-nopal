@@ -184,7 +184,7 @@ export function SettingsTab() {
                     boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
                   }}
                 >
-                  <MessageSquare className="h-5 w-5 text-[#EF4444]" />
+                  <MessageSquare className="h-5 w-5 text-destructive" />
                 </div>
                 <div className="flex-1 space-y-2">
                   <Label htmlFor="blockedKeywords">Blocked Keywords</Label>
@@ -199,7 +199,7 @@ export function SettingsTab() {
               </div>
             </div>
 
-            <div className="pt-4 border-t border-[#A3B1C6]/20">
+            <div className="pt-4 border-t border-line/20">
               <Button variant="primary" type="submit" disabled={saving}>
                 <Save className="h-4 w-4 mr-2" />
                 {saving ? 'Saving...' : 'Save Settings'}
@@ -218,7 +218,7 @@ export function SettingsTab() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="rounded-2xl border border-[#A3B1C6]/25 bg-white/30 p-4">
+          <div className="rounded-2xl border border-line bg-bg-elevated p-4">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-[var(--text-primary)]">

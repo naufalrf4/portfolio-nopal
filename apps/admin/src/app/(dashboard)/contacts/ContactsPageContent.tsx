@@ -131,7 +131,7 @@ export function ContactsPageContent() {
       />
 
       <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
-        <TabsList className="grid w-full gap-2 sm:w-auto sm:grid-cols-3 xl:grid-cols-6">
+        <TabsList className="mb-6 flex-wrap">
           <TabsTrigger value="submissions" className="flex items-center gap-2">
             <Mail className="h-4 w-4" />
             <span>Forms</span>

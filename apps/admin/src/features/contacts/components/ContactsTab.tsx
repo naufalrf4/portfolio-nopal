@@ -151,8 +151,8 @@ export function ContactsTab() {
                   }}
                   className={`px-4 py-2 rounded-2xl text-sm font-medium transition-all duration-200 ${
                     filterMode === mode
-                      ? 'bg-[var(--teal)] text-white shadow-neu-extruded-sm'
-                      : 'bg-[var(--bg-elevated)] text-[var(--text-primary)] shadow-neu-extruded-sm hover:shadow-neu-inset'
+                      ? 'bg-[var(--teal)] text-on-accent shadow-surface-raised-sm'
+                      : 'bg-[var(--bg-elevated)] text-[var(--text-primary)] shadow-surface-raised-sm hover:shadow-surface-sunken'
                   }`}
                 >
                   <span className="flex items-center gap-2">

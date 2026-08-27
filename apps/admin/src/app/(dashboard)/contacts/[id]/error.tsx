@@ -5,6 +5,7 @@ import { AlertCircle, RefreshCw, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PageWrapper } from '@/components/layout/PageWrapper';
 import Link from 'next/link';
+import { logger } from '@/lib/utils/logger';
 
 export default function ContactDetailError({
   error,
@@ -14,7 +15,7 @@ export default function ContactDetailError({
   reset: () => void;
 }) {
   useEffect(() => {
-    console.error('Contact detail page error:', error);
+    logger.error('Contact detail page error:', error);
   }, [error]);
 
   return (
@@ -45,7 +46,7 @@ export default function ContactDetailError({
                 boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
               }}
             >
-              <AlertCircle className="h-8 w-8 text-[#EF4444]" />
+              <AlertCircle className="h-8 w-8 text-destructive" />
             </div>
           </div>
 
@@ -72,8 +73,8 @@ export default function ContactDetailError({
             onClick={reset}
             className="inline-flex items-center justify-center gap-2 rounded-2xl px-6 py-3 text-base font-semibold transition-all duration-300 hover:-translate-y-[1px] active:translate-y-[0.5px]"
             style={{
-              background: '#6C63FF',
-              color: '#FFFFFF',
+              background: 'var(--teal)',
+              color: 'var(--on-accent)',
               boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
             }}
             onMouseEnter={(e) => {
