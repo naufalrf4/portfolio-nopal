@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { ResponsiveModal } from '@/components/ui/responsive-modal';
 import { toast } from 'sonner';
 import { COMMON_TIMES, SHORT_DAY_NAMES } from '../constants';
-import { formatDateISO } from '../utils/dateUtils';
+import { formatDateISO, getDayOfMonth, getWeekdayIndex } from '../utils/dateUtils';
 import { getErrorMessage } from '../utils/errors';
 
 interface BulkAddModalProps {
@@ -130,8 +130,8 @@ export function BulkAddModal({ isOpen, onClose, onSuccess, weekDates }: BulkAddM
                       : '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
                   }}
                 >
-                  <div className="text-xs">{SHORT_DAY_NAMES[date.getDay()]}</div>
-                  <div className="text-sm">{date.getDate()}</div>
+                  <div className="text-xs">{SHORT_DAY_NAMES[getWeekdayIndex(date)]}</div>
+                  <div className="text-sm">{getDayOfMonth(date)}</div>
                 </button>
               );
             })}

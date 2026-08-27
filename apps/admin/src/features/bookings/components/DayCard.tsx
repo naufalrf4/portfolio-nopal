@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import type { BookingSlot } from '../types/bookings.types';
 import { DAY_NAMES, SURFACE_STYLES } from '../constants';
-import { formatDateShort } from '../utils/dateUtils';
+import { formatDateShort, getWeekdayIndex } from '../utils/dateUtils';
 import { SlotCard } from './SlotCard';
 
 interface DayCardProps {
@@ -27,7 +27,7 @@ export function DayCard({
   onDeleteSlot,
   onToggleStatus,
 }: DayCardProps) {
-  const dayIndex = date.getDay();
+  const dayIndex = getWeekdayIndex(date);
 
   return (
     <div
