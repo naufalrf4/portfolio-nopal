@@ -8,6 +8,7 @@ import type {
   BookingQueryInput,
   CalendarQueryInput,
 } from '@/lib/validations/booking.schema';
+import { jakartaWallClockToInstant, toDateKey } from '@/lib/utils/date';
 
 export const bookingsService = {
   async getAll(query: BookingQueryInput) {
@@ -23,10 +24,10 @@ export const bookingsService = {
     if (dateFrom || dateTo) {
       const slotConditions = [];
       if (dateFrom) {
-        slotConditions.push(gte(bookingSlots.date, new Date(dateFrom).toISOString().split('T')[0]));
+        slotConditions.push(gte(bookingSlots.date, toDateKey(dateFrom)));
       }
       if (dateTo) {
-        slotConditions.push(lte(bookingSlots.date, new Date(dateTo).toISOString().split('T')[0]));
+        slotConditions.push(lte(bookingSlots.date, toDateKey(dateTo)));
       }
 
       const matchingSlotIds = await db
@@ -117,14 +118,13 @@ export const bookingsService = {
   },
 
   async create(data: CreateBookingInput) {
-    const bookingDate = new Date(data.date);
+    const dateStr = toDateKey(data.date);
 
-    if (bookingDate < new Date()) {
+    if (jakartaWallClockToInstant(dateStr, data.time).getTime() < Date.now()) {
       throw new Error('Booking date must be in the future');
     }
 
     const now = new Date().toISOString();
-    const dateStr = bookingDate.toISOString().split('T')[0];
 
     const [slot] = await db
       .insert(bookingSlots)
@@ -216,11 +216,8 @@ export const bookingsService = {
   async getCalendarView(query: CalendarQueryInput) {
     const { month, year } = query;
 
-    const startDate = new Date(year, month - 1, 1);
-    const endDate = new Date(year, month, 0, 23, 59, 59);
-
-    const startDateStr = startDate.toISOString().split('T')[0];
-    const endDateStr = endDate.toISOString().split('T')[0];
+    const startDateStr = new Date(Date.UTC(year, month - 1, 1)).toISOString().slice(0, 10);
+    const endDateStr = new Date(Date.UTC(year, month, 0)).toISOString().slice(0, 10);
 
     const matchingSlots = await db
       .select({ id: bookingSlots.id })
