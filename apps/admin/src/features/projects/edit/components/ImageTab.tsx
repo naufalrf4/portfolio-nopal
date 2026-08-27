@@ -14,7 +14,7 @@ interface ImageTabProps {
 export function ImageTab({ projectId, images, onImageUpload, onUpdate }: ImageTabProps) {
   return (
     <div className="space-y-6">
-      <div className="rounded-[var(--radius-container)] p-6 bg-[var(--bg-elevated)] shadow-neu-inset">
+      <div className="rounded-[var(--radius-container)] p-6 bg-[var(--bg-elevated)] shadow-surface-sunken">
         <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-4">Upload Images</h3>
         <ImageUploader folder="projects" onUpload={onImageUpload} multiple accept="image/*" />
         <p className="text-xs text-[var(--text-secondary)] mt-3">

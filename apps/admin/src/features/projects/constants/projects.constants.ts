@@ -1,4 +1,4 @@
-export const NEUMORPHIC_STYLES = {
+export const SURFACE_STYLES = {
   background: 'var(--bg-elevated)',
   foreground: 'var(--text-primary)',
   muted: 'var(--text-secondary)',
@@ -24,6 +24,6 @@ export const NEUMORPHIC_STYLES = {
 };
 
 export const FILTER_BUTTON_STYLES = {
-  active: `bg-[${NEUMORPHIC_STYLES.accent}] text-white shadow-neu-extruded-sm`,
-  inactive: `bg-[${NEUMORPHIC_STYLES.background}] text-[${NEUMORPHIC_STYLES.foreground}] shadow-neu-extruded-sm hover:shadow-neu-inset`,
+  active: `bg-[${SURFACE_STYLES.accent}] text-on-accent shadow-surface-raised-sm`,
+  inactive: `bg-[${SURFACE_STYLES.background}] text-[${SURFACE_STYLES.foreground}] shadow-surface-raised-sm hover:shadow-surface-sunken`,
 };

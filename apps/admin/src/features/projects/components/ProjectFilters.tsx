@@ -36,8 +36,8 @@ export function ProjectFilters({
               onClick={() => setFilterMode(mode)}
               className={`px-4 py-2 rounded-2xl text-sm font-medium transition-all duration-200 ${
                 filterMode === mode
-                  ? 'bg-[var(--teal)] text-white shadow-neu-extruded-sm'
-                  : 'bg-[var(--bg-elevated)] text-[var(--text-primary)] shadow-neu-extruded-sm hover:shadow-neu-inset'
+                  ? 'bg-[var(--teal)] text-on-accent shadow-surface-raised-sm'
+                  : 'bg-[var(--bg-elevated)] text-[var(--text-primary)] shadow-surface-raised-sm hover:shadow-surface-sunken'
               }`}
             >
               <span className="flex items-center gap-2">
@@ -53,7 +53,7 @@ export function ProjectFilters({
             onClick={() => setViewMode('grid')}
             className={`p-2 rounded-xl transition-all ${
               viewMode === 'grid'
-                ? 'bg-[var(--teal)] text-white'
+                ? 'bg-[var(--teal)] text-on-accent'
                 : 'bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:text-[var(--teal)]'
             }`}
             style={{
@@ -69,7 +69,7 @@ export function ProjectFilters({
             onClick={() => setViewMode('table')}
             className={`p-2 rounded-xl transition-all ${
               viewMode === 'table'
-                ? 'bg-[var(--teal)] text-white'
+                ? 'bg-[var(--teal)] text-on-accent'
                 : 'bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:text-[var(--teal)]'
             }`}
             style={{

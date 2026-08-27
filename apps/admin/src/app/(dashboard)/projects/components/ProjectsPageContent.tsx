@@ -66,7 +66,7 @@ export function ProjectsPageContent() {
         actions={
           <button
             onClick={() => setIsModalOpen(true)}
-            className="px-6 py-3 rounded-2xl font-semibold transition-all duration-200 hover:scale-105 bg-gradient-to-r from-[var(--teal)] to-[var(--amber)] text-white shadow-neu-extruded-sm"
+            className="px-6 py-3 rounded-2xl font-semibold transition-all duration-200 hover:scale-105 bg-accent text-on-accent shadow-surface-raised-sm"
           >
             Add Project
           </button>

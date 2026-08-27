@@ -8,7 +8,7 @@ export const FILTER_BUTTONS = [
   { mode: 'featured' as FilterMode, label: 'Featured', icon: Star },
 ] as const;
 
-export const NEUMORPHIC_STYLES = {
+export const SURFACE_STYLES = {
   card: {
     boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
   },

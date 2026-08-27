@@ -63,7 +63,7 @@ export function ProjectEditPageContent({ projectId }: ProjectEditPageContentProp
             </TabsList>
             <button
               onClick={() => setIsMetadataModalOpen(true)}
-              className="p-2 rounded-xl bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:text-[var(--teal)] shadow-neu-extruded-sm hover:shadow-neu-inset-sm transition-all"
+              className="p-2 rounded-xl bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:text-[var(--teal)] shadow-surface-raised-sm hover:shadow-surface-sunken-sm transition-all"
               title="Edit Metadata"
             >
               <Settings className="h-5 w-5" />

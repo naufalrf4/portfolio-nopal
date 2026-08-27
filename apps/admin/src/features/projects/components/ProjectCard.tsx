@@ -36,7 +36,7 @@ export function ProjectCard({
         }}
       >
         {imageUrl && (
-          <div className="mb-4 rounded-2xl overflow-hidden bg-[var(--bg-elevated)] shadow-neu-inset-sm">
+          <div className="mb-4 rounded-2xl overflow-hidden bg-[var(--bg-elevated)] shadow-surface-sunken-sm">
             <img src={imageUrl} alt={project.title} className="w-full h-40 object-cover" />
           </div>
         )}
@@ -56,7 +56,7 @@ export function ProjectCard({
               <TooltipTrigger asChild>
                 <button
                   onClick={onEdit}
-                  className="p-2 rounded-xl bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:text-[var(--teal)] transition-all duration-200 hover:shadow-neu-extruded-sm"
+                  className="p-2 rounded-xl bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:text-[var(--teal)] transition-all duration-200 hover:shadow-surface-raised-sm"
                 >
                   <Pencil className="h-4 w-4" />
                 </button>
@@ -67,7 +67,7 @@ export function ProjectCard({
               <TooltipTrigger asChild>
                 <button
                   onClick={onDelete}
-                  className="p-2 rounded-xl bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:text-red-500 transition-all duration-200 hover:shadow-neu-extruded-sm"
+                  className="p-2 rounded-xl bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:text-red-500 transition-all duration-200 hover:shadow-surface-raised-sm"
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>
@@ -128,7 +128,7 @@ export function ProjectCard({
           </div>
         )}
 
-        <div className="flex items-center justify-between pt-4 border-t border-[#A3B1C6]/20">
+        <div className="flex items-center justify-between pt-4 border-t border-line/20">
           <div className="flex items-center gap-2">
             <Switch
               checked={project.visible}

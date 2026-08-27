@@ -1,5 +1,5 @@
 import { Eye, EyeOff, Star, Pencil, Trash2 } from './Icons';
-import { NEUMORPHIC_STYLES } from '../constants/projects.constants';
+import { SURFACE_STYLES } from '../constants/projects.constants';
 import type { ProjectTableProps } from '../types/projects.types';
 
 export function ProjectTable({
@@ -13,13 +13,13 @@ export function ProjectTable({
     <div
       className="rounded-[var(--radius-container)] overflow-hidden bg-[var(--bg-elevated)]"
       style={{
-        boxShadow: NEUMORPHIC_STYLES.shadows.extruded,
+        boxShadow: SURFACE_STYLES.shadows.extruded,
       }}
     >
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-[#A3B1C6]/20">
+            <tr className="border-b border-line/20">
               <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">Project</th>
               <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">Category</th>
               <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">
@@ -33,7 +33,7 @@ export function ProjectTable({
           </thead>
           <tbody>
             {projects.map((project) => (
-              <tr key={project.id} className="border-b border-[#A3B1C6]/10 last:border-0">
+              <tr key={project.id} className="border-b border-line/10 last:border-0">
                 <td className="px-6 py-4">
                   <div>
                     <p className="font-medium text-[var(--text-primary)]">{project.title}</p>
@@ -48,7 +48,7 @@ export function ProjectTable({
                         key={tech}
                         className="px-2 py-1 text-xs rounded-full bg-[var(--bg-elevated)] text-[var(--text-primary)]"
                         style={{
-                          boxShadow: NEUMORPHIC_STYLES.shadows.insetTiny,
+                          boxShadow: SURFACE_STYLES.shadows.insetTiny,
                         }}
                       >
                         {tech}
