@@ -17,6 +17,7 @@ import { createId } from '@paralleldrive/cuid2';
 import { getSubmissionContext } from '@/lib/api/submission-context';
 import { checkRateLimit, getRateLimitHeaders } from '@/lib/services/rate-limiter';
 import { logger } from '@/lib/utils/logger';
+import { formatJakartaDateKeyLabel, jakartaWallClockToInstant } from '@/lib/utils/date';
 
 const publicBookingSchema = z.object({
   slotId: z.string().min(1),
@@ -103,13 +104,9 @@ export async function POST(request: NextRequest) {
       return errorResponse('This time slot is already booked', 409);
     }
 
-    const now = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Jakarta' }));
+    const slotStartInstant = jakartaWallClockToInstant(slotResult.date, slotResult.time);
 
-    const slotDateTime = new Date(slotResult.date + 'T00:00:00');
-    const [hours, minutes] = slotResult.time.split(':').map(Number);
-    slotDateTime.setHours(hours, minutes, 0, 0);
-
-    if (slotDateTime < now) {
+    if (slotStartInstant.getTime() < Date.now()) {
       return errorResponse('Cannot book a slot in the past', 400);
     }
 
@@ -148,12 +145,7 @@ export async function POST(request: NextRequest) {
       return created;
     });
 
-    const dateFormatted = new Date(slotResult.date + 'T00:00:00').toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
+    const dateFormatted = formatJakartaDateKeyLabel(slotResult.date);
 
     const responseData = {
       id: booking.id,

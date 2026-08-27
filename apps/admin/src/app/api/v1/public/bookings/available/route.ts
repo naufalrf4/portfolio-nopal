@@ -4,6 +4,11 @@ import { db } from '@/lib/db';
 import { bookingSlots } from '@/lib/db/schema';
 import { eq, and, gte, lte, asc } from 'drizzle-orm';
 import { successResponse, validationErrorResponse, serverErrorResponse } from '@/lib/api/responses';
+import {
+  addDaysToDateKey,
+  getJakartaDateKey,
+  jakartaWallClockToInstant,
+} from '@/lib/utils/date';
 
 const availableSlotsQuerySchema = z.object({
   days: z.coerce.number().int().min(1).max(90).default(14),
@@ -32,16 +37,9 @@ export async function GET(request: NextRequest) {
 
     const { days } = parsed.data;
 
-    const now = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Jakarta' }));
-    const today = new Date(now);
-    today.setHours(0, 0, 0, 0);
-
-    const endDate = new Date(today);
-    endDate.setDate(endDate.getDate() + days);
-    endDate.setHours(23, 59, 59, 999);
-
-    const todayStr = today.toISOString().split('T')[0];
-    const endDateStr = endDate.toISOString().split('T')[0];
+    const nowMs = Date.now();
+    const todayStr = getJakartaDateKey();
+    const endDateStr = addDaysToDateKey(todayStr, days);
 
     const slots = await db
       .select()
@@ -55,13 +53,9 @@ export async function GET(request: NextRequest) {
       )
       .orderBy(asc(bookingSlots.date), asc(bookingSlots.time));
 
-    const filteredSlots = slots.filter((slot) => {
-      const slotDateTime = new Date(slot.date + 'T00:00:00');
-      const [hours, minutes] = slot.time.split(':').map(Number);
-      slotDateTime.setHours(hours, minutes, 0, 0);
-
-      return slotDateTime > now;
-    });
+    const filteredSlots = slots.filter(
+      (slot) => jakartaWallClockToInstant(slot.date, slot.time).getTime() > nowMs
+    );
 
     const groupedByDate: Record<
       string,
