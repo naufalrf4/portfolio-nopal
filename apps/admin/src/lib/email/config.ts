@@ -1,4 +1,5 @@
 import nodemailer, { type Transporter } from 'nodemailer';
+import { logger } from '@/lib/utils/logger';
 
 function parseSmtpPort(): number | null {
   const rawPort = process.env.SMTP_PORT?.trim();
@@ -39,7 +40,7 @@ export function getEmailTransporter(): Transporter | null {
   }
 
   if (!isEmailConfigured()) {
-    console.warn('[Email] SMTP is not fully configured - email sending will be disabled');
+    logger.warn('[Email] SMTP is not fully configured - email sending will be disabled');
     cachedTransporter = null;
     return cachedTransporter;
   }

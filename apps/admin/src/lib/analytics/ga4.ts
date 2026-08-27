@@ -1,4 +1,5 @@
 import { BetaAnalyticsDataClient } from '@google-analytics/data';
+import { logger } from '@/lib/utils/logger';
 
 type GaOverview = {
   totalViews: number;
@@ -170,7 +171,7 @@ export async function getGaDashboardSummary(days: number): Promise<GaDashboardSu
       topPages: overview.topPages,
     };
   } catch (error) {
-    console.error('[GA4] Failed to fetch dashboard summary:', error);
+    logger.error('[GA4] Failed to fetch dashboard summary', error);
     return {
       enabled: false,
       totalViews: 0,

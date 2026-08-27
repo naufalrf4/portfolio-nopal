@@ -10,6 +10,7 @@ import {
 import { createId } from '@paralleldrive/cuid2';
 import type { CreateAnalyticsEventInput } from '@/lib/validations/analytics.schema';
 import { getGaDashboardSummary, getGaOverview, getGaPageViews } from '@/lib/analytics/ga4';
+import { logger } from '@/lib/utils/logger';
 
 type AnalyticsRange = '7d' | '30d' | '90d';
 type AnalyticsEventInsert = typeof analyticsEvents.$inferInsert;
@@ -110,7 +111,7 @@ export class AnalyticsService {
         return gaPageViews;
       }
     } catch (error) {
-      console.error('[AnalyticsService] Failed to load GA page views, falling back to internal analytics:', error);
+      logger.error('[AnalyticsService] Failed to load GA page views, falling back to internal analytics', error);
     }
 
     const startDate = new Date();
@@ -253,7 +254,7 @@ export class AnalyticsService {
         return gaOverview;
       }
     } catch (error) {
-      console.error('[AnalyticsService] Failed to load GA overview, falling back to internal analytics:', error);
+      logger.error('[AnalyticsService] Failed to load GA overview, falling back to internal analytics', error);
     }
 
     const startDate = new Date();

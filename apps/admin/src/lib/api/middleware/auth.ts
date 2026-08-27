@@ -3,12 +3,13 @@ import { timingSafeEqual } from 'crypto';
 import { safeAuth } from '@/lib/auth';
 import type { Session } from 'next-auth';
 import { unauthorizedResponse, forbiddenResponse } from '../responses';
+import { logger } from '@/lib/utils/logger';
 
 const ADMIN_INTERNAL_API_TOKEN =
   process.env.ADMIN_INTERNAL_API_TOKEN || process.env.ADMIN_SERVICE_TOKEN;
 
 if (!ADMIN_INTERNAL_API_TOKEN) {
-  console.warn(
+  logger.warn(
     '[auth] Neither ADMIN_INTERNAL_API_TOKEN nor ADMIN_SERVICE_TOKEN is set. ' +
       'All withServiceAuth requests will be rejected until one is configured.'
   );
