@@ -16,8 +16,8 @@ export function InteractionBreakdown({
         <div className="space-y-4">
           {[1, 2, 3, 4].map((item) => (
             <div key={item} className="space-y-2">
-              <div className="h-4 w-24 rounded bg-[#D1D5DB]/50 animate-pulse" />
-              <div className="h-2 rounded-full bg-[#D1D5DB]/30 animate-pulse" />
+              <div className="h-4 w-24 rounded bg-line animate-pulse" />
+              <div className="h-2 rounded-full bg-line animate-pulse" />
             </div>
           ))}
         </div>
@@ -36,7 +36,7 @@ export function InteractionBreakdown({
         </p>
       </div>
       {data.length === 0 ? (
-        <div className="rounded-[28px] neu-card-inset bg-[var(--bg-elevated)] px-4 py-10 text-center text-sm text-[var(--text-secondary)]">
+        <div className="rounded-[28px] card-inset bg-[var(--bg-elevated)] px-4 py-10 text-center text-sm text-[var(--text-secondary)]">
           No submissions yet.
         </div>
       ) : (
@@ -49,9 +49,9 @@ export function InteractionBreakdown({
                   <span className="font-medium text-[var(--text-primary)]">{item.label}</span>
                   <span className="text-[var(--text-secondary)]">{item.count.toLocaleString()}</span>
                 </div>
-                <div className="h-2 overflow-hidden rounded-full bg-[#D1D5DB]/30">
+                <div className="h-2 overflow-hidden rounded-full bg-line">
                   <div
-                    className="h-full rounded-full bg-gradient-to-r from-[var(--teal)] to-[var(--amber)]"
+                    className="h-full rounded-full bg-accent"
                     style={{ width: `${percentage}%` }}
                   />
                 </div>

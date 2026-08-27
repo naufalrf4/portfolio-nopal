@@ -10,7 +10,7 @@ export function TopLinkClicks({ data, loading }: { data: TelemetryLinkStat[]; lo
       <Card className="p-6 bg-[var(--bg-elevated)]">
         <div className="space-y-3">
           {[1, 2, 3, 4].map((item) => (
-            <div key={item} className="h-14 rounded-2xl bg-[#D1D5DB]/30 animate-pulse" />
+            <div key={item} className="h-14 rounded-2xl bg-line animate-pulse" />
           ))}
         </div>
       </Card>
@@ -28,7 +28,7 @@ export function TopLinkClicks({ data, loading }: { data: TelemetryLinkStat[]; lo
       </div>
 
       {data.length === 0 ? (
-        <div className="rounded-[28px] neu-card-inset bg-[var(--bg-elevated)] px-4 py-10 text-center text-sm text-[var(--text-secondary)]">
+        <div className="rounded-[28px] card-inset bg-[var(--bg-elevated)] px-4 py-10 text-center text-sm text-[var(--text-secondary)]">
           No click telemetry yet.
         </div>
       ) : (
@@ -36,7 +36,7 @@ export function TopLinkClicks({ data, loading }: { data: TelemetryLinkStat[]; lo
           {data.map((item) => (
             <div
               key={item.id}
-              className="flex items-center justify-between gap-3 rounded-2xl bg-[var(--bg-elevated)] px-4 py-3 shadow-neu-extruded"
+              className="flex items-center justify-between gap-3 rounded-2xl bg-[var(--bg-elevated)] px-4 py-3 shadow-surface-raised"
             >
               <div className="min-w-0">
                 <p className="truncate font-medium text-[var(--text-primary)]">{item.label}</p>
@@ -44,7 +44,7 @@ export function TopLinkClicks({ data, loading }: { data: TelemetryLinkStat[]; lo
                   {item.type} · {item.sourceApp}
                 </p>
               </div>
-              <span className="rounded-full bg-[#14B8A6] px-3 py-1 text-xs font-bold text-white">
+              <span className="rounded-full tile-tint-emerald px-3 py-1 text-xs font-bold">
                 {item.clicks}
               </span>
             </div>

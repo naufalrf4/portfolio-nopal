@@ -15,7 +15,7 @@ export function SourceAppBreakdown({
       <Card className="p-6 bg-[var(--bg-elevated)]">
         <div className="space-y-4">
           {[1, 2, 3].map((item) => (
-            <div key={item} className="h-16 rounded-2xl bg-[#D1D5DB]/30 animate-pulse" />
+            <div key={item} className="h-16 rounded-2xl bg-line animate-pulse" />
           ))}
         </div>
       </Card>
@@ -29,7 +29,7 @@ export function SourceAppBreakdown({
         <p className="text-sm text-[var(--text-secondary)]">Where submissions and clicks originate.</p>
       </div>
       {data.length === 0 ? (
-        <div className="rounded-[28px] neu-card-inset bg-[var(--bg-elevated)] px-4 py-10 text-center text-sm text-[var(--text-secondary)]">
+        <div className="rounded-[28px] card-inset bg-[var(--bg-elevated)] px-4 py-10 text-center text-sm text-[var(--text-secondary)]">
           No source app data available.
         </div>
       ) : (
@@ -37,7 +37,7 @@ export function SourceAppBreakdown({
           {data.map((item) => (
             <div
               key={item.app}
-              className="rounded-2xl bg-[var(--bg-elevated)] px-4 py-3 shadow-neu-extruded"
+              className="rounded-2xl bg-[var(--bg-elevated)] px-4 py-3 shadow-surface-raised"
             >
               <div className="flex items-center justify-between gap-3">
                 <div>
@@ -47,10 +47,10 @@ export function SourceAppBreakdown({
                   </p>
                 </div>
                 <div className="flex gap-2 text-xs">
-                  <span className="rounded-full bg-[#DBEAFE] px-2.5 py-1 font-semibold text-[#1D4ED8]">
+                  <span className="rounded-full tile-tint-blue px-2.5 py-1 font-semibold">
                     {item.submissions} submissions
                   </span>
-                  <span className="rounded-full bg-[#CCFBF1] px-2.5 py-1 font-semibold text-[#0F766E]">
+                  <span className="rounded-full tile-tint-emerald px-2.5 py-1 font-semibold">
                     {item.clicks} clicks
                   </span>
                 </div>

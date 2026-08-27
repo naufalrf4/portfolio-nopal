@@ -15,7 +15,7 @@ export function RecentInteractions({
       <Card className="p-6 bg-[var(--bg-elevated)]">
         <div className="space-y-3">
           {[1, 2, 3, 4].map((item) => (
-            <div key={item} className="h-16 rounded-2xl bg-[#D1D5DB]/30 animate-pulse" />
+            <div key={item} className="h-16 rounded-2xl bg-line animate-pulse" />
           ))}
         </div>
       </Card>
@@ -31,7 +31,7 @@ export function RecentInteractions({
         </p>
       </div>
       {data.length === 0 ? (
-        <div className="rounded-[28px] neu-card-inset bg-[var(--bg-elevated)] px-4 py-10 text-center text-sm text-[var(--text-secondary)]">
+        <div className="rounded-[28px] card-inset bg-[var(--bg-elevated)] px-4 py-10 text-center text-sm text-[var(--text-secondary)]">
           No recent interactions yet.
         </div>
       ) : (
@@ -39,7 +39,7 @@ export function RecentInteractions({
           {data.map((item) => (
             <div
               key={item.id}
-              className="rounded-2xl bg-[var(--bg-elevated)] px-4 py-3 shadow-neu-extruded"
+              className="rounded-2xl bg-[var(--bg-elevated)] px-4 py-3 shadow-surface-raised"
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">

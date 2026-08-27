@@ -14,8 +14,8 @@ export function InteractionTrendChart({
     return (
       <Card className="p-6 bg-[var(--bg-elevated)]">
         <div className="space-y-6">
-          <div className="h-6 w-44 rounded bg-[#D1D5DB]/50 animate-pulse" />
-          <div className="h-64 rounded-[28px] bg-[#D1D5DB]/30 animate-pulse" />
+          <div className="h-6 w-44 rounded bg-line animate-pulse" />
+          <div className="h-64 rounded-[28px] bg-line animate-pulse" />
         </div>
       </Card>
     );
@@ -31,7 +31,7 @@ export function InteractionTrendChart({
       </div>
 
       {data.length === 0 ? (
-        <div className="flex h-64 items-center justify-center rounded-[28px] neu-card-inset bg-[var(--bg-elevated)] text-sm text-[var(--text-secondary)]">
+        <div className="flex h-64 items-center justify-center rounded-[28px] card-inset bg-[var(--bg-elevated)] text-sm text-[var(--text-secondary)]">
           No activity recorded in this range.
         </div>
       ) : (
@@ -42,11 +42,11 @@ export function InteractionTrendChart({
               Submissions
             </span>
             <span className="flex items-center gap-2">
-              <span className="h-2.5 w-2.5 rounded-full bg-[#14B8A6]" />
+              <span className="h-2.5 w-2.5 rounded-full bg-[var(--amber)]" />
               Clicks
             </span>
           </div>
-          <div className="grid h-64 grid-cols-[repeat(auto-fit,minmax(18px,1fr))] items-end gap-2 rounded-[28px] neu-card-inset bg-[var(--bg-elevated)] p-4">
+          <div className="grid h-64 grid-cols-[repeat(auto-fit,minmax(18px,1fr))] items-end gap-2 rounded-[28px] card-inset bg-[var(--bg-elevated)] p-4">
             {data.map((item) => (
               <div key={item.date} className="flex h-full flex-col items-center justify-end gap-2">
                 <div className="flex w-full items-end justify-center gap-1">
@@ -58,7 +58,7 @@ export function InteractionTrendChart({
                     title={`${item.submissions} submissions`}
                   />
                   <div
-                    className="w-2 rounded-full bg-[#14B8A6]"
+                    className="w-2 rounded-full bg-[var(--amber)]"
                     style={{
                       height: `${Math.max((item.clicks / maxValue) * 180, item.clicks > 0 ? 8 : 0)}px`,
                     }}

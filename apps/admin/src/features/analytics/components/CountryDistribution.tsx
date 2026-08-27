@@ -15,7 +15,7 @@ export function CountryDistribution({ data, loading }: CountryDistributionProps)
       <Card
         className={cn(
           'p-6 bg-[var(--bg-elevated)]',
-          'shadow-neu-extruded'
+          'shadow-surface-raised'
         )}
       >
         <div className="space-y-4">
@@ -27,12 +27,12 @@ export function CountryDistribution({ data, loading }: CountryDistributionProps)
               <div key={i} className="space-y-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 bg-[#D1D5DB]/50 rounded-full animate-pulse" />
-                    <div className="h-3 w-24 bg-[#D1D5DB]/50 rounded animate-pulse" />
+                    <div className="w-6 h-6 bg-line rounded-full animate-pulse" />
+                    <div className="h-3 w-24 bg-line rounded animate-pulse" />
                   </div>
-                  <div className="h-3 w-12 bg-[#D1D5DB]/50 rounded animate-pulse" />
+                  <div className="h-3 w-12 bg-line rounded animate-pulse" />
                 </div>
-                <div className="h-2 bg-[#D1D5DB]/30 rounded-full animate-pulse" />
+                <div className="h-2 bg-line rounded-full animate-pulse" />
               </div>
             ))}
           </div>
@@ -46,7 +46,7 @@ export function CountryDistribution({ data, loading }: CountryDistributionProps)
     <Card
       className={cn(
         'p-6 bg-[var(--bg-elevated)]',
-        'shadow-neu-extruded'
+        'shadow-surface-raised'
       )}
     >
       <div className="flex items-center justify-between mb-6">
@@ -71,12 +71,9 @@ export function CountryDistribution({ data, loading }: CountryDistributionProps)
                 </div>
               </div>
 
-              <div className="h-2 bg-[#D1D5DB]/30 rounded-full overflow-hidden">
+              <div className="h-2 bg-line rounded-full overflow-hidden">
                 <div
-                  className={cn(
-                    'h-full rounded-full transition-all duration-500 ease-out',
-                    'bg-gradient-to-r from-[var(--teal)] to-[var(--amber)]'
-                  )}
+                  className={cn('h-full rounded-full transition-all duration-500 ease-out', 'bg-accent')}
                   style={{ width: `${country.percentage}%` }}
                 />
               </div>
@@ -85,7 +82,7 @@ export function CountryDistribution({ data, loading }: CountryDistributionProps)
         </div>
       ) : (
         <div className="py-12 flex flex-col items-center justify-center">
-          <Globe className="w-12 h-12 text-[#D1D5DB] mb-3" />
+          <Globe className="w-12 h-12 text-muted-foreground mb-3" />
           <p className="text-[var(--text-secondary)] text-sm">No geographic data available</p>
         </div>
       )}
