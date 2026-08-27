@@ -2,13 +2,13 @@
 @import '@naufalrf/design-tokens';
 
 @theme {
-	--color-neu-bg: var(--bg);
-	--color-neu-surface: var(--bg-elevated);
-	--color-neu-fg: var(--text-primary);
-	--color-neu-fg-muted: var(--text-secondary);
-	--color-neu-fg-subtle: var(--text-tertiary);
-	--color-neu-accent: var(--teal);
-	--color-neu-accent-secondary: var(--amber);
+	--color-tone-bg: var(--bg);
+	--color-tone-surface: var(--bg-elevated);
+	--color-tone-fg: var(--text-primary);
+	--color-tone-fg-muted: var(--text-secondary);
+	--color-tone-fg-subtle: var(--text-tertiary);
+	--color-tone-accent: var(--teal);
+	--color-tone-accent-secondary: var(--amber);
 
 	--font-display: 'Space Grotesk', sans-serif;
 	--font-sans: 'Inter', sans-serif;
@@ -20,13 +20,13 @@
 }
 
 :root {
-	--neu-bg: var(--bg);
-	--neu-surface: var(--bg-elevated);
-	--neu-fg: var(--text-primary);
-	--neu-fg-muted: var(--text-secondary);
-	--neu-fg-subtle: var(--text-tertiary);
-	--neu-accent: var(--teal);
-	--neu-accent-secondary: var(--amber);
+	--tone-bg: var(--bg);
+	--tone-surface: var(--bg-elevated);
+	--tone-fg: var(--text-primary);
+	--tone-fg-muted: var(--text-secondary);
+	--tone-fg-subtle: var(--text-tertiary);
+	--tone-accent: var(--teal);
+	--tone-accent-secondary: var(--amber);
 }
 
 body {
@@ -51,13 +51,13 @@ h6 {
 	font-family: var(--font-display), system-ui, sans-serif;
 }
 
-.neu-card {
+.panel-card {
 	background: var(--bg-card);
 	border: 1px solid var(--border);
 	border-radius: var(--radius-container);
 }
 
-.neu-button {
+.btn-base {
 	background: var(--bg-elevated);
 	border: 1px solid var(--border);
 	border-radius: var(--radius-base);
@@ -71,38 +71,38 @@ h6 {
 	justify-content: center;
 }
 
-.neu-button:hover:not(:disabled) {
+.btn-base:hover:not(:disabled) {
 	border-color: var(--border-hover);
 	transform: translateY(-1px);
 }
 
-.neu-button:active:not(:disabled) {
+.btn-base:active:not(:disabled) {
 	transform: translateY(0);
 }
 
-.neu-button:disabled {
+.btn-base:disabled {
 	opacity: 0.55;
 	cursor: not-allowed;
 }
 
-.neu-button-primary {
+.btn-primary {
 	background: var(--teal);
 	color: var(--bg);
 	border: 1px solid var(--teal);
 }
 
-.neu-button-primary:hover:not(:disabled) {
+.btn-primary:hover:not(:disabled) {
 	filter: brightness(1.1);
 }
 
-.neu-button-primary:disabled {
+.btn-primary:disabled {
 	opacity: 0.72;
 	background: var(--bg-elevated);
 	color: var(--text-tertiary);
 	border-color: var(--border);
 }
 
-.neu-input {
+.field-input {
 	background: var(--bg-elevated);
 	border: 1px solid var(--border);
 	border-radius: var(--radius-base);
@@ -112,7 +112,7 @@ h6 {
 	transition: all 0.2s ease;
 }
 
-.neu-input:focus {
+.field-input:focus {
 	outline: none;
 	border-color: var(--teal);
 	box-shadow: 0 0 0 2px var(--teal-soft);

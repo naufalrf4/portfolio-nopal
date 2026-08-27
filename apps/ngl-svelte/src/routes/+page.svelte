@@ -242,7 +242,7 @@
 		class="relative mx-auto flex min-h-[calc(100vh-5rem)] w-full max-w-2xl items-center justify-center"
 	>
 		<div
-			class="neu-card ngl-panel animate-scale-in relative w-full max-w-xl overflow-hidden rounded-[34px] border border-[var(--border)] bg-[var(--bg-card)] p-8 shadow-[0_8px_30px_-12px_rgba(0,0,0,0.5)] md:p-10"
+			class="panel-card ngl-panel animate-scale-in relative w-full max-w-xl overflow-hidden rounded-[34px] border border-[var(--border)] bg-[var(--bg-card)] p-8 shadow-[0_8px_30px_-12px_rgba(0,0,0,0.5)] md:p-10"
 		>
 			{#if form?.success}
 				<div in:scale class="flex flex-col items-center py-8 text-center">
@@ -268,7 +268,7 @@
 					<p class="ngl-muted mb-6 max-w-sm text-sm">Your anonymous message has been delivered.</p>
 					<a
 						href={resolve('/')}
-						class="neu-button px-6 py-3 text-sm inline-flex"
+						class="btn-base px-6 py-3 text-sm inline-flex"
 						data-sveltekit-reload
 					>
 						Send Another Message
@@ -277,7 +277,7 @@
 			{:else}
 				<div class="mb-8 text-center opacity-0 animate-fade-in-up">
 					<div
-						class="mx-auto mb-4 flex h-18 w-18 items-center justify-center rounded-full bg-[var(--bg-elevated)] border border-[var(--border)] shadow-neu-inset"
+						class="mx-auto mb-4 flex h-18 w-18 items-center justify-center rounded-full bg-[var(--bg-elevated)] border border-[var(--border)] shadow-surface-sunken"
 					>
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
@@ -289,11 +289,11 @@
 							stroke-width="2"
 							stroke-linecap="round"
 							stroke-linejoin="round"
-							class="text-[var(--neu-accent)]"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path></svg
+							class="text-[var(--tone-accent)]"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path></svg
 						>
 					</div>
 					<p
-						class="mb-3 text-xs font-semibold uppercase tracking-[0.32em] text-[var(--neu-accent)]"
+						class="mb-3 text-xs font-semibold uppercase tracking-[0.32em] text-[var(--tone-accent)]"
 					>
 						Anonymous message
 					</p>
@@ -388,7 +388,7 @@
 					<button
 						type="submit"
 						disabled={!canSubmit}
-						class="neu-button neu-button-primary flex w-full items-center justify-center gap-2 py-3 disabled:cursor-not-allowed disabled:opacity-50"
+						class="btn-base btn-primary flex w-full items-center justify-center gap-2 py-3 disabled:cursor-not-allowed disabled:opacity-50"
 					>
 						{#if isSubmitting}
 							<svg

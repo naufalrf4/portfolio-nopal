@@ -64,9 +64,7 @@
 					return { id: parsed.id, name: parsed.name, color: parsed.color };
 				}
 			}
-		} catch {
-			// Ignore broken storage and regenerate.
-		}
+		} catch {}
 
 		const alias = `Guest_${Math.random().toString(36).slice(2, 6)}`;
 		const identity = {
@@ -168,9 +166,7 @@
 						.slice()
 						.sort((a, b) => a.pageLabel.localeCompare(b.pageLabel) || a.name.localeCompare(b.name));
 				}
-			} catch {
-				// Ignore invalid frames.
-			}
+			} catch {}
 		});
 
 		socket.addEventListener('close', () => {
@@ -205,7 +201,7 @@
 		<button
 			type="button"
 			on:click={() => (isOpen = !isOpen)}
-			class="inline-flex max-w-[calc(100vw-2.5rem)] items-center justify-center gap-2 rounded-full border border-[var(--border)] bg-[var(--bg-card)] px-2.5 py-1.5 text-[10px] font-semibold text-[var(--text-secondary)] shadow-[0_4px_15px_-8px_rgba(0,0,0,0.4)] backdrop-blur-xl transition-transform duration-200 hover:-translate-y-0.5 md:max-w-[260px] md:px-4 md:py-2 md:text-[11px]"
+			class="inline-flex max-w-[calc(100vw-2.5rem)] items-center justify-center gap-2 rounded-full border border-[var(--border)] bg-[var(--bg-card)] px-2.5 py-1.5 text-[10px] font-semibold text-[var(--text-secondary)] shadow-[0_4px_15px_-8px_rgba(0,0,0,0.4)] transition-transform duration-200 hover:-translate-y-0.5 md:max-w-[260px] md:px-4 md:py-2 md:text-[11px]"
 		>
 			<span
 				class="inline-flex items-center gap-2 rounded-full bg-[var(--bg-elevated)] px-2 py-1 shadow-[inset_0_2px_10px_rgba(0,0,0,0.3)] md:px-2.5"
@@ -220,7 +216,7 @@
 
 		{#if isOpen}
 			<div
-				class="w-[min(92vw,360px)] rounded-[24px] border border-[var(--border)] bg-[var(--bg-card)] p-3 shadow-[0_8px_30px_-12px_rgba(0,0,0,0.5)] backdrop-blur-xl"
+				class="w-[min(92vw,360px)] rounded-[24px] border border-[var(--border)] bg-[var(--bg-card)] p-3 shadow-[0_8px_30px_-12px_rgba(0,0,0,0.5)]"
 			>
 				<div class="mb-2 flex items-center justify-between px-1">
 					<div>
