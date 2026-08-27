@@ -1,3 +1,4 @@
+import { logger } from "./lib/logger";
 import { timingSafeEqual } from "node:crypto";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
@@ -197,7 +198,7 @@ app.post("/ingest", async (c) => {
 });
 
 app.onError((err, c) => {
-  console.error("RAG service error:", err);
+  logger.error("RAG service error", err);
   if (err instanceof RagServiceError) {
     return c.json(
       {

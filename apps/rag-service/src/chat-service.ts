@@ -1,3 +1,4 @@
+import { logger } from "./lib/logger";
 import * as adminClient from "./admin-client";
 import { config } from "./config";
 import { embedTexts, generateText } from "./embedding";
@@ -286,7 +287,7 @@ export async function chat(
   try {
     history = await adminClient.getChatLog(sessionId);
   } catch {
-    console.warn("Failed to load chat history from admin API");
+    logger.warn("Failed to load chat history from admin API");
   }
 
   const historyText = formatHistory(history, config.chatHistoryLimit);
@@ -553,7 +554,7 @@ export async function chat(
   try {
     await adminClient.saveChatLog(sessionId, persistedMessages, "append");
   } catch {
-    console.warn("Failed to persist chat log to admin API");
+    logger.warn("Failed to persist chat log to admin API");
   }
 
   return {

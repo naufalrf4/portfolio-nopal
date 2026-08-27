@@ -1,3 +1,4 @@
+import { logger } from "./lib/logger";
 import { RagServiceError } from "./errors";
 
 export type ProviderType = "openai-compatible" | "gemini";
@@ -302,7 +303,7 @@ export class LlmProvider {
       return await this.main.generate(prompt, temperature);
     } catch (mainErr) {
       if (!this.fallback) throw mainErr;
-      console.warn(
+      logger.warn(
         `[LLM] Main provider failed (${String(mainErr)}), falling back.`,
       );
       try {
@@ -311,7 +312,7 @@ export class LlmProvider {
         if (fallbackErr instanceof Error) {
           (fallbackErr as Error & { cause?: unknown }).cause = mainErr;
         }
-        console.error(
+        logger.error(
           `[LLM] Fallback provider also failed (${String(fallbackErr)}); main provider error was (${String(mainErr)}).`,
         );
         throw fallbackErr;

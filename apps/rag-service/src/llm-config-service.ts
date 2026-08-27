@@ -1,3 +1,4 @@
+import { logger } from "./lib/logger";
 import { config } from "./config";
 import { RagServiceError } from "./errors";
 import type { FullLlmConfig, LlmSlotConfig } from "./llm-provider";
@@ -142,7 +143,7 @@ export async function resolveLlmConfig(): Promise<FullLlmConfig> {
     }
     return result;
   } catch (err) {
-    console.warn(
+    logger.warn(
       `[LLM Config] Admin API unavailable (${String(err)}), falling back to env vars.`,
     );
     return buildEnvFallbackConfig();
