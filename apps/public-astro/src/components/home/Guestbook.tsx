@@ -14,6 +14,7 @@ import {
   setStoredGuestbookUser,
   type StoredGuestbookUser,
 } from '@/lib/guestbookIdentity';
+import { formatDateShort } from '@/lib/utils';
 
 interface GuestbookProps {
   initialEntries?: GuestbookEntry[];
@@ -257,11 +258,7 @@ export function Guestbook({
                       </p>
                       {entry.createdAt && (
                         <p className="font-mono text-[10px] uppercase tracking-wider text-text-tertiary">
-                          {new Date(entry.createdAt).toLocaleDateString('en-GB', {
-                            day: 'numeric',
-                            month: 'short',
-                            year: 'numeric',
-                          })}
+                          {formatDateShort(entry.createdAt)}
                         </p>
                       )}
                     </div>
