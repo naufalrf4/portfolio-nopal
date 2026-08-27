@@ -59,10 +59,10 @@ export const chatLogs = pgTable(
     id: text().primaryKey().notNull(),
     sessionId: text().notNull(),
     messages: jsonb().default([]).notNull(),
-    createdAt: timestamp({ precision: 3, mode: 'string' })
+    createdAt: timestamp({ precision: 3, withTimezone: true, mode: 'string' })
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
-    updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
+    updatedAt: timestamp({ precision: 3, withTimezone: true, mode: 'string' }).notNull(),
   },
   (table) => [
     index('chat_logs_createdAt_idx').using(
@@ -89,10 +89,10 @@ export const profileLinks = pgTable(
     icon: text(),
     visible: boolean().default(true).notNull(),
     order: integer().default(0).notNull(),
-    createdAt: timestamp({ precision: 3, mode: 'string' })
+    createdAt: timestamp({ precision: 3, withTimezone: true, mode: 'string' })
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
-    updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
+    updatedAt: timestamp({ precision: 3, withTimezone: true, mode: 'string' }).notNull(),
   },
   (table) => [
     index('profile_links_order_idx').using('btree', table.order.asc().nullsLast().op('int4_ops')),
@@ -110,10 +110,10 @@ export const knowledgeDocs = pgTable(
     filename: text().notNull(),
     content: text().notNull(),
     indexed: boolean().default(false).notNull(),
-    createdAt: timestamp({ precision: 3, mode: 'string' })
+    createdAt: timestamp({ precision: 3, withTimezone: true, mode: 'string' })
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
-    updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
+    updatedAt: timestamp({ precision: 3, withTimezone: true, mode: 'string' }).notNull(),
   },
   (table) => [
     index('knowledge_docs_filename_idx').using(
@@ -140,10 +140,10 @@ export const users = pgTable(
     name: text(),
     image: text(),
     role: userRole().default('USER').notNull(),
-    createdAt: timestamp({ precision: 3, mode: 'string' })
+    createdAt: timestamp({ precision: 3, withTimezone: true, mode: 'string' })
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
-    updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
+    updatedAt: timestamp({ precision: 3, withTimezone: true, mode: 'string' }).notNull(),
   },
   (table) => [
     uniqueIndex('users_email_key').using('btree', table.email.asc().nullsLast().op('text_ops')),
@@ -156,7 +156,7 @@ export const verificationTokens = pgTable(
   {
     identifier: text().notNull(),
     token: text().notNull(),
-    expires: timestamp({ precision: 3, mode: 'string' }).notNull(),
+    expires: timestamp({ precision: 3, withTimezone: true, mode: 'string' }).notNull(),
   },
   (table) => [
     uniqueIndex('verification_tokens_identifier_token_key').using(
@@ -176,10 +176,10 @@ export const contactSettings = pgTable('contact_settings', {
   id: text().primaryKey().notNull(),
   notificationEmail: text(),
   blockedKeywords: text().array(),
-  createdAt: timestamp({ precision: 3, mode: 'string' })
+  createdAt: timestamp({ precision: 3, withTimezone: true, mode: 'string' })
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),
-  updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
+  updatedAt: timestamp({ precision: 3, withTimezone: true, mode: 'string' }).notNull(),
 });
 
 export const bookingSettings = pgTable('booking_settings', {
@@ -196,12 +196,13 @@ export const bookingSettings = pgTable('booking_settings', {
   googleCalendarGrantedScopes: text('google_calendar_granted_scopes').array(),
   googleCalendarConnectedAt: timestamp('google_calendar_connected_at', {
     precision: 3,
+    withTimezone: true,
     mode: 'string',
   }),
-  createdAt: timestamp({ precision: 3, mode: 'string' })
+  createdAt: timestamp({ precision: 3, withTimezone: true, mode: 'string' })
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),
-  updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
+  updatedAt: timestamp({ precision: 3, withTimezone: true, mode: 'string' }).notNull(),
 });
 
 export const bookingAvailability = pgTable(
@@ -212,10 +213,10 @@ export const bookingAvailability = pgTable(
     startTime: text().notNull(),
     endTime: text().notNull(),
     enabled: boolean().default(true).notNull(),
-    createdAt: timestamp({ precision: 3, mode: 'string' })
+    createdAt: timestamp({ precision: 3, withTimezone: true, mode: 'string' })
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
-    updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
+    updatedAt: timestamp({ precision: 3, withTimezone: true, mode: 'string' }).notNull(),
   },
   (table) => [
     index('booking_availability_dayOfWeek_idx').using(
@@ -273,7 +274,7 @@ export const sessions = pgTable(
     id: text().primaryKey().notNull(),
     sessionToken: text().notNull(),
     userId: text().notNull(),
-    expires: timestamp({ precision: 3, mode: 'string' }).notNull(),
+    expires: timestamp({ precision: 3, withTimezone: true, mode: 'string' }).notNull(),
   },
   (table) => [
     uniqueIndex('sessions_sessionToken_key').using(
@@ -450,7 +451,7 @@ export const projectImages = pgTable(
     order: integer().default(0).notNull(),
     caption: text(),
     alt: text(),
-    createdAt: timestamp({ precision: 3, mode: 'string' })
+    createdAt: timestamp({ precision: 3, withTimezone: true, mode: 'string' })
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
   },
@@ -478,10 +479,10 @@ export const bookingSlots = pgTable(
     time: text().notNull(),
     duration: integer().default(60).notNull(),
     status: slotStatus().default('AVAILABLE').notNull(),
-    createdAt: timestamp({ precision: 3, mode: 'string' })
+    createdAt: timestamp({ precision: 3, withTimezone: true, mode: 'string' })
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
-    updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
+    updatedAt: timestamp({ precision: 3, withTimezone: true, mode: 'string' }).notNull(),
   },
   (table) => [
     index('booking_slots_date_status_idx').using(
@@ -507,10 +508,10 @@ export const anonymousMessages = pgTable(
       .default(sql`'{}'::jsonb`)
       .notNull(),
     read: boolean().default(false).notNull(),
-    createdAt: timestamp({ precision: 3, mode: 'string' })
+    createdAt: timestamp({ precision: 3, withTimezone: true, mode: 'string' })
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
-    updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
+    updatedAt: timestamp({ precision: 3, withTimezone: true, mode: 'string' }).notNull(),
     city: text(),
     country: text(),
     countryCode: text(),
@@ -550,7 +551,7 @@ export const analyticsEvents = pgTable(
     ipAddress: varchar({ length: 45 }),
     countryCode: varchar({ length: 2 }),
     city: varchar({ length: 100 }),
-    createdAt: timestamp({ precision: 3, mode: 'string' })
+    createdAt: timestamp({ precision: 3, withTimezone: true, mode: 'string' })
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
   },
@@ -586,10 +587,10 @@ export const bookings = pgTable(
     status: bookingStatus().default('PENDING').notNull(),
     slotId: text(),
     ipHash: text().notNull(),
-    createdAt: timestamp({ precision: 3, mode: 'string' })
+    createdAt: timestamp({ precision: 3, withTimezone: true, mode: 'string' })
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
-    updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
+    updatedAt: timestamp({ precision: 3, withTimezone: true, mode: 'string' }).notNull(),
     city: text(),
     country: text(),
     countryCode: text(),
@@ -634,10 +635,10 @@ export const contactForms = pgTable(
       .notNull(),
     read: boolean().default(false).notNull(),
     replied: boolean().default(false).notNull(),
-    createdAt: timestamp({ precision: 3, mode: 'string' })
+    createdAt: timestamp({ precision: 3, withTimezone: true, mode: 'string' })
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
-    updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
+    updatedAt: timestamp({ precision: 3, withTimezone: true, mode: 'string' }).notNull(),
     city: text(),
     country: text(),
     countryCode: text(),
@@ -669,10 +670,10 @@ export const guestbookEntries = pgTable(
       .notNull(),
     reactions: jsonb().default([]).notNull(),
     visible: boolean().default(true).notNull(),
-    createdAt: timestamp({ precision: 3, mode: 'string' })
+    createdAt: timestamp({ precision: 3, withTimezone: true, mode: 'string' })
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
-    updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
+    updatedAt: timestamp({ precision: 3, withTimezone: true, mode: 'string' }).notNull(),
     city: text(),
     country: text(),
     countryCode: text(),
@@ -722,15 +723,15 @@ export const projects = pgTable(
     featured: boolean().default(false).notNull(),
     visible: boolean().default(true).notNull(),
     order: integer().default(0).notNull(),
-    createdAt: timestamp({ precision: 3, mode: 'string' })
+    createdAt: timestamp({ precision: 3, withTimezone: true, mode: 'string' })
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
-    updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
+    updatedAt: timestamp({ precision: 3, withTimezone: true, mode: 'string' }).notNull(),
     content: text(),
     thumbnailId: text(),
-    endDate: timestamp({ precision: 3, mode: 'string' }),
+    endDate: timestamp({ precision: 3, withTimezone: true, mode: 'string' }),
     projectDate: text(),
-    startDate: timestamp({ precision: 3, mode: 'string' }),
+    startDate: timestamp({ precision: 3, withTimezone: true, mode: 'string' }),
     tags: text().array(),
   },
   (table) => [
@@ -753,13 +754,13 @@ export const blogLink = pgTable('BlogLink', {
   source: text().notNull(),
   category: text(),
   tags: text().array(),
-  publishedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
+  publishedAt: timestamp({ precision: 3, withTimezone: true, mode: 'string' }).notNull(),
   visible: boolean().default(true).notNull(),
   order: integer().default(0).notNull(),
-  createdAt: timestamp({ precision: 3, mode: 'string' })
+  createdAt: timestamp({ precision: 3, withTimezone: true, mode: 'string' })
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),
-  updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
+  updatedAt: timestamp({ precision: 3, withTimezone: true, mode: 'string' }).notNull(),
 });
 
 export const aboutMe = pgTable('AboutMe', {
@@ -779,10 +780,10 @@ export const aboutMe = pgTable('AboutMe', {
   experience: jsonb(),
   socialLinks: jsonb(),
   freelanceProfile: jsonb(),
-  createdAt: timestamp({ precision: 3, mode: 'string' })
+  createdAt: timestamp({ precision: 3, withTimezone: true, mode: 'string' })
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),
-  updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
+  updatedAt: timestamp({ precision: 3, withTimezone: true, mode: 'string' }).notNull(),
 });
 
 export const achievements = pgTable(
@@ -797,10 +798,10 @@ export const achievements = pgTable(
     externalUrl: text(),
     order: integer().default(0).notNull(),
     visible: boolean().default(true).notNull(),
-    createdAt: timestamp({ precision: 3, mode: 'string' })
+    createdAt: timestamp({ precision: 3, withTimezone: true, mode: 'string' })
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
-    updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
+    updatedAt: timestamp({ precision: 3, withTimezone: true, mode: 'string' }).notNull(),
   },
   (table) => [
     index('achievements_order_idx').using('btree', table.order.asc().nullsLast().op('int4_ops')),
@@ -831,8 +832,8 @@ export const llmSettings = pgTable('llm_settings', {
 
   embeddingDimension: integer('embedding_dimension').notNull().default(1536),
 
-  createdAt: timestamp({ precision: 3, mode: 'string' })
+  createdAt: timestamp({ precision: 3, withTimezone: true, mode: 'string' })
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),
-  updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
+  updatedAt: timestamp({ precision: 3, withTimezone: true, mode: 'string' }).notNull(),
 });

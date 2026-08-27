@@ -92,6 +92,13 @@
       "when": 1787717888907,
       "tag": "0012_lame_star_brand",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1787820899836,
+      "tag": "0013_timestamptz_utc_normalization",
+      "breakpoints": true
     }
   ]
 }
