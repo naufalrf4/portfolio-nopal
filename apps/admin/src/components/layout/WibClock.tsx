@@ -17,7 +17,7 @@ export function WibClock({ className }: {
         const interval = setInterval(tick, TICK_INTERVAL_MS);
         return () => clearInterval(interval);
     }, []);
-    return (<div className={cn('hidden md:inline-flex items-center gap-1.5 rounded-full px-3 py-1.5', 'bg-[var(--bg-card)] neu-extruded-sm', className)} aria-hidden={!mounted}>
+    return (<div className={cn('hidden md:inline-flex items-center gap-1.5 rounded-full px-3 py-1.5', 'bg-[var(--bg-card)] surface-raised-sm', className)} aria-hidden={!mounted}>
       <span className="font-mono text-xs font-medium tabular-nums tracking-wide text-[var(--text-secondary)]" suppressHydrationWarning>
         {mounted ? time : PLACEHOLDER}
       </span>

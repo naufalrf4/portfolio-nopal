@@ -13,7 +13,7 @@ interface PageHeaderProps {
   icon?: React.ReactElement<{ className?: string; strokeWidth?: number }>;
 }
 
-const NEU_SHADOW_INSET =
+const SUNKEN_SHADOW =
   'inset 0 1px 4px rgba(0, 0, 0, 0.25)';
 
 function PageHeader({ title, description, actions, stats, className, icon }: PageHeaderProps) {
@@ -52,7 +52,7 @@ function PageHeader({ title, description, actions, stats, className, icon }: Pag
       {stats && stats.length > 0 && (
         <div
           className="flex flex-wrap items-center gap-2 md:gap-3 px-4 py-3 md:px-6 md:py-4 rounded-xl md:rounded-2xl bg-[var(--bg-elevated)]"
-          style={{ boxShadow: NEU_SHADOW_INSET }}
+          style={{ boxShadow: SUNKEN_SHADOW }}
         >
           {stats.map((stat, index) => (
             <div

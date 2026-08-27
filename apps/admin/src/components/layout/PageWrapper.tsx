@@ -10,7 +10,7 @@ interface PageWrapperProps {
 
 export function PageWrapper({ children, className }: PageWrapperProps) {
   return (
-    <div className={cn('max-w-7xl mx-auto space-y-6 animate-in fade-in duration-500', className)}>
+    <div className={cn('w-full space-y-6 animate-in fade-in duration-500', className)}>
       {children}
     </div>
   );

@@ -47,14 +47,14 @@ const navigation = [
   { name: 'Analytics', href: '/analytics', icon: BarChart3 },
 ];
 
-function NeuBadge({ count }: { count: number }) {
+function CountBadge({ count }: { count: number }) {
   return (
     <span
       className={cn(
         'ml-auto flex h-5 min-w-5 items-center justify-center',
-        'rounded-full px-1.5 text-xs font-bold text-white',
-        'bg-gradient-to-br from-[var(--teal)] to-[var(--amber)]',
-        'shadow-neu-extruded',
+        'rounded-full px-1.5 text-xs font-bold text-accent-foreground',
+        'bg-accent',
+        'shadow-surface-raised',
         'animate-pulse'
       )}
     >
@@ -63,7 +63,7 @@ function NeuBadge({ count }: { count: number }) {
   );
 }
 
-function NeuAvatar({
+function UserAvatar({
   image,
   name,
   initial,
@@ -79,7 +79,7 @@ function NeuAvatar({
 
   const insetShadow = cn(
     'rounded-full',
-    'shadow-neu-extruded',
+    'shadow-surface-raised',
     'bg-[var(--bg-elevated)]'
   );
 
@@ -97,8 +97,8 @@ function NeuAvatar({
         insetShadow,
         sizeClasses,
         'flex items-center justify-center',
-        'bg-gradient-to-br from-[var(--teal)] to-[var(--amber)]',
-        'text-white font-semibold',
+        'bg-accent',
+        'text-accent-foreground font-semibold',
         textSize
       )}
     >
@@ -174,7 +174,7 @@ export function AppSidebar({ session }: AppSidebarProps) {
         collapsible="icon"
         className={cn(
           'bg-[var(--bg-elevated)] border-none',
-          'neu-extruded-lg',
+          'surface-raised-lg',
           'transition-all duration-300 ease-out',
           'overflow-hidden'
         )}
@@ -185,7 +185,7 @@ export function AppSidebar({ session }: AppSidebarProps) {
               className={cn(
                 'relative flex shrink-0 items-center justify-center rounded-full',
                 'bg-[var(--bg-elevated)]',
-                'neu-extruded',
+                'surface-raised',
                 isCollapsed ? 'h-8 w-8' : 'h-10 w-10'
               )}
             >
@@ -231,16 +231,16 @@ export function AppSidebar({ session }: AppSidebarProps) {
                         isActive
                           ? cn(
                               'bg-[var(--bg-elevated)]',
-                              'neu-extruded',
+                              'surface-raised',
                               'text-[var(--teal)] font-medium'
                             )
                           : cn(
                               'bg-transparent text-[var(--text-secondary)]',
                               'hover:bg-[var(--bg-elevated)]',
-                              'hover:neu-extruded-sm',
+                              'hover:surface-raised-sm',
                               'hover:text-[var(--text-primary)]',
                               'hover:scale-[1.02]',
-                              'active:neu-extruded',
+                              'active:surface-raised',
                               'active:scale-[0.98]'
                             )
                       )}
@@ -266,9 +266,9 @@ export function AppSidebar({ session }: AppSidebarProps) {
                               <span
                                 className={cn(
                                   'absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center',
-                                  'rounded-full text-[10px] font-bold text-white',
-                                  'bg-gradient-to-br from-[var(--teal)] to-[var(--amber)]',
-                                  'neu-extruded',
+                                  'rounded-full text-[10px] font-bold text-accent-foreground',
+                                  'bg-accent',
+                                  'surface-raised',
                                   'animate-pulse'
                                 )}
                               >
@@ -278,7 +278,7 @@ export function AppSidebar({ session }: AppSidebarProps) {
                           </span>
                           {!isCollapsed && <span>{item.name}</span>}
                         </div>
-                        {showBadge && !isCollapsed && <NeuBadge count={contactUpdatesCount} />}
+                        {showBadge && !isCollapsed && <CountBadge count={contactUpdatesCount} />}
                       </Link>
                     </SidebarMenuButton>
                   );
@@ -298,11 +298,11 @@ export function AppSidebar({ session }: AppSidebarProps) {
               'rounded-2xl',
               isCollapsed ? 'p-1' : 'p-3',
               'bg-[var(--bg-elevated)]',
-              'shadow-neu-extruded'
+              'shadow-surface-raised'
             )}
           >
             <div className={cn('flex items-center gap-3', isCollapsed && 'justify-center')}>
-              <NeuAvatar
+              <UserAvatar
                 image={userImage}
                 name={userName}
                 initial={userInitial}
@@ -324,16 +324,16 @@ export function AppSidebar({ session }: AppSidebarProps) {
                           'flex h-9 w-9 shrink-0 items-center justify-center rounded-xl',
                           'bg-[var(--bg-elevated)] text-[var(--text-secondary)]',
                           'transition-all duration-300 ease-out',
-                          'hover:shadow-neu-extruded',
-                          'hover:text-[#EF4444] hover:scale-105',
-                          'active:shadow-neu-extruded',
+                          'hover:shadow-surface-raised',
+                          'hover:text-destructive hover:scale-105',
+                          'active:shadow-surface-raised',
                           'active:scale-95'
                         )}
                       >
                         <LogOut className="h-4 w-4" />
                       </button>
                     </TooltipTrigger>
-                    <TooltipContent side="top" className="bg-[var(--text-primary)] text-white border-none">
+                    <TooltipContent side="top" className="bg-[var(--text-primary)] text-[var(--bg)] border-none">
                       Sign out
                     </TooltipContent>
                   </Tooltip>
@@ -350,15 +350,15 @@ export function AppSidebar({ session }: AppSidebarProps) {
                       'mt-3 flex h-8 w-full items-center justify-center rounded-xl',
                       'bg-[var(--bg-elevated)] text-[var(--text-secondary)]',
                       'transition-all duration-300 ease-out',
-                      'hover:shadow-neu-extruded',
-                      'hover:text-[#EF4444]',
-                      'active:shadow-neu-extruded'
+                      'hover:shadow-surface-raised',
+                      'hover:text-destructive',
+                      'active:shadow-surface-raised'
                     )}
                   >
                     <LogOut className="h-4 w-4" />
                   </button>
                 </TooltipTrigger>
-                <TooltipContent side="right" className="bg-[var(--text-primary)] text-white border-none">
+                <TooltipContent side="right" className="bg-[var(--text-primary)] text-[var(--bg)] border-none">
                   Sign out
                 </TooltipContent>
               </Tooltip>

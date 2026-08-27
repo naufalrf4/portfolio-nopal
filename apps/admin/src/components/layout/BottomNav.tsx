@@ -152,13 +152,13 @@ export function BottomNav() {
           isActive
             ? cn(
                 'bg-[var(--teal)]/10',
-                'shadow-neu-extruded'
+                'shadow-surface-raised'
               )
             : cn(
                 'bg-transparent',
                 'hover:bg-[var(--bg-elevated)]',
-                'hover:shadow-neu-extruded',
-                'active:shadow-neu-extruded'
+                'hover:shadow-surface-raised',
+                'active:shadow-surface-raised'
               )
         )}
         aria-label={item.name}
@@ -177,9 +177,9 @@ export function BottomNav() {
               'absolute -top-1 -right-1',
               'flex h-5 min-w-5 items-center justify-center',
               'rounded-full px-1.5',
-              'text-[10px] font-bold text-white',
-              'bg-gradient-to-br from-[var(--teal)] to-[var(--amber)]',
-              'shadow-neu-extruded',
+              'text-[10px] font-bold text-accent-foreground',
+              'bg-accent',
+              'shadow-surface-raised',
               'animate-pulse'
             )}
           >
@@ -213,13 +213,13 @@ export function BottomNav() {
           isActive
             ? cn(
                 'bg-[var(--teal)]/10',
-                'shadow-neu-extruded'
+                'shadow-surface-raised'
               )
             : cn(
                 'bg-[var(--bg-elevated)]',
-                'shadow-neu-extruded',
-                'hover:shadow-neu-extruded',
-                'active:shadow-neu-extruded'
+                'shadow-surface-raised',
+                'hover:shadow-surface-raised',
+                'active:shadow-surface-raised'
               )
         )}
         aria-label={item.name}
@@ -237,9 +237,9 @@ export function BottomNav() {
                 'absolute -top-2 -right-2',
                 'flex h-4 min-w-4 items-center justify-center',
                 'rounded-full px-1',
-                'text-[9px] font-bold text-white',
-                'bg-gradient-to-br from-[var(--teal)] to-[var(--amber)]',
-                'shadow-neu-extruded'
+                'text-[9px] font-bold text-accent-foreground',
+                'bg-accent',
+                'shadow-surface-raised'
               )}
             >
               {item.badge && item.badge > 99 ? '99+' : item.badge}
@@ -268,22 +268,22 @@ export function BottomNav() {
         )}
       >
         <div
-          className="absolute inset-0 bg-black/20 backdrop-blur-sm"
+          className="absolute inset-0 scrim"
           onClick={() => setIsMoreOpen(false)}
         />
 
         <div
           className={cn(
-            'relative mx-4 mb-20',
+            'relative mx-4 mb-24',
             'p-4 rounded-2xl',
-            'bg-transparent backdrop-blur-md',
-            'shadow-neu-extruded',
+            'glass-bar border border-line-strong',
+            'shadow-surface-raised',
             'transition-all duration-300 ease-out',
             isMoreOpen ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
           )}
         >
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-semibold text-[#374151] pl-1">More Options</h3>
+            <h3 className="text-sm font-semibold text-[var(--text-primary)] pl-1">More Options</h3>
             <button
               type="button"
               onClick={() => setIsMoreOpen(false)}
@@ -291,9 +291,9 @@ export function BottomNav() {
                 'flex items-center justify-center',
                 'h-8 w-8 rounded-full',
                 'transition-all duration-200',
-                'bg-[var(--bg-elevated)]',
-                'shadow-neu-extruded',
-                'active:shadow-neu-extruded'
+                'bg-[var(--bg-elevated)] border border-line-strong',
+                'shadow-surface-raised',
+                'active:shadow-surface-raised'
               )}
               aria-label="Close menu"
             >
@@ -315,8 +315,8 @@ export function BottomNav() {
             'mx-4 mb-2',
             'flex items-center justify-around gap-1',
             'px-2 py-2 rounded-full',
-            'bg-[var(--bg-elevated)]',
-            'shadow-neu-extruded'
+            'glass-bar border border-line-strong',
+            'shadow-surface-raised'
           )}
         >
           {primaryItems.map((item) => renderNavButton(item))}
@@ -336,13 +336,13 @@ export function BottomNav() {
               isMoreOpen || isActiveInMoreMenu
                 ? cn(
                     'bg-[var(--teal)]/10',
-                    'shadow-neu-extruded'
+                    'shadow-surface-raised'
                   )
                 : cn(
                     'bg-transparent',
                     'hover:bg-[var(--bg-elevated)]',
-                    'hover:shadow-neu-extruded',
-                    'active:shadow-neu-extruded'
+                    'hover:shadow-surface-raised',
+                    'active:shadow-surface-raised'
                   )
             )}
             aria-label="More options"
@@ -363,8 +363,8 @@ export function BottomNav() {
                 className={cn(
                   'absolute top-0 right-0',
                   'h-3 w-3 rounded-full',
-                  'bg-gradient-to-br from-[var(--teal)] to-[var(--amber)]',
-                  'shadow-neu-extruded',
+                  'bg-accent',
+                  'shadow-surface-raised',
                   'animate-pulse'
                 )}
               />
