@@ -12,25 +12,10 @@ import type {
   UseAvailabilityOptions,
   UseAvailabilityResult,
 } from '../types/bookings.types';
+import { getWeekDates } from '../utils/dateUtils';
 
 const SLOTS_ENDPOINT = '/api/v1/admin/booking-slots';
 const SETTINGS_ENDPOINT = '/api/v1/admin/booking-settings';
-
-function formatDateISO(date: Date): string {
-  return date.toISOString().split('T')[0];
-}
-
-function getWeekDates(date: Date): { start: Date; end: Date } {
-  const start = new Date(date);
-  start.setDate(start.getDate() - start.getDay());
-  start.setHours(0, 0, 0, 0);
-
-  const end = new Date(start);
-  end.setDate(end.getDate() + 6);
-  end.setHours(23, 59, 59, 999);
-
-  return { start, end };
-}
 
 export function useAvailability(options: UseAvailabilityOptions = {}): UseAvailabilityResult {
   const { enabled = true, startDate, endDate } = options;
@@ -44,10 +29,10 @@ export function useAvailability(options: UseAvailabilityOptions = {}): UseAvaila
     if (startDate && endDate) {
       return { start: startDate, end: endDate };
     }
-    const weekData = getWeekDates(new Date());
+    const weekData = getWeekDates();
     return {
-      start: formatDateISO(weekData.start),
-      end: formatDateISO(weekData.end),
+      start: weekData.startKey,
+      end: weekData.endKey,
     };
   }, [startDate, endDate]);
 
