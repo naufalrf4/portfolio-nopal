@@ -48,6 +48,24 @@ export function formatDate(date: string | Date): string {
   });
 }
 
+export function formatDateShort(date: string | Date): string {
+  return getValidDate(date).toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    timeZone: JAKARTA_TIME_ZONE,
+  });
+}
+
+export function getJakartaYear(date: string | Date = new Date()): number {
+  return Number(
+    getValidDate(date).toLocaleDateString('en-CA', {
+      year: 'numeric',
+      timeZone: JAKARTA_TIME_ZONE,
+    })
+  );
+}
+
 const SECOND = 1000;
 const MINUTE = 60 * SECOND;
 const HOUR = 60 * MINUTE;
