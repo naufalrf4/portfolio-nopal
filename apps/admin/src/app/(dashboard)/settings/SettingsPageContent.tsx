@@ -4,6 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { User, Clock, Info } from 'lucide-react';
 import { SignOutButton } from '../../../components/common/SignOutButton';
 import type { Session } from 'next-auth';
+import { formatDate } from '@/lib/utils/date';
 
 const surfaceStyles = {
   background: 'var(--bg-elevated)',
@@ -114,15 +115,7 @@ export function SettingsPageContent({ session }: SettingsPageContentProps) {
       .toUpperCase();
   };
 
-  const lastSignIn = user?.email
-    ? new Date().toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-      })
-    : 'Unknown';
+  const lastSignIn = user?.email ? formatDate(new Date(), 'full') : 'Unknown';
 
   return (
     <>

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Sparkles } from 'lucide-react';
 import { SUNKEN_SHADOW } from '../constants';
+import { getJakartaHour } from '@/lib/utils/date';
 
 export interface WelcomeCardProps {
   delay?: number;
@@ -18,7 +19,7 @@ export function WelcomeCard({ delay = 0, userName }: WelcomeCardProps) {
     return () => clearTimeout(timer);
   }, [delay]);
 
-  const currentHour = new Date().getHours();
+  const currentHour = getJakartaHour();
   const greeting =
     currentHour < 12 ? 'Good Morning' : currentHour < 18 ? 'Good Afternoon' : 'Good Evening';
 
