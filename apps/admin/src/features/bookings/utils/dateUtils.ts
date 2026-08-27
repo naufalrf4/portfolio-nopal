@@ -1,36 +1,34 @@
+import {
+  addDaysToDateKey,
+  getDateKeyWeekday,
+  getJakartaDateKey,
+  getWeekStartKey,
+  jakartaWallClockToInstant,
+} from '@/lib/utils/date';
+
 export interface WeekDates {
   start: Date;
   end: Date;
   days: Date[];
+  startKey: string;
+  endKey: string;
 }
 
-function getServerDate(): Date {
-  const now = new Date();
-  const utc = now.getTime() + now.getTimezoneOffset() * 60000;
-  const serverTime = new Date(utc + 7 * 60 * 60 * 1000);
-  return serverTime;
-}
+export function getWeekDates(date?: Date | string): WeekDates {
+  const startKey = getWeekStartKey(getJakartaDateKey(date ?? new Date()));
+  const endKey = addDaysToDateKey(startKey, 6);
 
-export function getWeekDates(date: Date): WeekDates {
-  const serverDate = getServerDate();
-  const targetDate = date || serverDate;
+  const days = Array.from({ length: 7 }, (_, offset) =>
+    jakartaWallClockToInstant(addDaysToDateKey(startKey, offset))
+  );
 
-  const start = new Date(targetDate);
-  start.setDate(start.getDate() - start.getDay());
-  start.setHours(0, 0, 0, 0);
-
-  const end = new Date(start);
-  end.setDate(end.getDate() + 6);
-  end.setHours(23, 59, 59, 999);
-
-  const days: Date[] = [];
-  for (let i = 0; i < 7; i++) {
-    const day = new Date(start);
-    day.setDate(day.getDate() + i);
-    days.push(day);
-  }
-
-  return { start, end, days };
+  return {
+    start: jakartaWallClockToInstant(startKey),
+    end: jakartaWallClockToInstant(endKey),
+    days,
+    startKey,
+    endKey,
+  };
 }
 
 export function formatDateShort(date: Date): string {
@@ -51,7 +49,7 @@ export function formatDateFull(date: Date): string {
 }
 
 export function formatDateISO(date: Date): string {
-  return date.toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' });
+  return getJakartaDateKey(date);
 }
 
 export function calculateEndTime(startTime: string, durationMinutes: number = 60): string {
@@ -63,12 +61,21 @@ export function calculateEndTime(startTime: string, durationMinutes: number = 60
 }
 
 export function isToday(date: Date): boolean {
-  const serverDate = getServerDate();
-  return formatDateISO(serverDate) === formatDateISO(date);
+  return getJakartaDateKey(date) === getJakartaDateKey();
 }
 
 export function isThisWeek(weekStart: Date): boolean {
-  const serverDate = getServerDate();
-  const thisWeek = getWeekDates(serverDate);
-  return formatDateISO(thisWeek.start) === formatDateISO(weekStart);
+  return getWeekStartKey(getJakartaDateKey(weekStart)) === getWeekDates().startKey;
+}
+
+export function dateKeyToInstant(dateKey: string): Date {
+  return jakartaWallClockToInstant(dateKey);
+}
+
+export function getWeekdayIndex(date: Date): number {
+  return getDateKeyWeekday(getJakartaDateKey(date));
+}
+
+export function getDayOfMonth(date: Date): number {
+  return Number(getJakartaDateKey(date).slice(8, 10));
 }
