@@ -216,7 +216,7 @@ export function ExperienceTab() {
                 onClick={handleSaveChanges}
                 disabled={!hasUnsavedChanges || saving}
                 size="sm"
-                className="bg-[var(--teal)] text-white hover:bg-[#2563EB] disabled:bg-gray-300 disabled:text-gray-500"
+                className="bg-accent text-accent-foreground hover:bg-accent/90 disabled:bg-muted disabled:text-muted-foreground"
               >
                 {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
                 {saving ? 'Saving...' : 'Save Changes'}
@@ -228,7 +228,7 @@ export function ExperienceTab() {
             value={experienceSubTab}
             onValueChange={(value) => setExperienceSubTab(value as ExperienceSubTab)}
           >
-            <TabsList className="mb-4 grid h-auto grid-cols-4">
+            <TabsList className="mb-4 flex-wrap">
               {tabConfig.map((tab) => (
                 <TabsTrigger key={tab.value} value={tab.value} className="text-xs sm:text-sm">
                   <span className="hidden sm:inline">{tab.label}</span>

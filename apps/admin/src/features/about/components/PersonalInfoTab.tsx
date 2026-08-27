@@ -19,14 +19,14 @@ interface PreviewState {
   title: string;
 }
 
-const neumorphicButton = cn(
+const buttonSurface = cn(
   'h-9 w-9 rounded-xl shrink-0',
   'bg-[var(--bg-elevated)] flex items-center justify-center',
-  'shadow-neu-extruded',
+  'shadow-surface-raised',
   'text-[var(--text-secondary)] transition-all duration-200',
-  'hover:shadow-neu-extruded',
+  'hover:shadow-surface-raised',
   'hover:text-[var(--teal)]',
-  'active:shadow-neu-extruded',
+  'active:shadow-surface-raised',
   'focus:outline-none focus:ring-2 focus:ring-[var(--teal)]/30'
 );
 
@@ -189,7 +189,7 @@ export function PersonalInfoTab() {
                 <button
                   type="button"
                   onClick={() => handlePreview(avatarUrl, 'image', 'Avatar Preview')}
-                  className={neumorphicButton}
+                  className={buttonSurface}
                   title="Preview avatar"
                 >
                   <Eye className="h-4 w-4" />
@@ -219,7 +219,7 @@ export function PersonalInfoTab() {
                 <button
                   type="button"
                   onClick={() => handlePreview(resumeUrl, 'pdf', 'Resume Preview')}
-                  className={neumorphicButton}
+                  className={buttonSurface}
                   title="Preview resume"
                 >
                   <Eye className="h-4 w-4" />
@@ -236,7 +236,7 @@ export function PersonalInfoTab() {
           <Button
             onClick={handleSave}
             disabled={!hasUnsavedChanges || saving}
-            className="bg-[var(--teal)] hover:bg-[#2563EB] text-white disabled:bg-gray-300 disabled:text-gray-500"
+            className="bg-[var(--teal)] hover:bg-accent text-on-accent disabled:bg-gray-300 disabled:text-gray-500"
           >
             {saving && <Loader2 className="h-4 w-4 animate-spin" />}
             {saving ? 'Saving...' : 'Save Personal Info'}
@@ -261,7 +261,7 @@ export function PersonalInfoTab() {
             {preview?.type === 'image' ? 'Image' : 'PDF Document'}
           </span>
         </div>
-        <div className="rounded-xl overflow-hidden bg-white/50">
+        <div className="rounded-xl overflow-hidden bg-bg-elevated">
           {preview?.type === 'image' ? (
             <img
               src={preview.url}

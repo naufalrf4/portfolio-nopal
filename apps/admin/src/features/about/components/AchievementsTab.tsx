@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type FormEvent } from 'react';
 import {
   Plus,
   Pencil,
@@ -20,6 +20,7 @@ import { ResponsiveModal } from '@/components/ui/responsive-modal';
 import { FileUpload } from '@/components/upload/FileUpload';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
+import { logger } from '@/lib/utils/logger';
 
 interface Achievement {
   id: string;
@@ -35,10 +36,10 @@ interface Achievement {
   updatedAt: Date;
 }
 
-const neumorphicInset =
-  'shadow-neu-extruded';
-const neumorphicCard =
-  'shadow-neu-extruded';
+const sunkenSurface =
+  'shadow-surface-raised';
+const cardSurface =
+  'shadow-surface-raised';
 
 interface AchievementFormData {
   name: string;
@@ -81,14 +82,14 @@ export function AchievementsTab() {
         setAchievements(Array.isArray(achievementsList) ? achievementsList : []);
       }
     } catch (error) {
-      console.error('Failed to fetch achievements:', error);
+      logger.error('Failed to fetch achievements', error);
       setAchievements([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
     const url = editingId
@@ -110,7 +111,7 @@ export function AchievementsTab() {
         handleCloseModal();
       }
     } catch (error) {
-      console.error('Failed to save achievement:', error);
+      logger.error('Failed to save achievement', error);
     }
   };
 
@@ -150,7 +151,7 @@ export function AchievementsTab() {
         fetchAchievements();
       }
     } catch (error) {
-      console.error('Failed to delete achievement:', error);
+      logger.error('Failed to delete achievement', error);
     } finally {
       setIsDeleteModalOpen(false);
       setDeletingId(null);
@@ -192,7 +193,7 @@ export function AchievementsTab() {
       <Button
         type="submit"
         form="achievement-form"
-        className="bg-[var(--teal)] hover:bg-[#2563EB] text-white"
+        className="bg-accent text-accent-foreground hover:bg-accent/90"
       >
         {editingId ? 'Update' : 'Create'}
       </Button>
@@ -210,7 +211,7 @@ export function AchievementsTab() {
         {}
         <Button
           onClick={() => setIsModalOpen(true)}
-          className="hidden md:flex bg-[var(--teal)] hover:bg-[#2563EB] text-white"
+          className="hidden md:flex bg-accent text-accent-foreground hover:bg-accent/90"
         >
           <Plus className="w-4 h-4 mr-2" />
           Add Achievement
@@ -223,14 +224,14 @@ export function AchievementsTab() {
             key={achievement.id}
             className={cn(
               'bg-[var(--bg-elevated)] rounded-2xl overflow-hidden',
-              neumorphicCard,
+              cardSurface,
               'transition-all duration-200 hover:scale-[1.02] hover:-translate-y-1',
               !achievement.visible && 'opacity-60'
             )}
           >
             {}
             {achievement.photos.length > 0 && (
-              <div className="relative aspect-video bg-gradient-to-br from-[var(--teal)]/5 to-[#8B5CF6]/5">
+              <div className="relative aspect-video bg-accent/5">
                 <Image
                   src={achievement.photos[0]}
                   alt={achievement.name}
@@ -239,7 +240,7 @@ export function AchievementsTab() {
                   sizes="(max-width: 768px) 100vw, 400px"
                 />
                 {achievement.photos.length > 1 && (
-                  <div className="absolute bottom-2 right-2 px-2 py-1 rounded-md bg-[var(--bg-elevated)]/90 backdrop-blur-sm text-xs font-medium text-[var(--text-primary)]">
+                  <div className="absolute bottom-2 right-2 px-2 py-1 rounded-md bg-bg-elevated text-xs font-medium text-foreground">
                     +{achievement.photos.length - 1} more
                   </div>
                 )}
@@ -270,13 +271,13 @@ export function AchievementsTab() {
               )}
 
               {}
-              <div className="flex items-center justify-end gap-1 pt-2 border-t border-[#D1D5DB]">
+              <div className="flex items-center justify-end gap-1 pt-2 border-t border-line">
                 <button
                   onClick={() => handlePreview(achievement)}
                   className={cn(
                     'p-2 rounded-lg transition-all duration-200',
-                    'hover:bg-[#D1D5DB]',
-                    neumorphicInset
+                    'hover:bg-bg-elevated',
+                    sunkenSurface
                   )}
                   title="Preview"
                 >
@@ -286,8 +287,8 @@ export function AchievementsTab() {
                   onClick={() => handleEdit(achievement)}
                   className={cn(
                     'p-2 rounded-lg transition-all duration-200',
-                    'hover:bg-[#D1D5DB]',
-                    neumorphicInset
+                    'hover:bg-bg-elevated',
+                    sunkenSurface
                   )}
                   title="Edit"
                 >
@@ -298,7 +299,7 @@ export function AchievementsTab() {
                   className={cn(
                     'p-2 rounded-lg transition-all duration-200',
                     'hover:bg-red-100',
-                    neumorphicInset
+                    sunkenSurface
                   )}
                   title="Delete"
                 >
@@ -311,11 +312,11 @@ export function AchievementsTab() {
 
         {achievements.length === 0 && (
           <div className="col-span-full">
-            <div className={cn('bg-[var(--bg-elevated)] rounded-[var(--radius-container)] p-12 text-center', neumorphicCard)}>
+            <div className={cn('bg-[var(--bg-elevated)] rounded-[var(--radius-container)] p-12 text-center', cardSurface)}>
               <div
                 className={cn(
                   'w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center',
-                  neumorphicInset
+                  sunkenSurface
                 )}
               >
                 <Award className="w-10 h-10 text-[var(--text-secondary)]" />
@@ -335,7 +336,7 @@ export function AchievementsTab() {
         onClick={() => setIsModalOpen(true)}
         className={cn(
           'fixed bottom-20 right-6 w-14 h-14 rounded-full md:hidden',
-          'bg-gradient-to-br from-[var(--teal)] to-[#2563EB] text-white',
+          'bg-accent text-accent-foreground',
           'shadow-lg shadow-[var(--teal)]/30',
           'hover:shadow-xl hover:shadow-[var(--teal)]/40 hover:scale-105',
           'active:scale-95 transition-all duration-200',
@@ -367,12 +368,12 @@ export function AchievementsTab() {
               className={cn(
                 'w-full px-4 py-2.5 rounded-xl bg-[var(--bg-elevated)] text-[var(--text-primary)]',
                 'focus:outline-none focus:ring-2 focus:ring-[var(--teal)]/20',
-                neumorphicInset
+                sunkenSurface
               )}
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">
                 Location <span className="text-red-500">*</span>
@@ -385,7 +386,7 @@ export function AchievementsTab() {
                 className={cn(
                   'w-full px-4 py-2.5 rounded-xl bg-[var(--bg-elevated)] text-[var(--text-primary)]',
                   'focus:outline-none focus:ring-2 focus:ring-[var(--teal)]/20',
-                  neumorphicInset
+                  sunkenSurface
                 )}
               />
             </div>
@@ -403,7 +404,7 @@ export function AchievementsTab() {
                 className={cn(
                   'w-full px-4 py-2.5 rounded-xl bg-[var(--bg-elevated)] text-[var(--text-primary)]',
                   'focus:outline-none focus:ring-2 focus:ring-[var(--teal)]/20',
-                  neumorphicInset
+                  sunkenSurface
                 )}
               />
             </div>
@@ -418,7 +419,7 @@ export function AchievementsTab() {
               className={cn(
                 'w-full px-4 py-2.5 rounded-xl bg-[var(--bg-elevated)] text-[var(--text-primary)]',
                 'focus:outline-none focus:ring-2 focus:ring-[var(--teal)]/20 resize-none',
-                neumorphicInset
+                sunkenSurface
               )}
             />
           </div>
@@ -433,7 +434,7 @@ export function AchievementsTab() {
               className={cn(
                 'w-full px-4 py-2.5 rounded-xl bg-[var(--bg-elevated)] text-[var(--text-primary)]',
                 'focus:outline-none focus:ring-2 focus:ring-[var(--teal)]/20',
-                neumorphicInset
+                sunkenSurface
               )}
             />
           </div>
@@ -487,7 +488,7 @@ export function AchievementsTab() {
             <Button
               type="button"
               onClick={confirmDelete}
-              className="bg-red-500 hover:bg-red-600 text-white"
+              className="bg-red-500 hover:bg-red-600 text-on-error"
             >
               Delete
             </Button>
@@ -496,7 +497,7 @@ export function AchievementsTab() {
         size="sm"
       >
         <div className="flex items-center gap-4 py-4">
-          <div className={cn('p-3 rounded-xl bg-red-100', neumorphicInset)}>
+          <div className={cn('p-3 rounded-xl bg-red-100', sunkenSurface)}>
             <AlertTriangle className="w-6 h-6 text-red-500" />
           </div>
           <p className="text-sm text-[var(--text-secondary)]">
@@ -525,7 +526,7 @@ export function AchievementsTab() {
               rel="noopener noreferrer"
               className="w-full"
             >
-              <Button className="w-full gap-2 bg-[var(--teal)] hover:bg-[#2563EB] text-white">
+              <Button className="w-full gap-2 bg-accent text-accent-foreground hover:bg-accent/90">
                 <ExternalLink className="w-4 h-4" />
                 View Certificate
               </Button>
@@ -541,7 +542,7 @@ export function AchievementsTab() {
                 <div
                   className={cn(
                     'relative aspect-video rounded-xl overflow-hidden',
-                    neumorphicInset
+                    sunkenSurface
                   )}
                 >
                   <Image
@@ -563,8 +564,8 @@ export function AchievementsTab() {
                           )
                         }
                         className={cn(
-                          'absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-xl flex items-center justify-center bg-[var(--bg-elevated)]/90 backdrop-blur-sm transition-all hover:scale-105',
-                          neumorphicCard
+                          'absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-xl flex items-center justify-center bg-bg-elevated transition-all hover:scale-105',
+                          cardSurface
                         )}
                       >
                         <ChevronLeft className="w-5 h-5" />
@@ -576,14 +577,14 @@ export function AchievementsTab() {
                           )
                         }
                         className={cn(
-                          'absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-xl flex items-center justify-center bg-[var(--bg-elevated)]/90 backdrop-blur-sm transition-all hover:scale-105',
-                          neumorphicCard
+                          'absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-xl flex items-center justify-center bg-bg-elevated transition-all hover:scale-105',
+                          cardSurface
                         )}
                       >
                         <ChevronRight className="w-5 h-5" />
                       </button>
 
-                      <div className="absolute bottom-3 right-3 px-3 py-1.5 rounded-lg bg-[var(--bg-elevated)]/90 backdrop-blur-sm text-sm font-medium">
+                      <div className="absolute bottom-3 right-3 px-3 py-1.5 rounded-lg bg-bg-elevated text-sm font-medium">
                         {previewPhotoIndex + 1} / {previewAchievement.photos.length}
                       </div>
                     </>
@@ -623,7 +624,7 @@ export function AchievementsTab() {
               <div
                 className={cn(
                   'inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm',
-                  neumorphicInset
+                  sunkenSurface
                 )}
               >
                 <MapPin className="w-4 h-4 text-[var(--teal)]" />
@@ -632,7 +633,7 @@ export function AchievementsTab() {
               <div
                 className={cn(
                   'inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm',
-                  neumorphicInset
+                  sunkenSurface
                 )}
               >
                 <Calendar className="w-4 h-4 text-[var(--teal)]" />
@@ -642,7 +643,7 @@ export function AchievementsTab() {
 
             {}
             {previewAchievement.description && (
-              <div className={cn('rounded-xl p-4', neumorphicInset)}>
+              <div className={cn('rounded-xl p-4', sunkenSurface)}>
                 <p className="text-[var(--text-secondary)] leading-relaxed whitespace-pre-line">
                   {previewAchievement.description}
                 </p>

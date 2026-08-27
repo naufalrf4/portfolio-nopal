@@ -129,7 +129,7 @@ export function BioTab() {
 
   return (
     <div className="space-y-6">
-      <Card className="neu-card-inset">
+      <Card className="card-inset">
         <CardContent>
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-[var(--text-primary)]">Bio</h3>
@@ -147,7 +147,7 @@ export function BioTab() {
                 onClick={handleSaveBio}
                 disabled={!hasUnsavedChangesBio || isSavingBio}
                 size="sm"
-                className="bg-[var(--teal)] hover:bg-[#2563EB] text-white disabled:bg-gray-300 disabled:text-gray-500"
+                className="bg-[var(--teal)] hover:bg-accent text-on-accent disabled:bg-gray-300 disabled:text-gray-500"
               >
                 {isSavingBio ? 'Saving...' : 'Save Bio'}
               </Button>
@@ -194,7 +194,7 @@ export function BioTab() {
                 onClick={saveRoles}
                 disabled={!hasUnsavedChangesRoles || saving}
                 size="sm"
-                className="bg-[var(--teal)] hover:bg-[#2563EB] text-white disabled:bg-gray-300 disabled:text-gray-500"
+                className="bg-[var(--teal)] hover:bg-accent text-on-accent disabled:bg-gray-300 disabled:text-gray-500"
               >
                 {saving && <Loader2 className="h-4 w-4 animate-spin" />}
                 {saving ? 'Saving...' : 'Save Roles'}

@@ -12,18 +12,18 @@ interface ExperienceCardProps {
 
 export function ExperienceCard({ experience, onEdit, onDelete }: ExperienceCardProps) {
   return (
-    <div className="p-4 rounded-2xl bg-[var(--bg-elevated)] shadow-neu-extruded">
+    <div className="p-4 rounded-2xl bg-[var(--bg-elevated)] shadow-surface-raised">
       <div className="flex items-start justify-between gap-4">
         <div className="flex gap-3 flex-1 min-w-0">
           {experience.logoUrl ? (
             <img
               src={experience.logoUrl}
               alt={`${experience.organization} logo`}
-              className="w-12 h-12 rounded-xl object-cover shrink-0 shadow-neu-extruded"
+              className="w-12 h-12 rounded-xl object-cover shrink-0 shadow-surface-raised"
             />
           ) : (
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[var(--teal)] to-[var(--amber)] flex items-center justify-center shrink-0 shadow-neu-extruded">
-              <span className="text-white font-bold text-lg">
+            <div className="w-12 h-12 rounded-xl bg-accent flex items-center justify-center shrink-0 shadow-surface-raised">
+              <span className="text-accent-foreground font-bold text-lg">
                 {experience.organization.charAt(0).toUpperCase()}
               </span>
             </div>
@@ -45,7 +45,7 @@ export function ExperienceCard({ experience, onEdit, onDelete }: ExperienceCardP
                 {experience.skills.map((skill) => (
                   <span
                     key={skill}
-                    className="rounded-lg bg-[var(--bg-elevated)] px-2.5 py-1 text-xs text-[var(--text-primary)] shadow-neu-extruded"
+                    className="rounded-lg bg-[var(--bg-elevated)] px-2.5 py-1 text-xs text-[var(--text-primary)] shadow-surface-raised"
                   >
                     {skill}
                   </span>

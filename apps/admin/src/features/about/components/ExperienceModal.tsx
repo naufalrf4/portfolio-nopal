@@ -287,7 +287,7 @@ export function ExperienceModal({
               {skills.map((skill) => (
                 <div
                   key={skill}
-                  className="inline-flex items-center gap-2 rounded-xl bg-[var(--bg-elevated)] px-3 py-1.5 text-sm text-[var(--text-primary)] shadow-neu-extruded"
+                  className="inline-flex items-center gap-2 rounded-xl bg-[var(--bg-elevated)] px-3 py-1.5 text-sm text-[var(--text-primary)] shadow-surface-raised"
                 >
                   {skill}
                   <button

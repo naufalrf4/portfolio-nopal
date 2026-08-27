@@ -158,7 +158,7 @@ export function SkillsTab() {
               onClick={handleSave}
               disabled={!hasUnsavedChanges || saving}
               size="sm"
-              className="bg-[var(--teal)] hover:bg-[#2563EB] text-white disabled:bg-gray-300 disabled:text-gray-500"
+              className="bg-[var(--teal)] hover:bg-accent text-on-accent disabled:bg-gray-300 disabled:text-gray-500"
             >
               {saving && <Loader2 className="h-4 w-4 animate-spin" />}
               {saving ? 'Saving...' : 'Save Changes'}
@@ -181,7 +181,7 @@ export function SkillsTab() {
             {skillGroups.map((group, index) => (
               <div
                 key={`${group.category || 'group'}-${index}`}
-                className="grid gap-3 rounded-2xl border border-[#A3B1C6]/15 bg-[var(--bg-elevated)]/70 p-4 md:grid-cols-[220px_minmax(0,1fr)_auto]"
+                className="grid gap-3 rounded-2xl border border-line/15 bg-[var(--bg-elevated)]/70 p-4 md:grid-cols-[220px_minmax(0,1fr)_auto]"
               >
                 <Input
                   value={group.category}
@@ -219,7 +219,7 @@ export function SkillsTab() {
                     {groupedSkills[category].map((skill) => (
                       <div
                         key={`${skill.category}-${skill.name}`}
-                        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[var(--bg-elevated)] text-[var(--text-primary)] text-sm shadow-neu-extruded"
+                        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[var(--bg-elevated)] text-[var(--text-primary)] text-sm shadow-surface-raised"
                       >
                         <span className="font-medium">{skill.name}</span>
                         <button

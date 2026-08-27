@@ -14,7 +14,7 @@ export default function AboutLoading() {
       <div className="mt-6">
         {}
         <div className="mb-6 flex gap-2 flex-wrap">
-          {['Personal Info', 'Bio', 'Skills', 'Experience', 'Social Links'].map((tab) => (
+          {['Personal Info', 'Bio', 'Skills', 'Experience'].map((tab) => (
             <div
               key={tab}
               className="h-10 px-4 rounded-2xl animate-pulse"
@@ -27,7 +27,7 @@ export default function AboutLoading() {
                 <div
                   className="h-4 w-20 rounded"
                   style={{
-                    background: '#A0AEC0',
+                    background: 'var(--text-secondary)',
                   }}
                 />
               </div>
@@ -48,7 +48,7 @@ export default function AboutLoading() {
             <div
               className="h-6 w-48 rounded"
               style={{
-                background: '#A0AEC0',
+                background: 'var(--text-secondary)',
               }}
             />
 
@@ -58,7 +58,7 @@ export default function AboutLoading() {
                 <div
                   className="h-4 w-24 rounded"
                   style={{
-                    background: '#A0AEC0',
+                    background: 'var(--text-secondary)',
                   }}
                 />
                 <div
@@ -75,7 +75,7 @@ export default function AboutLoading() {
             <div
               className="h-12 w-32 rounded-2xl"
               style={{
-                background: '#6C63FF',
+                background: 'var(--teal)',
                 boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
               }}
             />

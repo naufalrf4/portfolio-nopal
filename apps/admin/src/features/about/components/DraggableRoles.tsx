@@ -145,7 +145,7 @@ function SortableRoleItem({ role, index, isPrimary, onRemove }: SortableRoleItem
       <div
         className={`
           absolute inset-0 rounded-xl transition-all duration-200
-          ${isDragging ? 'shadow-neu-extruded' : 'shadow-neu-extruded-sm'}
+          ${isDragging ? 'shadow-surface-raised' : 'shadow-surface-raised-sm'}
         `}
       />
 
@@ -163,7 +163,7 @@ function SortableRoleItem({ role, index, isPrimary, onRemove }: SortableRoleItem
           {isPrimary && (
             <div className="flex items-center gap-1 mt-1">
               <Star className="h-3 w-3 text-amber-500 fill-amber-500" />
-              <span className="text-xs font-medium bg-gradient-to-r from-[var(--teal)] to-[#8B5CF6] bg-clip-text text-transparent">
+              <span className="text-xs font-medium text-accent">
                 Primary
               </span>
             </div>
