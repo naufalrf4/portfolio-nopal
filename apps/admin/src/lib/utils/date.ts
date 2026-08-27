@@ -177,11 +177,6 @@ export function isYesterday(date: string | Date | null | undefined): boolean {
   return formatJakartaKey(yesterday) === dateKey;
 }
 
-/**
- * Formats a moment as a live Jakarta (WIB) clock string, e.g. "14:32:07 WIB"
- * or, with `showSeconds` false, "14:32 WIB". Always timezone-correct via
- * Intl.DateTimeFormat, regardless of the host's locale/timezone.
- */
 export function formatJakartaTime(
   date: string | Date | null | undefined = new Date(),
   showSeconds = true

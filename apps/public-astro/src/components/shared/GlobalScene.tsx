@@ -195,7 +195,6 @@ function initEngine(
       varying float vTwinkle;
       void main() {
         vec4 tex = texture2D(uTex, gl_PointCoord);
-        // Crisp star core always; uSoft adds a soft halo skirt without blurring the core.
         float a = mix(tex.a, max(tex.a, pow(tex.a, 0.45) * 0.6), uSoft);
         gl_FragColor = vec4(vColor, a * vTwinkle * uOpacity);
       }

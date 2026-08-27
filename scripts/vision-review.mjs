@@ -70,7 +70,6 @@ try {
   const json = JSON.parse(raw);
   out = json?.choices?.[0]?.message?.content ?? '';
 } catch {
-  // SSE stream fallback: concatenate delta content chunks
   for (const line of raw.split('\n')) {
     if (!line.startsWith('data:')) continue;
     const payload = line.slice(5).trim();
