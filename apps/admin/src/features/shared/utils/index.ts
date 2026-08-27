@@ -1,13 +1,28 @@
+import {
+  JAKARTA_TIMEZONE,
+  addDaysToDateKey,
+  formatDateTime as canonicalFormatDateTime,
+  getJakartaDateKey,
+  getWeekStartKey,
+  calendarDateToMonthKey,
+  jakartaWallClockToInstant,
+  monthKeyToCalendarDate,
+} from '@/lib/utils/date';
+
 export function generateId(): string {
   return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 }
 
 export function formatDateISO(date: Date): string {
-  return date.toISOString().split('T')[0];
+  return getJakartaDateKey(date);
 }
 
 export function formatDateShort(date: Date): string {
-  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    timeZone: JAKARTA_TIMEZONE,
+  });
 }
 
 export function formatDateFull(date: Date): string {
@@ -15,63 +30,40 @@ export function formatDateFull(date: Date): string {
     weekday: 'long',
     month: 'short',
     day: 'numeric',
+    timeZone: JAKARTA_TIMEZONE,
   });
 }
 
 export function formatDateTime(date: Date | string): string {
-  const d = typeof date === 'string' ? new Date(date) : date;
-  return d.toLocaleDateString('en-US', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
+  return canonicalFormatDateTime(date);
 }
 
 export function parseMonthDate(dateStr: string): Date | null {
-  if (!dateStr) return null;
-  const [year, month] = dateStr.split('-').map(Number);
-  if (!year || !month) return null;
-  return new Date(year, month - 1, 1);
+  return monthKeyToCalendarDate(dateStr);
 }
 
 export function formatMonthDate(date: Date | null): string {
-  if (!date) return '';
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  return `${year}-${month}`;
+  return calendarDateToMonthKey(date);
 }
 
 export function getWeekDates(date: Date): { start: Date; end: Date; days: Date[] } {
-  const start = new Date(date);
-  start.setDate(start.getDate() - start.getDay());
-  start.setHours(0, 0, 0, 0);
+  const startKey = getWeekStartKey(getJakartaDateKey(date));
 
-  const end = new Date(start);
-  end.setDate(end.getDate() + 6);
-  end.setHours(23, 59, 59, 999);
-
-  const days: Date[] = [];
-  for (let i = 0; i < 7; i++) {
-    const day = new Date(start);
-    day.setDate(day.getDate() + i);
-    days.push(day);
-  }
-
-  return { start, end, days };
+  return {
+    start: jakartaWallClockToInstant(startKey),
+    end: jakartaWallClockToInstant(addDaysToDateKey(startKey, 6)),
+    days: Array.from({ length: 7 }, (_, offset) =>
+      jakartaWallClockToInstant(addDaysToDateKey(startKey, offset))
+    ),
+  };
 }
 
 export function isToday(date: Date): boolean {
-  const today = new Date();
-  return formatDateISO(date) === formatDateISO(today);
+  return getJakartaDateKey(date) === getJakartaDateKey();
 }
 
 export function isThisWeek(date: Date): boolean {
-  const thisWeek = getWeekDates(new Date());
-  const targetWeek = getWeekDates(date);
-  return formatDateISO(thisWeek.start) === formatDateISO(targetWeek.start);
+  return getWeekStartKey(getJakartaDateKey(date)) === getWeekStartKey(getJakartaDateKey());
 }
 
 export function calculateEndTime(startTime: string, durationMinutes: number = 60): string {
