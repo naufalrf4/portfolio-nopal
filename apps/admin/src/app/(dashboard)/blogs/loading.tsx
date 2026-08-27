@@ -1,6 +1,6 @@
 import { PageWrapper } from '@/components/layout/PageWrapper';
 
-const NEUMORPHIC_SHADOWS = {
+const SURFACE_SHADOWS = {
   extruded: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
   inset: 'inset 0 1px 4px rgba(0, 0, 0, 0.25)',
 };
@@ -14,14 +14,14 @@ export default function BlogsLoading() {
             className="h-9 w-48 rounded-2xl animate-pulse"
             style={{
               backgroundColor: 'var(--bg-elevated)',
-              boxShadow: NEUMORPHIC_SHADOWS.inset,
+              boxShadow: SURFACE_SHADOWS.inset,
             }}
           />
           <div
             className="h-5 w-64 rounded-xl mt-2 animate-pulse"
             style={{
               backgroundColor: 'var(--bg-elevated)',
-              boxShadow: NEUMORPHIC_SHADOWS.inset,
+              boxShadow: SURFACE_SHADOWS.inset,
             }}
           />
         </div>
@@ -33,29 +33,29 @@ export default function BlogsLoading() {
             className="rounded-[var(--radius-container)] p-6"
             style={{
               backgroundColor: 'var(--bg-elevated)',
-              boxShadow: NEUMORPHIC_SHADOWS.extruded,
+              boxShadow: SURFACE_SHADOWS.extruded,
             }}
           >
             <div className="space-y-4">
               <div
                 className="h-6 w-3/4 rounded-xl animate-pulse"
                 style={{
-                  backgroundColor: '#D1D9E6',
-                  boxShadow: NEUMORPHIC_SHADOWS.inset,
+                  backgroundColor: 'var(--border)',
+                  boxShadow: SURFACE_SHADOWS.inset,
                 }}
               />
               <div
                 className="h-4 w-full rounded-xl animate-pulse"
                 style={{
-                  backgroundColor: '#D1D9E6',
-                  boxShadow: NEUMORPHIC_SHADOWS.inset,
+                  backgroundColor: 'var(--border)',
+                  boxShadow: SURFACE_SHADOWS.inset,
                 }}
               />
               <div
                 className="h-4 w-2/3 rounded-xl animate-pulse"
                 style={{
-                  backgroundColor: '#D1D9E6',
-                  boxShadow: NEUMORPHIC_SHADOWS.inset,
+                  backgroundColor: 'var(--border)',
+                  boxShadow: SURFACE_SHADOWS.inset,
                 }}
               />
             </div>

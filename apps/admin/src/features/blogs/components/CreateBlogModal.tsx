@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { createBlogLinkSchema, type CreateBlogLinkInput } from '@/lib/validations/blog-link.schema';
 import { ResponsiveModal } from '@/components/ui/responsive-modal';
 import { Button } from '@/components/ui/button';
-import { INPUT_CLASS_NAME, INPUT_STYLE, NEUMORPHIC_STYLES } from '../constants/blogs.constants';
+import { INPUT_CLASS_NAME, INPUT_STYLE, SURFACE_STYLES } from '../constants/blogs.constants';
 
 interface CreateBlogModalProps {
   isOpen: boolean;
@@ -66,9 +66,9 @@ export function CreateBlogModal({ isOpen, onClose, onSubmit }: CreateBlogModalPr
           <label
             htmlFor="url"
             className="block text-sm font-semibold"
-            style={{ color: NEUMORPHIC_STYLES.foreground }}
+            style={{ color: SURFACE_STYLES.foreground }}
           >
-            URL <span style={{ color: NEUMORPHIC_STYLES.accent }}>*</span>
+            URL <span style={{ color: SURFACE_STYLES.accent }}>*</span>
           </label>
           <input
             id="url"
@@ -87,9 +87,9 @@ export function CreateBlogModal({ isOpen, onClose, onSubmit }: CreateBlogModalPr
           <label
             htmlFor="title"
             className="block text-sm font-semibold"
-            style={{ color: NEUMORPHIC_STYLES.foreground }}
+            style={{ color: SURFACE_STYLES.foreground }}
           >
-            Title <span style={{ color: NEUMORPHIC_STYLES.accent }}>*</span>
+            Title <span style={{ color: SURFACE_STYLES.accent }}>*</span>
           </label>
           <input
             id="title"
@@ -108,9 +108,9 @@ export function CreateBlogModal({ isOpen, onClose, onSubmit }: CreateBlogModalPr
           <label
             htmlFor="source"
             className="block text-sm font-semibold"
-            style={{ color: NEUMORPHIC_STYLES.foreground }}
+            style={{ color: SURFACE_STYLES.foreground }}
           >
-            Source <span style={{ color: NEUMORPHIC_STYLES.accent }}>*</span>
+            Source <span style={{ color: SURFACE_STYLES.accent }}>*</span>
           </label>
           <input
             id="source"
@@ -129,7 +129,7 @@ export function CreateBlogModal({ isOpen, onClose, onSubmit }: CreateBlogModalPr
           <label
             htmlFor="description"
             className="block text-sm font-semibold"
-            style={{ color: NEUMORPHIC_STYLES.foreground }}
+            style={{ color: SURFACE_STYLES.foreground }}
           >
             Description
           </label>
@@ -147,7 +147,7 @@ export function CreateBlogModal({ isOpen, onClose, onSubmit }: CreateBlogModalPr
           <label
             htmlFor="imageUrl"
             className="block text-sm font-semibold"
-            style={{ color: NEUMORPHIC_STYLES.foreground }}
+            style={{ color: SURFACE_STYLES.foreground }}
           >
             Image URL
           </label>
@@ -165,7 +165,7 @@ export function CreateBlogModal({ isOpen, onClose, onSubmit }: CreateBlogModalPr
           <label
             htmlFor="publishedAt"
             className="block text-sm font-semibold"
-            style={{ color: NEUMORPHIC_STYLES.foreground }}
+            style={{ color: SURFACE_STYLES.foreground }}
           >
             Published Date
           </label>

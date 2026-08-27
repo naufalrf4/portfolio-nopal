@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { createBlogLinkSchema, type CreateBlogLinkInput } from '@/lib/validations/blog-link.schema';
 import { ResponsiveModal } from '@/components/ui/responsive-modal';
 import { Button } from '@/components/ui/button';
-import { INPUT_CLASS_NAME, INPUT_STYLE, NEUMORPHIC_STYLES } from '../constants/blogs.constants';
+import { INPUT_CLASS_NAME, INPUT_STYLE, SURFACE_STYLES } from '../constants/blogs.constants';
 import type { BlogLink } from '../types/blogs.types';
 
 interface EditBlogModalProps {
@@ -78,9 +78,9 @@ export function EditBlogModal({ isOpen, onClose, onSubmit, blogLink }: EditBlogM
           <label
             htmlFor="edit-url"
             className="block text-sm font-semibold"
-            style={{ color: NEUMORPHIC_STYLES.foreground }}
+            style={{ color: SURFACE_STYLES.foreground }}
           >
-            URL <span style={{ color: NEUMORPHIC_STYLES.accent }}>*</span>
+            URL <span style={{ color: SURFACE_STYLES.accent }}>*</span>
           </label>
           <input
             id="edit-url"
@@ -99,9 +99,9 @@ export function EditBlogModal({ isOpen, onClose, onSubmit, blogLink }: EditBlogM
           <label
             htmlFor="edit-title"
             className="block text-sm font-semibold"
-            style={{ color: NEUMORPHIC_STYLES.foreground }}
+            style={{ color: SURFACE_STYLES.foreground }}
           >
-            Title <span style={{ color: NEUMORPHIC_STYLES.accent }}>*</span>
+            Title <span style={{ color: SURFACE_STYLES.accent }}>*</span>
           </label>
           <input
             id="edit-title"
@@ -120,9 +120,9 @@ export function EditBlogModal({ isOpen, onClose, onSubmit, blogLink }: EditBlogM
           <label
             htmlFor="edit-source"
             className="block text-sm font-semibold"
-            style={{ color: NEUMORPHIC_STYLES.foreground }}
+            style={{ color: SURFACE_STYLES.foreground }}
           >
-            Source <span style={{ color: NEUMORPHIC_STYLES.accent }}>*</span>
+            Source <span style={{ color: SURFACE_STYLES.accent }}>*</span>
           </label>
           <input
             id="edit-source"
@@ -141,7 +141,7 @@ export function EditBlogModal({ isOpen, onClose, onSubmit, blogLink }: EditBlogM
           <label
             htmlFor="edit-description"
             className="block text-sm font-semibold"
-            style={{ color: NEUMORPHIC_STYLES.foreground }}
+            style={{ color: SURFACE_STYLES.foreground }}
           >
             Description
           </label>
@@ -159,7 +159,7 @@ export function EditBlogModal({ isOpen, onClose, onSubmit, blogLink }: EditBlogM
           <label
             htmlFor="edit-imageUrl"
             className="block text-sm font-semibold"
-            style={{ color: NEUMORPHIC_STYLES.foreground }}
+            style={{ color: SURFACE_STYLES.foreground }}
           >
             Image URL
           </label>
@@ -177,7 +177,7 @@ export function EditBlogModal({ isOpen, onClose, onSubmit, blogLink }: EditBlogM
           <label
             htmlFor="edit-publishedAt"
             className="block text-sm font-semibold"
-            style={{ color: NEUMORPHIC_STYLES.foreground }}
+            style={{ color: SURFACE_STYLES.foreground }}
           >
             Published Date
           </label>

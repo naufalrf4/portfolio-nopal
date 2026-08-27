@@ -1,6 +1,6 @@
 export type { BlogLink, FilterType } from './types/blogs.types';
 export {
-  NEUMORPHIC_STYLES,
+  SURFACE_STYLES,
   INPUT_CLASS_NAME,
   INPUT_STYLE,
   FILTER_BUTTONS,

@@ -12,7 +12,7 @@ import {
   DeleteConfirmModal,
   PlusIcon,
   BlogLinkIcon,
-  NEUMORPHIC_STYLES,
+  SURFACE_STYLES,
   FILTER_BUTTONS,
 } from '@/features/blogs';
 
@@ -69,8 +69,8 @@ export function BlogsPageContent() {
             onClick={() => setIsCreateModalOpen(true)}
             className="flex items-center gap-2 px-6 py-3 rounded-2xl font-semibold transition-all duration-200 hover:scale-105 hover:-translate-y-0.5"
             style={{
-              background: `linear-gradient(135deg, ${NEUMORPHIC_STYLES.accent}, ${NEUMORPHIC_STYLES.accentLight})`,
-              boxShadow: NEUMORPHIC_STYLES.shadows.small,
+              background: SURFACE_STYLES.accent,
+              boxShadow: SURFACE_STYLES.shadows.small,
               color: 'white',
             }}
           >
@@ -83,8 +83,8 @@ export function BlogsPageContent() {
       <div
         className="rounded-2xl p-2 mb-8 inline-flex gap-2"
         style={{
-          backgroundColor: NEUMORPHIC_STYLES.background,
-          boxShadow: NEUMORPHIC_STYLES.shadows.inset,
+          backgroundColor: SURFACE_STYLES.background,
+          boxShadow: SURFACE_STYLES.shadows.inset,
         }}
       >
         {FILTER_BUTTONS.map(({ key, label }) => (
@@ -93,9 +93,9 @@ export function BlogsPageContent() {
             onClick={() => setFilter(key)}
             className="px-5 py-2 rounded-xl font-medium transition-all duration-200"
             style={{
-              backgroundColor: filter === key ? NEUMORPHIC_STYLES.background : 'transparent',
-              boxShadow: filter === key ? NEUMORPHIC_STYLES.shadows.small : 'none',
-              color: filter === key ? NEUMORPHIC_STYLES.accent : NEUMORPHIC_STYLES.muted,
+              backgroundColor: filter === key ? SURFACE_STYLES.background : 'transparent',
+              boxShadow: filter === key ? SURFACE_STYLES.shadows.small : 'none',
+              color: filter === key ? SURFACE_STYLES.accent : SURFACE_STYLES.muted,
             }}
           >
             {label}
@@ -110,28 +110,28 @@ export function BlogsPageContent() {
         <div
           className="rounded-[var(--radius-container)] p-12 text-center"
           style={{
-            backgroundColor: NEUMORPHIC_STYLES.background,
-            boxShadow: NEUMORPHIC_STYLES.shadows.extruded,
+            backgroundColor: SURFACE_STYLES.background,
+            boxShadow: SURFACE_STYLES.shadows.extruded,
           }}
         >
           <div
             className="mx-auto w-20 h-20 rounded-2xl flex items-center justify-center mb-6"
             style={{
-              background: 'linear-gradient(135deg, var(--teal), var(--amber))',
-              boxShadow: NEUMORPHIC_STYLES.shadows.small,
+              background: 'var(--teal)',
+              boxShadow: SURFACE_STYLES.shadows.small,
             }}
           >
-            <span className="text-white">
+            <span className="text-on-accent">
               <BlogLinkIcon />
             </span>
           </div>
           <h3
             className="font-display text-xl font-bold mb-2"
-            style={{ color: NEUMORPHIC_STYLES.foreground }}
+            style={{ color: SURFACE_STYLES.foreground }}
           >
             {filter === 'all' ? 'No blog links yet' : `No ${filter} blog links`}
           </h3>
-          <p className="mb-6" style={{ color: NEUMORPHIC_STYLES.muted }}>
+          <p className="mb-6" style={{ color: SURFACE_STYLES.muted }}>
             {filter === 'all'
               ? 'Create your first blog link to showcase your articles.'
               : `You don't have any ${filter} blog links at the moment.`}
@@ -141,8 +141,8 @@ export function BlogsPageContent() {
               onClick={() => setIsCreateModalOpen(true)}
               className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl font-semibold transition-all duration-200 hover:scale-105"
               style={{
-                background: `linear-gradient(135deg, ${NEUMORPHIC_STYLES.accent}, ${NEUMORPHIC_STYLES.accentLight})`,
-                boxShadow: NEUMORPHIC_STYLES.shadows.small,
+                background: SURFACE_STYLES.accent,
+                boxShadow: SURFACE_STYLES.shadows.small,
                 color: 'white',
               }}
             >

@@ -1,4 +1,4 @@
-export const NEUMORPHIC_STYLES = {
+export const SURFACE_STYLES = {
   background: 'var(--bg-elevated)',
   foreground: 'var(--text-primary)',
   muted: 'var(--text-secondary)',
@@ -18,9 +18,9 @@ export const INPUT_CLASS_NAME =
   'w-full px-4 py-3 rounded-2xl border-none outline-none transition-all duration-200 focus:ring-2 focus:ring-[var(--teal)]/30 placeholder:text-[var(--text-secondary)]';
 
 export const INPUT_STYLE = {
-  backgroundColor: NEUMORPHIC_STYLES.background,
-  boxShadow: NEUMORPHIC_STYLES.shadows.inset,
-  color: NEUMORPHIC_STYLES.foreground,
+  backgroundColor: SURFACE_STYLES.background,
+  boxShadow: SURFACE_STYLES.shadows.inset,
+  color: SURFACE_STYLES.foreground,
 };
 
 export const FILTER_BUTTONS = [
