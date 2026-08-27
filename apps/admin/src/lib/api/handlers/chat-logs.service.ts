@@ -3,6 +3,7 @@ import { eq, desc, lt, count, sql } from 'drizzle-orm';
 import { chatLogs } from '@/lib/db/schema';
 import { createId } from '@paralleldrive/cuid2';
 import type { CreateChatLogInput, ChatLogQueryInput } from '@/lib/validations/chat-log.schema';
+import { subtractDaysFromNow } from '@/lib/utils/date';
 
 type ChatLogMessage = CreateChatLogInput['messages'][number];
 type ChatLogRow = {
@@ -158,8 +159,7 @@ export class ChatLogsService {
   }
 
   async deleteExpired(daysOld: number = 7) {
-    const cutoffDate = new Date();
-    cutoffDate.setDate(cutoffDate.getDate() - daysOld);
+    const cutoffDate = subtractDaysFromNow(daysOld);
 
     const result = await db
       .delete(chatLogs)
