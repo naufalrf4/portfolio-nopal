@@ -1,10 +1,13 @@
 services:
   db:
     image: pgvector/pgvector:pg16
+    command: ['postgres', '-c', 'timezone=Asia/Jakarta', '-c', 'log_timezone=Asia/Jakarta']
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      TZ: Asia/Jakarta
+      PGTZ: Asia/Jakarta
     ports:
       - '127.0.0.1:${DB_PORT:-5432}:5432'
     volumes:
@@ -23,6 +26,7 @@ services:
       target: dev
     working_dir: /app/apps/admin
     environment:
+      TZ: Asia/Jakarta
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
       DIRECT_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
       NEXTAUTH_SECRET: ${ADMIN_NEXTAUTH_SECRET}
@@ -54,6 +58,7 @@ services:
       GOOGLE_REFRESH_TOKEN: ${ADMIN_GOOGLE_REFRESH_TOKEN}
       GA_PROPERTY_ID: ${ADMIN_GA_PROPERTY_ID}
       GA_SERVICE_ACCOUNT: ${ADMIN_GA_SERVICE_ACCOUNT}
+      CRON_SECRET: ${ADMIN_CRON_SECRET}
     ports:
       - '127.0.0.1:${ADMIN_PORT:-3001}:3001'
     volumes:
@@ -70,6 +75,7 @@ services:
       target: dev
     working_dir: /app/apps/rag-service
     environment:
+      TZ: Asia/Jakarta
       APP_ENV: development
       HOST: 0.0.0.0
       PORT: 3005
@@ -109,6 +115,7 @@ services:
     working_dir: /app/apps/rag-service
     command: ['bun', 'run', 'db:bootstrap']
     environment:
+      TZ: Asia/Jakarta
       APP_ENV: development
       RAG_DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
     volumes:
@@ -126,6 +133,7 @@ services:
       target: dev
     working_dir: /app/apps/public-astro
     environment:
+      TZ: Asia/Jakarta
       ADMIN_API_URL: http://admin:3001
       PUBLIC_SITE_URL: ${PUBLIC_SITE_URL}
       PUBLIC_TURNSTILE_SITE_KEY: ${PUBLIC_TURNSTILE_SITE_KEY}
@@ -152,6 +160,7 @@ services:
       target: dev
     working_dir: /app/apps/links-astro
     environment:
+      TZ: Asia/Jakarta
       ADMIN_API_URL: http://admin:3001
       SITE_URL: ${LINKS_SITE_URL}
     ports:
@@ -170,6 +179,7 @@ services:
       target: dev
     working_dir: /app/apps/ngl-svelte
     environment:
+      TZ: Asia/Jakarta
       ADMIN_API_URL: http://admin:3001
       PUBLIC_TURNSTILE_SITE_KEY: ${NGL_PUBLIC_TURNSTILE_SITE_KEY}
       PUBLIC_GA_MEASUREMENT_ID: ${NGL_PUBLIC_GA_MEASUREMENT_ID}
@@ -191,6 +201,7 @@ services:
       target: dev
     working_dir: /app/apps/live-presence
     environment:
+      TZ: Asia/Jakarta
       NODE_ENV: development
       PORT: 3006
       ALLOWED_ORIGINS: ${PRESENCE_ALLOWED_ORIGINS}
