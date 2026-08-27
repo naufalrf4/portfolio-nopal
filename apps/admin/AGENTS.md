@@ -27,7 +27,8 @@ Authoritative AI control contract for this repository.
 - Keep Admin as the primary content and API authority for the whole portfolio ecosystem.
 - Preserve public, admin, and internal API namespace boundaries rather than collapsing them into one route surface.
 - Keep direct database access in server-side code only.
-- Preserve the simplified dark-first dashboard shell; legacy phase2 neumorphic design vocabulary was removed in the shared tokens migration.
+- Preserve the simplified dark-first dashboard shell; legacy phase2 neumorphic design vocabulary was removed in the shared tokens migration, and the `neu-*` naming layer was renamed to behavior-based utilities (`surface-raised`, `surface-sunken`, `shape-container`, `motion-base`, `panel-card`, `card-inset`, `field-input`, `icon-btn`, `badge-pill`, `skeleton-shimmer`, ...). Do not reintroduce `neu-*` names.
+- Light mode is attribute-driven: `globals.css` must keep `@custom-variant light (&:is([data-theme='light'] *))` to match the `data-theme` attribute written by `ThemeToggler`, and `<html>` keeps `suppressHydrationWarning` for the anti-FOUC script.
 
 ## 4. Operational Command Set
 
