@@ -3,6 +3,7 @@ import { signAssetUrls } from '@/lib/utils/sign-urls';
 import { normalizeAboutSkills } from '@/lib/about-skills';
 import { getAboutMeRecord } from '@/lib/api/handlers/about-read.service';
 import { profileLinksService } from '@/lib/api/handlers/profile-links.service';
+import { logger } from '@/lib/utils/logger';
 
 interface Skill {
   name: string;
@@ -273,7 +274,7 @@ export async function GET() {
 
     return successResponse(signedData);
   } catch (error) {
-    console.error('Public about route failed', error);
+    logger.error('Public about route failed', error);
     return serverErrorResponse(
       process.env.NODE_ENV === 'development' && error instanceof Error ? error.message : undefined
     );

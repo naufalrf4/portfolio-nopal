@@ -16,6 +16,7 @@ import {
   GoogleCalendarAuthError,
 } from '@/lib/services/googleCalendarService';
 import { bookingSettingsService } from '@/lib/api/handlers/booking-settings.service';
+import { logger } from '@/lib/utils/logger';
 
 const updateBookingStatusSchema = z.object({
   status: z.enum(['CONFIRMED', 'CANCELLED', 'COMPLETED']),
@@ -133,7 +134,7 @@ export async function PUT(request: NextRequest, context: RouteContext) {
           });
         }
       } catch (emailError) {
-        console.error('[Booking Status Update] Email failed:', emailError);
+        logger.error('[Booking Status Update] Email failed', emailError);
       }
 
       return successResponse(

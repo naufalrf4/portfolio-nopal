@@ -15,6 +15,7 @@ import { checkRateLimit, getRateLimitHeaders } from '@/lib/services/rate-limiter
 import { validateTurnstileToken } from '@/lib/services/turnstile';
 import { createId } from '@paralleldrive/cuid2';
 import { getSubmissionContext } from '@/lib/api/submission-context';
+import { logger } from '@/lib/utils/logger';
 
 const createContactSchema = z.object({
   name: z.string().min(1, 'Name is required').max(100),
@@ -114,7 +115,7 @@ export async function POST(request: NextRequest) {
         }),
       });
     } catch (emailError) {
-      console.error('[Contact API] User confirmation email failed:', emailError);
+      logger.error('[Contact API] User confirmation email failed', emailError);
     }
 
     try {
@@ -142,7 +143,7 @@ export async function POST(request: NextRequest) {
         });
       }
     } catch (emailError) {
-      console.error('[Contact API] Admin notification email failed:', emailError);
+      logger.error('[Contact API] Admin notification email failed', emailError);
     }
 
     const response = successResponse(

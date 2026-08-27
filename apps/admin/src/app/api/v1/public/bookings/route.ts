@@ -16,6 +16,7 @@ import { EMAIL_CONFIG } from '@/lib/email/config';
 import { createId } from '@paralleldrive/cuid2';
 import { getSubmissionContext } from '@/lib/api/submission-context';
 import { checkRateLimit, getRateLimitHeaders } from '@/lib/services/rate-limiter';
+import { logger } from '@/lib/utils/logger';
 
 const publicBookingSchema = z.object({
   slotId: z.string().min(1),
@@ -176,7 +177,7 @@ export async function POST(request: NextRequest) {
         duration: slotResult.duration,
       });
     } catch (emailError) {
-      console.error('[Booking API] User confirmation email failed:', emailError);
+      logger.error('[Booking API] User confirmation email failed', emailError);
     }
 
     try {
@@ -200,7 +201,7 @@ export async function POST(request: NextRequest) {
         });
       }
     } catch (emailError) {
-      console.error('[Booking API] Admin notification email failed:', emailError);
+      logger.error('[Booking API] Admin notification email failed', emailError);
     }
 
     const response = successResponse(responseData, 'Booking confirmed');

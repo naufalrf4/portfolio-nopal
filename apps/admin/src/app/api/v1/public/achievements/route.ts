@@ -5,6 +5,7 @@ import { eq, count, asc } from 'drizzle-orm';
 import { successResponse, serverErrorResponse } from '@/lib/api/responses';
 import { signStringArray } from '@/lib/utils/sign-urls';
 import { normalizeStoredAssetValue } from '@/lib/services/storage';
+import { logger } from '@/lib/utils/logger';
 
 const DEFAULT_LIMIT = 10;
 const MAX_LIMIT = 50;
@@ -54,7 +55,7 @@ export async function GET(req: NextRequest) {
 
     return successResponse({ achievements: signedAchievements, meta: { total } });
   } catch (error) {
-    console.error('Public achievements route failed', error);
+    logger.error('Public achievements route failed', error);
     return serverErrorResponse(
       process.env.NODE_ENV === 'development' && error instanceof Error ? error.message : undefined
     );
