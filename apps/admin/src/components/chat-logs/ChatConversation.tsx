@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { MessageBubble } from './MessageBubble';
 import { MessageSquare, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { formatDateTime } from '@/lib/utils/date';
 
 interface ChatMessage {
   id: string;
@@ -33,13 +34,7 @@ export function ChatConversation({
   updatedAt,
 }: ChatConversationProps) {
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
+    return formatDateTime(dateString);
   };
 
   const userMessages = messages.filter((m) => m.role === 'user');

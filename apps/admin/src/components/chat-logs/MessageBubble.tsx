@@ -1,6 +1,7 @@
 'use client';
 
 import { cn } from '@/lib/utils';
+import { formatJakartaTime } from '@/lib/utils/date';
 import { User, Bot, Clock, Cpu, Zap, Hash } from 'lucide-react';
 
 interface ChatMessage {
@@ -25,10 +26,7 @@ export function MessageBubble({ message }: MessageBubbleProps) {
   const isSystem = message.role === 'system';
 
   const formatTime = (timestamp: string) => {
-    return new Date(timestamp).toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-    });
+    return formatJakartaTime(timestamp, false);
   };
 
   if (isSystem) {

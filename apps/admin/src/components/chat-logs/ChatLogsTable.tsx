@@ -16,6 +16,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { DeleteConfirmModal } from './DeleteConfirmModal';
 import { cn } from '@/lib/utils';
+import { formatDateTime } from '@/lib/utils/date';
 
 interface ChatLog {
   id: string;
@@ -75,14 +76,7 @@ export function ChatLogsTable({ logs, loading, onDelete }: ChatLogsTableProps) {
   };
 
   const formatDate = (dateString: string | null) => {
-    if (!dateString) return 'N/A';
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
+    return formatDateTime(dateString);
   };
 
   const formatRelativeTime = (dateString: string | null) => {
