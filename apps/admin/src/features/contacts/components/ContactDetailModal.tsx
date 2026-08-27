@@ -16,6 +16,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ResponsiveModal } from '@/components/ui/responsive-modal';
+import { formatDate } from '@/lib/utils/date';
 import type { ContactForm } from '../types/contacts.types';
 import { ContactReplyComposer } from './ContactReplyComposer';
 
@@ -189,14 +190,7 @@ export function ContactDetailModal({
             <div className="flex items-center gap-2 text-sm text-[var(--text-secondary)]">
               <Clock className="h-4 w-4" />
               <span>
-                {new Date(contact.createdAt).toLocaleDateString('en-US', {
-                  weekday: 'long',
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })}
+                {formatDate(contact.createdAt, 'long')}
               </span>
             </div>
             <div>

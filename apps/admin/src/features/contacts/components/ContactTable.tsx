@@ -6,6 +6,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import type { ContactForm } from '../types/contacts.types';
+import { formatDate } from '@/lib/utils/date';
 
 interface ContactTableProps {
   contacts: ContactForm[];
@@ -101,11 +102,7 @@ export function ContactTable({
                     </p>
                   </td>
                   <td className="px-6 py-4 text-sm text-[var(--text-secondary)]">
-                    {new Date(contact.createdAt).toLocaleDateString('en-US', {
-                      month: 'short',
-                      day: 'numeric',
-                      year: 'numeric',
-                    })}
+                    {formatDate(contact.createdAt)}
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center justify-center gap-2">

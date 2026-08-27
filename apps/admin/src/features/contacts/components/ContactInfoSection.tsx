@@ -1,4 +1,5 @@
 import { Mail, Calendar, Hash } from 'lucide-react';
+import { formatDateTime } from '@/lib/utils/date';
 
 interface ContactInfoSectionProps {
   email: string;
@@ -7,13 +8,7 @@ interface ContactInfoSectionProps {
 }
 
 export function ContactInfoSection({ email, createdAt, ipHash }: ContactInfoSectionProps) {
-  const formattedDate = new Date(createdAt).toLocaleString('en-US', {
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
+  const formattedDate = formatDateTime(createdAt);
 
   return (
     <div className="space-y-6">
