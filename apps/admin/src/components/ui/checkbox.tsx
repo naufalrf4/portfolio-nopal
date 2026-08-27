@@ -15,9 +15,9 @@ function Checkbox({ className, ...props }: React.ComponentProps<typeof CheckboxP
         'bg-[var(--bg-elevated)]',
         'transition-all duration-300 ease-out',
         'outline-none',
-        'shadow-neu-inset',
+        'shadow-surface-sunken',
         'data-[state=checked]:bg-[var(--teal)]',
-        'data-[state=checked]:shadow-neu-extruded',
+        'data-[state=checked]:shadow-surface-raised',
         'focus-visible:ring-2 focus-visible:ring-[var(--teal)]/30 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-elevated)]',
         'disabled:cursor-not-allowed disabled:opacity-50',
         className
@@ -26,7 +26,7 @@ function Checkbox({ className, ...props }: React.ComponentProps<typeof CheckboxP
     >
       <CheckboxPrimitive.Indicator
         data-slot="checkbox-indicator"
-        className={cn('flex items-center justify-center text-white')}
+        className={cn('flex items-center justify-center text-on-accent')}
       >
         <Check className="h-3.5 w-3.5" strokeWidth={3} />
       </CheckboxPrimitive.Indicator>

@@ -27,12 +27,12 @@ interface ResponsiveModalProps {
   showCloseButton?: boolean;
 }
 
-const neumorphicButtonShadow =
-  'shadow-neu-extruded-sm';
-const neumorphicButtonHover =
-  'hover:shadow-neu-extruded';
-const neumorphicButtonActive =
-  'active:shadow-neu-extruded';
+const buttonShadow =
+  'shadow-surface-raised-sm';
+const buttonHover =
+  'hover:shadow-surface-raised';
+const buttonActive =
+  'active:shadow-surface-raised';
 
 function ResponsiveModal({
   open,
@@ -53,7 +53,7 @@ function ResponsiveModal({
         <Drawer.Portal>
           <Drawer.Overlay
             className={cn(
-              'fixed inset-0 z-50 bg-[var(--bg-elevated)]/80 backdrop-blur-md',
+              'fixed inset-0 z-50 scrim',
               'data-[state=open]:animate-in data-[state=closed]:animate-out',
               'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
               'duration-300'
@@ -63,7 +63,7 @@ function ResponsiveModal({
             className={cn(
               'fixed inset-x-0 bottom-0 z-50 flex max-h-[90vh] flex-col',
               'bg-[var(--bg-elevated)] rounded-t-[32px]',
-              'shadow-neu-extruded',
+              'shadow-surface-raised',
               'focus:outline-none',
               className
             )}
@@ -71,8 +71,8 @@ function ResponsiveModal({
             <div
               className={cn(
                 'mx-auto mt-4 mb-2 h-1.5 w-16 rounded-full',
-                'bg-[#A3B1C6]/40',
-                'shadow-neu-extruded'
+                'bg-line-strong/40',
+                'shadow-surface-raised'
               )}
               aria-hidden="true"
             />
@@ -94,11 +94,11 @@ function ResponsiveModal({
                   className={cn(
                     'h-10 w-10 rounded-xl shrink-0',
                     'bg-[var(--bg-elevated)] flex items-center justify-center',
-                    neumorphicButtonShadow,
+                    buttonShadow,
                     'text-[var(--text-secondary)] transition-all duration-200',
-                    neumorphicButtonHover,
+                    buttonHover,
                     'hover:text-[var(--text-primary)]',
-                    neumorphicButtonActive,
+                    buttonActive,
                     'focus:outline-none focus:ring-2 focus:ring-[var(--teal)]/30 focus:ring-offset-2 focus:ring-offset-[var(--bg-elevated)]',
                     '[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg]:size-5'
                   )}
@@ -115,7 +115,7 @@ function ResponsiveModal({
               <div
                 className={cn(
                   'flex flex-col-reverse gap-3 px-6 py-4 sm:flex-row sm:justify-end',
-                  'border-t border-[#A3B1C6]/20',
+                  'border-t border-line',
                   'bg-[var(--bg-elevated)]'
                 )}
               >

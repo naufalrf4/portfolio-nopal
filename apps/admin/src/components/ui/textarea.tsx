@@ -12,7 +12,7 @@ function Textarea({ className, ...props }: React.ComponentProps<'textarea'>) {
         'resize-y',
         'transition-all duration-300 ease-out',
         'outline-none',
-        'shadow-neu-inset',
+        'shadow-surface-sunken',
         'focus:ring-2 focus:ring-[var(--teal)]/30 focus:ring-offset-2 focus:ring-offset-[var(--bg-card)]',
         'disabled:opacity-50 disabled:cursor-not-allowed disabled:resize-none',
         className

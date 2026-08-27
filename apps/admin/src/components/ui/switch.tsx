@@ -14,7 +14,7 @@ function Switch({ className, ...props }: React.ComponentProps<typeof SwitchPrimi
         'bg-[var(--bg)] border-[var(--border)]',
         'transition-all duration-300 ease-out',
         'outline-none',
-        'shadow-neu-inset',
+        'shadow-surface-sunken',
         'data-[state=checked]:bg-[var(--teal)] data-[state=checked]:border-[var(--teal)]',
         'data-[state=checked]:shadow-none',
         'focus-visible:ring-2 focus-visible:ring-[var(--teal)]/30 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-elevated)]',

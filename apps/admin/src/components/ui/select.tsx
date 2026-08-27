@@ -33,11 +33,11 @@ function SelectTrigger({
       className={cn(
         'flex w-full items-center justify-between gap-2 whitespace-nowrap outline-none disabled:cursor-not-allowed disabled:opacity-50',
         'bg-[var(--bg-card)] rounded-2xl h-12 px-4 text-base text-[var(--text-primary)]',
-        'shadow-neu-extruded',
+        'shadow-surface-raised',
         'transition-all duration-300 ease-out',
-        'hover:shadow-neu-extruded',
+        'hover:shadow-surface-raised',
         'focus-visible:ring-2 focus-visible:ring-[var(--teal)]/30 focus-visible:ring-offset-2',
-        'data-[state=open]:shadow-neu-inset',
+        'data-[state=open]:shadow-surface-sunken',
         'data-[size=sm]:h-10 data-[size=sm]:px-3 data-[size=sm]:text-sm',
         '*:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-2',
         '[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*="size-"])]:size-4',
@@ -67,7 +67,7 @@ function SelectContent({
         className={cn(
           'relative z-50 max-h-(--radix-select-content-available-height) min-w-[8rem] origin-(--radix-select-content-transform-origin) overflow-x-hidden overflow-y-auto',
           'bg-[var(--bg-card)] rounded-2xl p-2',
-          'shadow-neu-extruded',
+          'shadow-surface-raised',
           'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
           'data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
           position === 'popper' &&

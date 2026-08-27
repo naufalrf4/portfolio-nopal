@@ -15,7 +15,7 @@ const TabsList = React.forwardRef<
     className={cn(
       'flex h-auto items-center justify-start rounded-[var(--radius-base)] p-1',
       'bg-[var(--bg-elevated)]',
-      'shadow-neu-extruded',
+      'shadow-surface-raised',
       'overflow-x-auto scrollbar-hide',
       'gap-1',
       className
@@ -37,7 +37,7 @@ const TabsTrigger = React.forwardRef<
       'text-[var(--text-secondary)]',
       'disabled:pointer-events-none disabled:opacity-50',
       'data-[state=active]:text-[var(--teal)] data-[state=active]:bg-[var(--bg-elevated)]',
-      'data-[state=active]:shadow-neu-extruded',
+      'data-[state=active]:shadow-surface-raised',
       'hover:text-[var(--text-primary)]',
       className
     )}

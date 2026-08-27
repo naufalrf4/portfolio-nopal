@@ -20,12 +20,12 @@ interface DatePickerProps {
   format?: string;
 }
 
-const neumorphicShadow =
-  'shadow-neu-extruded';
-const neumorphicHover =
-  'hover:shadow-neu-extruded';
-const neumorphicActive =
-  'active:shadow-neu-extruded';
+const raisedShadow =
+  'shadow-surface-raised';
+const raisedHover =
+  'hover:shadow-surface-raised';
+const raisedActive =
+  'active:shadow-surface-raised';
 
 function DatePicker({
   value,
@@ -64,10 +64,10 @@ function DatePicker({
       type="button"
       className={cn(
         'w-full h-9 px-3 py-2 text-sm text-left rounded-xl bg-[var(--bg-elevated)]',
-        neumorphicShadow,
+        raisedShadow,
         'transition-all duration-200',
-        neumorphicHover,
-        neumorphicActive,
+        raisedHover,
+        raisedActive,
         'disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:translate-y-0',
         !value && 'text-[var(--text-secondary)]',
         className
@@ -121,8 +121,8 @@ function DatePicker({
     nav: 'absolute w-full flex justify-between px-1 top-0',
     nav_button: cn(
       'h-7 w-7 flex items-center justify-center rounded-lg bg-[var(--bg-elevated)]',
-      'shadow-neu-extruded',
-      'hover:shadow-neu-extruded',
+      'shadow-surface-raised',
+      'hover:shadow-surface-raised',
       'disabled:opacity-40'
     ),
     nav_button_previous: '',
@@ -137,11 +137,11 @@ function DatePicker({
     day: cn(
       'h-7 w-7 m-auto p-0 font-medium rounded-lg bg-transparent',
       'hover:bg-[var(--teal)]/10 focus:outline-none focus:ring-1 focus:ring-[var(--teal)]/40',
-      'aria-selected:bg-[var(--teal)] aria-selected:text-white'
+      'aria-selected:bg-[var(--teal)] aria-selected:text-on-accent'
     ),
     day_range_start: 'rounded-l',
     day_range_end: 'rounded-r',
-    day_selected: 'bg-[var(--teal)] text-white hover:bg-[var(--teal)]',
+    day_selected: 'bg-[var(--teal)] text-on-accent hover:bg-[var(--teal)]',
     day_today: 'font-bold text-[var(--teal)]',
     day_outside: 'text-[var(--text-primary)]/30',
     day_disabled: 'text-[var(--text-primary)]/25 cursor-not-allowed',
@@ -181,7 +181,7 @@ function DatePicker({
           <Drawer.Portal>
             <Drawer.Overlay
               className={cn(
-                'fixed inset-0 z-50 bg-[var(--bg-elevated)]/80 backdrop-blur-md',
+                'fixed inset-0 z-50 scrim',
                 'data-[state=open]:animate-in data-[state=closed]:animate-out',
                 'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
                 'duration-300'
@@ -191,15 +191,15 @@ function DatePicker({
               className={cn(
                 'fixed inset-x-0 bottom-0 z-50 flex flex-col',
                 'bg-[var(--bg-elevated)] rounded-t-[32px]',
-                'shadow-neu-extruded',
+                'shadow-surface-raised',
                 'focus:outline-none'
               )}
             >
               <div
                 className={cn(
                   'mx-auto mt-4 mb-2 h-1.5 w-16 rounded-full',
-                  'bg-[#A3B1C6]/40',
-                  'shadow-neu-extruded'
+                  'bg-line-strong/40',
+                  'shadow-surface-raised'
                 )}
                 aria-hidden="true"
               />
@@ -211,11 +211,11 @@ function DatePicker({
                   className={cn(
                     'h-9 w-9 rounded-xl shrink-0',
                     'bg-[var(--bg-elevated)] flex items-center justify-center',
-                    'shadow-neu-extruded',
+                    'shadow-surface-raised',
                     'text-[var(--text-secondary)] transition-all duration-200',
-                    'hover:shadow-neu-extruded',
+                    'hover:shadow-surface-raised',
                     'hover:text-[var(--text-primary)]',
-                    'active:shadow-neu-extruded',
+                    'active:shadow-surface-raised',
                     'focus:outline-none focus:ring-2 focus:ring-[var(--teal)]/30'
                   )}
                 >
@@ -236,8 +236,8 @@ function DatePicker({
                       className={cn(
                         'px-4 py-2 text-sm font-medium text-red-600 rounded-xl',
                         'bg-[var(--bg-elevated)]',
-                        'shadow-neu-extruded',
-                        'hover:shadow-neu-extruded',
+                        'shadow-surface-raised',
+                        'hover:shadow-surface-raised',
                         'transition-all duration-200'
                       )}
                     >
@@ -272,7 +272,7 @@ function DatePicker({
         className={cn(
           'w-auto p-0',
           'rounded-xl bg-[var(--bg-elevated)]',
-          'shadow-neu-extruded',
+          'shadow-surface-raised',
           'z-[100]',
           'max-w-[280px]'
         )}

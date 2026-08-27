@@ -30,7 +30,7 @@ function DialogOverlay({
     <DialogPrimitive.Overlay
       data-slot="dialog-overlay"
       className={cn(
-        'fixed inset-0 z-50 bg-[var(--bg-elevated)]/80 backdrop-blur-md',
+        'fixed inset-0 z-50 scrim',
         'data-[state=open]:animate-in data-[state=closed]:animate-out',
         'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
         'duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]',
@@ -67,7 +67,7 @@ function DialogContent({
         className={cn(
           'fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%]',
           'bg-[var(--bg-elevated)] rounded-[var(--radius-container)] p-0 outline-none',
-          'shadow-neu-extruded',
+          'shadow-surface-raised',
           'data-[state=open]:animate-in data-[state=closed]:animate-out',
           'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
           'data-[state=open]:animate-modal-in data-[state=closed]:animate-modal-out',
@@ -84,11 +84,11 @@ function DialogContent({
             className={cn(
               'absolute top-5 right-5 h-10 w-10 rounded-xl',
               'bg-[var(--bg-elevated)] flex items-center justify-center',
-              'shadow-neu-extruded-sm',
+              'shadow-surface-raised-sm',
               'text-[var(--text-secondary)] transition-all duration-200',
-              'hover:shadow-neu-extruded',
+              'hover:shadow-surface-raised',
               'hover:text-[var(--text-primary)]',
-              'active:shadow-neu-extruded',
+              'active:shadow-surface-raised',
               'focus:outline-none focus:ring-2 focus:ring-[var(--teal)]/30 focus:ring-offset-2 focus:ring-offset-[var(--bg-elevated)]',
               'disabled:pointer-events-none disabled:opacity-50',
               '[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg]:size-5'

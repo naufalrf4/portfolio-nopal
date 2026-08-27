@@ -10,13 +10,13 @@ const badgeVariants = cva(
     variants: {
       variant: {
         default:
-          'bg-[var(--bg-elevated)] text-[var(--text-secondary)] shadow-neu-extruded',
+          'bg-[var(--bg-elevated)] text-[var(--text-secondary)] shadow-surface-raised',
         primary: 'bg-[var(--teal)]/10 text-[var(--teal)] border border-[var(--teal)]/20',
         success: 'bg-[var(--teal)]/10 text-[var(--teal)] border border-[var(--teal)]/20',
         warning: 'bg-[var(--amber)]/10 text-[var(--amber)] border border-[var(--amber)]/20',
         destructive: 'bg-red-500/10 text-red-500 border border-red-500/20',
         outline:
-          'bg-[var(--bg-elevated)] text-[var(--text-secondary)] shadow-neu-inset',
+          'bg-[var(--bg-elevated)] text-[var(--text-secondary)] shadow-surface-sunken',
       },
     },
     defaultVariants: {

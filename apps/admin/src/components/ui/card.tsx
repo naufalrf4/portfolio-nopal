@@ -3,7 +3,7 @@ import * as React from 'react';
 import { cn } from '@/lib/utils';
 
 function Card({ className, style, ...props }: React.ComponentProps<'div'>) {
-  const isInset = className?.includes('neu-card-inset');
+  const isInset = className?.includes('card-inset');
 
   return (
     <div
@@ -11,10 +11,10 @@ function Card({ className, style, ...props }: React.ComponentProps<'div'>) {
       className={cn(
         'bg-[var(--bg-elevated)] text-[var(--text-primary)] flex flex-col rounded-[var(--radius-container)] transition-all duration-300 ease-out',
         'data-[hoverable=true]:hover:-translate-y-0.5 data-[hoverable=true]:cursor-pointer',
-        '[&.neu-card-inset]:rounded-2xl',
+        '[&.card-inset]:rounded-2xl',
         isInset
-          ? 'shadow-neu-inset'
-          : 'shadow-neu-extruded data-[hoverable=true]:hover:shadow-neu-extruded',
+          ? 'shadow-surface-sunken'
+          : 'shadow-surface-raised data-[hoverable=true]:hover:shadow-surface-raised',
         className
       )}
       style={style}
