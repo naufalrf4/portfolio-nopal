@@ -1,17 +1,12 @@
 import type { ExperienceItem, ExperienceType } from '../types/about.types';
+import { calendarDateToMonthKey, monthKeyToCalendarDate } from '@/lib/utils/date';
 
 export function parseMonthDate(dateStr: string): Date | null {
-  if (!dateStr) return null;
-  const [year, month] = dateStr.split('-').map(Number);
-  if (!year || !month) return null;
-  return new Date(year, month - 1, 1);
+  return monthKeyToCalendarDate(dateStr);
 }
 
 export function formatMonthDate(date: Date | null): string {
-  if (!date) return '';
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  return `${year}-${month}`;
+  return calendarDateToMonthKey(date);
 }
 
 export function getTitleLabel(type: string): string {
