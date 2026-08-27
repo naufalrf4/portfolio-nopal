@@ -10,6 +10,7 @@ services:
         NEXT_PUBLIC_GA_MEASUREMENT_ID: ${ADMIN_NEXT_PUBLIC_GA_MEASUREMENT_ID}
     restart: unless-stopped
     environment:
+      TZ: Asia/Jakarta
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${DB_HOST:-db}:5432/${POSTGRES_DB}
       DIRECT_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${DB_HOST:-db}:5432/${POSTGRES_DB}
       AUTH_TRUST_HOST: ${ADMIN_AUTH_TRUST_HOST:-true}
@@ -42,6 +43,7 @@ services:
       GOOGLE_REFRESH_TOKEN: ${ADMIN_GOOGLE_REFRESH_TOKEN}
       GA_PROPERTY_ID: ${ADMIN_GA_PROPERTY_ID}
       GA_SERVICE_ACCOUNT: ${ADMIN_GA_SERVICE_ACCOUNT}
+      CRON_SECRET: ${ADMIN_CRON_SECRET}
     expose:
       - '3001'
     healthcheck:
@@ -83,6 +85,7 @@ services:
         NEXT_PUBLIC_GA_MEASUREMENT_ID: ${ADMIN_NEXT_PUBLIC_GA_MEASUREMENT_ID}
     command: ['bun', 'run', 'db:migrate']
     environment:
+      TZ: Asia/Jakarta
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${DB_HOST:-db}:5432/${POSTGRES_DB}
       DIRECT_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${DB_HOST:-db}:5432/${POSTGRES_DB}
       AUTH_TRUST_HOST: ${ADMIN_AUTH_TRUST_HOST:-true}
@@ -125,6 +128,7 @@ services:
       target: prod
     restart: unless-stopped
     environment:
+      TZ: Asia/Jakarta
       APP_ENV: production
       HOST: 0.0.0.0
       PORT: 3005
@@ -185,6 +189,7 @@ services:
       target: prod
     command: ['bun', 'run', 'db:bootstrap']
     environment:
+      TZ: Asia/Jakarta
       APP_ENV: production
       HOST: 0.0.0.0
       PORT: 3005
@@ -216,6 +221,7 @@ services:
       target: prod
     restart: unless-stopped
     environment:
+      TZ: Asia/Jakarta
       ADMIN_API_URL: http://admin:3001
       PUBLIC_SITE_URL: ${PUBLIC_SITE_URL}
       PUBLIC_TURNSTILE_SITE_KEY: ${PUBLIC_TURNSTILE_SITE_KEY}
@@ -268,6 +274,7 @@ services:
       target: prod
     restart: unless-stopped
     environment:
+      TZ: Asia/Jakarta
       ADMIN_API_URL: http://admin:3001
       PUBLIC_CURSOR_WS_URL: ${PRESENCE_PUBLIC_WS_URL}
       SITE_URL: ${LINKS_SITE_URL}
@@ -313,6 +320,7 @@ services:
       target: prod
     restart: unless-stopped
     environment:
+      TZ: Asia/Jakarta
       ADMIN_API_URL: http://admin:3001
       PUBLIC_CURSOR_WS_URL: ${PRESENCE_PUBLIC_WS_URL}
       PUBLIC_TURNSTILE_SITE_KEY: ${NGL_PUBLIC_TURNSTILE_SITE_KEY}
@@ -359,6 +367,7 @@ services:
       target: prod
     restart: unless-stopped
     environment:
+      TZ: Asia/Jakarta
       NODE_ENV: production
       PORT: 3006
       ALLOWED_ORIGINS: ${PRESENCE_ALLOWED_ORIGINS}
