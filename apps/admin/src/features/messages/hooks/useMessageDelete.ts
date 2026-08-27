@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { AnonymousMessage } from '../types/messages.types';
+import { logger } from '@/lib/utils/logger';
 
 interface UseMessageDeleteOptions {
   deleteMessage: (id: string) => Promise<{ success: boolean }>;
@@ -39,7 +40,7 @@ export function useMessageDelete({
         closeDeleteModal();
       }
     } catch (error) {
-      console.error('Failed to delete message:', error);
+      logger.error('Failed to delete message', error);
     } finally {
       setIsDeleting(false);
     }

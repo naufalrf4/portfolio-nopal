@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { toast } from 'sonner';
 import type { AnonymousMessage, FilterTab } from '../types/messages.types';
+import { logger } from '@/lib/utils/logger';
 
 export function useMessages() {
   const [messages, setMessages] = useState<AnonymousMessage[]>([]);
@@ -29,7 +30,7 @@ export function useMessages() {
         }
       } catch (error) {
         if ((error as Error).name !== 'AbortError') {
-          console.error('Failed to fetch messages:', error);
+          logger.error('Failed to fetch messages', error);
           toast.error('Failed to load messages');
         }
       } finally {
@@ -58,7 +59,7 @@ export function useMessages() {
         toast.success(currentValue ? 'Message marked as unread' : 'Message marked as read');
       }
     } catch (error) {
-      console.error('Failed to toggle read status:', error);
+      logger.error('Failed to toggle read status', error);
       toast.error('Failed to update read status');
     }
   }, []);
@@ -81,7 +82,7 @@ export function useMessages() {
       setUnreadCount(0);
       toast.success('All messages marked as read', { id: toastId });
     } catch (error) {
-      console.error('Failed to mark all as read:', error);
+      logger.error('Failed to mark all as read', error);
       toast.error('Failed to mark messages as read', { id: toastId });
     } finally {
       setMarkingAllRead(false);
@@ -105,7 +106,7 @@ export function useMessages() {
       }
       return { success: false };
     } catch (error) {
-      console.error('Failed to delete message:', error);
+      logger.error('Failed to delete message', error);
       toast.error('Failed to delete message');
       return { success: false };
     }
