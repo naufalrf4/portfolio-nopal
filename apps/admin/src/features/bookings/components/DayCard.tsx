@@ -4,7 +4,7 @@ import { Plus } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import type { BookingSlot } from '../types/bookings.types';
-import { DAY_NAMES, NEUMORPHIC_STYLES } from '../constants';
+import { DAY_NAMES, SURFACE_STYLES } from '../constants';
 import { formatDateShort } from '../utils/dateUtils';
 import { SlotCard } from './SlotCard';
 
@@ -32,7 +32,7 @@ export function DayCard({
   return (
     <div
       className={`rounded-2xl p-4 bg-[var(--bg-elevated)] transition-all ${isToday ? 'ring-2 ring-[var(--teal)]/50' : ''}`}
-      style={NEUMORPHIC_STYLES.cardInset}
+      style={SURFACE_STYLES.cardInset}
     >
       <div className="flex items-center justify-between mb-3">
         <div>

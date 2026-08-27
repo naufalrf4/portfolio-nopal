@@ -115,7 +115,7 @@ export default function BookingDetailLoading() {
             ))}
           </div>
 
-          <div className="mt-6 pt-6 border-t border-[#A3B1C6]/20">
+          <div className="mt-6 pt-6 border-t border-line/20">
             <h3 className="text-sm font-semibold text-[var(--text-secondary)] uppercase tracking-wide mb-3">
               Quick Actions
             </h3>

@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import type { BookingSettings } from '../types/bookings.types';
-import { COMMON_TIMEZONES, REMINDER_DAYS, NEUMORPHIC_STYLES } from '../constants';
+import { COMMON_TIMEZONES, REMINDER_DAYS, SURFACE_STYLES } from '../constants';
 
 interface SettingsCardProps {
   settings: BookingSettings;
@@ -23,11 +23,11 @@ interface SettingsCardProps {
 
 export function SettingsCard({ settings, onChange, onSave, saving }: SettingsCardProps) {
   return (
-    <div className="rounded-[var(--radius-container)] p-6 bg-[var(--bg-elevated)]" style={NEUMORPHIC_STYLES.card}>
+    <div className="rounded-[var(--radius-container)] p-6 bg-[var(--bg-elevated)]" style={SURFACE_STYLES.card}>
       <div className="flex items-center gap-3 mb-6">
         <div
           className="p-3 rounded-2xl bg-[var(--bg-elevated)] text-[var(--teal)]"
-          style={NEUMORPHIC_STYLES.iconContainer}
+          style={SURFACE_STYLES.iconContainer}
         >
           <SettingsIcon className="h-5 w-5" />
         </div>

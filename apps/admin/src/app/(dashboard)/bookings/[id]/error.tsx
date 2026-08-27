@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { AlertTriangle, ArrowLeft } from 'lucide-react';
 import { PageWrapper } from '@/components/layout/PageWrapper';
 import { Button } from '@/components/ui/button';
+import { logger } from '@/lib/utils/logger';
 
 export default function BookingDetailError({
   error,
@@ -16,7 +17,7 @@ export default function BookingDetailError({
   const router = useRouter();
 
   useEffect(() => {
-    console.error('Booking detail error:', error);
+    logger.error('Booking detail error:', error);
   }, [error]);
 
   return (
@@ -53,7 +54,7 @@ export default function BookingDetailError({
             was a problem connecting to the server.
           </p>
           {error.digest && (
-            <p className="text-xs text-[#9CA3AF] mb-6 font-mono">Error ID: {error.digest}</p>
+            <p className="text-xs text-muted-foreground mb-6 font-mono">Error ID: {error.digest}</p>
           )}
           <div className="flex gap-3">
             <Button variant="outline" onClick={() => router.push('/bookings')} className="flex-1">

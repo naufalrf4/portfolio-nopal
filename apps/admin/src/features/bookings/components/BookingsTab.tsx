@@ -313,7 +313,7 @@ export function BookingsTab({ onPendingCountChange }: BookingsTabProps) {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-[#A3B1C6]/20">
+                  <tr className="border-b border-line/20">
                     <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">
                       Name
                     </th>
@@ -335,7 +335,7 @@ export function BookingsTab({ onPendingCountChange }: BookingsTabProps) {
                   {bookings.map((booking) => (
                     <tr
                       key={booking.id}
-                      className="border-b border-[#A3B1C6]/10 last:border-0 hover:bg-[#D5DCE8]/30 transition-colors cursor-pointer"
+                      className="border-b border-line/10 last:border-0 hover:bg-bg-elevated/30 transition-colors cursor-pointer"
                       onClick={() => openDetailModal(booking)}
                     >
                       <td className="px-6 py-4">
@@ -385,7 +385,7 @@ export function BookingsTab({ onPendingCountChange }: BookingsTabProps) {
                                 icon={<X className="h-4 w-4" />}
                                 tooltip="Cancel"
                                 onClick={() => updateStatus(booking.id, 'CANCELLED')}
-                                hoverColor="#EF4444"
+                                hoverColor="var(--error)"
                               />
                             </>
                           )}
@@ -403,7 +403,7 @@ export function BookingsTab({ onPendingCountChange }: BookingsTabProps) {
                             icon={<Trash2 className="h-4 w-4" />}
                             tooltip="Delete"
                             onClick={() => openDeleteModal(booking)}
-                            hoverColor="#EF4444"
+                            hoverColor="var(--error)"
                           />
                         </div>
                       </td>
@@ -517,7 +517,7 @@ export function BookingsTab({ onPendingCountChange }: BookingsTabProps) {
                 {selectedBooking.status}
               </Badge>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <DetailField label="Name" value={selectedBooking.name} />
               <DetailField label="Email" value={selectedBooking.email} />
               <DetailField label="Phone" value={selectedBooking.phone || 'N/A'} />
@@ -532,7 +532,7 @@ export function BookingsTab({ onPendingCountChange }: BookingsTabProps) {
                       href={selectedBooking.meetUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="inline-flex items-center gap-1 text-[#2563EB] hover:text-[#1D4ED8]"
+                      className="inline-flex items-center gap-1 text-accent hover:text-accent"
                     >
                       Join meeting
                       <ExternalLink className="h-3.5 w-3.5" />
@@ -550,7 +550,7 @@ export function BookingsTab({ onPendingCountChange }: BookingsTabProps) {
                       href={selectedBooking.calendarUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="inline-flex items-center gap-1 text-[#2563EB] hover:text-[#1D4ED8]"
+                      className="inline-flex items-center gap-1 text-accent hover:text-accent"
                     >
                       Open event
                       <ExternalLink className="h-3.5 w-3.5" />

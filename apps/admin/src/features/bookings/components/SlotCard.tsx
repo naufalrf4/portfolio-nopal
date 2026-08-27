@@ -3,7 +3,7 @@
 import { Trash2, Ban, Pencil } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import type { BookingSlot } from '../types/bookings.types';
-import { SLOT_STATUS_STYLES, NEUMORPHIC_STYLES } from '../constants';
+import { SLOT_STATUS_STYLES, SURFACE_STYLES } from '../constants';
 
 interface SlotCardProps {
   slot: BookingSlot;
@@ -44,7 +44,7 @@ export function SlotCard({ slot, onEdit, onDelete, onToggle }: SlotCardProps) {
             <button
               onClick={onToggle}
               className="p-1.5 rounded-lg bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:text-[var(--teal)] transition-colors"
-              style={NEUMORPHIC_STYLES.buttonMicro}
+              style={SURFACE_STYLES.buttonMicro}
               title={slot.status === 'AVAILABLE' ? 'Block' : 'Unblock'}
             >
               <Ban className="h-3 w-3" />
@@ -52,7 +52,7 @@ export function SlotCard({ slot, onEdit, onDelete, onToggle }: SlotCardProps) {
             <button
               onClick={onEdit}
               className="p-1.5 rounded-lg bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:text-[var(--teal)] transition-colors"
-              style={NEUMORPHIC_STYLES.buttonMicro}
+              style={SURFACE_STYLES.buttonMicro}
               title="Edit"
             >
               <Pencil className="h-3 w-3" />
@@ -62,7 +62,7 @@ export function SlotCard({ slot, onEdit, onDelete, onToggle }: SlotCardProps) {
         <button
           onClick={onDelete}
           className="p-1.5 rounded-lg bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:text-red-500 transition-colors"
-          style={NEUMORPHIC_STYLES.buttonMicro}
+          style={SURFACE_STYLES.buttonMicro}
           title="Delete"
         >
           <Trash2 className="h-3 w-3" />

@@ -164,24 +164,13 @@ export function BookingDetailPageContent({ initialBooking }: BookingDetailPageCo
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div
-          className="lg:col-span-2 rounded-[var(--radius-container)] p-8 bg-[var(--bg-elevated)]"
-          style={{
-            boxShadow:
-              '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
-          }}
-        >
+        <div className="lg:col-span-2 rounded-[var(--radius-container)] p-8 bg-[var(--bg-elevated)] shadow-surface-raised">
           <div className="flex items-start justify-between mb-6">
             <div>
               <h2 className="text-2xl font-semibold text-[var(--text-primary)] mb-2">{booking.name}</h2>
               <Badge variant={getStatusBadgeVariant(booking.status)}>{booking.status}</Badge>
             </div>
-            <div
-              className="p-4 rounded-2xl bg-[var(--bg-elevated)]"
-              style={{
-                boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
-              }}
-            >
+            <div className="p-4 rounded-2xl bg-[var(--bg-elevated)] shadow-surface-raised-sm">
               <Calendar className="h-8 w-8 text-[var(--teal)]" />
             </div>
           </div>
@@ -193,12 +182,7 @@ export function BookingDetailPageContent({ initialBooking }: BookingDetailPageCo
               </h3>
               <div className="space-y-4">
                 <div className="flex items-center gap-4">
-                  <div
-                    className="p-3 rounded-2xl bg-[var(--bg-elevated)]"
-                    style={{
-                      boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
-                    }}
-                  >
+                  <div className="p-3 rounded-2xl bg-[var(--bg-elevated)] shadow-surface-raised-sm">
                     <User className="h-5 w-5 text-[var(--text-secondary)]" />
                   </div>
                   <div>
@@ -207,12 +191,7 @@ export function BookingDetailPageContent({ initialBooking }: BookingDetailPageCo
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
-                  <div
-                    className="p-3 rounded-2xl bg-[var(--bg-elevated)]"
-                    style={{
-                      boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
-                    }}
-                  >
+                  <div className="p-3 rounded-2xl bg-[var(--bg-elevated)] shadow-surface-raised-sm">
                     <Mail className="h-5 w-5 text-[var(--text-secondary)]" />
                   </div>
                   <div>
@@ -222,12 +201,7 @@ export function BookingDetailPageContent({ initialBooking }: BookingDetailPageCo
                 </div>
                 {booking.phone && (
                   <div className="flex items-center gap-4">
-                    <div
-                      className="p-3 rounded-2xl bg-[var(--bg-elevated)]"
-                      style={{
-                        boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
-                      }}
-                    >
+                    <div className="p-3 rounded-2xl bg-[var(--bg-elevated)] shadow-surface-raised-sm">
                       <Phone className="h-5 w-5 text-[var(--text-secondary)]" />
                     </div>
                     <div>
@@ -245,12 +219,7 @@ export function BookingDetailPageContent({ initialBooking }: BookingDetailPageCo
               </h3>
               <div className="space-y-4">
                 <div className="flex items-center gap-4">
-                  <div
-                    className="p-3 rounded-2xl bg-[var(--bg-elevated)]"
-                    style={{
-                      boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
-                    }}
-                  >
+                  <div className="p-3 rounded-2xl bg-[var(--bg-elevated)] shadow-surface-raised-sm">
                     <Calendar className="h-5 w-5 text-[var(--text-secondary)]" />
                   </div>
                   <div>
@@ -259,12 +228,7 @@ export function BookingDetailPageContent({ initialBooking }: BookingDetailPageCo
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
-                  <div
-                    className="p-3 rounded-2xl bg-[var(--bg-elevated)]"
-                    style={{
-                      boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
-                    }}
-                  >
+                  <div className="p-3 rounded-2xl bg-[var(--bg-elevated)] shadow-surface-raised-sm">
                     <Clock className="h-5 w-5 text-[var(--text-secondary)]" />
                   </div>
                   <div>
@@ -273,12 +237,7 @@ export function BookingDetailPageContent({ initialBooking }: BookingDetailPageCo
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
-                  <div
-                    className="p-3 rounded-2xl bg-[var(--bg-elevated)]"
-                    style={{
-                      boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
-                    }}
-                  >
+                  <div className="p-3 rounded-2xl bg-[var(--bg-elevated)] shadow-surface-raised-sm">
                     <Globe className="h-5 w-5 text-[var(--text-secondary)]" />
                   </div>
                   <div>
@@ -294,12 +253,7 @@ export function BookingDetailPageContent({ initialBooking }: BookingDetailPageCo
                 <h3 className="text-sm font-semibold text-[var(--text-secondary)] uppercase tracking-wide mb-4">
                   Notes
                 </h3>
-                <div
-                  className="p-4 rounded-2xl bg-[var(--bg-elevated)]"
-                  style={{
-                    boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
-                  }}
-                >
+                <div className="p-4 rounded-2xl bg-[var(--bg-elevated)] shadow-surface-raised-sm">
                   <div className="flex items-start gap-3">
                     <FileText className="h-5 w-5 text-[var(--text-secondary)] mt-0.5" />
                     <p className="text-[var(--text-primary)] leading-relaxed">{booking.notes}</p>
@@ -310,13 +264,7 @@ export function BookingDetailPageContent({ initialBooking }: BookingDetailPageCo
           </div>
         </div>
 
-        <div
-          className="rounded-[var(--radius-container)] p-8 bg-[var(--bg-elevated)] h-fit"
-          style={{
-            boxShadow:
-              '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
-          }}
-        >
+        <div className="rounded-[var(--radius-container)] p-8 bg-[var(--bg-elevated)] h-fit shadow-surface-raised">
           <h3 className="text-sm font-semibold text-[var(--text-secondary)] uppercase tracking-wide mb-4">
             Booking Metadata
           </h3>
@@ -339,52 +287,43 @@ export function BookingDetailPageContent({ initialBooking }: BookingDetailPageCo
             </div>
           </div>
 
-          <div className="mt-6 pt-6 border-t border-[#A3B1C6]/20">
+          <div className="mt-6 pt-6 border-t border-line/20">
             <h3 className="text-sm font-semibold text-[var(--text-secondary)] uppercase tracking-wide mb-3">
               Quick Actions
             </h3>
             <div className="space-y-2">
               {booking.status === 'PENDING' && (
                 <>
-                  <button
-                    onClick={async () => {
-                      setSelectedStatus('CONFIRMED');
-                      await handleUpdateStatus();
-                    }}
-                    className="w-full py-2 px-4 rounded-2xl text-sm font-medium text-white bg-[var(--teal)] hover:bg-[#319795] transition-colors"
-                    style={{
-                      boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
-                    }}
+<button
+onClick={async () => {
+setSelectedStatus('CONFIRMED');
+await handleUpdateStatus();
+}}
+                    className="w-full py-2 px-4 rounded-2xl text-sm font-medium text-on-accent bg-[var(--teal)] hover:bg-accent transition-colors shadow-surface-raised-sm"
                   >
-                    Confirm Booking
-                  </button>
-                  <button
-                    onClick={async () => {
-                      setSelectedStatus('CANCELLED');
-                      await handleUpdateStatus();
-                    }}
-                    className="w-full py-2 px-4 rounded-2xl text-sm font-medium text-white bg-red-500 hover:bg-red-600 transition-colors"
-                    style={{
-                      boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
-                    }}
+Confirm Booking
+</button>
+<button
+onClick={async () => {
+setSelectedStatus('CANCELLED');
+await handleUpdateStatus();
+}}
+                    className="w-full py-2 px-4 rounded-2xl text-sm font-medium text-on-error bg-red-500 hover:bg-red-600 transition-colors shadow-surface-raised-sm"
                   >
-                    Cancel Booking
-                  </button>
+Cancel Booking
+</button>
                 </>
               )}
               {booking.status === 'CONFIRMED' && (
-                <button
-                  onClick={async () => {
-                    setSelectedStatus('COMPLETED');
-                    await handleUpdateStatus();
-                  }}
-                  className="w-full py-2 px-4 rounded-2xl text-sm font-medium text-white bg-[var(--teal)] hover:bg-[#2563EB] transition-colors"
-                  style={{
-                    boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
-                  }}
+<button
+onClick={async () => {
+setSelectedStatus('COMPLETED');
+await handleUpdateStatus();
+}}
+                  className="w-full py-2 px-4 rounded-2xl text-sm font-medium text-on-accent bg-[var(--teal)] hover:bg-accent transition-colors shadow-surface-raised-sm"
                 >
-                  Mark as Completed
-                </button>
+Mark as Completed
+</button>
               )}
             </div>
           </div>
@@ -413,10 +352,7 @@ export function BookingDetailPageContent({ initialBooking }: BookingDetailPageCo
             <select
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value as Booking['status'])}
-              className="w-full px-4 py-3 rounded-2xl bg-[var(--bg-elevated)] text-[var(--text-primary)] border-none focus:outline-none focus:ring-2 focus:ring-[var(--teal)]"
-              style={{
-                boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
-              }}
+              className="w-full px-4 py-3 rounded-2xl bg-[var(--bg-elevated)] text-[var(--text-primary)] border-none focus:outline-none focus:ring-2 focus:ring-[var(--teal)] shadow-surface-raised-sm"
             >
               <option value="PENDING">Pending</option>
               <option value="CONFIRMED">Confirmed</option>
@@ -433,10 +369,7 @@ export function BookingDetailPageContent({ initialBooking }: BookingDetailPageCo
               onChange={(e) => setStatusNotes(e.target.value)}
               rows={4}
               placeholder="Add any notes about this status change..."
-              className="w-full px-4 py-3 rounded-2xl bg-[var(--bg-elevated)] text-[var(--text-primary)] border-none focus:outline-none focus:ring-2 focus:ring-[var(--teal)] resize-none"
-              style={{
-                boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
-              }}
+              className="w-full px-4 py-3 rounded-2xl bg-[var(--bg-elevated)] text-[var(--text-primary)] border-none focus:outline-none focus:ring-2 focus:ring-[var(--teal)] resize-none shadow-surface-raised-sm"
             />
           </div>
         </div>

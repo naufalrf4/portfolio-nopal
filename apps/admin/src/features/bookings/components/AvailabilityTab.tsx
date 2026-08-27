@@ -18,6 +18,7 @@ import { DayCard } from './DayCard';
 import { SettingsCard } from './SettingsCard';
 import { AddSlotModal } from './AddSlotModal';
 import { BulkAddModal } from './BulkAddModal';
+import { logger } from '@/lib/utils/logger';
 
 export function AvailabilityTab() {
   const [slots, setSlots] = useState<BookingSlot[]>([]);
@@ -60,7 +61,7 @@ export function AvailabilityTab() {
       } else if (slotsData.success && slotsData.data?.slots) {
         setSlots(slotsData.data.slots);
       } else {
-        console.warn('⚠️ Unexpected API response:', slotsData);
+        logger.warn('⚠️ Unexpected API response', { slotsData });
         setSlots([]);
       }
 
@@ -236,7 +237,7 @@ export function AvailabilityTab() {
 
     slotsArray.forEach((slot) => {
       if (!slot || !slot.date) {
-        console.warn('⚠️ Invalid slot:', slot);
+        logger.warn('⚠️ Invalid slot', { slot });
         return;
       }
 
@@ -402,7 +403,7 @@ export function AvailabilityTab() {
 
       <button
         onClick={() => openAddSlotModal()}
-        className="fixed bottom-6 right-6 md:hidden p-4 rounded-full bg-[var(--teal)] text-white shadow-lg hover:bg-[#2563EB] transition-colors z-50"
+        className="fixed bottom-6 right-6 md:hidden p-4 rounded-full bg-[var(--teal)] text-on-accent shadow-lg hover:bg-accent transition-colors z-50"
         style={{
           boxShadow: '0 8px 24px rgba(59, 130, 246, 0.4)',
         }}

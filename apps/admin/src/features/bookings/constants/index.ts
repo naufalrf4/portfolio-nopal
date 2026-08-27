@@ -75,7 +75,7 @@ export const SLOT_STATUS_STYLES = {
   },
 } as const;
 
-export const NEUMORPHIC_STYLES = {
+export const SURFACE_STYLES = {
   card: {
     background: 'var(--bg-elevated)',
     boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',

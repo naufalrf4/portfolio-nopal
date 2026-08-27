@@ -122,7 +122,7 @@ export function BulkAddModal({ isOpen, onClose, onSuccess, weekDates }: BulkAddM
                   key={index}
                   onClick={() => toggleDay(index)}
                   className={`px-4 py-2 rounded-xl font-medium transition-all ${
-                    isSelected ? 'bg-[var(--teal)] text-white' : 'bg-[var(--bg-elevated)] text-[var(--text-secondary)]'
+                    isSelected ? 'bg-[var(--teal)] text-on-accent' : 'bg-[var(--bg-elevated)] text-[var(--text-secondary)]'
                   }`}
                   style={{
                     boxShadow: isSelected
@@ -148,7 +148,7 @@ export function BulkAddModal({ isOpen, onClose, onSuccess, weekDates }: BulkAddM
                   key={time}
                   onClick={() => toggleTime(time)}
                   className={`px-4 py-2 rounded-xl font-medium transition-all ${
-                    isSelected ? 'bg-[var(--teal)] text-white' : 'bg-[var(--bg-elevated)] text-[var(--text-secondary)]'
+                    isSelected ? 'bg-[var(--teal)] text-on-accent' : 'bg-[var(--bg-elevated)] text-[var(--text-secondary)]'
                   }`}
                   style={{
                     boxShadow: isSelected
@@ -184,7 +184,7 @@ export function BulkAddModal({ isOpen, onClose, onSuccess, weekDates }: BulkAddM
                   <button
                     key={time}
                     onClick={() => toggleTime(time)}
-                    className="px-4 py-2 rounded-xl font-medium bg-[var(--teal)] text-white transition-all"
+                    className="px-4 py-2 rounded-xl font-medium bg-[var(--teal)] text-on-accent transition-all"
                     style={{
                       boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)',
                     }}

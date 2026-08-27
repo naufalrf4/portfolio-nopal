@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { AlertTriangle } from 'lucide-react';
 import { PageWrapper } from '@/components/layout/PageWrapper';
 import { Button } from '@/components/ui/button';
+import { logger } from '@/lib/utils/logger';
 
 export default function BookingsError({
   error,
@@ -13,7 +14,7 @@ export default function BookingsError({
   reset: () => void;
 }) {
   useEffect(() => {
-    console.error('Bookings page error:', error);
+    logger.error('Bookings page error:', error);
   }, [error]);
 
   return (
@@ -39,7 +40,7 @@ export default function BookingsError({
             We encountered an error while loading the bookings page. Please try again.
           </p>
           {error.digest && (
-            <p className="text-xs text-[#9CA3AF] mb-6 font-mono">Error ID: {error.digest}</p>
+            <p className="text-xs text-muted-foreground mb-6 font-mono">Error ID: {error.digest}</p>
           )}
           <Button onClick={reset} className="w-full">
             Try Again
