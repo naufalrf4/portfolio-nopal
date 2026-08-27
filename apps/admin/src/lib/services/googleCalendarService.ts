@@ -1,6 +1,7 @@
 import { createCipheriv, createDecipheriv, createHash, randomBytes } from 'node:crypto';
 import { google } from 'googleapis';
 import type { BookingSettings } from '@/features/bookings/types/bookings.types';
+import { instantToJakartaWallClock, jakartaWallClockToInstant } from '@/lib/utils/date';
 
 const DEFAULT_TIMEZONE = 'Asia/Jakarta';
 const GOOGLE_CALENDAR_SCOPES = [
@@ -121,26 +122,9 @@ function decryptRefreshToken(payload: string | null | undefined) {
   }
 }
 
-function readBookingTimezone(metadata: unknown) {
-  if (metadata && typeof metadata === 'object' && 'timezone' in metadata) {
-    const timezone = metadata.timezone;
-    if (typeof timezone === 'string' && timezone.trim()) {
-      return timezone;
-    }
-  }
-
-  return DEFAULT_TIMEZONE;
-}
-
-function parseSlotDateTime(date: string, time: string) {
-  const [year, month, day] = date.split('-').map((value) => Number.parseInt(value, 10));
-  const [hours, minutes] = time.split(':').map((value) => Number.parseInt(value, 10));
-
-  if ([year, month, day, hours, minutes].some((value) => Number.isNaN(value))) {
-    throw new Error(`Invalid booking slot date/time: ${date} ${time}`);
-  }
-
-  return new Date(Date.UTC(year, month - 1, day, hours, minutes, 0));
+function readEventTimezone(settings: BookingSettings) {
+  const configured = settings.timezone?.trim();
+  return configured ? configured : DEFAULT_TIMEZONE;
 }
 
 function getGoogleClientCredentials() {
@@ -291,8 +275,8 @@ export const googleCalendarService = {
     client.setCredentials({ refresh_token: refreshToken });
 
     const calendar = google.calendar({ version: 'v3', auth: client });
-    const timezone = readBookingTimezone(booking.metadata);
-    const start = parseSlotDateTime(slot.date, slot.time);
+    const timezone = readEventTimezone(settings);
+    const start = jakartaWallClockToInstant(slot.date, slot.time);
     const end = new Date(start.getTime() + slot.duration * 60 * 1000);
 
     let response;
@@ -312,11 +296,11 @@ export const googleCalendarService = {
             .filter(Boolean)
             .join('\n\n'),
           start: {
-            dateTime: start.toISOString(),
+            dateTime: instantToJakartaWallClock(start),
             timeZone: timezone,
           },
           end: {
-            dateTime: end.toISOString(),
+            dateTime: instantToJakartaWallClock(end),
             timeZone: timezone,
           },
           attendees: [{ email: booking.email, displayName: booking.name }],
