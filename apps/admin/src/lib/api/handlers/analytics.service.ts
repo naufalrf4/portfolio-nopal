@@ -11,6 +11,7 @@ import { createId } from '@paralleldrive/cuid2';
 import type { CreateAnalyticsEventInput } from '@/lib/validations/analytics.schema';
 import { getGaDashboardSummary, getGaOverview, getGaPageViews } from '@/lib/analytics/ga4';
 import { logger } from '@/lib/utils/logger';
+import { getJakartaDateKey, subtractDaysFromNow } from '@/lib/utils/date';
 
 type AnalyticsRange = '7d' | '30d' | '90d';
 type AnalyticsEventInsert = typeof analyticsEvents.$inferInsert;
@@ -51,9 +52,7 @@ function getRangeDays(range: AnalyticsRange): number {
 }
 
 function getStartDate(days: number): Date {
-  const startDate = new Date();
-  startDate.setDate(startDate.getDate() - days);
-  return startDate;
+  return subtractDaysFromNow(days);
 }
 
 function asRecord(value: unknown): Record<string, unknown> {
@@ -73,7 +72,7 @@ function getNullableString(record: Record<string, unknown>, key: string): string
 }
 
 function toDailyBucket(value: string): string {
-  return new Date(value).toISOString().split('T')[0];
+  return getJakartaDateKey(value);
 }
 
 function startCase(value: string): string {
@@ -114,8 +113,7 @@ export class AnalyticsService {
       logger.error('[AnalyticsService] Failed to load GA page views, falling back to internal analytics', error);
     }
 
-    const startDate = new Date();
-    startDate.setDate(startDate.getDate() - days);
+    const startDate = getStartDate(days);
 
     const conditions = [
       eq(analyticsEvents.eventType, 'pageview'),
@@ -136,7 +134,7 @@ export class AnalyticsService {
 
     const groupedByDate = events.reduce(
       (acc, event) => {
-        const date = new Date(event.createdAt).toISOString().split('T')[0];
+        const date = toDailyBucket(event.createdAt);
         if (!acc[date]) {
           acc[date] = { date, views: 0 };
         }
@@ -150,8 +148,7 @@ export class AnalyticsService {
   }
 
   async getEntityStats(entityType: string, days: number = 30) {
-    const startDate = new Date();
-    startDate.setDate(startDate.getDate() - days);
+    const startDate = getStartDate(days);
 
     const events = await db
       .select({
@@ -187,8 +184,7 @@ export class AnalyticsService {
   }
 
   async getCountryStats(days: number = 30) {
-    const startDate = new Date();
-    startDate.setDate(startDate.getDate() - days);
+    const startDate = getStartDate(days);
 
     const events = await db
       .select({
@@ -257,8 +253,7 @@ export class AnalyticsService {
       logger.error('[AnalyticsService] Failed to load GA overview, falling back to internal analytics', error);
     }
 
-    const startDate = new Date();
-    startDate.setDate(startDate.getDate() - days);
+    const startDate = getStartDate(days);
 
     const startDateStr = startDate.toISOString();
 
