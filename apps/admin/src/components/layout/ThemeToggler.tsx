@@ -46,7 +46,7 @@ export function ThemeToggler({ className }: { className?: string }) {
       }
     };
 
-    if (typeof document.startViewTransition !== 'function') {
+    if (typeof document.startViewTransition !== 'function' || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       applyTheme();
       return;
     }
@@ -84,7 +84,7 @@ export function ThemeToggler({ className }: { className?: string }) {
       onClick={toggleTheme}
       aria-label="Toggle theme"
       className={cn(
-        'neu-icon-btn inline-flex h-10 w-10 items-center justify-center text-foreground/70 transition-colors hover:text-foreground',
+        'icon-btn inline-flex h-10 w-10 items-center justify-center text-foreground/70 transition-colors hover:text-foreground',
         className
       )}
     >
