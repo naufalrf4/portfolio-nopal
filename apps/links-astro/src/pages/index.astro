@@ -10,6 +10,11 @@ import { getLinksPageData } from '../lib/api';
 import { detectSocialPlatform, isSocialProfileLink, normalizeUrl } from '../lib/link-classification';
 import type { AboutData, ProfileLink, SocialLink } from '../types';
 
+const currentYear = new Date().toLocaleDateString('en-CA', {
+  year: 'numeric',
+  timeZone: 'Asia/Jakarta',
+});
+
 const fallbackAboutData: AboutData = {
   fullName: 'NaufalRF',
   tagline: 'Full-Stack Engineer',
@@ -110,7 +115,7 @@ const presenceSocketUrl =
           )}
           <footer class="pt-2 text-center">
             <p class="text-sm text-foreground-muted">
-              © {new Date().getFullYear()} Naufal Rizqullah Firdaus.
+              © {currentYear} Naufal Rizqullah Firdaus.
             </p>
           </footer>
         </>
