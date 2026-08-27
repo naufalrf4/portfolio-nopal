@@ -13,12 +13,14 @@ import {
   formatDateISO,
   formatDateFull,
   isThisWeek,
+  dateKeyToInstant,
 } from '../utils/dateUtils';
 import { DayCard } from './DayCard';
 import { SettingsCard } from './SettingsCard';
 import { AddSlotModal } from './AddSlotModal';
 import { BulkAddModal } from './BulkAddModal';
 import { logger } from '@/lib/utils/logger';
+import { addDaysToDateKey, getJakartaDateKey } from '@/lib/utils/date';
 
 export function AvailabilityTab() {
   const [slots, setSlots] = useState<BookingSlot[]>([]);
@@ -31,7 +33,7 @@ export function AvailabilityTab() {
   });
   const [loading, setLoading] = useState(true);
   const [savingSettings, setSavingSettings] = useState(false);
-  const [currentWeek, setCurrentWeek] = useState(new Date());
+  const [currentWeek, setCurrentWeek] = useState(() => getJakartaDateKey());
 
   const [isAddSlotModalOpen, setIsAddSlotModalOpen] = useState(false);
   const [isBulkAddModalOpen, setIsBulkAddModalOpen] = useState(false);
@@ -45,8 +47,8 @@ export function AvailabilityTab() {
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
-      const startDate = formatDateISO(weekData.start);
-      const endDate = formatDateISO(weekData.end);
+      const startDate = weekData.startKey;
+      const endDate = weekData.endKey;
 
       const [slotsRes, settingsRes] = await Promise.all([
         fetch(`/api/v1/admin/booking-slots?startDate=${startDate}&endDate=${endDate}`),
@@ -113,15 +115,12 @@ export function AvailabilityTab() {
 
   async function handleCopyFromLastWeek() {
     try {
-      const prevWeekStart = new Date(weekData.start);
-      prevWeekStart.setDate(prevWeekStart.getDate() - 7);
-
       const response = await fetch('/api/v1/admin/booking-slots/copy', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          sourceStartDate: formatDateISO(prevWeekStart),
-          targetStartDate: formatDateISO(weekData.start),
+          sourceStartDate: addDaysToDateKey(weekData.startKey, -7),
+          targetStartDate: weekData.startKey,
         }),
       });
 
@@ -205,13 +204,11 @@ export function AvailabilityTab() {
   }
 
   function navigateWeek(direction: 'prev' | 'next') {
-    const newDate = new Date(currentWeek);
-    newDate.setDate(newDate.getDate() + (direction === 'next' ? 7 : -7));
-    setCurrentWeek(newDate);
+    setCurrentWeek(addDaysToDateKey(currentWeek, direction === 'next' ? 7 : -7));
   }
 
   function goToThisWeek() {
-    setCurrentWeek(new Date());
+    setCurrentWeek(getJakartaDateKey());
   }
 
   function openAddSlotModal(date?: string) {
@@ -291,7 +288,7 @@ export function AvailabilityTab() {
             <div className="text-center">
               <h2 className="text-lg font-semibold text-[var(--text-primary)]">
                 {formatDateShort(weekData.start)} - {formatDateShort(weekData.end)},{' '}
-                {weekData.start.getFullYear()}
+                {weekData.startKey.slice(0, 4)}
               </h2>
             </div>
             <button
@@ -336,7 +333,7 @@ export function AvailabilityTab() {
             {weekData.days.map((day) => {
               const dateStr = formatDateISO(day);
               const daySlots = slotsByDate[dateStr] || [];
-              const isTodayDate = formatDateISO(new Date()) === dateStr;
+              const isTodayDate = getJakartaDateKey() === dateStr;
 
               return (
                 <DayCard
@@ -382,7 +379,7 @@ export function AvailabilityTab() {
         title="Delete Time Slot"
         description={
           deletingSlot
-            ? `Are you sure you want to delete the slot on ${formatDateFull(new Date(deletingSlot.date))} at ${deletingSlot.startTime}?`
+            ? `Are you sure you want to delete the slot on ${formatDateFull(dateKeyToInstant(deletingSlot.date))} at ${deletingSlot.startTime}?`
             : ''
         }
         footer={
