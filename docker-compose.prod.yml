@@ -121,6 +121,44 @@ services:
     networks:
       - dokploy-network
 
+  admin-cron:
+    image: docker.io/library/node:22-bookworm-slim
+    restart: unless-stopped
+    depends_on:
+      admin:
+        condition: service_healthy
+    environment:
+      TZ: Asia/Jakarta
+      CRON_SECRET: ${ADMIN_CRON_SECRET}
+      CRON_TARGET: http://admin:3001/api/cron/cleanup-chatlogs
+      CRON_AT: ${ADMIN_CRON_AT:-02:00}
+    entrypoint: ['sh', '-c']
+    command:
+      - |
+        while :; do
+          now=$$(date +%s)
+          next=$$(date -d "today $$CRON_AT" +%s)
+          if [ "$$next" -le "$$now" ]; then next=$$(date -d "tomorrow $$CRON_AT" +%s); fi
+          echo "[$$(date -Iseconds)] cleanup-chatlogs scheduled for $$(date -d @$$next -Iseconds)"
+          sleep $$((next - now))
+          node -e 'fetch(process.env.CRON_TARGET,{method:"POST",headers:{authorization:"Bearer "+process.env.CRON_SECRET}}).then(function(r){return r.text().then(function(t){console.log("["+new Date().toISOString()+"] status="+r.status+" "+t.slice(0,200));process.exit(r.ok?0:1)})}).catch(function(e){console.error("["+new Date().toISOString()+"] request failed: "+e.message);process.exit(1)})' || echo "[$$(date -Iseconds)] cleanup-chatlogs invocation failed; retrying next cycle"
+        done
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    user: node
+    deploy:
+      resources:
+        limits:
+          memory: 64m
+          cpus: "0.1"
+    networks:
+      - internal
+
   rag:
     build:
       context: .

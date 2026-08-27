@@ -5,7 +5,7 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 WAIT_TIMEOUT="${PROD_HEALTH_WAIT_TIMEOUT:-240}"
 ROLLBACK_FILE="$ROOT_DIR/.docker-prod-rollback.yml"
 
-ALL_SERVICES=(admin rag public links ngl live-presence)
+ALL_SERVICES=(admin admin-cron rag public links ngl live-presence)
 if [ "$#" -gt 0 ]; then
   TARGETS=("$@")
 else
