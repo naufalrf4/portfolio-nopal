@@ -66,8 +66,7 @@ function buildGuestIdentity() {
         return { id: parsed.id, name: parsed.name, color: parsed.color };
       }
     }
-  } catch {
-  }
+  } catch {}
 
   const alias = `Guest_${Math.random().toString(36).slice(2, 6)}`;
   const identity = {
@@ -193,8 +192,7 @@ export function LivePresencePill({ socketUrl, pagePath, pageLabel }: LivePresenc
                 )
             );
           }
-        } catch {
-        }
+        } catch {}
       });
 
       socket.addEventListener('close', () => {
@@ -235,9 +233,9 @@ export function LivePresencePill({ socketUrl, pagePath, pageLabel }: LivePresenc
         <button
           type="button"
           onClick={() => setIsOpen((open) => !open)}
-          className="inline-flex max-w-[calc(100vw-2.5rem)] items-center justify-center gap-2 rounded-full border border-[var(--border)] bg-[var(--bg-card)] px-2.5 py-1.5 text-[10px] font-semibold text-[var(--text-secondary)] shadow-neu-extruded-sm backdrop-blur-xl transition-transform duration-200 hover:-translate-y-0.5 md:max-w-[260px] md:px-4 md:py-2 md:text-[11px]"
+          className="inline-flex max-w-[calc(100vw-2.5rem)] items-center justify-center gap-2 rounded-full border border-[var(--border)] bg-[var(--bg-card)] px-2.5 py-1.5 text-[10px] font-semibold text-[var(--text-secondary)] shadow-surface-raised-sm transition-transform duration-200 hover:-translate-y-0.5 md:max-w-[260px] md:px-4 md:py-2 md:text-[11px]"
         >
-          <span className="inline-flex items-center gap-2 rounded-full bg-[var(--bg-elevated)] px-2 py-1 shadow-neu-inset md:px-2.5">
+          <span className="inline-flex items-center gap-2 rounded-full bg-[var(--bg-elevated)] px-2 py-1 shadow-surface-sunken md:px-2.5">
             <span
               className={`h-2.5 w-2.5 rounded-full ${status === 'connected' ? 'bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.75)]' : status === 'connecting' ? 'bg-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.65)]' : 'bg-slate-500 shadow-none'}`}
             />
@@ -248,15 +246,17 @@ export function LivePresencePill({ socketUrl, pagePath, pageLabel }: LivePresenc
         </button>
 
         {isOpen ? (
-          <div className="w-[min(92vw,360px)] rounded-[24px] border border-[var(--border)] bg-[var(--bg-card)] p-3 shadow-neu-extruded backdrop-blur-xl">
+          <div className="w-[min(92vw,360px)] rounded-[24px] border border-[var(--border)] bg-[var(--bg-card)] p-3 shadow-surface-raised">
             <div className="mb-2 flex items-center justify-between px-1">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--text-tertiary)]">
                   Live now
                 </p>
-                <p className="text-sm font-semibold text-[var(--text-primary)]">Shared portfolio presence</p>
+                <p className="text-sm font-semibold text-[var(--text-primary)]">
+                  Shared portfolio presence
+                </p>
               </div>
-              <span className="rounded-full bg-[var(--bg-elevated)] px-2.5 py-1 text-[10px] font-semibold text-[var(--teal)] shadow-neu-inset">
+              <span className="rounded-full bg-[var(--bg-elevated)] px-2.5 py-1 text-[10px] font-semibold text-[var(--teal)] shadow-surface-sunken">
                 {participants.length}
               </span>
             </div>
@@ -265,7 +265,7 @@ export function LivePresencePill({ socketUrl, pagePath, pageLabel }: LivePresenc
               {participants.map((participant) => (
                 <div
                   key={`${participant.id}-${participant.pageLabel}`}
-                  className="flex items-start justify-between gap-3 rounded-[18px] border border-[var(--border)] bg-[var(--bg-elevated)] px-3 py-2.5 shadow-neu-extruded-sm"
+                  className="flex items-start justify-between gap-3 rounded-[18px] border border-[var(--border)] bg-[var(--bg-elevated)] px-3 py-2.5 shadow-surface-raised-sm"
                 >
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">

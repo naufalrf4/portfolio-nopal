@@ -11,8 +11,8 @@ const initial = name.charAt(0).toUpperCase();---
 
 <div class="homepage-reveal flex flex-col items-center gap-5 py-6 md:gap-6 md:py-7">
   <div class="relative">
-    <div class="homepage-reveal-pop relative rounded-full bg-surface p-2.5 shadow-neu-extruded transition-transform duration-300 md:scale-110">
-      <div class="w-28 h-28 md:w-32 md:h-32 rounded-full overflow-hidden bg-surface shadow-neu-inset flex items-center justify-center">
+    <div class="homepage-reveal-pop relative rounded-full bg-surface p-2.5 shadow-surface-raised transition-transform duration-300 md:scale-110">
+      <div class="w-28 h-28 md:w-32 md:h-32 rounded-full overflow-hidden bg-surface shadow-surface-sunken flex items-center justify-center">
         {avatarUrl ? (
           <img
             src={avatarUrl}
@@ -28,7 +28,7 @@ const initial = name.charAt(0).toUpperCase();---
         )}
       </div>
     </div>
-    <div class="absolute -bottom-1 -right-1 rounded-full bg-surface p-1.5 shadow-neu-extruded-sm animate-bounce duration-1000">
+    <div class="absolute -bottom-1 -right-1 rounded-full bg-surface p-1.5 shadow-surface-raised-sm animate-bounce duration-1000">
       <span class="text-base md:text-lg">👋</span>
     </div>
   </div>
@@ -43,7 +43,7 @@ const initial = name.charAt(0).toUpperCase();---
     </p>
   </div>
 
-  <div class="homepage-reveal-soft flex items-center gap-2 rounded-full bg-surface px-3.5 py-2 shadow-neu-extruded-sm" style="animation-delay: 0.28s">
+  <div class="homepage-reveal-soft flex items-center gap-2 rounded-full bg-surface px-3.5 py-2 shadow-surface-raised-sm" style="animation-delay: 0.28s">
     <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.6)]" />
     <span class="text-xs md:text-sm text-foreground-muted font-medium">
       Available for work

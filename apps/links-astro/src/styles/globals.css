@@ -28,10 +28,10 @@
   --color-accent-light: var(--teal);
   --color-accent-secondary: var(--amber);
 
-  --shadow-neu-extruded: 0 8px 30px -12px rgba(0, 0, 0, 0.5);
-  --shadow-neu-extruded-hover: 0 12px 40px -12px rgba(0, 0, 0, 0.6);
-  --shadow-neu-extruded-sm: 0 4px 15px -8px rgba(0, 0, 0, 0.4);
-  --shadow-neu-inset: inset 0 2px 10px rgba(0, 0, 0, 0.3);
+  --shadow-surface-raised: 0 8px 30px -12px rgba(0, 0, 0, 0.5);
+  --shadow-surface-raised-hover: 0 12px 40px -12px rgba(0, 0, 0, 0.6);
+  --shadow-surface-raised-sm: 0 4px 15px -8px rgba(0, 0, 0, 0.4);
+  --shadow-surface-sunken: inset 0 2px 10px rgba(0, 0, 0, 0.3);
   
   --radius-container: var(--radius-container);
 }
