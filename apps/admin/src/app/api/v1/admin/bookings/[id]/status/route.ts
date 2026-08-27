@@ -17,6 +17,7 @@ import {
 } from '@/lib/services/googleCalendarService';
 import { bookingSettingsService } from '@/lib/api/handlers/booking-settings.service';
 import { logger } from '@/lib/utils/logger';
+import { formatJakartaDateKeyLabel } from '@/lib/utils/date';
 
 const updateBookingStatusSchema = z.object({
   status: z.enum(['CONFIRMED', 'CANCELLED', 'COMPLETED']),
@@ -101,13 +102,7 @@ export async function PUT(request: NextRequest, context: RouteContext) {
 
       const slot = bookingResult.bookingSlot!;
 
-      const dateObj = new Date(slot.date + 'T00:00:00');
-      const dateFormatted = dateObj.toLocaleDateString('en-US', {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      });
+      const dateFormatted = formatJakartaDateKeyLabel(slot.date);
 
       try {
         if (parsed.data.status === 'CONFIRMED') {
