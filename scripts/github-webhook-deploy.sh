@@ -5,6 +5,7 @@ ROOT_DIR="${PORTFOLIO_WEBHOOK_REPO_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.."
 LOCK_FILE="${PORTFOLIO_WEBHOOK_LOCK_FILE:-/var/lib/portfolio-webhook/deploy.lock}"
 LOG_FILE="${PORTFOLIO_WEBHOOK_LOG_FILE:-/var/log/portfolio-webhook/deploy.log}"
 BRANCH="${PORTFOLIO_WEBHOOK_BRANCH:-main}"
+export TZ="${TZ:-Asia/Jakarta}"
 
 mkdir -p "$(dirname "$LOCK_FILE")" "$(dirname "$LOG_FILE")"
 
