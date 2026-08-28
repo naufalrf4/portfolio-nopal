@@ -303,7 +303,7 @@ function initEngine(
     for (const [el, meta] of sectionEntries) {
       if (meta.rootTop < bestTop) { bestTop = meta.rootTop; best = el; }
     }
-    const raw = best?.getAttribute('data-scene');
+    const raw = best?.getAttribute('data-scene') ?? undefined;
     const next: SceneStateName = isSceneName(raw) ? raw : routeDefault(window.location.pathname);
     if (next !== targetScene) targetScene = next;
   }, {});

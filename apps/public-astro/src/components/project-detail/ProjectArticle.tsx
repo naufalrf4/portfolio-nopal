@@ -180,7 +180,7 @@ function getNormalizedContent(content?: string | null): {
     try {
       current = JSON.parse(candidate);
     } catch {
-      return { markdown: current, tiptap: null };
+      return { markdown: candidate, tiptap: null };
     }
   }
 

@@ -38,9 +38,9 @@ function containsKeyword(haystack: string, keyword: string): boolean {
 }
 
 function getLinkTokens(link: {
-  platform?: string;
-  label?: string;
-  icon?: string;
+  platform?: string | null;
+  label?: string | null;
+  icon?: string | null;
   url: string;
 }): string {
   return [link.platform, link.label, link.icon, getUrlMetadata(link.url)?.normalizedUrl]

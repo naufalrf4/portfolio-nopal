@@ -2,6 +2,7 @@ export type {
   AboutData,
   Skill,
   ExperienceItem,
+  ExperienceItem as Experience,
   SocialLink,
   Achievement,
   AchievementsResponse,
@@ -11,13 +12,15 @@ export type {
   ContactSubmissionInput,
   BookingAvailability,
   BookingSlotItem,
+  BookingSlotItem as BookingSlot,
   BookingSubmissionInput,
   ApiSuccessEnvelope,
   ApiErrorEnvelope,
   ApiEnvelope,
 } from '@naufalrf/contracts';
 
-export type { Blog as BlogLink } from '@naufalrf/contracts';
+import type { Blog } from '@naufalrf/contracts';
+export type BlogLink = Blog;
 
 export interface ProjectImage {
   id: string;

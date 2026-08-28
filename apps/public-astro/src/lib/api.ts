@@ -70,6 +70,7 @@ const FALLBACK_ABOUT: AboutData = {
     platform: new URL(url).hostname.replace(/^www\./, '').split('.')[0],
     url,
   })),
+  updatedAt: '',
 };
 
 /**

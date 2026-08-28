@@ -13,6 +13,7 @@ interface SyncedUser {
   email: string;
   name: string | null;
   image: string | null;
+  token: string;
 }
 
 export function PublicSignInForm({ callbackUrl = '/' }: PublicSignInFormProps) {
@@ -24,13 +25,15 @@ export function PublicSignInForm({ callbackUrl = '/' }: PublicSignInFormProps) {
     const url = new URL(window.location.href);
     const isSynced = url.searchParams.get('guestbook_sync') === '1';
     const email = url.searchParams.get('guestbook_email');
+    const token = url.searchParams.get('guestbook_token');
 
-    if (isSynced && email) {
+    if (isSynced && email && token) {
       const syncedUser: SyncedUser = {
         id: email,
         email,
         name: url.searchParams.get('guestbook_name'),
         image: url.searchParams.get('guestbook_image'),
+        token,
       };
 
       setStoredGuestbookUser(syncedUser);

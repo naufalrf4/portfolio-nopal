@@ -27,6 +27,7 @@ const _d1: AboutData = {
   skills: [],
   experience: [],
   socialLinks: [],
+  updatedAt: '',
 };
 
 const _d2: ProjectListItem = {
@@ -41,6 +42,7 @@ const _d2: ProjectListItem = {
   imageUrl: null,
   featured: false,
   createdAt: '',
+  updatedAt: '',
   images: [],
 };
 
@@ -58,6 +60,7 @@ const _d3: ProjectDetail = {
   imageUrl: null,
   featured: false,
   createdAt: '',
+  updatedAt: '',
   projectDate: null,
   images: [],
 };
