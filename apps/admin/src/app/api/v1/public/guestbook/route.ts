@@ -15,6 +15,7 @@ import { validateTurnstileToken } from '@/lib/services/turnstile';
 import { getSubmissionContext } from '@/lib/api/submission-context';
 import { checkRateLimit, getRateLimitHeaders } from '@/lib/services/rate-limiter';
 import { verifyGuestbookToken } from '@/lib/guestbook-token';
+import { notificationService } from '@/lib/services/notificationService';
 
 const createGuestbookEntrySchema = z.object({
   message: z
@@ -143,6 +144,15 @@ export async function POST(request: NextRequest) {
     };
 
     const entry = await guestbookService.create(user.id, message, locationData);
+    if (!entry) {
+      return serverErrorResponse();
+    }
+
+    void notificationService.enqueue('guestbook.created', {
+      name: entry.user.name,
+      message: entry.message,
+      createdAt: entry.createdAt,
+    });
 
     const response = successResponse(entry, 'Entry added successfully');
 

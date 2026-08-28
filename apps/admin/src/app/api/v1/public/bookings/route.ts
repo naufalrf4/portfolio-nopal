@@ -10,12 +10,17 @@ import {
   errorResponse,
   notFoundResponse,
 } from '@/lib/api/responses';
-import { validateTurnstileToken } from '@/lib/services/turnstile';
+import {
+  RAG_SERVICE_TOKEN_HEADER,
+  isRagServiceTokenValid,
+  validateTurnstileToken,
+} from '@/lib/services/turnstile';
 import { emailService } from '@/lib/services/emailService';
 import { EMAIL_CONFIG } from '@/lib/email/config';
 import { createId } from '@paralleldrive/cuid2';
 import { getSubmissionContext } from '@/lib/api/submission-context';
 import { checkRateLimit, getRateLimitHeaders } from '@/lib/services/rate-limiter';
+import { notificationService } from '@/lib/services/notificationService';
 import { logger } from '@/lib/utils/logger';
 import { formatJakartaDateKeyLabel, jakartaWallClockToInstant } from '@/lib/utils/date';
 
@@ -70,7 +75,12 @@ export async function POST(request: NextRequest) {
       return validationErrorResponse(parsed.error.flatten().fieldErrors);
     }
 
-    const turnstileValidation = await validateTurnstileToken(parsed.data.turnstileToken);
+    const serviceTokenHeader = request.headers.get(RAG_SERVICE_TOKEN_HEADER);
+    const bypassTurnstile = isRagServiceTokenValid(serviceTokenHeader);
+
+    const turnstileValidation = bypassTurnstile
+      ? { success: true as const }
+      : await validateTurnstileToken(parsed.data.turnstileToken);
     if (!turnstileValidation.success) {
       const response = errorResponse(
         turnstileValidation.message ?? 'CAPTCHA verification failed. Please try again.',
@@ -195,6 +205,14 @@ export async function POST(request: NextRequest) {
     } catch (emailError) {
       logger.error('[Booking API] Admin notification email failed', emailError);
     }
+
+    void notificationService.enqueue('booking.created', {
+      name: booking.name,
+      email: booking.email,
+      date: slotResult.date,
+      time: slotResult.time,
+      notes: booking.notes,
+    });
 
     const response = successResponse(responseData, 'Booking confirmed');
 

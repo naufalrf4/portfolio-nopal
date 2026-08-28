@@ -1,3 +1,5 @@
+import { timingSafeEqual } from 'node:crypto';
+
 interface TurnstileVerifyResponse {
   success: boolean;
   'error-codes'?: string[];
@@ -22,6 +24,25 @@ interface TurnstileValidationResult {
 }
 
 const TURNSTILE_VERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
+
+export const RAG_SERVICE_TOKEN_HEADER = 'X-Service-Token';
+
+const RAG_SERVICE_TOKEN = process.env.RAG_SERVICE_TOKEN;
+
+export function isRagServiceTokenValid(provided: string | null): boolean {
+  if (!provided || !RAG_SERVICE_TOKEN) {
+    return false;
+  }
+
+  const providedBuffer = Buffer.from(provided);
+  const expectedBuffer = Buffer.from(RAG_SERVICE_TOKEN);
+
+  if (providedBuffer.length !== expectedBuffer.length) {
+    return false;
+  }
+
+  return timingSafeEqual(providedBuffer, expectedBuffer);
+}
 
 export async function verifyTurnstileToken(token: string): Promise<TurnstileVerifyResult> {
   const secretKey = process.env.TURNSTILE_SECRET_KEY;

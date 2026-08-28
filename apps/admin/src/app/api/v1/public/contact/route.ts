@@ -15,6 +15,7 @@ import { checkRateLimit, getRateLimitHeaders } from '@/lib/services/rate-limiter
 import { validateTurnstileToken } from '@/lib/services/turnstile';
 import { createId } from '@paralleldrive/cuid2';
 import { getSubmissionContext } from '@/lib/api/submission-context';
+import { notificationService } from '@/lib/services/notificationService';
 import { logger } from '@/lib/utils/logger';
 
 const createContactSchema = z.object({
@@ -145,6 +146,14 @@ export async function POST(request: NextRequest) {
     } catch (emailError) {
       logger.error('[Contact API] Admin notification email failed', emailError);
     }
+
+    void notificationService.enqueue('contact.created', {
+      name: contact.name,
+      email: contact.email,
+      subject: contact.subject,
+      message: contact.message,
+      createdAt: contact.createdAt,
+    });
 
     const response = successResponse(
       {

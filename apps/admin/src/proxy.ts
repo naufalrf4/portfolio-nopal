@@ -24,10 +24,13 @@ const protectedRoutes = [
   '/dashboard',
   '/projects',
   '/blogs',
+  '/publications',
   '/links',
   '/guestbook',
   '/messages',
   '/analytics',
+  '/logs',
+  '/notifications',
   '/settings',
 ];
 

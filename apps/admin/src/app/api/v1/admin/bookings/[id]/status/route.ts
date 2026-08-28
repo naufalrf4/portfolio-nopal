@@ -16,6 +16,7 @@ import {
   GoogleCalendarAuthError,
 } from '@/lib/services/googleCalendarService';
 import { bookingSettingsService } from '@/lib/api/handlers/booking-settings.service';
+import { notificationService } from '@/lib/services/notificationService';
 import { logger } from '@/lib/utils/logger';
 import { formatJakartaDateKeyLabel } from '@/lib/utils/date';
 
@@ -131,6 +132,14 @@ export async function PUT(request: NextRequest, context: RouteContext) {
       } catch (emailError) {
         logger.error('[Booking Status Update] Email failed', emailError);
       }
+
+      void notificationService.enqueue('booking.status_changed', {
+        name: updated.name,
+        previousStatus: bookingResult.status,
+        status: updated.status,
+        date: slot.date,
+        time: slot.time,
+      });
 
       return successResponse(
         {

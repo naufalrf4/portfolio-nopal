@@ -1,132 +1,58 @@
-type LogLevel = 'debug' | 'info' | 'warn' | 'error';
+import { createLogger } from '@naufalrf/http';
+import type { Logger } from '@naufalrf/http';
+import { createId } from '@paralleldrive/cuid2';
+import type { LogEntryInput } from '@naufalrf/contracts';
 
-interface LogEntry {
-  timestamp: string;
-  level: LogLevel;
-  service: string;
-  message: string;
-  context?: Record<string, unknown>;
-  error?: {
-    name: string;
-    message: string;
-    stack?: string;
-  };
-  correlationId?: string;
-  duration?: number;
-}
-
-class Logger {
-  private service: string;
-  private isDevelopment: boolean;
-
-  constructor(service: string = 'admin-api') {
-    this.service = service;
-    this.isDevelopment = process.env.NODE_ENV !== 'production';
-  }
-
-  private formatTimestamp(): string {
-    return new Date().toISOString();
-  }
-
-  private createLogEntry(
-    level: LogLevel,
-    message: string,
-    context?: Record<string, unknown>,
-    error?: unknown
-  ): LogEntry {
-    const entry: LogEntry = {
-      timestamp: this.formatTimestamp(),
-      level,
-      service: this.service,
-      message,
-    };
-
-    if (context) {
-      entry.context = context;
+function createAdminSink(): (entry: LogEntryInput) => void {
+  return (entry) => {
+    if (typeof window !== 'undefined') {
+      return;
     }
 
-    if (error) {
-      if (error instanceof Error) {
-        entry.error = {
-          name: error.name,
-          message: error.message,
-          stack: this.isDevelopment ? error.stack : undefined,
-        };
-      } else {
-        entry.error = {
-          name: 'UnknownError',
-          message: String(error),
-        };
-      }
-    }
+    void (async () => {
+      try {
+        const { logSettingsService } = await import('@/lib/api/handlers/log-settings.service');
+        const settings = await logSettingsService.getCaptureSettings();
 
-    return entry;
-  }
-
-  private output(entry: LogEntry): void {
-    if (this.isDevelopment) {
-      const levelColors: Record<LogLevel, string> = {
-        debug: '\x1b[36m',
-        info: '\x1b[32m',
-        warn: '\x1b[33m',
-        error: '\x1b[31m',
-      };
-      const reset = '\x1b[0m';
-      const color = levelColors[entry.level];
-
-      console.log(
-        `${color}[${entry.timestamp}] ${entry.level.toUpperCase()} [${entry.service}]${reset} ${entry.message}`
-      );
-
-      if (entry.context) {
-        console.log('  Context:', JSON.stringify(entry.context, null, 2));
-      }
-
-      if (entry.error) {
-        console.error('  Error:', entry.error.name, '-', entry.error.message);
-        if (entry.error.stack) {
-          console.error('  Stack:', entry.error.stack);
+        if (!settings.enabled) {
+          return;
         }
+
+        const { meetsLevel, effectiveLevelFor } = await import('@naufalrf/contracts');
+        const threshold = effectiveLevelFor(entry.service, settings);
+        if (!meetsLevel(entry.level, threshold)) {
+          return;
+        }
+
+        const { db } = await import('@/lib/db');
+        const { appLogs } = await import('@/lib/db/schema');
+
+        await db.insert(appLogs).values({
+          id: createId(),
+          timestamp: entry.timestamp,
+          level: entry.level,
+          service: entry.service,
+          message: entry.message,
+          ...(entry.context !== undefined ? { context: entry.context } : {}),
+          ...(entry.errorName !== undefined ? { errorName: entry.errorName } : {}),
+          ...(entry.errorMessage !== undefined ? { errorMessage: entry.errorMessage } : {}),
+          ...(entry.errorStack !== undefined ? { errorStack: entry.errorStack } : {}),
+          ...(entry.correlationId !== undefined ? { correlationId: entry.correlationId } : {}),
+          ...(entry.durationMs !== undefined ? { durationMs: entry.durationMs } : {}),
+          ...(entry.route !== undefined ? { route: entry.route } : {}),
+          ...(entry.statusCode !== undefined ? { statusCode: entry.statusCode } : {}),
+        });
+      } catch {
+        return;
       }
-    } else {
-      console.log(JSON.stringify(entry));
-    }
-  }
-
-  debug(message: string, context?: Record<string, unknown>): void {
-    if (this.isDevelopment) {
-      this.output(this.createLogEntry('debug', message, context));
-    }
-  }
-
-  info(message: string, context?: Record<string, unknown>): void {
-    this.output(this.createLogEntry('info', message, context));
-  }
-
-  warn(message: string, context?: Record<string, unknown>): void {
-    this.output(this.createLogEntry('warn', message, context));
-  }
-
-  error(message: string, error?: unknown, context?: Record<string, unknown>): void {
-    this.output(this.createLogEntry('error', message, context, error));
-  }
-
-  request(method: string, path: string, status: number, duration: number): void {
-    this.info('HTTP Request', {
-      method,
-      path,
-      status,
-      duration: `${duration}ms`,
-    });
-  }
-
-  database(operation: string, table: string, duration: number): void {
-    this.debug('Database Operation', {
-      operation,
-      table,
-      duration: `${duration}ms`,
-    });
-  }
+    })();
+  };
 }
 
-export const logger = new Logger();
+const adminLogger: Logger = createLogger({
+  service: 'admin',
+  sink: createAdminSink(),
+  isDevelopment: process.env.NODE_ENV !== 'production',
+});
+
+export const logger = adminLogger;

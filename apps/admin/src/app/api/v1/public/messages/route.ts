@@ -7,10 +7,15 @@ import {
   errorResponse,
 } from '@/lib/api/responses';
 import { checkRateLimit, getRateLimitHeaders } from '@/lib/services/rate-limiter';
-import { validateTurnstileToken } from '@/lib/services/turnstile';
+import {
+  RAG_SERVICE_TOKEN_HEADER,
+  isRagServiceTokenValid,
+  validateTurnstileToken,
+} from '@/lib/services/turnstile';
 import { createId } from '@paralleldrive/cuid2';
 import { getSubmissionContext } from '@/lib/api/submission-context';
 import { anonymousMessagesService } from '@/lib/api/handlers/anonymous-messages.service';
+import { notificationService } from '@/lib/services/notificationService';
 
 const publicMessageSchema = z.object({
   content: z
@@ -63,7 +68,12 @@ export async function POST(request: NextRequest) {
 
     const { content, turnstileToken } = parsed.data;
 
-    const turnstileValidation = await validateTurnstileToken(turnstileToken);
+    const serviceTokenHeader = request.headers.get(RAG_SERVICE_TOKEN_HEADER);
+    const bypassTurnstile = isRagServiceTokenValid(serviceTokenHeader);
+
+    const turnstileValidation = bypassTurnstile
+      ? { success: true as const }
+      : await validateTurnstileToken(turnstileToken);
     if (!turnstileValidation.success) {
       return errorResponse(
         turnstileValidation.message ?? 'CAPTCHA verification failed. Please try again.',
@@ -89,6 +99,11 @@ export async function POST(request: NextRequest) {
     };
 
     await anonymousMessagesService.create(messageData);
+
+    void notificationService.enqueue('message.created', {
+      content: messageData.content,
+      createdAt: messageData.createdAt,
+    });
 
     const response = successResponse({ success: true }, 'Message sent successfully');
 
