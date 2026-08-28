@@ -18,6 +18,7 @@ COPY apps/links-astro/package.json ./apps/links-astro/package.json
 COPY apps/ngl-svelte/package.json ./apps/ngl-svelte/package.json
 COPY apps/rag-service/package.json ./apps/rag-service/package.json
 COPY apps/live-presence/package.json ./apps/live-presence/package.json
+COPY apps/slidedeck/package.json ./apps/slidedeck/package.json
 COPY e2e/package.json ./e2e/package.json
 RUN bun install --frozen-lockfile
 COPY apps/admin ./apps/admin
