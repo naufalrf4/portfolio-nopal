@@ -31,6 +31,7 @@ export const config = {
   adminApiUrl: env("ADMIN_API_URL", "http://localhost:3001"),
   adminServiceToken: env("ADMIN_SERVICE_TOKEN", ""),
   adminInternalApiToken: env("ADMIN_INTERNAL_API_TOKEN", ""),
+  ragServiceToken: env("RAG_SERVICE_TOKEN", ""),
   ragIngestServiceToken: env("RAG_INGEST_SERVICE_TOKEN", ""),
 
   openaiApiKey: env("OPENAI_API_KEY", ""),

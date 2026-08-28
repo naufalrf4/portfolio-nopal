@@ -1,4 +1,5 @@
-
+import { config } from "./config";
+import type { BookingSlotOption } from "./types";
 
 export type AgenticToolName = "submit_guestbook" | "send_message" | "create_booking";
 
@@ -82,6 +83,13 @@ export function stageSendMessage(
   };
 }
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const PLACEHOLDER_VALUES = new Set(["", "tbd", "you", "unknown", "n/a", "none", "unknown@unknown.com"]);
+
+export function isPlaceholderValue(value: string): boolean {
+  return PLACEHOLDER_VALUES.has(value.trim().toLowerCase());
+}
+
 export function stageCreateBooking(
   slotId: string,
   name: string,
@@ -90,9 +98,9 @@ export function stageCreateBooking(
   phone?: string,
 ): ToolStageResult {
   const missing: string[] = [];
-  if (!slotId) missing.push("slotId");
-  if (!name || name.trim().length === 0) missing.push("name");
-  if (!email || !email.includes("@")) missing.push("valid email");
+  if (!slotId || isPlaceholderValue(slotId)) missing.push("slotId");
+  if (!name || name.trim().length === 0 || isPlaceholderValue(name)) missing.push("name");
+  if (!email || !EMAIL_REGEX.test(email) || isPlaceholderValue(email)) missing.push("valid email");
 
   const description = `Create booking for ${name || 'you'} at slot ${slotId}`;
 
@@ -136,6 +144,7 @@ function tooLong(value: string, max: number): boolean {
 export async function executeSubmitGuestbook(
   payload: Record<string, unknown>,
   adminApiUrl: string,
+  clientIp?: string,
 ): Promise<{ success: boolean; message: string }> {
   const message = String(payload.message ?? '').trim();
   const guestbookToken = String(payload.guestbookToken ?? '');
@@ -152,7 +161,10 @@ export async function executeSubmitGuestbook(
 
   const res = await fetch(`${adminApiUrl.replace(/\/$/, "")}/api/v1/public/guestbook`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      ...(clientIp ? { "X-Forwarded-For": clientIp } : {}),
+    },
     body: JSON.stringify({
       message,
       guestbookToken,
@@ -176,6 +188,7 @@ export async function executeSubmitGuestbook(
 export async function executeSendMessage(
   payload: Record<string, unknown>,
   adminApiUrl: string,
+  clientIp?: string,
 ): Promise<{ success: boolean; message: string }> {
   const content = String(payload.content ?? '').trim();
 
@@ -191,11 +204,12 @@ export async function executeSendMessage(
 
   const res = await fetch(`${adminApiUrl.replace(/\/$/, "")}/api/v1/public/messages`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      content,
-      turnstileToken: "",
-    }),
+    headers: {
+      "Content-Type": "application/json",
+      "X-Service-Token": config.ragServiceToken,
+      ...(clientIp ? { "X-Forwarded-For": clientIp } : {}),
+    },
+    body: JSON.stringify({ content }),
   });
 
   const data = (await res.json()) as Record<string, unknown>;
@@ -211,16 +225,10 @@ export async function executeSendMessage(
   return { success: true, message: "Message sent successfully!" };
 }
 
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const PLACEHOLDER_VALUES = new Set(["", "tbd", "you", "unknown", "n/a", "none", "unknown@unknown.com"]);
-
-function isPlaceholderValue(value: string): boolean {
-  return PLACEHOLDER_VALUES.has(value.trim().toLowerCase());
-}
-
 export async function executeCreateBooking(
   payload: Record<string, unknown>,
   adminApiUrl: string,
+  clientIp?: string,
 ): Promise<{ success: boolean; message: string }> {
   const slotId = String(payload.slotId ?? '').trim();
   const name = String(payload.name ?? '').trim();
@@ -249,14 +257,17 @@ export async function executeCreateBooking(
 
   const res = await fetch(`${adminApiUrl.replace(/\/$/, "")}/api/v1/public/bookings`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      "X-Service-Token": config.ragServiceToken,
+      ...(clientIp ? { "X-Forwarded-For": clientIp } : {}),
+    },
     body: JSON.stringify({
       slotId,
       name,
       email,
       phone,
       notes,
-      turnstileToken: "",
     }),
   });
 
@@ -271,4 +282,55 @@ export async function executeCreateBooking(
   }
 
   return { success: true, message: `Booking created for ${name} at slot ${slotId}!` };
+}
+
+function jakartaSlotDateTimeIso(date: string, startTime: string): string {
+  return `${date}T${startTime}:00+07:00`;
+}
+
+function jakartaSlotLabel(date: string, startTime: string, endTime: string): string {
+  const dateLabel = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Asia/Jakarta",
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+  }).format(new Date(jakartaSlotDateTimeIso(date, startTime)));
+  return `${dateLabel}, ${startTime}-${endTime} WIB`;
+}
+
+export async function fetchAvailableBookingSlots(
+  adminApiUrl: string,
+  days: number,
+): Promise<BookingSlotOption[]> {
+  try {
+    const res = await fetch(
+      `${adminApiUrl.replace(/\/$/, "")}/api/v1/public/bookings/available?days=${days}`,
+    );
+    if (!res.ok) return [];
+    const payload = (await res.json()) as Record<string, unknown>;
+    const grouped = (payload.data ?? payload) as Record<string, unknown>;
+    if (!grouped || typeof grouped !== "object") return [];
+
+    const options: BookingSlotOption[] = [];
+    for (const slots of Object.values(grouped)) {
+      if (!Array.isArray(slots)) continue;
+      for (const slot of slots) {
+        if (!slot || typeof slot !== "object") continue;
+        const typed = slot as Record<string, unknown>;
+        const id = String(typed.id ?? "").trim();
+        const date = String(typed.date ?? "").trim();
+        const startTime = String(typed.startTime ?? "").trim();
+        const endTime = String(typed.endTime ?? "").trim();
+        if (!id || !date || !startTime || !endTime) continue;
+        options.push({
+          slotId: id,
+          label: jakartaSlotLabel(date, startTime, endTime),
+          dateTimeIso: jakartaSlotDateTimeIso(date, startTime),
+        });
+      }
+    }
+    return options;
+  } catch {
+    return [];
+  }
 }

@@ -14,9 +14,15 @@ import {
   normalizeLanguage,
 } from "./prompt-builder";
 import * as repository from "./repository";
-import { stageAction } from "./staged-action-repository";
+import {
+  stageAction,
+  findActiveAction,
+  updateStagedAction,
+  type StagedAction,
+} from "./staged-action-repository";
 import { executeTool } from "./tool-service";
 import type {
+  BookingSlotOption,
   ChatLogMessage,
   ChatRequest,
   ChatResponse,
@@ -24,12 +30,15 @@ import type {
   PendingAction,
   QueryPlan,
   RetrievedChunk,
+  StagedPendingAction,
   SuggestedAction,
 } from "./types";
 import {
   stageSubmitGuestbook,
   stageSendMessage,
   stageCreateBooking,
+  fetchAvailableBookingSlots,
+  isPlaceholderValue,
 } from "./agentic-tools";
 
 function stringOrNone(value: unknown): string | undefined {
@@ -100,24 +109,50 @@ function buildCitations(
   return citations;
 }
 
+interface RankedSuggestedAction extends SuggestedAction {
+  relevanceScore: number;
+}
+
+const MIN_ACTION_CHUNK_RELEVANCE = 0.3;
+const FALLBACK_ACTION_RELEVANCE_SCORE = 0.3;
+const TOOL_PROJECT_ACTION_RELEVANCE_SCORE = 0.5;
+const MAX_SUGGESTED_ACTIONS = 2;
+const TEXT_RELEVANCE_MENTION_BONUS = 0.15;
+const TEXT_RELEVANCE_ABSENCE_PENALTY = 0.05;
+
+function buildCitationActionCandidates(
+  retrievedChunks: RetrievedChunk[],
+): RankedSuggestedAction[] {
+  const candidates = new Map<string, RankedSuggestedAction>();
+  for (const chunk of retrievedChunks) {
+    if (chunk.score < MIN_ACTION_CHUNK_RELEVANCE) continue;
+    const metadata = chunk.metadata as Record<string, unknown>;
+    const route = stringOrNone(metadata.route);
+    if (!route) continue;
+    const existing = candidates.get(route);
+    if (existing && existing.relevanceScore >= chunk.score) continue;
+    const title = stringOrNone(metadata.title);
+    const routeLabel = stringOrNone(metadata.route_label);
+    candidates.set(route, {
+      type: "open_page",
+      target: route,
+      label: routeLabel ?? `Open ${title ?? chunk.source}`,
+      relevanceScore: chunk.score,
+    });
+  }
+  return [...candidates.values()];
+}
+
 function buildSuggestedActions(
-  citations: Citation[],
+  citationActionCandidates: RankedSuggestedAction[],
   fallbackActions: Array<{ type: string; target: string; label: string }>,
-): SuggestedAction[] {
-  const citationActions = citations
-    .filter((c) => !!c.route)
-    .map(
-      (c): SuggestedAction => ({
-        type: "open_page",
-        target: c.route!,
-        label: c.routeLabel ?? `Open ${c.title ?? c.source}`,
-      }),
-    );
-  if (citationActions.length > 0) return citationActions;
+): RankedSuggestedAction[] {
+  if (citationActionCandidates.length > 0) return citationActionCandidates;
   return fallbackActions.map((a) => ({
-    type: a.type,
+    type: "open_page",
     target: a.target,
     label: a.label,
+    relevanceScore: FALLBACK_ACTION_RELEVANCE_SCORE,
   }));
 }
 
@@ -126,11 +161,11 @@ function buildToolProjectActions(
     | { metadata: Record<string, unknown> }
     | undefined,
   existingActions: SuggestedAction[],
-): SuggestedAction[] {
+): RankedSuggestedAction[] {
   if (!toolResult) return [];
   const refs = toolResult.metadata.referencedProjects;
   if (!Array.isArray(refs)) return [];
-  const actions: SuggestedAction[] = [];
+  const actions: RankedSuggestedAction[] = [];
   const seen = new Set<string>();
   for (const ref of refs) {
     if (!ref || typeof ref !== "object") continue;
@@ -146,10 +181,44 @@ function buildToolProjectActions(
       type: "open_page",
       target,
       label: title ? `Open ${title}` : "Open referenced project",
+      relevanceScore: TOOL_PROJECT_ACTION_RELEVANCE_SCORE,
     });
     if (actions.length >= 3) break;
   }
   return actions;
+}
+
+function normalizeMatchFragment(value: string): string {
+  return value.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+}
+
+function answerMentionsAction(answerText: string, action: RankedSuggestedAction): boolean {
+  const normalizedAnswer = normalizeMatchFragment(answerText);
+  if (!normalizedAnswer) return false;
+  const fragments = [action.label, ...action.target.split("/")]
+    .map(normalizeMatchFragment)
+    .filter((fragment) => fragment.length >= 3);
+  return fragments.some((fragment) => normalizedAnswer.includes(fragment));
+}
+
+function rankSuggestedActions(
+  candidates: RankedSuggestedAction[],
+  answerText: string,
+): SuggestedAction[] {
+  const deduped = new Map<string, RankedSuggestedAction>();
+  for (const candidate of candidates) {
+    const mentioned = answerMentionsAction(answerText, candidate);
+    const adjustedScore =
+      candidate.relevanceScore +
+      (mentioned ? TEXT_RELEVANCE_MENTION_BONUS : -TEXT_RELEVANCE_ABSENCE_PENALTY);
+    const existing = deduped.get(candidate.target);
+    if (existing && existing.relevanceScore >= adjustedScore) continue;
+    deduped.set(candidate.target, { ...candidate, relevanceScore: adjustedScore });
+  }
+  return [...deduped.values()]
+    .sort((a, b) => b.relevanceScore - a.relevanceScore)
+    .slice(0, MAX_SUGGESTED_ACTIONS)
+    .map(({ relevanceScore, ...action }) => action);
 }
 
 function minimumRetrievalConfidence(intent: string): number {
@@ -201,6 +270,8 @@ function messageToPayload(msg: ChatLogMessage): Record<string, unknown> {
   return payload;
 }
 
+const BOOKING_TRIGGER_REGEX = /\b(book|schedule|reserve|pesan|jadwalkan)\s+(a\s+)?(slot|booking|appointment)\b/i;
+
 const AGENTIC_PATTERNS: Array<{
   regex: RegExp;
   handler: (msg: string) => PendingAction | null;
@@ -226,7 +297,7 @@ const AGENTIC_PATTERNS: Array<{
     },
   },
   {
-    regex: /\b(book|schedule|reserve|pesan|jadwalkan)\s+(a\s+)?(slot|booking|appointment)\b/i,
+    regex: BOOKING_TRIGGER_REGEX,
     handler: () => {
       const result = stageCreateBooking("", "", "").pendingAction;
       return result;
@@ -243,6 +314,131 @@ function detectAgenticIntent(message: string): PendingAction | null {
   return null;
 }
 
+const BOOKING_LOOKAHEAD_DAYS = 14;
+const MAX_SLOT_OPTIONS = 20;
+
+interface ExtractedBookingFields {
+  slotId: string;
+  email: string;
+  phone: string | undefined;
+  notes: string | undefined;
+  name: string;
+}
+
+function extractEmailFromMessage(message: string): string {
+  const match = message.match(/[^\s@]+@[^\s@]+\.[^\s@]+/);
+  return match ? match[0] : "";
+}
+
+function extractPhoneFromMessage(message: string): string | undefined {
+  const match = message.match(/\+?\d[\d\-\s]{7,14}\d/);
+  return match ? match[0].replace(/[\s-]+/g, "") : undefined;
+}
+
+function extractNotesFromMessage(message: string): string | undefined {
+  const match = message.match(/(?:notes?|catatan)\s*:\s*(.{1,1000})/i);
+  return match ? match[1]!.trim() : undefined;
+}
+
+function extractExplicitNameFromMessage(message: string): string {
+  const match = message.match(
+    /\b(?:my name is|name is|nama saya|saya bernama)\s+([a-zA-Z][a-zA-Z .'-]{1,79})/i,
+  );
+  return match ? match[1]!.trim() : "";
+}
+
+function extractSlotIdFromMessage(message: string, slotOptions: BookingSlotOption[]): string {
+  const trimmed = message.trim();
+  const direct = slotOptions.find((option) => option.slotId === trimmed);
+  if (direct) return direct.slotId;
+  const indexMatch = trimmed.match(/^(?:slot\s*#?|option\s*#?|#)?(\d{1,2})$/i);
+  if (indexMatch) {
+    const index = Number.parseInt(indexMatch[1]!, 10) - 1;
+    if (index >= 0 && index < slotOptions.length) return slotOptions[index]!.slotId;
+  }
+  return "";
+}
+
+function extractBookingFieldsFromMessage(
+  message: string,
+  slotOptions: BookingSlotOption[],
+): ExtractedBookingFields {
+  const email = extractEmailFromMessage(message);
+  const phone = extractPhoneFromMessage(message);
+  const slotId = extractSlotIdFromMessage(message, slotOptions);
+  const notes = extractNotesFromMessage(message);
+  const explicitName = extractExplicitNameFromMessage(message);
+  const hasOtherSignal = Boolean(email || phone || slotId || notes);
+  const looksLikeBareName =
+    !explicitName &&
+    !hasOtherSignal &&
+    !BOOKING_TRIGGER_REGEX.test(message) &&
+    /^[a-zA-Z][a-zA-Z .'-]{1,79}$/.test(message.trim());
+  const name = explicitName || (looksLikeBareName ? message.trim() : "");
+  return { slotId, email, phone, notes, name };
+}
+
+async function handleBookingTurn(
+  sessionId: string,
+  message: string,
+  existingDraft: StagedAction | null,
+): Promise<ChatResponse> {
+  const priorPayload = existingDraft?.payload ?? {};
+  const priorSlotId = stringOrNone(priorPayload.slotId) ?? "";
+  const priorName = stringOrNone(priorPayload.name) ?? "";
+  const priorEmail = stringOrNone(priorPayload.email) ?? "";
+  const priorNotes = stringOrNone(priorPayload.notes);
+  const priorPhone = stringOrNone(priorPayload.phone);
+
+  const slotStillUnresolved = !priorSlotId || isPlaceholderValue(priorSlotId);
+  const slotOptions = slotStillUnresolved
+    ? await fetchAvailableBookingSlots(config.adminApiUrl, BOOKING_LOOKAHEAD_DAYS)
+    : [];
+
+  const extracted = extractBookingFieldsFromMessage(message, slotOptions);
+
+  const slotId = extracted.slotId || priorSlotId;
+  const name = extracted.name || priorName;
+  const email = extracted.email || priorEmail;
+  const notes = extracted.notes ?? priorNotes;
+  const phone = extracted.phone ?? priorPhone;
+
+  const staged = stageCreateBooking(slotId, name, email, notes, phone);
+  const pendingAction = staged.pendingAction;
+
+  const actionId = existingDraft
+    ? ((await updateStagedAction(existingDraft.id, sessionId, pendingAction)) ??
+      (await stageAction(sessionId, pendingAction)))
+    : await stageAction(sessionId, pendingAction);
+
+  const stagedPendingAction: StagedPendingAction = {
+    actionId,
+    tool: "create_booking",
+    description: pendingAction.description,
+    missingFields: pendingAction.missingFields,
+  };
+  if (pendingAction.missingFields.includes("slotId")) {
+    stagedPendingAction.slotOptions = slotOptions.slice(0, MAX_SLOT_OPTIONS);
+  }
+
+  return {
+    sessionId,
+    message: staged.message,
+    sources: [],
+    citations: [],
+    suggestedActions: [],
+    metadata: {
+      workflow: "agentic",
+      intent: "create_booking",
+      queryLanguage: "en",
+      answerLanguage: "en",
+      retrievalConfidence: 0,
+      abstained: false,
+    },
+    pendingAction: stagedPendingAction,
+  };
+}
+
 export async function chat(
   request: ChatRequest,
   preferredLanguage?: string,
@@ -250,8 +446,17 @@ export async function chat(
   const startedAt = performance.now();
   const sessionId = request.sessionId ?? crypto.randomUUID();
 
+  const activeBookingDraft = await findActiveAction(sessionId, "create_booking");
+  if (activeBookingDraft !== null) {
+    return handleBookingTurn(sessionId, request.message, activeBookingDraft);
+  }
+
   const detected = detectAgenticIntent(request.message);
   if (detected !== null) {
+    if (detected.tool === "create_booking") {
+      return handleBookingTurn(sessionId, request.message, null);
+    }
+
     const response: ChatResponse = {
       sessionId,
       message: detected.missingFields.length > 0
@@ -314,7 +519,7 @@ export async function chat(
         const t = a.type;
         const tg = a.target;
         const l = a.label;
-        if (t && tg && l) {
+        if (t === "open_page" && tg && l) {
           suggestedActions.push({ type: t, target: tg, label: l });
         }
       }
@@ -449,13 +654,20 @@ export async function chat(
   retrievedChunks = retrievedChunks.slice(0, config.retrievalLimit);
   const sources = [...new Set(retrievedChunks.map((c) => c.source))];
   const citations = buildCitations(retrievedChunks);
-  const finalSuggestedActions = buildSuggestedActions(
-    citations,
+  const citationActionCandidates = buildCitationActionCandidates(retrievedChunks);
+  const primaryActionCandidates = buildSuggestedActions(
+    citationActionCandidates,
     queryPlan.suggestedActions,
   );
-  finalSuggestedActions.push(
-    ...buildToolProjectActions(toolResult, finalSuggestedActions),
+  const toolProjectActionCandidates = buildToolProjectActions(
+    toolResult,
+    primaryActionCandidates,
   );
+  const suggestedActionCandidates = [
+    ...primaryActionCandidates,
+    ...toolProjectActionCandidates,
+  ];
+  let finalSuggestedActions: SuggestedAction[] = [];
   const retrievalConfidence = retrievedChunks.reduce(
     (max, c) => Math.max(max, c.score),
     0,
@@ -488,11 +700,7 @@ export async function chat(
       queryPlan.portfolioAreas,
       retrievedChunks.length === 0 ? "no_data" : "low_confidence",
     );
-    finalSuggestedActions.splice(
-      0,
-      finalSuggestedActions.length,
-      ...buildAbstentionActions(queryPlan.portfolioAreas),
-    );
+    finalSuggestedActions = buildAbstentionActions(queryPlan.portfolioAreas);
   } else {
     const contextSections: Array<{ source: string; content: string }> = [];
     if (toolResult) {
@@ -523,6 +731,10 @@ export async function chat(
       prompt: generated.promptTokens,
       completion: generated.completionTokens,
     };
+  }
+
+  if (!abstained) {
+    finalSuggestedActions = rankSuggestedActions(suggestedActionCandidates, finalText);
   }
 
   const durationMs = Math.round(performance.now() - startedAt);

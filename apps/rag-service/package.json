@@ -13,7 +13,9 @@
   },
   "dependencies": {
     "hono": "^4.7.5",
-    "postgres": "^3.4.5"
+    "postgres": "^3.4.5",
+    "@naufalrf/http": "workspace:*",
+    "@naufalrf/contracts": "workspace:*"
   },
   "devDependencies": {
     "@types/bun": "^1.2.0",

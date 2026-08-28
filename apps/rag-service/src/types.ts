@@ -13,8 +13,10 @@ interface Citation {
   section?: string;
 }
 
+type SuggestedActionType = "open_page";
+
 interface SuggestedAction {
-  type: string;
+  type: SuggestedActionType;
   target: string;
   label: string;
 }
@@ -35,11 +37,18 @@ interface PendingAction {
   missingFields: string[];
 }
 
+interface BookingSlotOption {
+  slotId: string;
+  label: string;
+  dateTimeIso: string;
+}
+
 interface StagedPendingAction {
   actionId: string;
   tool: string;
   description: string;
   missingFields: string[];
+  slotOptions?: BookingSlotOption[];
 }
 
 interface ChatResponse {
@@ -180,10 +189,12 @@ export type {
   ChatRequest,
   Citation,
   SuggestedAction,
+  SuggestedActionType,
   ChatMetadata,
   PendingAction,
   ChatResponse,
   StagedPendingAction,
+  BookingSlotOption,
   ConfirmRequest,
   ConfirmResponse,
   IngestRequest,

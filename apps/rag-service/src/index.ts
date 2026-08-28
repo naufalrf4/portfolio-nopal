@@ -1,6 +1,6 @@
 import { logger } from "./lib/logger";
 import { timingSafeEqual } from "node:crypto";
-import { Hono } from "hono";
+import { Hono, type Context } from "hono";
 import { cors } from "hono/cors";
 import { config } from "./config";
 import { consumeAction } from "./staged-action-repository";
@@ -9,12 +9,43 @@ import { chat } from "./chat-service";
 import { ingest } from "./ingest-service";
 import { RagServiceError } from "./errors";
 import { executeSubmitGuestbook, executeSendMessage, executeCreateBooking } from "./agentic-tools";
+import { checkRateLimit, getRateLimitHeaders } from "./rate-limiter";
 
 const app = new Hono();
 
 const MAX_CHAT_MESSAGE_LENGTH = 2000;
-const SESSION_ID_PATTERN = /^[A-Za-z0-9_-]{8,64}$/;
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+const CHAT_RATE_LIMIT_CONFIG = { maxRequests: 20, windowMs: 60 * 1000 };
+const CHAT_CONFIRM_RATE_LIMIT_CONFIG = { maxRequests: 6, windowMs: 60 * 1000 };
+
+function getClientIp(c: Context): string {
+  const forwarded = c.req.header("X-Forwarded-For");
+  if (forwarded) {
+    const hops = forwarded
+      .split(",")
+      .map((segment) => segment.trim())
+      .filter(Boolean);
+    const trusted = hops[hops.length - 1];
+    if (trusted) return trusted;
+  }
+
+  const realIp = c.req.header("X-Real-IP")?.trim();
+  if (realIp) return realIp;
+
+  return "unknown";
+}
+
+function rateLimitedResponse(c: Context, message: string, headers: Record<string, string>) {
+  return c.json(
+    {
+      success: false,
+      error: { message, code: "RATE_LIMITED" },
+    },
+    429,
+    headers,
+  );
+}
 
 app.use(
   "*",
@@ -44,6 +75,16 @@ app.get("/health", (c) => {
 });
 
 app.post("/chat", async (c) => {
+  const clientIp = getClientIp(c);
+  const ipRateLimit = checkRateLimit(`chat:ip:${clientIp}`, CHAT_RATE_LIMIT_CONFIG);
+  if (!ipRateLimit.allowed) {
+    return rateLimitedResponse(
+      c,
+      "Too many chat requests. Please wait a minute before trying again.",
+      getRateLimitHeaders(ipRateLimit),
+    );
+  }
+
   let body: unknown;
   try {
     body = await c.req.json();
@@ -59,8 +100,22 @@ app.post("/chat", async (c) => {
   const chatRequest: ChatRequest = {
     message: typeof raw.message === "string" ? raw.message.trim() : "",
   };
-  if (typeof raw.sessionId === "string" && SESSION_ID_PATTERN.test(raw.sessionId)) {
+  if (typeof raw.sessionId === "string" && UUID_PATTERN.test(raw.sessionId)) {
     chatRequest.sessionId = raw.sessionId;
+  }
+
+  if (chatRequest.sessionId) {
+    const sessionRateLimit = checkRateLimit(
+      `chat:session:${chatRequest.sessionId}`,
+      CHAT_RATE_LIMIT_CONFIG,
+    );
+    if (!sessionRateLimit.allowed) {
+      return rateLimitedResponse(
+        c,
+        "Too many chat requests. Please wait a minute before trying again.",
+        getRateLimitHeaders(sessionRateLimit),
+      );
+    }
   }
 
   if (!chatRequest.message) {
@@ -85,6 +140,16 @@ app.post("/chat", async (c) => {
 });
 
 app.post("/chat/confirm", async (c) => {
+  const clientIp = getClientIp(c);
+  const ipRateLimit = checkRateLimit(`chat-confirm:ip:${clientIp}`, CHAT_CONFIRM_RATE_LIMIT_CONFIG);
+  if (!ipRateLimit.allowed) {
+    return rateLimitedResponse(
+      c,
+      "Too many confirmation requests. Please wait a minute before trying again.",
+      getRateLimitHeaders(ipRateLimit),
+    );
+  }
+
   let body: unknown;
   try {
     body = await c.req.json();
@@ -101,8 +166,20 @@ app.post("/chat/confirm", async (c) => {
     throw new RagServiceError("actionId is required.", "INVALID_CONFIRM_REQUEST", 400);
   }
 
-  if (!SESSION_ID_PATTERN.test(sessionId)) {
+  if (!UUID_PATTERN.test(sessionId)) {
     throw new RagServiceError("sessionId is required.", "INVALID_CONFIRM_REQUEST", 400);
+  }
+
+  const sessionRateLimit = checkRateLimit(
+    `chat-confirm:session:${sessionId}`,
+    CHAT_CONFIRM_RATE_LIMIT_CONFIG,
+  );
+  if (!sessionRateLimit.allowed) {
+    return rateLimitedResponse(
+      c,
+      "Too many confirmation requests. Please wait a minute before trying again.",
+      getRateLimitHeaders(sessionRateLimit),
+    );
   }
 
   const staged = await consumeAction(actionId, sessionId);
@@ -124,14 +201,15 @@ app.post("/chat/confirm", async (c) => {
   }
 
   const adminApiUrl = config.adminApiUrl;
+  const forwardedIp = clientIp !== "unknown" ? clientIp : undefined;
 
   let result: { success: boolean; message: string };
   if (staged.tool === "submit_guestbook") {
-    result = await executeSubmitGuestbook(staged.payload, adminApiUrl);
+    result = await executeSubmitGuestbook(staged.payload, adminApiUrl, forwardedIp);
   } else if (staged.tool === "send_message") {
-    result = await executeSendMessage(staged.payload, adminApiUrl);
+    result = await executeSendMessage(staged.payload, adminApiUrl, forwardedIp);
   } else if (staged.tool === "create_booking") {
-    result = await executeCreateBooking(staged.payload, adminApiUrl);
+    result = await executeCreateBooking(staged.payload, adminApiUrl, forwardedIp);
   } else {
     throw new RagServiceError(`Unknown tool: ${staged.tool}`, "UNKNOWN_TOOL", 400);
   }

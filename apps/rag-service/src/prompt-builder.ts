@@ -218,7 +218,7 @@ export function buildQueryAnalysisPrompt(
 },
 "retrievalQueries":["string"],
 "portfolioAreas":["projects|about|blogs|experience|skills|contact|general"],
-"suggestedActions":[{"type":"open_page|highlight_section|open_link","target":"string","label":"string"}]
+"suggestedActions":[{"type":"open_page","target":"string","label":"string"}]
 }`;
 
   return [
@@ -243,6 +243,7 @@ export function buildQueryAnalysisPrompt(
     "- retrievalQueries may be empty when needsPortfolioContext is false; otherwise contain 1 to 3 concise search queries",
     "- Do not bias toward projects when the user asks for general knowledge or casual conversation",
     "- suggestedActions must be empty when no website action is useful",
+    "- suggestedActions type must always be open_page",
     "- target should be a route like /projects, /about, /blogs, /contact, /ai-chatbot or a section anchor like #featured-projects",
     "- Preserve the user's language or produce multilingual-friendly retrieval queries when helpful",
     "",
