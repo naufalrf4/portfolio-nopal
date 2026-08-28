@@ -5,6 +5,7 @@ import {
   timestamp,
   text,
   integer,
+  bigint,
   index,
   uniqueIndex,
   jsonb,
@@ -837,3 +838,128 @@ export const llmSettings = pgTable('llm_settings', {
     .notNull(),
   updatedAt: timestamp({ precision: 3, withTimezone: true, mode: 'string' }).notNull(),
 });
+
+export const appLogs = pgTable(
+  'app_logs',
+  {
+    id: text().primaryKey().notNull(),
+    timestamp: timestamp({ precision: 3, withTimezone: true, mode: 'string' }).notNull(),
+    receivedAt: timestamp('received_at', { precision: 3, withTimezone: true, mode: 'string' })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+    level: text().notNull(),
+    service: text().notNull(),
+    message: text().notNull(),
+    context: jsonb(),
+    errorName: text('error_name'),
+    errorMessage: text('error_message'),
+    errorStack: text('error_stack'),
+    correlationId: text('correlation_id'),
+    durationMs: integer('duration_ms'),
+    route: text(),
+    statusCode: integer('status_code'),
+  },
+  (table) => [
+    index('app_logs_timestamp_idx').using(
+      'btree',
+      table.timestamp.asc().nullsLast().op('timestamptz_ops')
+    ),
+    index('app_logs_level_timestamp_idx').using(
+      'btree',
+      table.level.asc().nullsLast().op('text_ops'),
+      table.timestamp.asc().nullsLast().op('timestamptz_ops')
+    ),
+    index('app_logs_service_timestamp_idx').using(
+      'btree',
+      table.service.asc().nullsLast().op('text_ops'),
+      table.timestamp.asc().nullsLast().op('timestamptz_ops')
+    ),
+    index('app_logs_correlationId_idx').using(
+      'btree',
+      table.correlationId.asc().nullsLast().op('text_ops')
+    ),
+  ]
+);
+
+export const logSettings = pgTable('log_settings', {
+  id: text().primaryKey().notNull(),
+  minLevel: text('min_level').default('info').notNull(),
+  enabled: boolean().default(true).notNull(),
+  serviceOverrides: jsonb('service_overrides').default({}).notNull(),
+  retentionDays: jsonb('retention_days')
+    .default({ debug: 7, info: 30, warn: 90, error: 90 })
+    .notNull(),
+  createdAt: timestamp({ precision: 3, withTimezone: true, mode: 'string' })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+  updatedAt: timestamp({ precision: 3, withTimezone: true, mode: 'string' }).notNull(),
+});
+
+export const notificationChannels = pgTable('notification_channels', {
+  id: text().primaryKey().notNull(),
+  name: text().notNull(),
+  chatId: text('chat_id').notNull(),
+  messageThreadId: integer('message_thread_id'),
+  enabled: boolean().default(true).notNull(),
+  createdAt: timestamp({ precision: 3, withTimezone: true, mode: 'string' })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+  updatedAt: timestamp({ precision: 3, withTimezone: true, mode: 'string' }).notNull(),
+});
+
+export const notificationRules = pgTable(
+  'notification_rules',
+  {
+    id: text().primaryKey().notNull(),
+    eventType: text('event_type').notNull(),
+    channelId: text('channel_id')
+      .notNull()
+      .references(() => notificationChannels.id),
+    enabled: boolean().default(true).notNull(),
+    minLevel: text('min_level'),
+    createdAt: timestamp({ precision: 3, withTimezone: true, mode: 'string' })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+    updatedAt: timestamp({ precision: 3, withTimezone: true, mode: 'string' }).notNull(),
+  },
+  (table) => [
+    unique('notification_rules_event_type_channel_id_unique').on(
+      table.eventType,
+      table.channelId
+    ),
+  ]
+);
+
+export const notificationOutbox = pgTable(
+  'notification_outbox',
+  {
+    id: text().primaryKey().notNull(),
+    eventType: text('event_type').notNull(),
+    channelId: text('channel_id')
+      .notNull()
+      .references(() => notificationChannels.id),
+    payload: jsonb().notNull(),
+    status: text().default('pending').notNull(),
+    attempts: integer().default(0).notNull(),
+    nextAttemptAt: timestamp('next_attempt_at', {
+      precision: 3,
+      withTimezone: true,
+      mode: 'string',
+    })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+    lastError: text('last_error'),
+    telegramMessageId: bigint('telegram_message_id', { mode: 'number' }),
+    createdAt: timestamp({ precision: 3, withTimezone: true, mode: 'string' })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+    sentAt: timestamp('sent_at', { precision: 3, withTimezone: true, mode: 'string' }),
+  },
+  (table) => [
+    index('notification_outbox_status_next_attempt_at_idx').using(
+      'btree',
+      table.status.asc().nullsLast().op('text_ops'),
+      table.nextAttemptAt.asc().nullsLast().op('timestamptz_ops')
+    ),
+  ]
+);
