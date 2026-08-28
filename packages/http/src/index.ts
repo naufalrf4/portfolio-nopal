@@ -126,3 +126,18 @@ export function isSuccessEnvelope<T>(
     'data' in json
   );
 }
+
+export { createLogger } from './logger';
+export type {
+  Logger,
+  LogSink,
+  LoggerConsole,
+  CreateLoggerOptions,
+} from './logger';
+
+export { createLogShipper } from './log-shipper';
+export type {
+  LogShipper,
+  LogShipperConsole,
+  CreateLogShipperOptions,
+} from './log-shipper';
