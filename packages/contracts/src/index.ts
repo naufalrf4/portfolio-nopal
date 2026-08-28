@@ -39,6 +39,7 @@ export interface AboutData {
   skills: Skill[];
   experience: ExperienceItem[];
   socialLinks: SocialLink[];
+  updatedAt: string;
 }
 
 export interface ProjectImage {
@@ -61,6 +62,7 @@ export interface ProjectListItem {
   imageUrl: string | null;
   featured: boolean;
   createdAt: string;
+  updatedAt: string;
   images: ProjectImage[];
 }
 
@@ -89,6 +91,7 @@ export interface ProjectDetail {
   imageUrl: string | null;
   featured: boolean;
   createdAt: string;
+  updatedAt: string;
   projectDate: string | null;
   images: ProjectDetailImage[];
 }
@@ -241,3 +244,61 @@ export type ApiEnvelope<T = unknown> = ApiSuccessEnvelope<T> | ApiErrorEnvelope;
 export type {
   ProjectListItem as Project, 
 };
+
+export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
+
+export type LogService =
+  | 'admin'
+  | 'public-astro'
+  | 'links-astro'
+  | 'ngl-svelte'
+  | 'rag-service';
+
+export const LOG_LEVEL_SEVERITY: Record<LogLevel, number> = {
+  debug: 10,
+  info: 20,
+  warn: 30,
+  error: 40,
+};
+
+export interface LogEntryInput {
+  timestamp: string;
+  level: LogLevel;
+  service: LogService;
+  message: string;
+  context?: Record<string, unknown>;
+  errorName?: string;
+  errorMessage?: string;
+  errorStack?: string;
+  correlationId?: string;
+  durationMs?: number;
+  route?: string;
+  statusCode?: number;
+}
+
+export interface LogIngestRequest {
+  entries: LogEntryInput[];
+}
+
+export interface LogIngestResult {
+  accepted: number;
+  stored: number;
+}
+
+export interface LogCaptureSettings {
+  minLevel: LogLevel;
+  enabled: boolean;
+  serviceOverrides: Partial<Record<LogService, LogLevel>>;
+  retentionDays: Record<LogLevel, number>;
+}
+
+export function meetsLevel(entryLevel: LogLevel, threshold: LogLevel): boolean {
+  return LOG_LEVEL_SEVERITY[entryLevel] >= LOG_LEVEL_SEVERITY[threshold];
+}
+
+export function effectiveLevelFor(
+  service: LogService,
+  settings: Pick<LogCaptureSettings, 'minLevel' | 'serviceOverrides'>
+): LogLevel {
+  return settings.serviceOverrides[service] ?? settings.minLevel;
+}
