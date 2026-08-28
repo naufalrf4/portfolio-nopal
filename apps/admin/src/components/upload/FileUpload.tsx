@@ -401,7 +401,7 @@ export function FileUpload({
               className={cn(
                 'relative rounded-[20px] border-2 border-dashed p-6 sm:p-8',
                 'transition-all duration-300 ease-out',
-                'bg-[var(--bg-elevated)]',
+                'bg-[var(--bg-card)]',
                 'shadow-surface-sunken',
                 isDragActive &&
                 isDragActive &&
@@ -415,7 +415,7 @@ export function FileUpload({
                     'border-destructive bg-destructive/10',
                     'shadow-surface-sunken',
                   ],
-                !isDragActive && !hasError && 'border-line hover:border-line-strong',
+                !isDragActive && !hasError && 'border-line-strong hover:border-line-hover',
                 hasError && 'border-destructive/60',
                 !disabled && !isUploading && 'cursor-pointer hover:scale-[1.005]'
               )}

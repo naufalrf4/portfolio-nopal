@@ -1,8 +1,15 @@
 'use client';
 
 import * as React from 'react';
+import Link from 'next/link';
+import { ArrowLeft } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
+
+interface PageHeaderBackNav {
+  href: string;
+  label?: string;
+}
 
 interface PageHeaderProps {
   title: string;
@@ -11,12 +18,13 @@ interface PageHeaderProps {
   stats?: { label: string; value: string | number; variant?: 'default' | 'success' | 'warning' }[];
   className?: string;
   icon?: React.ReactElement<{ className?: string; strokeWidth?: number }>;
+  back?: PageHeaderBackNav;
 }
 
 const SUNKEN_SHADOW =
   'inset 0 1px 4px rgba(0, 0, 0, 0.25)';
 
-function PageHeader({ title, description, actions, stats, className, icon }: PageHeaderProps) {
+function PageHeader({ title, description, actions, stats, className, icon, back }: PageHeaderProps) {
   return (
     <div
       data-slot="page-header"
@@ -26,6 +34,17 @@ function PageHeader({ title, description, actions, stats, className, icon }: Pag
         className
       )}
     >
+      {back && (
+        <div>
+          <Link
+            href={back.href}
+            className="inline-flex items-center gap-2 text-sm text-[var(--text-secondary)] hover:text-[var(--teal)] transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            <span>{back.label ?? 'Back'}</span>
+          </Link>
+        </div>
+      )}
       <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3 md:gap-4">
         <div className="flex-1 space-y-0.5 md:space-y-1">
           <div className="flex items-center gap-2 md:gap-3">
@@ -76,4 +95,4 @@ function PageHeader({ title, description, actions, stats, className, icon }: Pag
 }
 
 export { PageHeader };
-export type { PageHeaderProps };
+export type { PageHeaderProps, PageHeaderBackNav };

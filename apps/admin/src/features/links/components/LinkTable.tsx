@@ -44,7 +44,7 @@ export function LinkTable({ links, onEdit, onDelete, onToggleVisibility }: LinkT
         </TableHeader>
         <TableBody>
           {links.map((link) => {
-            const { icon: IconComponent } = getIconData(link.icon);
+            const { icon: IconComponent, color } = getIconData(link.icon);
             return (
               <TableRow
                 key={link.id}
@@ -56,7 +56,8 @@ export function LinkTable({ links, onEdit, onDelete, onToggleVisibility }: LinkT
                 <TableCell>
                   <div className="flex items-center gap-3">
                     <div
-                      className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border border-line-strong bg-accent text-accent-foreground"
+                      className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border border-line-strong text-white"
+                      style={{ backgroundColor: color }}
                     >
                       <IconComponent className="h-5 w-5" />
                     </div>

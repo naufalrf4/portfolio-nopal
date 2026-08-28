@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Calendar, ArrowLeft, Mail, Phone, Clock, Globe, FileText, User } from 'lucide-react';
+import { Calendar, Mail, Phone, Clock, Globe, FileText, User } from 'lucide-react';
+import { PageHeader } from '@/components/layout/PageHeader';
 import { PageWrapper } from '@/components/layout/PageWrapper';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -139,19 +140,12 @@ export function BookingDetailPageContent({ initialBooking }: BookingDetailPageCo
 
   return (
     <PageWrapper>
-      <div className="mb-6">
-        <button
-          onClick={() => router.push('/bookings')}
-          className="inline-flex items-center gap-2 text-[var(--text-secondary)] hover:text-[var(--teal)] transition-colors mb-4"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back to Bookings
-        </button>
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-[var(--text-primary)] mb-2">Booking Details</h1>
-            <p className="text-[var(--text-secondary)]">View and manage booking information</p>
-          </div>
+      <PageHeader
+        title="Booking Details"
+        description="View and manage booking information"
+        icon={<Calendar />}
+        back={{ href: '/bookings', label: 'Back to Bookings' }}
+        actions={
           <div className="flex gap-2">
             <Button variant="outline" onClick={() => setIsStatusModalOpen(true)}>
               Update Status
@@ -160,8 +154,8 @@ export function BookingDetailPageContent({ initialBooking }: BookingDetailPageCo
               Delete
             </Button>
           </div>
-        </div>
-      </div>
+        }
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 rounded-[var(--radius-container)] p-8 bg-[var(--bg-elevated)] shadow-surface-raised">

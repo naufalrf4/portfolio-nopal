@@ -16,6 +16,7 @@ import {
   Server,
   Cloud,
   Code2,
+  Image,
 } from 'lucide-react';
 
 export {
@@ -36,4 +37,5 @@ export {
   Server,
   Cloud,
   Code2,
+  Image,
 };

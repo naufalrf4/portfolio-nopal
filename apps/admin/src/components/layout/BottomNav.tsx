@@ -102,7 +102,7 @@ export function BottomNav() {
     { name: 'Projects', href: '/projects', icon: FolderKanban },
     { name: 'Contact', href: '/contacts', icon: Send, badge: contactUpdatesCount },
     { name: 'AI Service', href: '/knowledge', icon: FileText },
-    { name: 'Blogs', href: '/blogs', icon: BookOpen },
+    { name: 'Publications', href: '/publications', icon: BookOpen },
     { name: 'Links', href: '/links', icon: LinkIcon },
     { name: 'Analytics', href: '/analytics', icon: BarChart3 },
   ];

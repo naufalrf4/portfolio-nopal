@@ -11,9 +11,9 @@ import {
   User,
   BarChart3,
   LogOut,
-  Lock,
   FileText,
   BookOpen,
+  ScrollText,
 } from 'lucide-react';
 import { signOut } from 'next-auth/react';
 import type { Session } from 'next-auth';
@@ -40,11 +40,12 @@ const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { name: 'About Me', href: '/about', icon: User },
   { name: 'Projects', href: '/projects', icon: FolderKanban },
-  { name: 'Blogs', href: '/blogs', icon: BookOpen },
+  { name: 'Publications', href: '/publications', icon: BookOpen },
   { name: 'Contact', href: '/contacts', icon: Send },
   { name: 'Links', href: '/links', icon: LinkIcon },
   { name: 'AI Service', href: '/knowledge', icon: FileText },
   { name: 'Analytics', href: '/analytics', icon: BarChart3 },
+  { name: 'Logs', href: '/logs', icon: ScrollText },
 ];
 
 function CountBadge({ count }: { count: number }) {
@@ -189,7 +190,11 @@ export function AppSidebar({ session }: AppSidebarProps) {
                 isCollapsed ? 'h-8 w-8' : 'h-10 w-10'
               )}
             >
-              <Lock className={cn('text-[var(--teal)]', isCollapsed ? 'h-4 w-4' : 'h-5 w-5')} />
+              <img
+                src="/favicon.ico"
+                alt="NaufalRF Portfolio"
+                className="h-full w-full rounded-full object-cover"
+              />
               {isCollapsed && (
                 <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-success ring-2 ring-[var(--bg-elevated)] animate-pulse" />
               )}

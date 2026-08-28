@@ -63,7 +63,7 @@ function DatePicker({
     <button
       type="button"
       className={cn(
-        'w-full h-9 px-3 py-2 text-sm text-left rounded-xl bg-[var(--bg-elevated)]',
+        'w-full h-9 px-3 py-2 text-sm text-left rounded-xl bg-[var(--bg-card)] border border-line-strong',
         raisedShadow,
         'transition-all duration-200',
         raisedHover,
@@ -120,7 +120,7 @@ function DatePicker({
     caption_label: 'text-sm font-medium text-[var(--text-primary)]',
     nav: 'absolute w-full flex justify-between px-1 top-0',
     nav_button: cn(
-      'h-7 w-7 flex items-center justify-center rounded-lg bg-[var(--bg-elevated)]',
+      'h-7 w-7 flex items-center justify-center rounded-lg bg-[var(--bg-card)] border border-line-strong',
       'shadow-surface-raised',
       'hover:shadow-surface-raised',
       'disabled:opacity-40'
@@ -210,7 +210,7 @@ function DatePicker({
                 <Drawer.Close
                   className={cn(
                     'h-9 w-9 rounded-xl shrink-0',
-                    'bg-[var(--bg-elevated)] flex items-center justify-center',
+                    'bg-[var(--bg-card)] border border-line-strong flex items-center justify-center',
                     'shadow-surface-raised',
                     'text-[var(--text-secondary)] transition-all duration-200',
                     'hover:shadow-surface-raised',
@@ -235,7 +235,7 @@ function DatePicker({
                       onClick={handleClear}
                       className={cn(
                         'px-4 py-2 text-sm font-medium text-red-600 rounded-xl',
-                        'bg-[var(--bg-elevated)]',
+                        'bg-[var(--bg-card)] border border-line-strong',
                         'shadow-surface-raised',
                         'hover:shadow-surface-raised',
                         'transition-all duration-200'

@@ -8,6 +8,8 @@ import {
   jakartaWallClockToInstant,
   monthKeyToCalendarDate,
 } from '@/lib/utils/date';
+import { ICON_OPTIONS, DEFAULT_ICON } from '@/features/links/constants/links.constants';
+import type { LucideIcon } from 'lucide-react';
 
 export function generateId(): string {
   return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -125,4 +127,39 @@ export function sortByDate<T extends { createdAt: string | Date }>(
 
 export function sortByOrder<T extends { order: number }>(items: T[]): T[] {
   return [...items].sort((a, b) => a.order - b.order);
+}
+
+export function getPlatformFromUrl(
+  url: string | null | undefined
+): { icon: LucideIcon; color: string; label: string } {
+  const fallback = { ...DEFAULT_ICON, label: 'Link' };
+  if (!url) return fallback;
+
+  let hostname: string;
+  try {
+    hostname = new URL(url).hostname.replace(/^www\./, '').toLowerCase();
+  } catch {
+    return fallback;
+  }
+
+  if (hostname.includes('github.com')) {
+    return ICON_OPTIONS.find((option) => option.value === 'github')!;
+  }
+  if (hostname.includes('linkedin.com')) {
+    return ICON_OPTIONS.find((option) => option.value === 'linkedin')!;
+  }
+  if (hostname.includes('twitter.com') || hostname.includes('x.com')) {
+    return ICON_OPTIONS.find((option) => option.value === 'twitter')!;
+  }
+  if (hostname.includes('instagram.com')) {
+    return ICON_OPTIONS.find((option) => option.value === 'instagram')!;
+  }
+  if (hostname.includes('youtube.com') || hostname.includes('youtu.be')) {
+    return ICON_OPTIONS.find((option) => option.value === 'youtube')!;
+  }
+  if (hostname.includes('facebook.com')) {
+    return ICON_OPTIONS.find((option) => option.value === 'facebook')!;
+  }
+
+  return ICON_OPTIONS.find((option) => option.value === 'globe')!;
 }

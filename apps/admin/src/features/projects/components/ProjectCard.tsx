@@ -1,13 +1,9 @@
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Star, Pencil, Trash2, Wrench, ExternalLink, Github, Hash } from './Icons';
+import { Star, Pencil, Trash2, Wrench, ExternalLink, Github, Hash, Image as ImageIcon } from './Icons';
 import { Switch } from '@/components/ui/switch';
-import { getCategoryIcon } from '../utils/projects.utils';
+import { getPlatformFromUrl } from '@/features/shared/utils';
+import { truncateUrl } from '@/lib/utils/string';
 import type { ProjectCardProps } from '../types/projects.types';
-
-type ProjectWithImages = ProjectCardProps['project'] & {
-  imageUrl?: string | null;
-  images?: Array<{ url: string }>;
-};
 
 export function ProjectCard({
   project,
@@ -17,40 +13,30 @@ export function ProjectCard({
   onToggleVisibility,
   onToggleFeatured,
 }: ProjectCardProps) {
-  const projectWithImages = project as ProjectWithImages;
-  const CategoryIcon = getCategoryIcon(project.category);
   const imageUrl =
-    projectWithImages.imageUrl ||
-    (projectWithImages.images && projectWithImages.images.length > 0
-      ? projectWithImages.images[0].url
+    project.imageUrl ||
+    (project.images && project.images.length > 0
+      ? project.images[0].url
       : null);
 
   return (
     <TooltipProvider>
       <div
-        className="group relative rounded-[var(--radius-container)] p-6 bg-[var(--bg-elevated)] transition-all duration-300 hover:-translate-y-1"
+        className="group relative rounded-[var(--radius-container)] p-6 bg-[var(--bg-elevated)] transition-all duration-300 hover:-translate-y-1 shadow-surface-raised"
         style={{
-          boxShadow:
-            '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
           animationDelay: `${index * 50}ms`,
         }}
       >
-        {imageUrl && (
-          <div className="mb-4 rounded-2xl overflow-hidden bg-[var(--bg-elevated)] shadow-surface-sunken-sm">
+        <div className="mb-4 rounded-2xl overflow-hidden shadow-surface-sunken-sm">
+          {imageUrl ? (
             <img src={imageUrl} alt={project.title} className="w-full h-40 object-cover" />
-          </div>
-        )}
-
-        <div className="flex items-center justify-between mb-4">
-          <div
-            className="p-3 rounded-2xl bg-[var(--bg-elevated)] text-[var(--teal)]"
-            style={{
-              boxShadow:
-                '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
-            }}
-          >
-            <CategoryIcon className="h-5 w-5" />
-          </div>
+          ) : (
+            <div className="w-full h-40 flex items-center justify-center bg-[var(--bg-elevated)]">
+              <ImageIcon className="h-8 w-8 text-[var(--text-secondary)]" />
+            </div>
+          )}
+        </div>
+        <div className="flex items-center justify-end mb-4">
           <div className="flex items-center gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
             <Tooltip>
               <TooltipTrigger asChild>
@@ -94,10 +80,7 @@ export function ProjectCard({
               {project.techStack.slice(0, 3).map((tech) => (
                 <span
                   key={tech}
-                  className="px-3 py-1 text-xs rounded-full bg-[var(--bg-elevated)] text-[var(--text-primary)]"
-                  style={{
-                    boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.3)',
-                  }}
+                  className="px-3 py-1 text-xs rounded-full bg-[var(--bg-elevated)] text-[var(--text-primary)] shadow-surface-raised-sm"
                 >
                   {tech}
                 </span>
@@ -114,16 +97,28 @@ export function ProjectCard({
         {(project.liveUrl || project.repoUrl) && (
           <div className="mb-4 space-y-2">
             {project.liveUrl && (
-              <div className="flex items-center gap-2 text-xs text-[var(--text-secondary)]">
-                <ExternalLink className="h-4 w-4" />
-                <span className="truncate">{new URL(project.liveUrl).hostname}</span>
-              </div>
+              <a
+                href={project.liveUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-xs hover:underline truncate"
+                style={{ color: getPlatformFromUrl(project.liveUrl).color }}
+              >
+                <ExternalLink className="h-4 w-4 flex-shrink-0" />
+                <span className="truncate">{truncateUrl(project.liveUrl)}</span>
+              </a>
             )}
             {project.repoUrl && (
-              <div className="flex items-center gap-2 text-xs text-[var(--text-secondary)]">
-                <Github className="h-4 w-4" />
-                <span className="truncate">Repository</span>
-              </div>
+              <a
+                href={project.repoUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-xs hover:underline truncate"
+                style={{ color: getPlatformFromUrl(project.repoUrl).color }}
+              >
+                <Github className="h-4 w-4 flex-shrink-0" />
+                <span className="truncate">{truncateUrl(project.repoUrl)}</span>
+              </a>
             )}
           </div>
         )}

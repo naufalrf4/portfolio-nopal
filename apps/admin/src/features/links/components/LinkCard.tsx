@@ -14,7 +14,7 @@ interface LinkCardProps {
 }
 
 export function LinkCard({ link, index, onEdit, onDelete, onToggleVisibility }: LinkCardProps) {
-  const { icon: IconComponent } = getIconData(link.icon);
+  const { icon: IconComponent, color } = getIconData(link.icon);
 
   return (
     <div
@@ -26,7 +26,8 @@ export function LinkCard({ link, index, onEdit, onDelete, onToggleVisibility }: 
     >
       <div className="flex items-start justify-between mb-4">
         <div
-          className="w-14 h-14 rounded-2xl flex items-center justify-center border border-line-strong bg-accent text-accent-foreground"
+          className="w-14 h-14 rounded-2xl flex items-center justify-center border border-line-strong text-white"
+          style={{ backgroundColor: color }}
         >
           <IconComponent className="h-7 w-7" />
         </div>

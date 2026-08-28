@@ -42,7 +42,7 @@ const buttonVariants = cva(
           'active:shadow-surface-sunken',
         ].join(' '),
         outline: [
-          'bg-transparent border-[var(--border)] text-foreground',
+          'bg-transparent border border-line-strong text-foreground',
           'shadow-surface-raised',
           'hover:bg-[var(--bg-elevated)] hover:translate-y-[-1px]',
           'hover:shadow-surface-raised',

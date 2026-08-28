@@ -6,6 +6,8 @@ export interface Project {
   description: string | null;
   category: string;
   techStack: string[];
+  imageUrl?: string | null;
+  images?: Array<{ url: string }>;
   liveUrl: string | null;
   repoUrl: string | null;
   featured: boolean;

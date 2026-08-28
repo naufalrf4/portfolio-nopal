@@ -20,8 +20,8 @@ export const QUICK_ACTIONS: QuickAction[] = [
   },
   {
     icon: <BookOpen className="w-4 h-4" />,
-    label: 'Manage Blogs',
-    href: '/blogs',
+    label: 'Manage Publications',
+    href: '/publications',
     delay: 750,
   },
   {

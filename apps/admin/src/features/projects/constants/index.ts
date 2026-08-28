@@ -1,5 +1,5 @@
 import { Eye, EyeOff, Star } from 'lucide-react';
-import type { FilterMode } from '../types';
+import type { FilterMode } from '../types/projects.types';
 
 export const FILTER_BUTTONS = [
   { mode: 'all' as FilterMode, label: 'All', icon: null },

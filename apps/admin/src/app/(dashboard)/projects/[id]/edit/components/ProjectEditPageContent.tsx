@@ -1,9 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
-import { ArrowLeft, Loader2, Settings } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { FolderKanban, Loader2, Settings } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { PageWrapper } from '@/components/layout/PageWrapper';
@@ -40,18 +38,11 @@ export function ProjectEditPageContent({ projectId }: ProjectEditPageContentProp
 
   return (
     <PageWrapper>
-      <div className="mb-6">
-        <Link href="/projects">
-          <Button variant="ghost" size="sm">
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Projects
-          </Button>
-        </Link>
-      </div>
-
       <PageHeader
         title={`Editing: ${project.title}`}
         description="Manage images and content for this project"
+        icon={<FolderKanban />}
+        back={{ href: '/projects', label: 'Back to Projects' }}
       />
 
       <div className="mt-6">

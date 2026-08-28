@@ -36,7 +36,7 @@ const TabsTrigger = React.forwardRef<
       'text-sm font-medium transition-all flex-shrink-0',
       'text-[var(--text-secondary)]',
       'disabled:pointer-events-none disabled:opacity-50',
-      'data-[state=active]:text-[var(--teal)] data-[state=active]:bg-[var(--bg-elevated)]',
+      'data-[state=active]:text-[var(--teal)] data-[state=active]:bg-[var(--bg-card)]',
       'data-[state=active]:shadow-surface-raised',
       'hover:text-[var(--text-primary)]',
       className

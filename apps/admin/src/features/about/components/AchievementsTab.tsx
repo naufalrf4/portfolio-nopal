@@ -14,6 +14,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Award,
+  Link2,
+  Image as ImageIcon,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ResponsiveModal } from '@/components/ui/responsive-modal';
@@ -21,6 +23,8 @@ import { FileUpload } from '@/components/upload/FileUpload';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import { logger } from '@/lib/utils/logger';
+import { getPlatformFromUrl } from '@/features/shared/utils';
+import { truncateUrl } from '@/lib/utils/string';
 
 interface Achievement {
   id: string;
@@ -230,22 +234,28 @@ export function AchievementsTab() {
             )}
           >
             {}
-            {achievement.photos.length > 0 && (
-              <div className="relative aspect-video bg-accent/5">
-                <Image
-                  src={achievement.photos[0]}
-                  alt={achievement.name}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 768px) 100vw, 400px"
-                />
-                {achievement.photos.length > 1 && (
-                  <div className="absolute bottom-2 right-2 px-2 py-1 rounded-md bg-bg-elevated text-xs font-medium text-foreground">
-                    +{achievement.photos.length - 1} more
-                  </div>
-                )}
-              </div>
-            )}
+            <div className="relative w-full h-40 bg-accent/5 overflow-hidden">
+              {achievement.photos.length > 0 ? (
+                <>
+                  <Image
+                    src={achievement.photos[0]}
+                    alt={achievement.name}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 400px"
+                  />
+                  {achievement.photos.length > 1 && (
+                    <div className="absolute bottom-2 right-2 px-2 py-1 rounded-md bg-bg-elevated text-xs font-medium text-foreground">
+                      +{achievement.photos.length - 1} more
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="w-full h-full flex items-center justify-center">
+                  <ImageIcon className="w-8 h-8 text-[var(--text-secondary)]" />
+                </div>
+              )}
+            </div>
 
             {}
             <div className="p-4">
@@ -268,6 +278,19 @@ export function AchievementsTab() {
                 <p className="text-xs text-[var(--text-primary)] line-clamp-2 mb-3">
                   {achievement.description}
                 </p>
+              )}
+
+              {achievement.externalUrl && (
+                <a
+                  href={achievement.externalUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-xs hover:underline truncate mb-3"
+                  style={{ color: getPlatformFromUrl(achievement.externalUrl).color }}
+                >
+                  <Link2 className="w-4 h-4 shrink-0" />
+                  <span className="truncate">{truncateUrl(achievement.externalUrl)}</span>
+                </a>
               )}
 
               {}
