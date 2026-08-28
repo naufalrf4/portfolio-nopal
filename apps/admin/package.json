@@ -9,6 +9,7 @@
     "start": "PORT=3001 HOSTNAME=0.0.0.0 node --env-file=.env.local scripts/start-standalone.mjs",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
+    "test": "bun test",
     "clean": "rm -rf .next node_modules",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
@@ -70,6 +71,7 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/bun": "^1.2.0",
     "@types/geoip-lite": "^1.4.4",
     "@types/mapbox-gl": "^3.4.1",
     "@types/node": "^20",

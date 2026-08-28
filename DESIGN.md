@@ -138,6 +138,8 @@ One WebGL canvas mounted from `BaseLayout.astro`, surviving Astro ClientRouter n
 | Projects archive | Full-width project rows, year/domain index |
 | Project detail | Full-bleed proof image, sticky chapter rail |
 | Blogs | Lead story + publication index |
+| Services | Capability catalogue: hero + technical/talks service grids, availability status, CTA rail |
+| Portfolio | Deck content rendered server-side as scrolling editorial sections (retired client-side SPA slide viewer) |
 | Contact | Communication console: channel rail + form workspace |
 | AI assistant | Research cockpit: conversation canvas + citation rail |
 | Links | Identity transmission panel: profile top, indexed destination rows |
@@ -229,7 +231,8 @@ The admin shell is intentionally less cinematic. It prioritizes information dens
 
 - Admin `neu-*` utility class names are retained as a backwards-compatible naming layer. Their values are flat dark-first shadows, not neumorphic. Renaming all class references across 100+ files is deferred as low-risk cosmetic debt.
 - Links-astro and NGL retain `neu-*` class names in component markup; values resolve to shared dark-first tokens.
-- Public-astro Track E (persistent WebGL scene) is not yet implemented. The current hero uses section-local effects. Track E will replace this.
+- Public-astro Track E (persistent WebGL scene) is implemented in `apps/public-astro/src/components/shared/GlobalScene.tsx` and mounted from `BaseLayout.astro` with `transition:persist`. Scene state is driven by `[data-scene]` sections via IntersectionObserver, with a static CSS `.scene-fallback` for mobile, reduced motion, save-data, slow connections, and WebGL failure.
+- Public-astro homepage sections duplicate their own `<section>` + eyebrow + heading markup instead of using the shared `Section` / `SectionHeader` primitives. `SectionHeader` currently has no consumers. Consolidating the section rhythm into the shared primitives is deferred until the next homepage layout pass.
 - `graphify-out/` contains stale references to `neumorphic_styles` node labels from pre-migration code. These are generated artifacts and will self-update on the next `graphify update`.
 
 ---

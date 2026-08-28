@@ -4,6 +4,14 @@ Chronological timeline of meaningful project work, discoveries, decisions, and b
 
 ## Entries
 
+### 2026-08-28 13:47
+
+- Task: implement Phase 5 centralized logging backend in Admin
+- Mode: implementation
+- Files: `apps/admin/src/lib/validations/log-query.schema.ts`, `apps/admin/src/lib/services/logQuery.service.ts`, `apps/admin/src/lib/services/__tests__/logQuery.service.test.ts`, `apps/admin/src/app/api/v1/admin/logs/route.ts`, `apps/admin/src/app/api/v1/admin/log-settings/route.ts`, `PROGRESS.md`
+- Status: done
+- Notes: Added Zod-validated log filters, descending `(timestamp, id)` keyset pagination with cursor reuse, normalized per-level counts, authenticated log query and log-settings routes, and four unit tests covering page boundaries, cursor position, and missing count defaults. No UI, schema, proxy, internal ingest route, or component files were modified.
+
 ### 2026-08-18 13:16
 
 - Task: F4 config validation + local Postgres bootstrap + demo-auth smoke test
@@ -757,3 +765,42 @@ Chronological timeline of meaningful project work, discoveries, decisions, and b
 (7) **Catatan `docker compose config`.** Output `config` menampilkan `$$` pada `command`, itu compose meng-escape ulang untuk output yang bisa dipakai lagi, bukan tanda escaping-nya salah. Yang membuktikan benar adalah eksekusi nyata di poin (6), bukan output `config`.
 
 (8) **Ini menutup satu-satunya titik kontrol GMT+7 yang tadinya di luar repo.** Catatan sebelumnya menyebut penjadwal harus dikonfigurasi di Dokploy/host sebagai `Asia/Jakarta`; sekarang jadwal itu hidup di dalam compose dengan `TZ: Asia/Jakarta` di sidecar-nya sendiri, jadi tidak lagi bergantung pada konfigurasi di luar repo. Jam bisa diubah via `ADMIN_CRON_AT` (default `02:00` WIB).
+
+### 2026-08-27 22:04
+
+- Task: rename Admin presentation-layer Blogs to Publications
+- Mode: implementation
+- Files: `apps/admin/src/features/publications/` (moved from `features/blogs/`), `apps/admin/src/app/(dashboard)/publications/` (moved from `blogs/`), `apps/admin/src/app/(dashboard)/blogs/page.tsx`, `apps/admin/src/components/layout/AppSidebar.tsx`, `apps/admin/src/components/layout/BottomNav.tsx`, `apps/admin/src/features/dashboard/constants/quick-actions.tsx`, `apps/admin/src/proxy.ts`, `apps/admin/src/lib/api/handlers/publication-links.service.ts`, `apps/admin/src/app/api/v1/admin/blogs/{route.ts,[id]/route.ts,reorder/route.ts}`, `PROGRESS.md`
+- Status: done
+- Notes: Renamed the Admin-only publications feature, presentation route, labels, navigation, component symbols, and internal service from Blogs to Publications. Preserved the database `blogLink` symbol, API route directories and `/api/v1/admin/blogs*` fetch URLs, validation `Blog*` contracts, and RAG `'blog'` discriminator. Added an authenticated legacy `/blogs` page redirect to `/publications`; proxy protected routes retain `/blogs` and add `/publications` because its matching uses `pathname.startsWith(route)`.
+
+### 2026-08-28 14:04
+
+- Task: implement Phase 9 centralized notification backend in Admin
+- Mode: implementation
+- Files: `apps/admin/src/lib/validations/notifications.schema.ts`, `apps/admin/src/lib/api/handlers/notification-channels.service.ts`, `apps/admin/src/lib/api/handlers/notification-outbox.service.ts`, `apps/admin/src/lib/api/handlers/__tests__/notification-channels.service.test.ts`, `apps/admin/src/lib/api/handlers/__tests__/notification-outbox.service.test.ts`, `apps/admin/src/app/api/v1/admin/notifications/channels/route.ts`, `apps/admin/src/app/api/v1/admin/notifications/channels/[id]/route.ts`, `apps/admin/src/app/api/v1/admin/notifications/channels/[id]/test/route.ts`, `apps/admin/src/app/api/v1/admin/notifications/rules/route.ts`, `apps/admin/src/app/api/v1/admin/notifications/rules/[id]/route.ts`, `apps/admin/src/app/api/v1/admin/notifications/outbox/route.ts`, `apps/admin/src/app/api/v1/admin/notifications/outbox/[id]/retry/route.ts`, `PROGRESS.md`
+- Status: implemented; workspace verification partially blocked
+- Notes: Added validated channel/rule/outbox payloads, injectable channel and outbox services, channel referential-integrity blocking, failed/dead outbox requeue behavior, authenticated CRUD/rule/outbox routes, and Telegram test-send error passthrough. New service tests pass 8/8 (26 assertions). `bun run typecheck` exited 0 before the final type-only service annotation. Route-directory LSP diagnostics reported zero errors; individual service diagnostics repeatedly timed out on the known cold-start limit. Full `bun test` reported an existing opaque `UnknownError - [object Object]`; lint reached an environment failure because typescript-eslint resolved unsupported TypeScript 7.0, after an earlier run reported only one unrelated concurrent UI warning in `src/features/notifications/hooks/useNotificationOutbox.ts`.
+
+### 2026-08-28 14:24
+
+- Task: complete centralized logging + Telegram Phases 7, 8, and 10
+- Mode: implementation
+- Files: `apps/admin/src/app/api/v1/public/contact/route.ts`, `apps/admin/src/app/api/v1/public/bookings/route.ts`, `apps/admin/src/app/api/v1/public/messages/route.ts`, `apps/admin/src/app/api/v1/public/guestbook/route.ts`, `apps/admin/src/app/api/v1/admin/bookings/[id]/status/route.ts`, `apps/admin/src/lib/services/notificationDispatch.service.ts`, `apps/admin/src/lib/services/logRetention.service.ts`, their service tests, `apps/admin/src/app/api/cron/dispatch-notifications/route.ts`, `apps/admin/src/app/api/cron/cleanup-logs/route.ts`, `docker-compose.prod.yml`, `scripts/docker-prod-up.sh`, `PROGRESS.md`
+- Status: done
+- Notes: Added isolated success-path enqueue calls for all five submission events. Added a transactional `FOR UPDATE SKIP LOCKED` dispatcher with sequential 1100ms spacing, Telegram 429 full-run halt/defer behavior, exponential retry/dead-letter behavior, injectable sender/sleeper/database seams, and unit coverage. Added per-level log retention plus sent-outbox retention and protected cron routes. Production now has an internal-only 60-second notification dispatcher sidecar, and the existing daily cron invokes both chat-log and app-log cleanup. Focused tests passed (6/6); full Admin tests passed (40/40), including the intentional logged notification failure-path test; Admin typecheck passed; production compose parses as YAML. A throwaway injected dispatcher exercise demonstrated sent, throttled-pending/deferred, skipped-after-throttle, and fifth-attempt-dead outcomes, then was deleted. Root lint remains intentionally skipped because the existing TypeScript 7 / typescript-eslint workspace conflict aborts before source analysis.
+
+### 2026-08-28 14:29
+
+- Task: finalize centralized logging + Telegram Phases 7, 8, and 10 verification
+- Mode: verification
+- Status: done
+- Notes: Corrected the exported dispatch seam so `dispatchPendingNotifications` itself accepts an injected database for the required no-Postgres driver exercise. Strengthened retention coverage by making the outbox deletion request explicitly carry `status: 'sent'`; the test asserts it. Corrected the `admin-cron` inline JavaScript syntax for its two cleanup requests. Final verification: focused service tests 6/6, Admin typecheck clean, full Admin suite 40/40 (documented intentional notification failure-path log output), compose YAML and daily cron JavaScript parse clean, and generated Next route manifest includes both `/api/cron/cleanup-logs` and `/api/cron/dispatch-notifications`. The exported dispatcher driver demonstrated `sent`, 429 pending/deferred and halt, plus fifth-attempt `dead`, then was deleted. LSP diagnostics timed out repeatedly despite clean TypeScript compilation; root lint remains skipped because the existing TypeScript 7 / typescript-eslint conflict aborts before source analysis.
+
+### 2026-08-28 15:10
+
+- Task: public-astro SEO/GEO hardening (Phase 1 + Phase 2) and SEO-GEO-PLAYBOOK.md
+- Mode: implementation
+- Files: `apps/public-astro/public/og-image.svg`, `apps/public-astro/src/lib/site.ts`, `apps/public-astro/src/lib/api.ts`, `apps/public-astro/src/components/home/HeroSection.tsx`, `apps/public-astro/src/layouts/BaseLayout.astro`, `apps/public-astro/src/layouts/PageLayout.astro`, `apps/public-astro/src/pages/sitemap-index.xml.ts`, `apps/public-astro/src/pages/robots.txt.ts`, `apps/public-astro/public/llms.txt`, `apps/public-astro/.env.example`, `apps/public-astro/src/components/about/AboutContent.tsx`, `apps/public-astro/src/pages/services.astro`, `apps/public-astro/src/pages/portfolio.astro`, `SEO-GEO-PLAYBOOK.md`, `DESIGN.md`
+- Status: done
+- Notes: **Phase 1.** Added a static `og-image.svg`, hardened `HeroSection` copy and its roles fallback so the hero never renders empty when the Admin API is slow/unreachable, and made `lib/api.ts` fetch helpers resilient (safe variants that degrade pages to partial content instead of throwing). Deduplicated repeated JSON-LD blocks emitted across `BaseLayout`/`PageLayout`, fixed `sitemap-index.xml.ts`/`llms.txt` to resolve the site origin through the new `lib/site.ts` `getSiteUrl()` (env `SITE_URL` first, then Vite `import.meta.env.SITE_URL`, then the hardcoded production domain) instead of a stale/hardcoded value, and removed the meta `keywords` tag (long deprecated as a ranking signal, kept only as crawl noise). **Phase 2.** Added `BreadcrumbList` JSON-LD and a real `dateModified` field where content has a last-updated timestamp, added AI-crawler-specific `robots.txt` allow rules (GPTBot, ClaudeBot, PerplexityBot, etc.) alongside the existing directives, gave the `Person` JSON-LD a stable `@id` so it can be referenced/deduped across pages, surfaced a genuine last-updated date in the About page (replacing a fake/derived timestamp), added the new `/services` page (technical + talks/mentoring service catalogue with availability status pulled from `getAboutSafe()`), and retired the old client-side SPA slide viewer at `/portfolio` in favor of a server-rendered page that reads the deck's own slide HTML at request time and re-renders it as plain scrolling sections in the site's own visual language. Added `SEO-GEO-PLAYBOOK.md` at repo root as the companion reference doc for this work, and added two rows to DESIGN.md's Layout family table for `/services` and the redefined `/portfolio`. Verification: fresh `bun run --filter public-astro build` completed with exit code 0 (server + client build, sitemap generated), no errors — only a pre-existing, unrelated vite chunk-size warning on the three.js bundle.

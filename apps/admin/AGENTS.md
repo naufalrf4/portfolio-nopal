@@ -98,3 +98,13 @@ Authoritative AI control contract for this repository.
 - Distinguish three kinds of temporal values. Instants (`createdAt`, `timestamp`) → format with `formatDate`/`formatDateTime`/`formatJakartaTime`. Date-keys (`YYYY-MM-DD` strings from analytics buckets or `booking_slots.date`) → format with `formatDateKeyShort`/`formatJakartaDateKeyLabel`; `new Date('2026-08-27')` is UTC midnight and renders as the previous day west of UTC. Pure calendar dates (`YYYY-MM` experience months) → use `monthKeyToCalendarDate`/`calendarDateToMonthKey`, which are intentionally local-`Date` based because `date-picker.tsx` (date-fns) reads local fields; converting them to instants renders the wrong month.
 - Rolling cutoffs use `subtractDaysFromNow` (elapsed-ms), not `setDate(getDate() - n)`. Daily analytics buckets use `getJakartaDateKey`, not `toISOString().split('T')[0]`.
 - The drizzle client pins `connection: { timezone: 'Asia/Jakarta' }`, so `timestamptz` columns come back rendered as `+07`. Absolute instants are unaffected. This is only safe because no SQL in this app does date arithmetic (`date_trunc`, `CURRENT_DATE`, `::date`, `AT TIME ZONE`, `EXTRACT`); if you add any, re-check that assumption first.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->
