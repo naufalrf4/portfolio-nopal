@@ -59,6 +59,7 @@ services:
       GA_PROPERTY_ID: ${ADMIN_GA_PROPERTY_ID}
       GA_SERVICE_ACCOUNT: ${ADMIN_GA_SERVICE_ACCOUNT}
       CRON_SECRET: ${ADMIN_CRON_SECRET}
+      TELEGRAM_BOT_TOKEN: ${ADMIN_TELEGRAM_BOT_TOKEN}
     ports:
       - '127.0.0.1:${ADMIN_PORT:-3001}:3001'
     volumes:
@@ -135,6 +136,7 @@ services:
     environment:
       TZ: Asia/Jakarta
       ADMIN_API_URL: http://admin:3001
+      ADMIN_INTERNAL_API_TOKEN: ${ADMIN_INTERNAL_API_TOKEN}
       PUBLIC_SITE_URL: ${PUBLIC_SITE_URL}
       PUBLIC_TURNSTILE_SITE_KEY: ${PUBLIC_TURNSTILE_SITE_KEY}
       RAG_SERVICE_URL: http://rag:3005
@@ -162,6 +164,7 @@ services:
     environment:
       TZ: Asia/Jakarta
       ADMIN_API_URL: http://admin:3001
+      ADMIN_INTERNAL_API_TOKEN: ${ADMIN_INTERNAL_API_TOKEN}
       SITE_URL: ${LINKS_SITE_URL}
     ports:
       - '127.0.0.1:${LINKS_PORT:-3002}:3002'
@@ -181,6 +184,7 @@ services:
     environment:
       TZ: Asia/Jakarta
       ADMIN_API_URL: http://admin:3001
+      ADMIN_INTERNAL_API_TOKEN: ${ADMIN_INTERNAL_API_TOKEN}
       PUBLIC_TURNSTILE_SITE_KEY: ${NGL_PUBLIC_TURNSTILE_SITE_KEY}
       PUBLIC_GA_MEASUREMENT_ID: ${NGL_PUBLIC_GA_MEASUREMENT_ID}
       HOST: 0.0.0.0
