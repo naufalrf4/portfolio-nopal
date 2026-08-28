@@ -7,9 +7,10 @@ interface Props {
   ogImage?: string;
   canonicalUrl?: string;
   ogType?: 'website' | 'article' | 'profile';
+  hideFooter?: boolean;
 }
 
-const { title, description, ogImage, canonicalUrl, ogType } = Astro.props;---
+const { title, description, ogImage, canonicalUrl, ogType, hideFooter } = Astro.props;---
 
 <BaseLayout
   title={title}
@@ -17,6 +18,7 @@ const { title, description, ogImage, canonicalUrl, ogType } = Astro.props;---
   ogImage={ogImage}
   canonicalUrl={canonicalUrl}
   ogType={ogType}
+  hideFooter={hideFooter}
 >
   <slot name="head" slot="head" />
   <slot />

@@ -166,6 +166,7 @@ const AchievementModal: FC<AchievementModalProps> = ({ achievement, isOpen, onCl
                 src={achievement.photos[currentPhotoIndex]}
                 alt={achievement.name}
                 className="h-full w-full object-contain p-2 md:p-3"
+                loading="lazy"
               />
             ) : (
               mediaPlaceholder
@@ -225,6 +226,7 @@ const AchievementModal: FC<AchievementModalProps> = ({ achievement, isOpen, onCl
                     src={photo}
                     alt={`Thumbnail ${idx + 1}`}
                     className="h-full w-full object-cover"
+                    loading="lazy"
                   />
                 </button>
               ))}

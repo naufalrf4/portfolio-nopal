@@ -10,6 +10,7 @@ import {
   RefreshCcw,
 } from 'lucide-react';
 import { getBookingAvailability, submitBooking } from '@/lib/api';
+import { trackConversion } from '@/lib/analytics';
 import { getBrowserTimezone } from '@/lib/submission-context';
 import type { BookingAvailability, BookingSlot } from '@/types';
 import { cn } from '@/lib/utils';
@@ -214,6 +215,7 @@ export function BookingCalendar({ turnstileSiteKey }: BookingCalendarProps) {
       );
       setTurnstileToken('');
       setTurnstileResetKey((value) => value + 1);
+      trackConversion('booking_conversion', booking.id);
       await loadAvailability();
       setCurrentStep(1);
     } catch (error) {

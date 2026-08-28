@@ -130,10 +130,10 @@ export const ExperienceTabs: FC<ExperienceTabsProps> = ({ experience }) => {
               </div>
 
               <Card className="p-5 md:p-6 transition-colors duration-300 hover:border-line-hover">
-                <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-                  <div className="flex items-start gap-3">
+                <div className="mb-4 flex min-w-0 flex-col gap-3 md:flex-row md:items-start md:justify-between">
+                  <div className="flex min-w-0 flex-1 items-start gap-3">
                     {exp.logoUrl ? (
-                      <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-bg-elevated p-2 border border-line">
+                      <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-bg-elevated p-2 border border-line">
                         <img
                           src={exp.logoUrl}
                           alt={`${exp.organization} logo`}
@@ -142,24 +142,26 @@ export const ExperienceTabs: FC<ExperienceTabsProps> = ({ experience }) => {
                         />
                       </div>
                     ) : (
-                      <ExperienceLogoPlaceholder />
+                      <div className="shrink-0">
+                        <ExperienceLogoPlaceholder />
+                      </div>
                     )}
 
-                    <div>
-                      <h4 className="text-lg font-bold text-foreground">{exp.title}</h4>
-                      <p className="font-medium text-primary">{exp.organization}</p>
+                    <div className="min-w-0 flex-1">
+                      <h4 className="text-lg font-bold text-foreground break-words">{exp.title}</h4>
+                      <p className="font-medium text-primary break-words">{exp.organization}</p>
                     </div>
                   </div>
 
-                  <div className="flex flex-col items-start gap-2 text-sm text-muted-foreground md:items-end">
-                    <div className="flex items-center gap-1">
-                      <Calendar size={14} />
-                      <span>{formatExperienceRange(exp)}</span>
+                  <div className="flex min-w-0 flex-col items-start gap-2 text-sm text-muted-foreground md:items-end">
+                    <div className="flex min-w-0 max-w-full items-center gap-1">
+                      <Calendar size={14} className="shrink-0" />
+                      <span className="break-words">{formatExperienceRange(exp)}</span>
                     </div>
                     {exp.location ? (
-                      <div className="inline-flex items-center gap-1 rounded-full bg-primary/5 px-3 py-1 text-xs text-primary">
-                        <MapPin size={12} />
-                        <span>{exp.location}</span>
+                      <div className="inline-flex min-w-0 max-w-full items-center gap-1 rounded-full bg-primary/5 px-3 py-1 text-xs text-primary">
+                        <MapPin size={12} className="shrink-0" />
+                        <span className="break-words">{exp.location}</span>
                       </div>
                     ) : null}
                   </div>

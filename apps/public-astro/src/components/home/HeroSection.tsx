@@ -50,11 +50,12 @@ export function HeroSection({ about }: HeroSectionProps) {
   const [isRoleVisible, setIsRoleVisible] = useState(true);
   const [isGreetingVisible, setIsGreetingVisible] = useState(true);
 
-  const roles = about.roles || ['Full-Stack Engineer'];
+  const roles = about.roles?.length ? about.roles : ['System & Automation Engineer'];
   const socialLinks = filterPublicSocialLinks(about.socialLinks);
   const heroBio =
-    about.shortBio?.trim() || 'I build digital products with care, and make sure they work well.';
-  const fullName = about.fullName?.trim() || 'NaufalRF';
+    about.shortBio?.trim() ||
+    "I like turning messy problems into things that just work. Code, systems, whatever it takes.";
+  const fullName = about.fullName?.trim() || 'Naufal Rizqullah Firdaus';
   const firstName = fullName.split(' ')[0];
   const reduceMotion = useReducedMotion() ?? false;
   const { scrollYProgress } = useScroll({
@@ -99,10 +100,10 @@ export function HeroSection({ about }: HeroSectionProps) {
       className="relative min-h-[100dvh] overflow-hidden"
     >
       {}
-      <div className="relative z-10 mx-auto flex min-h-[100dvh] w-full max-w-7xl items-stretch px-4 sm:px-6 lg:px-8">
+      <div className="relative z-10 mx-auto flex min-h-[100dvh] w-full max-w-7xl flex-col items-stretch px-4 sm:px-6 md:flex-row lg:px-8">
       {}
       <motion.div
-        className="relative z-10 flex w-full flex-col justify-center py-24 md:w-[62%] md:pr-10 lg:pr-16"
+        className="relative z-10 order-2 flex w-full flex-col justify-center py-16 md:order-1 md:w-[62%] md:py-24 md:pr-10 lg:pr-16"
         style={{ opacity: contentOpacity }}
       >
 
@@ -167,13 +168,6 @@ export function HeroSection({ about }: HeroSectionProps) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.55, ease: [0.22, 1, 0.36, 1] }}
         >
-          <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-text-secondary">
-            <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green opacity-60"></span>
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-green shadow-[0_0_8px_var(--green)]"></span>
-            </span>
-            Available for work
-          </div>
 
           <div className="flex flex-row items-center gap-3 md:gap-4">
             <a href="/about">
@@ -182,7 +176,7 @@ export function HeroSection({ about }: HeroSectionProps) {
                 size="sm"
                 className="group px-5 py-2.5 text-sm md:px-7 md:py-3 md:text-base"
               >
-                Learn More
+                See what I've made
                 <ArrowRight
                   className="ml-1 transition-transform duration-300 ease-out group-hover:translate-x-1 group-hover:text-amber md:ml-2"
                   size={16}
@@ -200,25 +194,51 @@ export function HeroSection({ about }: HeroSectionProps) {
                     className="mr-1 transition-transform duration-300 ease-out group-hover:-translate-y-0.5 md:mr-2"
                     size={16}
                   />
-                  Download CV
+                  Grab my CV
                 </Button>
               </a>
             )}
           </div>
+
+          {}
+          {socialLinks.length > 0 && (
+            <motion.div
+              className="flex items-center gap-2 md:hidden"
+              initial={reduceMotion ? false : { opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.7, ease: [0.22, 1, 0.36, 1] }}
+            >
+              {socialLinks.slice(0, 5).map((link, index) => {
+                const Icon = socialIcons[link.platform.toLowerCase()] || Mail;
+                return (
+                  <a
+                    key={index}
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex h-9 w-9 items-center justify-center rounded-lg border border-line text-text-secondary transition-all duration-300 hover:border-line-hover hover:bg-bg-card/60 hover:text-teal"
+                    aria-label={link.platform}
+                  >
+                    <Icon size={16} />
+                  </a>
+                );
+              })}
+            </motion.div>
+          )}
         </motion.div>
       </motion.div>
 
       {}
       {}
-      <div className="pointer-events-auto relative z-10 hidden w-[38%] flex-col items-center justify-center gap-6 border-l border-line/60 bg-bg-elevated/20 px-8 py-24 backdrop-blur-sm md:flex lg:w-[32%] lg:px-12">
+      <div className="pointer-events-auto relative z-10 order-1 flex w-full flex-col items-center justify-center gap-6 border-b border-line/60 bg-bg-elevated/20 px-8 py-8 backdrop-blur-sm md:order-2 md:w-[38%] md:border-b-0 md:border-l md:py-24 lg:w-[32%] lg:px-12">
         {}
-        <div className="absolute left-0 top-0 h-full w-[1px] overflow-hidden opacity-30">
+        <div className="absolute left-0 top-0 hidden h-full w-[1px] overflow-hidden opacity-30 md:block">
           <div className="h-full w-full bg-[linear-gradient(to_bottom,transparent_50%,var(--border)_50%)] bg-[length:1px_12px]" />
         </div>
 
         {}
         <motion.div
-          className="flex w-full justify-center"
+          className="flex w-full max-w-[240px] justify-center md:max-w-none"
           initial={reduceMotion ? false : { opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
@@ -229,7 +249,7 @@ export function HeroSection({ about }: HeroSectionProps) {
         {}
         {socialLinks.length > 0 && (
           <motion.div
-            className="flex items-center justify-center gap-2"
+            className="hidden items-center justify-center gap-2 md:flex"
             initial={reduceMotion ? false : { opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.7, ease: [0.22, 1, 0.36, 1] }}
@@ -251,15 +271,6 @@ export function HeroSection({ about }: HeroSectionProps) {
             })}
           </motion.div>
         )}
-
-        <motion.div
-          className="flex flex-col items-center gap-1 font-mono text-[0.65rem] uppercase tracking-widest text-text-tertiary"
-          initial={reduceMotion ? false : { opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.7, delay: 0.85 }}
-        >
-          <span>Indonesia</span>
-        </motion.div>
       </div>
       </div>
 
@@ -268,8 +279,8 @@ export function HeroSection({ about }: HeroSectionProps) {
         <div className="relative mx-auto h-full w-full max-w-7xl overflow-hidden px-4 sm:px-6 lg:px-8">
           <div className="absolute inset-x-4 inset-y-0 sm:inset-x-6 lg:inset-x-8">
             <div className="hero-dot-grid absolute inset-0" />
-            <div className="hero-glow-a absolute left-[10%] top-[12%] h-[42vh] w-[42vh] rounded-full" />
-            <div className="hero-glow-b absolute bottom-[8%] right-[8%] h-[34vh] w-[34vh] rounded-full" />
+            <div className="hero-glow-a absolute left-[10%] top-[12%] h-[24vh] w-[24vh] sm:h-[34vh] sm:w-[34vh] md:h-[42vh] md:w-[42vh] rounded-full" />
+            <div className="hero-glow-b absolute bottom-[8%] right-[8%] h-[20vh] w-[20vh] sm:h-[28vh] sm:w-[28vh] md:h-[34vh] md:w-[34vh] rounded-full" />
           </div>
         </div>
         <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[var(--bg)] to-transparent" />

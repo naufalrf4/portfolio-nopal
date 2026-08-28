@@ -4,24 +4,15 @@ export interface Message {
   content: string;
   timestamp: Date;
   sources?: string[];
-  citations?: Citation[];
   suggestedActions?: SuggestedAction[];
   metadata?: ChatMetadata;
   pendingAction?: PendingAction;
 }
 
-export interface Citation {
-  source: string;
-  title?: string;
-  route?: string;
-  routeLabel?: string;
-  sourceType?: string;
-  sourceRef?: string;
-  section?: string;
-}
+export type SuggestedActionType = 'open_page' | 'open_link' | 'highlight_section';
 
 export interface SuggestedAction {
-  type: string;
+  type: SuggestedActionType;
   target: string;
   label: string;
 }
@@ -35,11 +26,18 @@ export interface ChatMetadata {
   abstained: boolean;
 }
 
+export interface BookingSlotOption {
+  slotId: string;
+  label: string;
+  dateTimeIso: string;
+}
+
 export interface PendingAction {
   actionId: string;
   tool: string;
   description: string;
   missingFields: string[];
+  slotOptions?: BookingSlotOption[];
 }
 
 export interface ChatRequest {
@@ -51,7 +49,6 @@ export interface ChatResponse {
   sessionId: string;
   message: string;
   sources: string[];
-  citations?: Citation[];
   suggestedActions?: SuggestedAction[];
   metadata?: ChatMetadata;
   pendingAction?: PendingAction;

@@ -254,7 +254,7 @@ const role = about.roles?.[0] ?? 'System & Automation Engineer';
                 />
               ) : (
                 <div className="flex h-full w-full items-center justify-center bg-bg-elevated">
-                  <span className="font-display text-7xl font-bold text-teal">
+                  <span className="font-display text-5xl sm:text-6xl md:text-7xl font-bold text-teal">
                     {fullName.charAt(0)}
                   </span>
                 </div>

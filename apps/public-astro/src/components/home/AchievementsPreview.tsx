@@ -1,4 +1,3 @@
-import { ArrowRight } from 'lucide-react';
 import { Card } from '@/components/shared/Card';
 import { BlurFade } from '@/components/ui/BlurFade';
 import type { Achievement } from '@/types';
@@ -19,18 +18,9 @@ export function AchievementsPreview({ achievements }: AchievementsPreviewProps) 
           <span className="mb-4 font-mono text-xs uppercase tracking-[0.25em] text-teal">
             03 / Recognition
           </span>
-          <div className="flex w-full flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-            <h2 className="font-display text-3xl font-bold tracking-tight text-text-primary md:text-5xl lg:text-6xl">
-              Achievements
-            </h2>
-            <a
-              href="/about#achievements"
-              className="group inline-flex items-center gap-2 font-mono text-sm uppercase tracking-wide text-text-secondary transition-colors hover:text-text-primary"
-            >
-              View All
-              <ArrowRight size={14} className="transition-transform duration-300 group-hover:translate-x-1" />
-            </a>
-          </div>
+          <h2 className="font-display text-3xl font-bold tracking-tight text-text-primary md:text-5xl lg:text-6xl">
+            Achievements
+          </h2>
         </BlurFade>
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">

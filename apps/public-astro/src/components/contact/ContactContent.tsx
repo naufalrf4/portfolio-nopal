@@ -52,8 +52,8 @@ export function ContactContent({ aboutData, turnstileSiteKey }: ContactContentPr
   };
 
   return (
-    <div className="px-4 pb-12 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-7xl">
+    <div className="pb-12">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-12 grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-12">
           <BlurFade delay={0.12} inView className="lg:col-span-7">
             <div className="mb-6 rounded-xl border-line bg-bg-elevated p-1.5">

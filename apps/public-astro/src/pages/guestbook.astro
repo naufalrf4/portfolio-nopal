@@ -1,28 +1,34 @@
 ---
 import PageLayout from '../layouts/PageLayout.astro';
 import { Guestbook } from '@/components/home/Guestbook';
-import { getGuestbookEntries } from '../lib/api';
+import { getGuestbookEntries, ApiFetchFailedError } from '../lib/api';
+import { serviceUnavailableResponse } from '../lib/site';
 
 const turnstileSiteKey =
   process.env.PUBLIC_TURNSTILE_SITE_KEY?.trim() || import.meta.env.PUBLIC_TURNSTILE_SITE_KEY?.trim() || '';
-const guestbookData = await getGuestbookEntries();
+
+let guestbookData;
+try {
+  guestbookData = await getGuestbookEntries();
+} catch (error) {
+  if (error instanceof ApiFetchFailedError) {
+    return serviceUnavailableResponse();
+  }
+  throw error;
+}
 const title = 'Guestbook';
 const description = 'Read guestbook messages left for Naufal Rizqullah Firdaus by collaborators, classmates, builders, and visitors following his system engineering, automation, and real-world project work.';---
 
 <PageLayout title={title} description={description}>
-  <section class="px-4 py-12 sm:px-6 md:py-16 lg:px-8">
-    <div class="mx-auto max-w-7xl">
-      <div class="homepage-reveal-blur" style="animation-delay:0.18s">
-        <Guestbook
-          client:load
-          initialEntries={guestbookData.entries}
-          turnstileSiteKey={turnstileSiteKey}
-          mode="page"
-          heroEyebrow="Guestbook"
-          heroTitle="Leave a mark"
-          heroDescription="A running wall of notes from people who stopped by. Scroll through, or leave one of your own."
-        />
-      </div>
-    </div>
-  </section>
+  <div class="homepage-reveal-blur" style="animation-delay:0.18s">
+    <Guestbook
+      client:load
+      initialEntries={guestbookData.entries}
+      turnstileSiteKey={turnstileSiteKey}
+      mode="page"
+      heroEyebrow="Guestbook"
+      heroTitle="Leave a mark"
+      heroDescription="Notes from people who stopped by. Read a few, or leave your own."
+    />
+  </div>
 </PageLayout>

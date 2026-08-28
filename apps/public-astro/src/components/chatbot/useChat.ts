@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { sendChatMessage, confirmAction } from './chat.service';
 import { useChatSession } from './useChatSession';
+import { getLastAssistantMessageId } from './messageUtils';
 import type { Message } from './types';
 
 const MESSAGE_STORAGE_KEY = 'portfolio-chat-messages-v1';
@@ -80,11 +81,14 @@ function persistMessages(messages: Message[]) {
   }
 
   try {
+    const lastAssistantMessageId = getLastAssistantMessageId(messages);
+
     window.localStorage.setItem(
       MESSAGE_STORAGE_KEY,
       JSON.stringify(
-        messages.map((message) => ({
+        messages.map(({ suggestedActions, ...message }) => ({
           ...message,
+          ...(message.id === lastAssistantMessageId ? { suggestedActions } : {}),
           timestamp: message.timestamp.toISOString(),
         }))
       )
@@ -114,6 +118,7 @@ export function useChat(): UseChat {
   const [confirmingMessageId, setConfirmingMessageId] = useState<string | null>(null);
   const { sessionId, setSessionId, clearSession } = useChatSession();
   const streamingIntervalRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isSendingRef = useRef(false);
 
   useEffect(() => {
     setMessages(readStoredMessages());
@@ -130,7 +135,8 @@ export function useChat(): UseChat {
 
   const sendMessage = useCallback(
     async (content: string) => {
-      if (!content.trim()) return;
+      if (!content.trim() || isSendingRef.current) return;
+      isSendingRef.current = true;
 
       const userMessage: Message = {
         id: generateId(),
@@ -165,7 +171,6 @@ export function useChat(): UseChat {
           content: '',
           timestamp: new Date(),
           sources: response.sources,
-          citations: response.citations,
           suggestedActions: response.suggestedActions,
           metadata: response.metadata,
           pendingAction: response.pendingAction,
@@ -196,6 +201,8 @@ export function useChat(): UseChat {
         const errorMessage = err instanceof Error ? err.message : 'Failed to send message';
         setError(errorMessage);
         setIsLoading(false);
+      } finally {
+        isSendingRef.current = false;
       }
     },
     [sessionId, setSessionId]

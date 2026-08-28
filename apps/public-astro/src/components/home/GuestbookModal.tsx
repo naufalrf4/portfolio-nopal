@@ -1,10 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { AlertCircle, Chrome, Send, UserCircle2 } from 'lucide-react';
+import { AlertCircle, Send } from 'lucide-react';
 import { getBrowserTimezone } from '@/lib/submission-context';
 import { Button } from '../shared/Button';
 import { Textarea } from '../shared/Textarea';
 import { ResponsiveModal } from '../shared/ResponsiveModal';
 import { TurnstileWidget } from '../shared/TurnstileWidget';
+import { GoogleLogo } from '../shared/GoogleLogo';
 
 interface GuestbookUser {
   id: string;
@@ -180,11 +181,12 @@ export function GuestbookModal({
             </Button>
             <Button
               type="button"
-              variant="primary"
+              variant="default"
               isLoading={isSigningIn}
               onClick={handleGoogleSignIn}
+              className="gap-2.5 border-[#dadce0] bg-white text-[#1f1f1f] hover:!text-[#1f1f1f] hover:border-[#c6c6c6]"
             >
-              <Chrome size={18} className="mr-2" />
+              <GoogleLogo size={18} />
               Continue with Google
             </Button>
           </div>
@@ -248,15 +250,15 @@ export function GuestbookModal({
         <div className="space-y-4">
           <div className="rounded-xl border border-line bg-bg-elevated p-5 md:p-6">
             <div className="flex items-center gap-4">
-              <div className="flex h-14 w-14 items-center justify-center rounded-xl border border-teal/30 bg-[var(--teal-soft)] text-teal">
-                <UserCircle2 size={28} />
+              <div className="flex h-14 w-14 items-center justify-center rounded-xl border border-line bg-bg-card">
+                <GoogleLogo size={26} />
               </div>
               <div>
                 <h3 className="text-xl font-bold font-display text-text-primary">
                   Sign in with Google
                 </h3>
                 <p className="mt-1 text-sm leading-relaxed text-text-secondary">
-                  You will come right back here and the guestbook composer will open automatically.
+                  You will land right back here, ready to write your message.
                 </p>
               </div>
             </div>

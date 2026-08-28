@@ -41,6 +41,7 @@ export interface Project {
   imageUrl: string | null;
   featured: boolean;
   createdAt: string;
+  updatedAt: string;
   projectDate?: string | null;
   images: ProjectImage[];
 }

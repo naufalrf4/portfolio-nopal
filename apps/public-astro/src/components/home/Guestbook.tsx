@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { LogIn, MessageSquare, Plus, UserCircle2 } from 'lucide-react';
+import { Plus, UserCircle2 } from 'lucide-react';
 import { Button } from '../shared/Button';
 import { Section } from '../shared/Section';
+import { GoogleLogo } from '../shared/GoogleLogo';
 import { GuestbookModal } from './GuestbookModal';
 import type { GuestbookEntry } from '@/types';
 import { BlurFade } from '@/components/ui/BlurFade';
@@ -158,7 +159,7 @@ export function Guestbook({
           <div className="flex items-center gap-4">
             <div className="h-10 w-10 overflow-hidden rounded-full bg-line">
               {user.image ? (
-                <img src={user.image} alt={user.name || ''} className="h-full w-full object-cover" />
+                <img src={user.image} alt={user.name || ''} className="h-full w-full object-cover" loading="lazy" />
               ) : (
                 <UserCircle2 className="h-full w-full p-2 text-text-tertiary" />
               )}
@@ -189,18 +190,18 @@ export function Guestbook({
         </div>
       ) : (
         <div className="relative z-10 space-y-6">
-          <p className="text-center font-mono text-xs text-text-tertiary">Sign in to leave your mark</p>
+          <p className="text-center font-mono text-xs text-text-tertiary">Add your voice to the guestbook</p>
           <Button
-            variant="accent"
+            variant="default"
             size="md"
             onClick={() => setIsModalOpen(true)}
-            className="w-full justify-center"
+            className="w-full justify-center gap-2.5 border-[#dadce0] bg-white text-[#1f1f1f] hover:!text-[#1f1f1f] hover:border-[#c6c6c6]"
             data-analytics-button
             data-entity-type="guestbook_signin_cta"
             data-entity-id="guestbook"
             data-entity-label="Sign in to guestbook"
           >
-            <LogIn size={18} className="mr-2" />
+            <GoogleLogo size={18} />
             Sign in to post
           </Button>
         </div>
@@ -221,16 +222,16 @@ export function Guestbook({
 
   if (isPageMode) {
     return (
-      <Section id="guestbook" scene="signal" className="relative w-full py-8">
-        <div className="mx-auto w-full max-w-7xl">
+      <Section id="guestbook" scene="signal" className="relative w-full py-12 md:py-16">
+        <div className="w-full">
           <div className="mb-10 grid gap-8 lg:grid-cols-[1fr_360px] lg:items-start">
             {heroTitle && (
-              <PageHero
-                eyebrow={heroEyebrow}
-                title={heroTitle}
+<PageHero
+eyebrow={heroEyebrow}
+title={heroTitle}
                 description={heroDescription}
                 className="mb-0 md:mb-0"
-              />
+/>
             )}
             <div className="relative">
               {composerCard}
@@ -241,14 +242,14 @@ export function Guestbook({
 
           {entries.length === 0 ? (
             <div className="flex h-32 w-full items-center justify-center rounded-2xl border border-dashed border-line">
-              <span className="font-mono text-xs text-text-tertiary">NO MESSAGES YET</span>
+              <span className="font-mono text-xs text-text-tertiary">No messages yet</span>
             </div>
           ) : (
             <div className="columns-1 gap-5 sm:columns-2 lg:columns-3">
               {entries.map((entry) => (
                 <article
                   key={entry.id}
-                  className="mb-5 break-inside-avoid rounded-2xl border border-line bg-bg-card p-5 transition-colors hover:border-line-hover"
+                  className="mb-5 break-inside-avoid rounded-2xl border border-line bg-bg-card p-5 transition-all duration-300 hover:-translate-y-0.5 hover:border-line-hover"
                 >
                   <div className="flex items-center gap-3">
                     <Avatar image={entry.user.image} />
@@ -284,7 +285,7 @@ export function Guestbook({
           <BlurFade delay={0.2} inView className="order-2 w-full min-w-0 lg:order-1">
             {homeRows.length === 0 ? (
               <div className="flex h-32 w-full items-center justify-center rounded-2xl border border-dashed border-line">
-                <span className="font-mono text-xs text-text-tertiary">NO SIGNALS DETECTED</span>
+                <span className="font-mono text-xs text-text-tertiary">No messages yet</span>
               </div>
             ) : (
               <div className="relative flex w-full flex-col gap-4 overflow-hidden">
@@ -323,17 +324,12 @@ export function Guestbook({
 
           {}
           <BlurFade delay={0.4} inView className="order-1 flex flex-col justify-center lg:order-2">
-            <div className="mb-8 flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-sm bg-text-primary text-bg">
-                <MessageSquare size={18} />
-              </div>
-              <span className="font-mono text-xs uppercase tracking-widest text-text-primary">Incoming Transmissions</span>
-            </div>
+            <span className="mb-4 font-mono text-xs uppercase tracking-[0.25em] text-teal">05 / Guestbook</span>
             <h2 className="font-display text-3xl font-bold tracking-tight text-text-primary md:text-4xl lg:text-5xl">
               Guestbook
             </h2>
             <p className="mt-4 text-base leading-relaxed text-text-secondary md:text-lg">
-              A few words from visitors, collaborators, and friends. Leave a short public note once you sign in with Google.
+              A few words from people who stopped by. Reactions, notes, and quick hellos.
             </p>
 
             <div className="relative mt-12">

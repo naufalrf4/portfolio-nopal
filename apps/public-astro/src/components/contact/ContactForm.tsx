@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { AlertCircle, CheckCircle2, Send } from 'lucide-react';
 import { submitContactForm } from '@/lib/api';
+import { trackConversion } from '@/lib/analytics';
 import { getBrowserTimezone } from '@/lib/submission-context';
 import { Button } from '../shared/Button';
 import { Input } from '../shared/Input';
@@ -112,6 +113,7 @@ export function ContactForm({ turnstileSiteKey }: ContactFormProps) {
       setSubmitSuccess('Message sent successfully. I will get back to you soon.');
       setTurnstileToken('');
       setTurnstileResetKey((value) => value + 1);
+      trackConversion('contact_conversion', 'contact-form');
     } catch (error) {
       setSubmitError(error instanceof Error ? error.message : 'Failed to send your message.');
       setTurnstileToken('');

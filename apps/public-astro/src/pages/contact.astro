@@ -2,9 +2,12 @@
 import { ContactContent } from '../components/contact/ContactContent';
 import { PageHero } from '../components/shared';
 import PageLayout from '../layouts/PageLayout.astro';
-import { getAbout } from '../lib/api';
+import { getAboutSafe } from '../lib/api';
 
-const aboutData = await getAbout();
+// Contact form is functional even without profile data (e.g. social links),
+// so this uses the non-throwing safe variant rather than 503-ing the whole
+// page when the Admin API is unreachable.
+const aboutData = await getAboutSafe();
 const turnstileSiteKey =
   process.env.PUBLIC_TURNSTILE_SITE_KEY?.trim() ||
   import.meta.env.PUBLIC_TURNSTILE_SITE_KEY?.trim() ||
@@ -15,12 +18,12 @@ const description =
   'Reach out to Naufal Rizqullah Firdaus for system integration, automation, IoT, cloud, or AI workflow conversations, hiring, collaboration, speaking, and engineering opportunities across Indonesia or remote teams.';---
 
 <PageLayout title={title} description={description}>
-  <div class="px-4 py-12 sm:px-6 md:py-16 lg:px-8">
-    <div class="mx-auto max-w-7xl">
+  <div class="py-12 md:py-16">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <PageHero
-        eyebrow="Get in touch"
-        title="Let's build something"
-        description="Send a direct message, ask a question, or book a call about integrated systems, automation workflows, IoT platforms, AI-enabled operations, speaking, or collaboration opportunities."
+        eyebrow="Say hello"
+        title="Let's talk"
+        description="Got a project, a question, or just want to chat? Drop a message or book a call. I read everything."
       />
     </div>
     <ContactContent client:load aboutData={aboutData} turnstileSiteKey={turnstileSiteKey} />

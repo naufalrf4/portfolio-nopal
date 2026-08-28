@@ -1,9 +1,19 @@
 ---
 import PageLayout from '../layouts/PageLayout.astro';
 import { AboutContent } from '../components/about/AboutContent';
-import { getAbout, getAchievements } from '../lib/api';
+import { getAbout, getAchievements, ApiFetchFailedError } from '../lib/api';
+import { serviceUnavailableResponse } from '../lib/site';
+import { formatDate } from '../lib/utils';
 
-const [about, achievementsData] = await Promise.all([getAbout(), getAchievements()]);
+let about, achievementsData;
+try {
+  [about, achievementsData] = await Promise.all([getAbout(), getAchievements()]);
+} catch (error) {
+  if (error instanceof ApiFetchFailedError) {
+    return serviceUnavailableResponse();
+  }
+  throw error;
+}
 
 const title = "About";
 const description = "Naufal Rizqullah Firdaus is a System & Automation Engineer and Computer Engineering student at IPB University, building software, cloud, IoT, and AI systems from Depok, Indonesia.";---
@@ -15,6 +25,11 @@ const description = "Naufal Rizqullah Firdaus is a System & Automation Engineer 
   ogType="profile"
 >
   <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 md:py-12 lg:px-8">
-    <AboutContent client:load about={about} achievements={achievementsData.achievements} />
+    <AboutContent
+      client:load
+      about={about}
+      achievements={achievementsData.achievements}
+      lastUpdated={formatDate(about.updatedAt)}
+    />
   </div>
 </PageLayout>

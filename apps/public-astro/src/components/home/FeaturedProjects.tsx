@@ -20,11 +20,11 @@ export function FeaturedProjects({ projects }: FeaturedProjectsProps) {
     <section data-scene="circuit" className="relative w-full border-t border-line py-16 md:py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {}
-        <BlurFade direction="left" offset={24} className="mb-10 flex-col items-end">
+        <BlurFade direction="up" offset={24} className="mb-10 flex flex-col items-start">
           <span className="font-mono text-xs uppercase tracking-[0.25em] text-teal mb-4">
             02 / Selected Work
           </span>
-          <h2 className="max-w-lg text-right font-display text-3xl font-bold tracking-tight text-text-primary md:text-5xl lg:text-6xl">
+          <h2 className="max-w-lg font-display text-3xl font-bold tracking-tight text-text-primary md:text-5xl lg:text-6xl">
             Featured Projects
           </h2>
         </BlurFade>

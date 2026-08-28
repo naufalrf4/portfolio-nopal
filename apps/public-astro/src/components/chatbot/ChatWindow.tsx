@@ -3,22 +3,16 @@ import { useChat } from './useChat';
 import { ChatHeader } from './ChatHeader';
 import { MessageList } from './MessageList';
 import { ChatInput } from './ChatInput';
+import { ChatSidebar } from './ChatSidebar';
 import { AlertCircle } from 'lucide-react';
 
 interface ChatWindowProps {
   onClose?: () => void;
-  onToggleSize?: () => void;
   isFullPage?: boolean;
-  isExpanded?: boolean;
   className?: string;
 }
 
-export function ChatWindow({
-  onToggleSize,
-  isFullPage = false,
-  isExpanded = false,
-  className,
-}: ChatWindowProps) {
+export function ChatWindow({ onClose, isFullPage = false, className }: ChatWindowProps) {
   const {
     messages,
     isLoading,
@@ -28,32 +22,29 @@ export function ChatWindow({
     shouldScrollToBottom,
     confirmPendingAction,
     confirmingMessageId,
+    streamingMessageId,
   } = useChat();
 
-  return (
+  const chatCard = (
     <div
       className={cn(
         'flex flex-col overflow-hidden rounded-xl bg-bg-card',
         'shadow-[0_24px_64px_-16px_rgba(0,0,0,0.5)]',
         'border border-line',
-        isFullPage ? 'h-full' : 'h-[500px]',
-        className
+        isFullPage ? 'h-full min-h-0' : 'h-full',
+        !isFullPage && className
       )}
     >
-      <ChatHeader
-        onToggleSize={onToggleSize}
-        onClear={clearMessages}
-        isFullPage={isFullPage}
-        isExpanded={isExpanded}
-      />
+      <ChatHeader onClose={onClose} onClear={clearMessages} isFullPage={isFullPage} />
 
       <MessageList
         messages={messages}
         isLoading={isLoading}
         shouldScrollToBottom={shouldScrollToBottom}
         onConfirmAction={confirmPendingAction}
-        onQuickPrompt={sendMessage}
         confirmingMessageId={confirmingMessageId}
+        streamingMessageId={streamingMessageId}
+        onSelectSlot={sendMessage}
       />
 
       {error && (
@@ -66,6 +57,23 @@ export function ChatWindow({
       )}
 
       <ChatInput onSend={sendMessage} isLoading={isLoading} />
+    </div>
+  );
+
+  if (!isFullPage) {
+    return chatCard;
+  }
+
+  return (
+    <div
+      className={cn(
+        'grid h-full min-h-0 grid-cols-1 grid-rows-[auto_minmax(0,1fr)] gap-3',
+        'lg:grid-cols-[minmax(0,280px)_minmax(0,1fr)] lg:grid-rows-none lg:gap-8',
+        className
+      )}
+    >
+      <ChatSidebar onSelectPrompt={sendMessage} isLoading={isLoading} />
+      {chatCard}
     </div>
   );
 }

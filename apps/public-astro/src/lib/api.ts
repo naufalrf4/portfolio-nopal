@@ -1,4 +1,4 @@
-import { createAbortSignal, HttpError, isAbortError, isSuccessEnvelope } from '@naufalrf/http';
+import { createAbortSignal, createLogger, createLogShipper, HttpError, isAbortError, isSuccessEnvelope } from '@naufalrf/http';
 import type {
   ProjectsResponse,
   Project,
@@ -10,6 +10,7 @@ import type {
   BookingAvailability,
   BookingSubmissionInput,
 } from '../types';
+import type { LogEntryInput } from '@naufalrf/contracts';
 import { MOCK_ABOUT, MOCK_ACHIEVEMENTS, MOCK_BLOGS, MOCK_GUESTBOOK, MOCK_PROJECTS } from './mock-data';
 
 const API_BASE =
@@ -21,6 +22,36 @@ const API_TIMEOUT_MS = 5000;
 const USE_MOCK =
   (typeof process !== 'undefined' ? process.env.PUBLIC_MOCK_DATA?.trim() : undefined) === 'true' ||
   import.meta.env.PUBLIC_MOCK_DATA?.trim() === 'true';
+
+const ADMIN_INTERNAL_API_TOKEN =
+  (typeof process !== 'undefined' ? process.env.ADMIN_INTERNAL_API_TOKEN?.trim() : undefined) ||
+  import.meta.env.ADMIN_INTERNAL_API_TOKEN?.trim() ||
+  (typeof process !== 'undefined' ? process.env.ADMIN_SERVICE_TOKEN?.trim() : undefined) ||
+  import.meta.env.ADMIN_SERVICE_TOKEN?.trim() ||
+  '';
+
+function createPublicApiSink(): ((entry: LogEntryInput) => void) | undefined {
+  if (!ADMIN_INTERNAL_API_TOKEN) return undefined;
+  const shipper = createLogShipper({
+    endpoint: `${API_BASE}/api/v1/internal/logs`,
+    token: ADMIN_INTERNAL_API_TOKEN,
+  });
+  return (entry) => shipper.enqueue(entry);
+}
+
+export const logger = createLogger({
+  service: 'public-astro',
+  sink: createPublicApiSink(),
+});
+
+// Real profile URLs referenced elsewhere in this codebase (see
+// src/lib/mock-data.ts). Used so `about.socialLinks` is never completely
+// empty even when the CMS is unreachable and the hard fallback kicks in.
+const FALLBACK_SAME_AS: string[] = [
+  'https://github.com/naufalrf',
+  'https://linkedin.com/in/naufalrf',
+  'https://twitter.com/naufalrf',
+];
 
 const FALLBACK_ABOUT: AboutData = {
   fullName: 'Naufal Rizqullah Firdaus',
@@ -35,8 +66,25 @@ const FALLBACK_ABOUT: AboutData = {
   availabilityStatus: null,
   skills: [],
   experience: [],
-  socialLinks: [],
+  socialLinks: FALLBACK_SAME_AS.map((url) => ({
+    platform: new URL(url).hostname.replace(/^www\./, '').split('.')[0],
+    url,
+  })),
 };
+
+/**
+ * Thrown by fetch functions below when the upstream Admin API is unreachable
+ * or errors out, as opposed to genuinely returning an empty result. Callers
+ * (Astro pages) can catch this specifically to distinguish "nothing to show"
+ * from "we couldn't ask", and respond with a 503 instead of silently
+ * rendering an empty shell as a 200.
+ */
+export class ApiFetchFailedError extends Error {
+  constructor(message: string, cause?: unknown) {
+    super(message, { cause });
+    this.name = 'ApiFetchFailedError';
+  }
+}
 
 class ApiClientError extends HttpError {
   constructor(message: string, cause?: unknown) {
@@ -127,18 +175,17 @@ export async function getProjects(params?: {
   }
   try {
     return await requestProjects(params);
-  } catch {
-    return {
-      projects: [],
-      meta: { total: 0, featured: 0 },
-    };
+  } catch (error) {
+    logger.error('Failed to fetch projects from Admin API', error, { params });
+    throw new ApiFetchFailedError('Failed to fetch projects from Admin API', error);
   }
 }
 
 export async function getProjectBySlug(slug: string): Promise<Project | null> {
   try {
     return await apiFetch<Project>(`/api/v1/public/projects/${encodeURIComponent(slug)}`);
-  } catch {
+  } catch (error) {
+    logger.error('Failed to fetch project by slug from Admin API', error, { slug });
     return null;
   }
 }
@@ -151,15 +198,34 @@ export async function getBlogs(limit?: number): Promise<BlogsResponse> {
   const query = limit ? `?limit=${limit}` : '';
   try {
     return await apiFetch<BlogsResponse>(`/api/v1/public/blogs${query}`);
-  } catch {
-    return { blogs: [], meta: { total: 0 } };
+  } catch (error) {
+    logger.error('Failed to fetch blogs from Admin API', error, { limit });
+    throw new ApiFetchFailedError('Failed to fetch blogs from Admin API', error);
   }
 }
 
+/**
+ * Fetches the About/profile data. On failure this throws `ApiFetchFailedError`
+ * rather than silently returning `FALLBACK_ABOUT` - callers that render a
+ * full page around this data (e.g. index.astro) should catch and return a
+ * 503. `FALLBACK_ABOUT` is exported for callers (e.g. BaseLayout, which
+ * cannot fail the whole response for every page) that need a best-effort
+ * default instead.
+ */
 export async function getAbout(): Promise<AboutData> {
   if (USE_MOCK) return MOCK_ABOUT;
   try {
     return await apiFetch<AboutData>('/api/v1/public/about');
+  } catch (error) {
+    logger.error('Failed to fetch about data from Admin API', error);
+    throw new ApiFetchFailedError('Failed to fetch about data from Admin API', error);
+  }
+}
+
+/** Best-effort About data for layout-level callers that must never throw. */
+export async function getAboutSafe(): Promise<AboutData> {
+  try {
+    return await getAbout();
   } catch {
     return FALLBACK_ABOUT;
   }
@@ -173,8 +239,9 @@ export async function getAchievements(limit?: number): Promise<AchievementsRespo
   const query = limit ? `?limit=${limit}` : '';
   try {
     return await apiFetch<AchievementsResponse>(`/api/v1/public/achievements${query}`);
-  } catch {
-    return { achievements: [], meta: { total: 0 } };
+  } catch (error) {
+    logger.error('Failed to fetch achievements from Admin API', error, { limit });
+    throw new ApiFetchFailedError('Failed to fetch achievements from Admin API', error);
   }
 }
 
@@ -182,8 +249,9 @@ export async function getGuestbookEntries(): Promise<GuestbookResponse> {
   if (USE_MOCK) return { entries: MOCK_GUESTBOOK };
   try {
     return await apiFetch<GuestbookResponse>('/api/v1/public/guestbook');
-  } catch {
-    return { entries: [] };
+  } catch (error) {
+    logger.error('Failed to fetch guestbook entries from Admin API', error);
+    throw new ApiFetchFailedError('Failed to fetch guestbook entries from Admin API', error);
   }
 }
 

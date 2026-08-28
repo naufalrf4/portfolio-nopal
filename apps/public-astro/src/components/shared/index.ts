@@ -4,5 +4,4 @@ export * from './Card';
 export * from './PageHero';
 export * from './PresenceChip';
 export * from './Section';
-export * from './SectionHeader';
 export * from './TurnstileWidget';

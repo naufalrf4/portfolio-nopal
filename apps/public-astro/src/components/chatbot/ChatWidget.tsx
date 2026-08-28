@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { MessageCircle, X } from 'lucide-react';
 import { ChatWindow } from './ChatWindow';
@@ -12,8 +13,6 @@ interface ChatWidgetProps {
 
 export function ChatWidget({ currentPath }: ChatWidgetProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [isAnimating, setIsAnimating] = useState(false);
   const pathname = useAstroPathname(currentPath);
 
   useEffect(() => {
@@ -22,7 +21,6 @@ export function ChatWidget({ currentPath }: ChatWidgetProps) {
     }
 
     setIsOpen(false);
-    setIsExpanded(false);
     sessionStorage.removeItem(WIDGET_STATE_KEY);
   }, [pathname]);
 
@@ -44,7 +42,6 @@ export function ChatWidget({ currentPath }: ChatWidgetProps) {
       return;
     }
 
-    setIsAnimating(true);
     if (isOpen) {
       setIsOpen(false);
       sessionStorage.removeItem(WIDGET_STATE_KEY);
@@ -52,19 +49,11 @@ export function ChatWidget({ currentPath }: ChatWidgetProps) {
       setIsOpen(true);
       sessionStorage.setItem(WIDGET_STATE_KEY, 'true');
     }
-    setTimeout(() => setIsAnimating(false), 300);
   }, [isOpen]);
 
   const handleClose = useCallback(() => {
-    setIsAnimating(true);
     setIsOpen(false);
-    setIsExpanded(false);
     sessionStorage.removeItem(WIDGET_STATE_KEY);
-    setTimeout(() => setIsAnimating(false), 300);
-  }, []);
-
-  const handleToggleSize = useCallback(() => {
-    setIsExpanded((prev) => !prev);
   }, []);
 
   if (pathname === '/ai-chatbot') {
@@ -76,44 +65,36 @@ export function ChatWidget({ currentPath }: ChatWidgetProps) {
       <button
         onClick={handleToggle}
         className={cn(
-          'fixed bottom-20 md:bottom-6 left-4 md:left-auto md:right-6 z-[60]',
+          'fixed bottom-28 md:bottom-6 left-4 md:left-auto md:right-6 z-[60]',
           'w-14 h-14 rounded-full',
           'bg-teal text-bg',
           'shadow-[0_8px_24px_-8px_var(--teal-glow)]',
           'hover:shadow-[0_12px_32px_-8px_var(--teal-glow)]',
           'hover:scale-105',
           'active:scale-95',
-          'transition-all duration-300',
-          'flex items-center justify-center',
-          isOpen && 'rotate-180'
+          'transition-transform duration-300',
+          'flex items-center justify-center'
         )}
         aria-label={isOpen ? 'Close chat' : 'Open chat'}
       >
-        <span
-          className={cn('transition-transform duration-300', isOpen ? 'rotate-180' : 'rotate-0')}
-        >
-          {isOpen ? <X size={24} /> : <MessageCircle size={24} />}
-        </span>
+        {isOpen ? <X size={24} /> : <MessageCircle size={24} />}
       </button>
 
-      {isOpen && (
-        <div
-          className={cn(
-            'fixed z-[60]',
-            'transition-all duration-300 ease-out',
-            isExpanded
-              ? 'bottom-4 right-4 left-4 md:left-auto md:w-[600px] h-[80vh]'
-              : 'bottom-36 md:bottom-24 left-4 md:left-auto md:right-6 w-[calc(100vw-2rem)] md:w-96 h-[500px]',
-            isAnimating ? 'animate-in fade-in zoom-in-95' : ''
-          )}
-        >
-          <ChatWindow
-            onClose={handleClose}
-            onToggleSize={handleToggleSize}
-            isExpanded={isExpanded}
-          />
-        </div>
-      )}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: 16, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 16, scale: 0.96 }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            className={cn(
+              'fixed z-[60] bottom-24 right-6 w-96 h-[500px]'
+            )}
+          >
+            <ChatWindow onClose={handleClose} />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }

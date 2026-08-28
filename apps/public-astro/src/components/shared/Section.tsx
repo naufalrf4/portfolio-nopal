@@ -15,12 +15,12 @@ export function Section({ children, className, id, tone = 'base', scene }: Secti
       id={id}
       data-scene={scene}
       className={cn(
-        'py-24 md:py-32 px-4 sm:px-6 lg:px-8 overflow-x-hidden',
+        'py-24 md:py-32 overflow-x-hidden',
         tone === 'elevated' && 'bg-bg-elevated border-y border-line',
         className
       )}
     >
-      <div className="mx-auto max-w-7xl">{children}</div>
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">{children}</div>
     </section>
   );
 }

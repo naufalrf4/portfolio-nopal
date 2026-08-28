@@ -2,21 +2,30 @@
 import { BlogsContent } from '@/components/blogs';
 import { PageHero } from '@/components/shared';
 import PageLayout from '@/layouts/PageLayout.astro';
-import { getBlogs } from '@/lib/api';
+import { getBlogs, ApiFetchFailedError } from '@/lib/api';
+import { serviceUnavailableResponse } from '@/lib/site';
 
-const { blogs } = await getBlogs();
+let blogs;
+try {
+  ({ blogs } = await getBlogs());
+} catch (error) {
+  if (error instanceof ApiFetchFailedError) {
+    return serviceUnavailableResponse();
+  }
+  throw error;
+}
 
 const title = 'Publication';
 const description =
   'Articles, engineering notes, and published journals or thesis work from Naufal Rizqullah Firdaus, covering automation, IoT, cloud software, and AI.';---
 
 <PageLayout title={title} description={description}>
-  <div class="min-h-screen px-4 py-12 sm:px-6 md:py-16 lg:px-8">
-    <div class="mx-auto max-w-7xl">
+  <div class="min-h-screen py-12 md:py-16">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <PageHero
         eyebrow="Writing"
-        title="Publication"
-        description="Articles, notes, and published work, from engineering write-ups to journals and thesis papers."
+        title="Things I've written"
+        description="Stuff I've written myself, plus a few pieces others wrote about my work."
       />
 
       <BlogsContent initialBlogs={blogs} client:load />

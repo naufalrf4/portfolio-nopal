@@ -11,7 +11,11 @@
   "dependencies": {
     "@astrojs/node": "^9.5.4",
     "@astrojs/react": "^4.4.2",
+    "@astrojs/rss": "^4.0.19",
     "@astrojs/sitemap": "^3.7.0",
+    "@naufalrf/contracts": "workspace:*",
+    "@naufalrf/design-tokens": "workspace:*",
+    "@naufalrf/http": "workspace:*",
     "astro": "^5.17.1",
     "clsx": "^2.1.1",
     "framer-motion": "^12.34.3",
@@ -21,13 +25,11 @@
     "react-markdown": "^10.1.0",
     "rehype-sanitize": "^6.0.0",
     "remark-gfm": "^4.0.1",
-    "tailwind-merge": "^3.5.0",
-    "@naufalrf/http": "workspace:*",
-    "@naufalrf/contracts": "workspace:*",
-    "@naufalrf/design-tokens": "workspace:*"
+    "tailwind-merge": "^3.5.0"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.2.2",
+    "sharp": "^0.35.4",
     "tailwindcss": "^4.2.1"
   }
 }

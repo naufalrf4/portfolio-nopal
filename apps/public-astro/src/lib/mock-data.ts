@@ -44,6 +44,7 @@ export const MOCK_ABOUT: AboutData = {
     { platform: 'linkedin', url: 'https://linkedin.com/in/naufalrf' },
     { platform: 'twitter', url: 'https://twitter.com/naufalrf' },
   ],
+  updatedAt: '2026-07-01T00:00:00.000Z',
 };
 
 const thumb = (label: string) => ({
@@ -67,6 +68,7 @@ export const MOCK_PROJECTS: Project[] = [
     imageUrl: 'https://placehold.co/800x500/0f172a/3ed9c4?text=Presence',
     featured: true,
     createdAt: '2026-06-01T00:00:00.000Z',
+    updatedAt: '2026-06-01T00:00:00.000Z',
     images: [thumb('Presence')],
   },
   {
@@ -81,6 +83,7 @@ export const MOCK_PROJECTS: Project[] = [
     imageUrl: 'https://placehold.co/800x500/0f172a/3ed9c4?text=IoT',
     featured: true,
     createdAt: '2026-05-01T00:00:00.000Z',
+    updatedAt: '2026-05-01T00:00:00.000Z',
     images: [thumb('IoT')],
   },
   {
@@ -95,6 +98,7 @@ export const MOCK_PROJECTS: Project[] = [
     imageUrl: 'https://placehold.co/800x500/0f172a/3ed9c4?text=RAG+Chat',
     featured: true,
     createdAt: '2026-04-01T00:00:00.000Z',
+    updatedAt: '2026-04-01T00:00:00.000Z',
     images: [thumb('RAG Chat')],
   },
 ];

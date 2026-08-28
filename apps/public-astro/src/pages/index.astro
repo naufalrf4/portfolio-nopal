@@ -7,15 +7,25 @@ import { Guestbook } from '../components/home/Guestbook';
 import { LatestArticles } from '../components/home/LatestArticles';
 import { TechnicalExpertise } from '../components/home/TechnicalExpertise';
 import { Meteors } from '../components/ui/Meteors';
-import { getAbout, getProjects, getBlogs, getGuestbookEntries, getAchievements } from '../lib/api';
+import { getAbout, getProjects, getBlogs, getGuestbookEntries, getAchievements, ApiFetchFailedError } from '../lib/api';
+import { serviceUnavailableResponse } from '../lib/site';
 
-const [about, projectsData, blogsData, guestbookData, achievementsData] = await Promise.all([
-  getAbout(),
-  getProjects({ featured: true, limit: 3 }),
-  getBlogs(3),
-  getGuestbookEntries(),
-  getAchievements(3),
-]);
+let about, projectsData, blogsData, guestbookData, achievementsData;
+try {
+  [about, projectsData, blogsData, guestbookData, achievementsData] = await Promise.all([
+    getAbout(),
+    getProjects({ featured: true, limit: 3 }),
+    getBlogs(3),
+    getGuestbookEntries(),
+    getAchievements(3),
+  ]);
+} catch (error) {
+  if (error instanceof ApiFetchFailedError) {
+    return serviceUnavailableResponse();
+  }
+  throw error;
+}
+
 const turnstileSiteKey =
   process.env.PUBLIC_TURNSTILE_SITE_KEY?.trim() ||
   import.meta.env.PUBLIC_TURNSTILE_SITE_KEY?.trim() ||
@@ -24,67 +34,11 @@ const turnstileSiteKey =
 const title = 'NaufalRF Portfolio';
 const description =
   'Naufal Rizqullah Firdaus is a System & Automation Engineer and Computer Engineering student at IPB University (Institut Pertanian Bogor) based in Depok, building integrated systems across software, cloud, IoT, and AI workflows for real-world operations in Indonesia and beyond.';
-
-const websiteStructuredData = {
-  '@context': 'https://schema.org',
-  '@type': 'WebSite',
-  name: 'NaufalRF Portfolio',
-  url: 'https://naufalrf.net',
-  description:
-    'The personal portfolio of Naufal Rizqullah Firdaus featuring system integration engineering, automation workflows, IoT development, cloud infrastructure, and AI-driven systems built for real-world operational use.',
-  author: {
-    '@type': 'Person',
-    name: 'Naufal Rizqullah Firdaus',
-    alternateName: 'NaufalRF',
-  },
-};
-
-const personStructuredData = {
-  '@context': 'https://schema.org',
-  '@type': 'Person',
-  name: 'Naufal Rizqullah Firdaus',
-  alternateName: 'NaufalRF',
-  url: 'https://naufalrf.net',
-  jobTitle: ['System & Automation Engineer', 'Automation Engineer', 'IoT System Developer'],
-  description:
-    'System & Automation Engineer from Depok, Indonesia focused on building integrated systems across software, cloud infrastructure, IoT devices, and AI-driven workflows.',
-  address: {
-    '@type': 'PostalAddress',
-    addressLocality: 'Depok',
-    addressRegion: 'West Java',
-    addressCountry: 'ID',
-  },
-  knowsAbout: [
-    'System Integration Engineering',
-    'Automation Engineering',
-    'IoT Systems Development',
-    'ESP32 MQTT IoT systems',
-    'automation workflows with n8n and Python',
-    'cloud-based system architecture on AWS',
-    'AI integration with LangChain and LLM systems',
-    'Next.js Laravel full-stack systems',
-  ],
-  alumniOf: {
-    '@type': 'CollegeOrUniversity',
-    name: 'IPB University',
-    alternateName: 'Institut Pertanian Bogor',
-  },
-  worksFor: {
-    '@type': 'Organization',
-    name: 'Open to opportunities',
-  },
-  sameAs: about.socialLinks.map((link) => link.url),
-};---
+---
 
 <PageLayout title={title} description={description}>
   <Fragment slot="head">
-    <meta
-      name="keywords"
-      content="Naufal Rizqullah Firdaus, NaufalRF, System & Automation Engineer, system integration engineer portfolio, automation engineer Indonesia, IoT system developer, AI workflow engineer, real-time system developer, IPB University, Institut Pertanian Bogor, Teknik Komputer, Computer Engineering, Depok, Bogor, Jakarta, Jabodetabek, ESP32 MQTT IoT system, automation workflows n8n Python, cloud-based system architecture AWS, Next.js Laravel full-stack system, AI integration LangChain LLM, Digistar Club by Telkom Indonesia"
-    />
     <meta name="author" content="Naufal Rizqullah Firdaus" />
-    <script type="application/ld+json" set:html={JSON.stringify(websiteStructuredData)} />
-    <script type="application/ld+json" set:html={JSON.stringify(personStructuredData)} />
   </Fragment>
 
   <HeroSection client:load about={about} />
@@ -111,8 +65,6 @@ const personStructuredData = {
     <section data-scene="signal" class="relative w-full overflow-hidden border-t-2 border-teal">
       <div class="pointer-events-none absolute inset-0 z-0 opacity-80">
         <Meteors number={34} client:visible />
-      </div>
-        <Meteors number={14} client:visible />
       </div>
       <div class="relative z-10 mx-auto flex max-w-7xl flex-col justify-between px-4 py-24 sm:flex-row sm:items-end sm:px-6 lg:px-8 lg:py-32">
         <div class="max-w-2xl">

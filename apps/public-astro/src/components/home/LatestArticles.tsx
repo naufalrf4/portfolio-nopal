@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { ArrowRight, Eye } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Eye } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
 import type { BlogLink } from '@/types';
 import { ThreeDCard, CardItem, BorderBeam, BlurFade } from '@/components/ui';
@@ -19,23 +20,14 @@ export function LatestArticles({ blogs }: LatestArticlesProps) {
     <section data-scene="flow" className="relative w-full border-t border-line py-16 md:py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {}
-        <BlurFade direction="left" offset={24} className="mb-10 flex-col items-end">
-          <span className="font-mono text-xs uppercase tracking-[0.25em] text-teal mb-4">03 / Field Notes</span>
-          <h2 className="text-right font-display text-3xl font-bold tracking-tight text-text-primary md:text-5xl lg:text-6xl">
+        <BlurFade direction="up" offset={24} className="mb-10 flex flex-col items-start">
+          <span className="font-mono text-xs uppercase tracking-[0.25em] text-teal mb-4">04 / Field Notes</span>
+          <h2 className="font-display text-3xl font-bold tracking-tight text-text-primary md:text-5xl lg:text-6xl">
             Latest Articles
           </h2>
-          <div className="mt-6 flex w-full flex-col items-end gap-4 sm:flex-row sm:justify-end sm:items-end">
-            <p className="max-w-md text-right text-base text-text-secondary md:text-lg">
-              Notes from building, breaking, and shipping systems.
-            </p>
-            <a
-              href="/publications"
-              className="group inline-flex items-center gap-2 font-mono text-sm uppercase tracking-wide text-text-secondary transition-colors hover:text-text-primary"
-              aria-label="View all articles"
-            >
-              <ArrowRight size={16} className="transition-transform duration-300 group-hover:translate-x-1" />
-            </a>
-          </div>
+          <p className="mt-6 max-w-md text-base text-text-secondary md:text-lg">
+            Notes from building, breaking, and shipping systems.
+          </p>
         </BlurFade>
 
         {isEmpty ? (
@@ -61,48 +53,54 @@ export function LatestArticles({ blogs }: LatestArticlesProps) {
             {selected && (
               <BlurFade direction="up" offset={20} className="lg:-ml-8 lg:pr-4">
                 <ThreeDCard maxTilt={6} className="group">
-                  <a
-                    key={selected.id}
-                    href={selected.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block"
-                  >
-                    <div className="relative rounded-2xl border border-line bg-bg-card p-4 transition-colors duration-500 group-hover:border-line-hover md:p-6">
-                      <BorderBeam duration={8} />
-                      <CardItem translateZ={30}>
-                        <div className="mb-6 overflow-hidden rounded-lg border border-line bg-bg-elevated">
-                          {selected.imageUrl ? (
-                            <img
-                              src={selected.imageUrl}
-                              alt={selected.title}
-                              loading="lazy"
-                              className="aspect-[16/9] w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                            />
-                          ) : (
-                            <div className="flex aspect-[16/9] w-full items-center justify-center bg-bg-card text-text-tertiary">
-                              <span className="font-display text-5xl font-bold opacity-30">{selected.title.charAt(0)}</span>
-                            </div>
+                  <AnimatePresence mode="wait">
+                    <motion.a
+                      key={selected.id}
+                      href={selected.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.25, ease: 'easeOut' }}
+                    >
+                      <div className="relative rounded-2xl border border-line bg-bg-card p-4 transition-colors duration-500 group-hover:border-line-hover md:p-5">
+                        <BorderBeam duration={8} />
+                        <CardItem translateZ={30}>
+                          <div className="mb-5 overflow-hidden rounded-lg border border-line bg-bg-elevated">
+                            {selected.imageUrl ? (
+                              <img
+                                src={selected.imageUrl}
+                                alt={selected.title}
+                                loading="lazy"
+                                className="aspect-[16/9] max-h-64 w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                              />
+                            ) : (
+                              <div className="flex aspect-[16/9] max-h-64 w-full items-center justify-center bg-bg-card text-text-tertiary">
+                                <span className="font-display text-5xl font-bold opacity-30">{selected.title.charAt(0)}</span>
+                              </div>
+                            )}
+                          </div>
+                        </CardItem>
+                        <CardItem translateZ={16}>
+                          <div className="flex items-center gap-3 text-text-tertiary">
+                            <span className="font-mono text-xs uppercase tracking-widest">{selected.source}</span>
+                            <span className="h-px w-8 bg-line"></span>
+                            <span className="font-mono text-[10px] uppercase tracking-wider">{selected.publishedAt ? formatDate(selected.publishedAt) : ''}</span>
+                          </div>
+                          <h3 className="mt-3 font-display text-xl font-bold text-text-primary transition-colors group-hover:text-teal md:text-2xl lg:text-3xl">
+                            {selected.title}
+                          </h3>
+                          {selected.description && (
+                            <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-text-secondary md:text-base">
+                              {selected.description}
+                            </p>
                           )}
-                        </div>
-                      </CardItem>
-                      <CardItem translateZ={16}>
-                        <div className="flex items-center gap-3 text-text-tertiary">
-                          <span className="font-mono text-xs uppercase tracking-widest">{selected.source}</span>
-                          <span className="h-px w-8 bg-line"></span>
-                          <span className="font-mono text-[10px] uppercase tracking-wider">{selected.publishedAt ? formatDate(selected.publishedAt) : ''}</span>
-                        </div>
-                        <h3 className="mt-4 font-display text-2xl font-bold text-text-primary transition-colors group-hover:text-teal md:text-4xl lg:text-5xl">
-                          {selected.title}
-                        </h3>
-                        {selected.description && (
-                          <p className="mt-4 text-base leading-relaxed text-text-secondary md:text-lg">
-                            {selected.description}
-                          </p>
-                        )}
-                      </CardItem>
-                    </div>
-                  </a>
+                        </CardItem>
+                      </div>
+                    </motion.a>
+                  </AnimatePresence>
                 </ThreeDCard>
               </BlurFade>
             )}

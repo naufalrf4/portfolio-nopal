@@ -1,7 +1,8 @@
 ---
 import { ClientRouter } from 'astro:transitions';
 import '../styles/globals.css';
-import { getAbout } from '@/lib/api';
+import { getAboutSafe } from '@/lib/api';
+import { getSiteUrl } from '@/lib/site';
 import Navbar from '../components/layout/Navbar.astro';
 import Footer from '../components/layout/Footer.astro';
 import { MobileBottomNav } from '../components/layout/MobileBottomNav';
@@ -11,7 +12,7 @@ import { ScrollToTopButton } from '../components/shared/ScrollToTopButton';
 import { GlobalScene } from '../components/shared/GlobalScene';
 
 const SITE_NAME = 'NaufalRF Portfolio';
-const about = await getAbout();
+const about = await getAboutSafe();
 const sameAs = about.socialLinks.map((link) => link.url);
 const twitterProfile = about.socialLinks.find((link) => {
   const platform = link.platform.toLowerCase();
@@ -26,20 +27,24 @@ interface Props {
   ogImage?: string;
   canonicalUrl?: string;
   ogType?: 'website' | 'article' | 'profile';
+  hideFooter?: boolean;
 }
 
 const {
   title: rawTitle,
   description,
+  // Generated at build time via `sharp` from `public/og-image.svg` - run
+  // `bun run scripts/generate-og-image.ts` to regenerate after editing the SVG.
   ogImage = '/og-image.png',
   canonicalUrl,
-  ogType = 'website'
+  ogType = 'website',
+  hideFooter = false
 } = Astro.props;
 
 const title = rawTitle === SITE_NAME ? SITE_NAME : `${rawTitle} - ${SITE_NAME}`;
 
 const currentPath = Astro.url.pathname;
-const siteUrl = process.env.SITE_URL?.trim() || import.meta.env.SITE_URL || 'https://naufalrf.net';
+const siteUrl = getSiteUrl();
 const canonical = canonicalUrl || new URL(currentPath, siteUrl).href;
 const presenceSocketUrl =
   process.env.PUBLIC_CURSOR_WS_URL?.trim() || import.meta.env.PUBLIC_CURSOR_WS_URL?.trim() || 'ws://localhost:3006/ws';
@@ -47,6 +52,7 @@ const presenceSocketUrl =
 const personSchema = {
   '@context': 'https://schema.org',
   '@type': 'Person',
+  '@id': `${siteUrl}/#person`,
   name: about.fullName || 'Naufal Rizqullah Firdaus',
   alternateName: 'NaufalRF',
   description: about.shortBio || about.tagline || description,
@@ -55,12 +61,11 @@ const personSchema = {
     'System Integration Engineering',
     'Automation Engineering',
     'IoT Systems Development',
-    'Cloud Infrastructure',
-    'AI Workflow Integration',
     'ESP32 MQTT IoT systems',
     'automation workflows with n8n and Python',
+    'cloud-based system architecture on AWS',
+    'AI integration with LangChain and LLM systems',
     'Next.js Laravel full-stack systems',
-    'LangChain and LLM integration',
   ],
   address: {
     '@type': 'PostalAddress',
@@ -78,6 +83,9 @@ const websiteSchema = {
   name: SITE_NAME,
   url: siteUrl,
   description,
+  publisher: {
+    '@id': `${siteUrl}/#person`,
+  },
 };---
 
 <!doctype html>
@@ -102,6 +110,7 @@ const websiteSchema = {
     </script>
     <meta name="viewport" content="width=device-width" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="alternate" type="application/rss+xml" title="NaufalRF Portfolio" href="/rss.xml" />
     <meta name="generator" content={Astro.generator} />
     <ClientRouter />
 
@@ -144,10 +153,10 @@ const websiteSchema = {
     <LiveCursorBand client:load currentPath={currentPath} socketUrl={presenceSocketUrl} />
     <ScrollToTopButton client:load currentPath={currentPath} />
     <Navbar />
-    <main class="relative z-10 min-h-screen flex flex-col">
+    <main class="relative z-10 min-h-screen">
       <slot />
     </main>
-    <Footer className="relative z-10" />
+    {!hideFooter && <Footer className="relative z-10" />}
     <ChatWidget client:load currentPath={currentPath} />
     <MobileBottomNav client:load currentPath={currentPath} />
     <script is:inline>
