@@ -1,9 +1,10 @@
+import { Image as ImageIcon } from 'lucide-react';
 import type { PublicationLink } from '../types/publications.types';
 import { SURFACE_STYLES } from '../constants/publications.constants';
 import { formatDate } from '@/lib/utils/date';
 import { truncateUrl } from '@/lib/utils/string';
 import { Switch } from '@/components/ui/switch';
-import { PublicationLinkIcon, ExternalLinkIcon, EditIcon, TrashIcon } from './Icons';
+import { ExternalLinkIcon, EditIcon, TrashIcon } from './Icons';
 
 interface PublicationCardProps {
   publicationLink: PublicationLink;
@@ -21,15 +22,19 @@ export function PublicationCard({ publicationLink, onEdit, onDelete, onToggleVis
         boxShadow: SURFACE_STYLES.shadows.extruded,
       }}
     >
-      {publicationLink.imageUrl && (
-        <div className="mb-4 rounded-2xl overflow-hidden bg-[var(--bg-elevated)] shadow-surface-sunken-sm">
+      <div className="mb-4 rounded-2xl overflow-hidden shadow-surface-sunken-sm">
+        {publicationLink.imageUrl ? (
           <img src={publicationLink.imageUrl} alt={publicationLink.title} className="w-full h-40 object-cover" />
-        </div>
-      )}
+        ) : (
+          <div
+            className="w-full h-40 flex items-center justify-center"
+            style={{ backgroundColor: SURFACE_STYLES.background }}
+          >
+            <ImageIcon className="h-8 w-8" style={{ color: SURFACE_STYLES.muted }} />
+          </div>
+        )}
+      </div>
       <div className="flex items-start gap-4">
-        <div className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 border border-line-strong bg-accent text-accent-foreground">
-          <PublicationLinkIcon />
-        </div>
         <div className="flex-1 min-w-0">
           <h3
             className="font-display text-lg font-bold truncate"
