@@ -1,8 +1,8 @@
-FROM docker.io/oven/bun:1.3.6 AS dev
+FROM docker.io/oven/bun:1.3.14 AS dev
 WORKDIR /app
 CMD ["sh", "-lc", "bun install --frozen-lockfile && bun run dev"]
 
-FROM docker.io/oven/bun:1.3.6 AS builder
+FROM docker.io/oven/bun:1.3.14 AS builder
 WORKDIR /app
 COPY package.json bun.lock ./
 COPY packages ./packages
@@ -19,7 +19,7 @@ COPY apps/links-astro ./apps/links-astro
 WORKDIR /app/apps/links-astro
 RUN bun run build
 
-FROM docker.io/oven/bun:1.3.6 AS prod
+FROM docker.io/oven/bun:1.3.14 AS prod
 WORKDIR /app/apps/links-astro
 ENV NODE_ENV=production
 ENV HOST=0.0.0.0

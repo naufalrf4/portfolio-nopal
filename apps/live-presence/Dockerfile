@@ -1,8 +1,8 @@
-FROM docker.io/oven/bun:1.3.6 AS dev
+FROM docker.io/oven/bun:1.3.14 AS dev
 WORKDIR /app
 CMD ["sh", "-lc", "bun install --frozen-lockfile && bun run dev"]
 
-FROM docker.io/oven/bun:1.3.6 AS builder
+FROM docker.io/oven/bun:1.3.14 AS builder
 WORKDIR /app
 COPY package.json bun.lock ./
 COPY packages ./packages
@@ -17,7 +17,7 @@ COPY e2e/package.json ./e2e/package.json
 RUN bun install --frozen-lockfile
 COPY apps/live-presence ./apps/live-presence
 
-FROM docker.io/oven/bun:1.3.6 AS prod
+FROM docker.io/oven/bun:1.3.14 AS prod
 WORKDIR /app/apps/live-presence
 ENV NODE_ENV=production
 ENV PORT=3006
