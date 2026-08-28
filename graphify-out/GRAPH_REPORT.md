@@ -1,60 +1,60 @@
-# Graph Report - portfolio-nopal  (2026-08-27)
+# Graph Report - portfolio-nopal  (2026-08-28)
 
 ## Corpus Check
-- 786 files · ~315,463 words
+- 875 files · ~356,256 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 4107 nodes · 8918 edges · 276 communities (196 shown, 80 thin omitted)
-- Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 112 edges (avg confidence: 0.6)
+- 4581 nodes · 10258 edges · 266 communities (197 shown, 69 thin omitted)
+- Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 145 edges (avg confidence: 0.61)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `df65fe84`
+- Built from commit: `6081ee08`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
 - db/schema.ts
 - successResponse
-- skeleton.tsx
-- public-astro/src/types/index.ts
+- LogSettingsPanel.tsx
+- contracts/src/index.ts
 - Entries
 - admin/projects/route.ts
-- .error
-- ContactsPageContent.tsx
+- partials.ts
+- http/src/index.ts
 - cn
-- public-astro/src/layouts/BaseLayout.astro
-- ChatLogDetailPageContent.tsx
+- cn
+- card.tsx
 - ExperienceModal.tsx
 - messages/components/index.ts
-- features/blogs/index.ts
-- devDependencies
+- publications/index.ts
+- scripts
 - scripts
 - admin/achievements/route.ts
-- contacts/components/index.ts
+- contacts.types.ts
 - dependencies
 - links/index.ts
-- validationErrorResponse
+- public/guestbook/route.ts
 - seed.ts
-- googleCalendarService.ts
+- lib/auth.ts
 - projects/components/index.ts
 - BookingCalendar.tsx
 - admin/knowledge/route.ts
 - dependencies
-- cn
+- RulesTab.tsx
 - analytics.service.ts
 - drizzle/schema.ts
-- KnowledgeTable.tsx
-- admin/links/route.ts
-- AboutContent.tsx
+- notifications/templates/index.ts
+- ProfileLinksService
+- googleCalendarService.ts
 - chat-service.ts
 - AnalyticsDashboard.tsx
 - booking-settings.service.ts
-- ui/index.ts
+- public-astro/src/types/index.ts
 - chat-logs.service.ts
-- EntryCard.tsx
-- ProjectDetail.tsx
+- utils/logger.ts
+- AboutContent.tsx
 - booking-slots.service.ts
 - compilerOptions
 - ContactContent.tsx
@@ -66,27 +66,27 @@
 - NaufalRF Portfolio Platform
 - []
 - buildSubmissionProxyHeaders
-- EditKnowledgePageContent.tsx
+- contact-settings/route.ts
 - Guestbook.tsx
-- storage.ts
+- NotificationChannelsService
+- date.ts
 - about-read.service.ts
-- content-export.service.ts
-- +page.svelte
+- LivePresenceBadge.svelte
 - DESIGN.md — naufalrf.net Cross-App Design Contract
 - compilerOptions
 - bookings.service.ts
-- date.ts
+- useChat.ts
 - rag-service/package.json
-- repository.ts
-- ContactsService
+- ingest-service.ts
+- logQuery.service.ts
 - env.ts
 - admin/messages/route.ts
-- SettingsTab.tsx
+- button.tsx
 - agentic-tools.ts
 - components.json
 - 8. Audit Keamanan & Konsistensi Menyeluruh (2026-08-26, sesi kedua)
-- card.tsx
-- public/about/route.ts
+- about.schema.ts
+- getSubmissionContext
 - slidedeck/package.json
 - devDependencies
 - app/layout.tsx
@@ -98,14 +98,14 @@
 - ProjectArticle.tsx
 - tool-service.ts
 - errorResponse
-- http/src/index.ts
+- rules/route.ts
 - scripts
 - compilerOptions
 - dependencies
-- SettingsCard.tsx
-- ResponsiveModal
-- FileUpload.tsx
-- src/types.ts
+- BookingsTab.tsx
+- internal/logs/route.ts
+- public/about/route.ts
+- rag-service/src/index.ts
 - Bagian B — Sisa Pekerjaan (dari PROJECT_AUDIT.md §8.6)
 - links-astro/tsconfig.json
 - GeminiClient
@@ -113,9 +113,9 @@
 - contracts/package.json
 - http/package.json
 - AGENTS.md
-- LivePresencePill.tsx
-- links-astro/src/lib/api.ts
-- useChat.ts
+- ngl-svelte/src/lib/api.ts
+- FileUpload.tsx
+- chatbot/types.ts
 - compilerOptions
 - admin/AGENTS.md
 - ngl-svelte/AGENTS.md
@@ -124,21 +124,21 @@
 - admin-client.ts
 - src/config.ts
 - start-standalone.mjs
-- getSubmissionContext
-- projects/types/index.ts
+- callback/route.ts
+- .error
 - gtag.ts
 - slides
 - booking-availability.schema.ts
 - DESIGN.md — NaufalRF public-astro
 - Architecture
 - contracts/tsconfig.json
-- responsive-modal.tsx
+- notificationService.ts
 - links-astro/AGENTS.md
 - Cross-App Design Contract (DESIGN.md)
 - http/tsconfig.json
 - getErrorMessage
 - devDependencies
-- ContentExportService
+- about.service.ts
 - e2e/package.json
 - validations/bookings.ts
 - contacts.ts
@@ -148,18 +148,18 @@
 - compilerOptions
 - PROGRESS.md
 - contacts/route.ts
-- ContactTable.tsx
+- GlobalScene.tsx
 - src/types.d.ts
 - public-astro/src/lib/api.ts
 - Maintenance
 - Service Boundaries
 - reset-db.ts
-- admin/src/lib/utils.ts
+- devDependencies
 - design-tokens/package.json
 - vision-review.mjs
 - next.config.js
-- GlobalScene.tsx
-- Logger
+- LivePresencePill.tsx
+- public-auth/signin/page.tsx
 - e2e/tsconfig.json
 - projects/[id]/page.tsx
 - package.json
@@ -169,33 +169,31 @@
 - error/page.tsx
 - main.js
 - E2E — API-only, local pre-deploy
-- (dashboard)/layout.tsx
-- class-variance-authority
-- button.tsx
+- ContactsService
+- AnimatedThemeToggler.tsx
+- BookingSettingsService
 - app/page.tsx
 - guestbook.schema.ts
 - start-dev.sh
 - next-env.d.ts
-- ga4.ts
+- clsx
 - @dnd-kit/core
-- @dnd-kit/sortable
+- icons.ts
 - shared/constants/index.ts
 - dom-to-image-more
 - dotenv
 - @google-analytics/data
-- @google-cloud/storage
+- @dnd-kit/utilities
 - googleapis
 - @hookform/resolvers
 - date-fns
 - drizzle-orm
 - @naufalrf/http
-- mammoth
+- profile-link.schema.ts
 - mapbox-gl
 - @naufalrf/contracts
 - @naufalrf/design-tokens
-- next
 - GuestbookService
-- nodemailer
 - globals
 - @paralleldrive/cuid2
 - postgres
@@ -206,37 +204,32 @@
 - @radix-ui/react-label
 - @radix-ui/react-popover
 - @radix-ui/react-select
-- @radix-ui/react-separator
 - @radix-ui/react-slot
 - @radix-ui/react-switch
-- @radix-ui/react-tabs
+- 2026-08-02 — GlobalScene circuit+flow fidelity pass (public-astro)
 - @radix-ui/react-tooltip
-- react
-- react-day-picker
-- react-dom
-- react-dropzone
+- next-auth
 - react-hook-form
 - react-map-gl
-- globals
-- prettier-plugin-svelte
-- sonner
-- tailwind-merge
-- @typescript-eslint/eslint-plugin
+- @radix-ui/react-checkbox
+- vaul
+- @commitlint/config-conventional
 - @typescript-eslint/parser
 - sync-slidedeck.sh
 - use-debounce
 - zod
 - dom-to-image-more.d.ts
-- about.service.ts
+- storage.ts
 - eslint-config-prettier
-- AnimatedThemeToggler.tsx
+- ProjectDetail.tsx
 - eslint-plugin-svelte
-- MessageDetailModal.tsx
-- DraggableImageGrid.tsx
+- eslint-plugin-react
+- PageWrapper.tsx
 - typescript
-- ai
+- guestbook-token.ts
 - app.d.ts
 - prerender
+- ContentExportService
 - overview.md
 - .context/README.md
 - docker-dev-down.sh
@@ -251,28 +244,26 @@
 - { GET, POST }
 - @sveltejs/vite-plugin-svelte
 - bookings/[id]/page.tsx
-- ImageUploader.tsx
-- settings/loading.tsx
-- new/page.tsx
-- icons.ts
-- @dnd-kit/utilities
+- lint-staged
+- admin/package.json
 - eslint
+- @typescript-eslint/eslint-plugin
 
 ## God Nodes (most connected - your core abstractions)
-1. `successResponse` - 170 edges
-2. `serverErrorResponse()` - 161 edges
-3. `cn()` - 145 edges
-4. `validationErrorResponse()` - 92 edges
-5. `withAdminAuth()` - 77 edges
-6. `Button()` - 74 edges
-7. `cn()` - 73 edges
-8. `Entries` - 73 edges
-9. `notFoundResponse()` - 55 edges
-10. `Logger` - 45 edges
+1. `successResponse` - 198 edges
+2. `serverErrorResponse()` - 190 edges
+3. `cn()` - 162 edges
+4. `validationErrorResponse()` - 110 edges
+5. `Button()` - 82 edges
+6. `withAdminAuth()` - 82 edges
+7. `Entries` - 74 edges
+8. `cn()` - 71 edges
+9. `notFoundResponse()` - 64 edges
+10. `PageWrapper()` - 50 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `MessageResult` --inherits--> `MessageResponse`  [EXTRACTED]
-  apps/ngl-svelte/src/lib/api.ts → packages/contracts/src/index.ts
+- `createPublicApiSink()` --calls--> `createLogShipper()`  [EXTRACTED]
+  apps/public-astro/src/lib/api.ts → packages/http/src/log-shipper.ts
 - `FileUpload()` --calls--> `getErrorMessage()`  [EXTRACTED]
   apps/admin/src/components/upload/FileUpload.tsx → packages/http/src/index.ts
 - `ImageUploader()` --calls--> `getErrorMessage()`  [EXTRACTED]
@@ -283,69 +274,70 @@
   apps/admin/src/features/bookings/components/AvailabilityTab.tsx → packages/http/src/index.ts
 
 ## Import Cycles
+- 2-file cycle: `packages/http/src/index.ts -> packages/http/src/log-shipper.ts -> packages/http/src/index.ts`
 - 3-file cycle: `apps/admin/src/app/(dashboard)/contacts/[id]/ContactActions.tsx -> apps/admin/src/features/contacts/components/index.ts -> apps/admin/src/features/contacts/components/ContactDetailView.tsx -> apps/admin/src/app/(dashboard)/contacts/[id]/ContactActions.tsx`
 
-## Communities (276 total, 80 thin omitted)
+## Communities (266 total, 69 thin omitted)
 
 ### Community 0 - "db/schema.ts"
 Cohesion: 0.03
-Nodes (70): loadAdminRuntime(), GET, handleGet(), LocationStat, POST, ProjectContentRepairUpdate, GET, PATCH (+62 more)
+Nodes (88): loadAdminRuntime(), GET, handleGet(), LocationStat, DELETE, handleDelete(), RouteContext, POST (+80 more)
 
 ### Community 1 - "successResponse"
-Cohesion: 0.05
-Nodes (90): DELETE(), GET(), PATCH(), PUT(), RouteContext, GET, handleGet(), GET (+82 more)
+Cohesion: 0.04
+Nodes (122): DELETE(), GET(), PATCH(), PUT(), RouteContext, GET, handleGet(), GET (+114 more)
 
-### Community 2 - "skeleton.tsx"
-Cohesion: 0.11
-Nodes (11): AnalyticsSuspense(), AnalyticsSuspenseProps, DataListSuspense(), DataListSuspenseProps, ProjectGridSuspense(), ProjectGridSuspenseProps, StatCardsSuspense(), StatCardsSuspenseProps (+3 more)
+### Community 2 - "LogSettingsPanel.tsx"
+Cohesion: 0.08
+Nodes (44): LogsPageContent(), metadata, Label(), Select(), SelectContent(), SelectItem(), SelectLabel(), SelectScrollDownButton() (+36 more)
 
-### Community 3 - "public-astro/src/types/index.ts"
-Cohesion: 0.07
-Nodes (44): SkillBadges(), SkillBadgesProps, AchievementsPreview(), AchievementsPreviewProps, GuestbookProps, GuestbookResponse, Achievement, AchievementsResponse (+36 more)
+### Community 3 - "contracts/src/index.ts"
+Cohesion: 0.06
+Nodes (35): AchievementsResponse, ApiEnvelope, ApiErrorEnvelope, ApiSuccessEnvelope, AvailabilityStatus, BlogsResponse, BookingResult, BookingSlotItem (+27 more)
 
 ### Community 4 - "Entries"
 Cohesion: 0.03
-Nodes (73): 2026-03-15 14:41, 2026-03-15 14:56, 2026-03-15 15:05, 2026-03-15 16:10, 2026-03-15 16:32, 2026-03-15 18:06, 2026-03-15 19:06, 2026-03-15 19:27 (+65 more)
+Nodes (74): 2026-03-15 14:41, 2026-03-15 14:56, 2026-03-15 15:05, 2026-03-15 16:10, 2026-03-15 16:32, 2026-03-15 18:06, 2026-03-15 19:06, 2026-03-15 19:27 (+66 more)
 
 ### Community 5 - "admin/projects/route.ts"
 Cohesion: 0.05
-Nodes (50): GET, handleGet(), handlePut(), PUT, GET, handleGet(), handlePost(), POST (+42 more)
+Nodes (49): GET, handleGet(), handlePut(), PUT, GET, handleGet(), handlePost(), POST (+41 more)
 
-### Community 6 - ".error"
-Cohesion: 0.14
-Nodes (38): getEmailTransporter(), isEmailConfigured(), parseSmtpPort(), parseSmtpSecure(), adminBookingNotificationTemplate(), adminContactNotificationTemplate(), bookingConfirmationTemplate(), bookingConfirmedTemplate() (+30 more)
+### Community 6 - "partials.ts"
+Cohesion: 0.27
+Nodes (26): adminBookingNotificationTemplate(), adminContactNotificationTemplate(), bookingConfirmationTemplate(), bookingConfirmedTemplate(), bookingRejectedTemplate(), contactConfirmationTemplate(), contactReplyTemplate(), escapeHtml() (+18 more)
 
-### Community 7 - "ContactsPageContent.tsx"
-Cohesion: 0.10
-Nodes (18): ContactsPageContent(), ContactTab, getContactTab(), TAB_VALUES, metadata, ChatLog, KnowledgeDoc, KnowledgePageContent() (+10 more)
+### Community 7 - "http/src/index.ts"
+Cohesion: 0.07
+Nodes (23): createLinksApiSink(), createNglApiSink(), createRagSink(), ragLogger, LogEntryInput, LogService, AdminApiEnvelope, AdminApiErrorBody (+15 more)
 
 ### Community 8 - "cn"
-Cohesion: 0.08
-Nodes (47): SkeletonCard(), SkeletonGrid(), SkeletonLine(), SkeletonLineProps, SkeletonTable(), SkeletonTabs(), AppSidebar(), AppSidebarProps (+39 more)
+Cohesion: 0.05
+Nodes (69): SkeletonCard(), SkeletonGrid(), SkeletonLine(), SkeletonLineProps, SkeletonTable(), SkeletonTabs(), IngestButtonProps, AppSidebar() (+61 more)
 
-### Community 9 - "public-astro/src/layouts/BaseLayout.astro"
-Cohesion: 0.12
-Nodes (20): ChatWidget(), ChatWidgetProps, LiveCursorBand(), LiveCursorBandProps, MobileBottomNav(), MobileBottomNavProps, navItems, PresenceChip() (+12 more)
+### Community 9 - "cn"
+Cohesion: 0.06
+Nodes (45): ChatHeader(), ChatHeaderProps, iconButtonClassName, ChatInput(), ChatInputProps, ChatSidebar(), ChatSidebarProps, KNOWS_ABOUT (+37 more)
 
-### Community 10 - "ChatLogDetailPageContent.tsx"
-Cohesion: 0.25
-Nodes (6): ChatLog, ChatLogDetailPageContent(), ChatLogDetailPageContentProps, ChatMessage, metadata, PageProps
+### Community 10 - "card.tsx"
+Cohesion: 0.05
+Nodes (42): ChatLog, ChatLogDetailPageContent(), ChatLogDetailPageContentProps, ChatMessage, metadata, PageProps, ContactActions(), ChatConversationProps (+34 more)
 
 ### Community 11 - "ExperienceModal.tsx"
 Cohesion: 0.09
-Nodes (35): AboutPageContent(), metadata, BioTab(), DraggableRoles(), DraggableRolesProps, SortableRoleItemProps, ExperienceCard(), ExperienceCardProps (+27 more)
+Nodes (35): BioTab(), ExperienceCard(), ExperienceCardProps, ExperienceModal(), ExperienceModalProps, ExperienceSubTab, ExperienceTab(), tabConfig (+27 more)
 
 ### Community 12 - "messages/components/index.ts"
-Cohesion: 0.08
-Nodes (37): MessagesPanel(), MessagesPanelProps, DeleteConfirmModal(), DeleteConfirmModalProps, EMPTY_STATE_CONFIG, EmptyState(), EmptyStateProps, FilterTabs() (+29 more)
+Cohesion: 0.07
+Nodes (41): MessagesPanel(), MessagesPanelProps, DeleteConfirmModal(), EMPTY_STATE_CONFIG, EmptyState(), EmptyStateProps, FilterTabs(), FilterTabsProps (+33 more)
 
-### Community 13 - "features/blogs/index.ts"
-Cohesion: 0.11
-Nodes (32): BlogsPageContent(), metadata, handleSubmit(), BlogCard(), BlogCardProps, CreateBlogModal(), CreateBlogModalProps, DeleteConfirmModal() (+24 more)
+### Community 13 - "publications/index.ts"
+Cohesion: 0.06
+Nodes (51): metadata, PublicationsPageContent(), handleSubmit(), DeleteConfirmModal(), EmptyState(), EmptyStateProps, EntryCard(), EntryCardProps (+43 more)
 
-### Community 14 - "devDependencies"
-Cohesion: 0.04
-Nodes (48): devDependencies, drizzle-kit, eslint, eslint-config-next, geoip-lite, tailwindcss, @tailwindcss/postcss, tw-animate-css (+40 more)
+### Community 14 - "scripts"
+Cohesion: 0.14
+Nodes (14): scripts, build, clean, db:generate, db:migrate, db:push, db:reset, db:seed (+6 more)
 
 ### Community 15 - "scripts"
 Cohesion: 0.11
@@ -355,9 +347,9 @@ Nodes (19): scripts, build, commitlint, dev, dev:all, docker:dev, docker:dev:dow
 Cohesion: 0.07
 Nodes (28): handlePost(), POST, GET, handleGet(), handlePost(), POST, GET(), AchievementCreateInput (+20 more)
 
-### Community 17 - "contacts/components/index.ts"
+### Community 17 - "contacts.types.ts"
 Cohesion: 0.10
-Nodes (29): ContactActions(), ContactActionsProps, ContactDetailPageContentProps, CardAction(), CardFooter(), ACTION_LABELS, BulkActionModal(), BulkActionModalProps (+21 more)
+Nodes (25): ContactDetailPageContent(), ContactDetailPageContentProps, ContactDetailPage(), generateMetadata(), PageProps, ContactDetailModalProps, ContactDetailViewProps, ContactTableProps (+17 more)
 
 ### Community 18 - "dependencies"
 Cohesion: 0.04
@@ -365,27 +357,27 @@ Nodes (46): dependencies, astro, @astrojs/node, @astrojs/react, @astrojs/sitemap
 
 ### Community 19 - "links/index.ts"
 Cohesion: 0.10
-Nodes (32): LinksPageContent(), metadata, FloatingActionButton(), FloatingActionButtonProps, DeleteConfirmModal(), DeleteConfirmModalProps, EmptyState(), EmptyStateProps (+24 more)
+Nodes (31): LinksPageContent(), metadata, FloatingActionButton(), FloatingActionButtonProps, DeleteConfirmModal(), EmptyState(), EmptyStateProps, FilterButtons() (+23 more)
 
-### Community 20 - "validationErrorResponse"
-Cohesion: 0.06
-Nodes (52): GET, handleGet(), handlePost(), POST, BookingStatusUpdate, PATCH, PUT(), readBookingMetadata() (+44 more)
+### Community 20 - "public/guestbook/route.ts"
+Cohesion: 0.08
+Nodes (37): POST(), RATE_LIMIT_CONFIG, POST(), RATE_LIMIT_CONFIG, syncUserSchema, UserConflictUpdate, UserInsert, POST() (+29 more)
 
 ### Community 21 - "seed.ts"
 Cohesion: 0.07
 Nodes (43): pdf-parse, AboutInsert, AchievementInsert, AdminRuntime, buildAboutRow(), buildAchievementRows(), buildKnowledgeDocs(), buildProfileLinkRows() (+35 more)
 
-### Community 22 - "googleCalendarService.ts"
-Cohesion: 0.05
-Nodes (54): GET(), GET(), buildSignInUrl(), GET(), normalizeAdminCallbackUrl(), SignInPage(), SignInPageProps, normalizeCallbackUrl() (+46 more)
+### Community 22 - "lib/auth.ts"
+Cohesion: 0.13
+Nodes (13): DashboardLayout(), UnauthorizedPageContent(), UnauthorizedPageContentProps, metadata, UnauthorizedPage(), { auth, signIn, signOut, handlers }, authCallbacks, AuthDbCallbacks (+5 more)
 
 ### Community 23 - "projects/components/index.ts"
-Cohesion: 0.09
-Nodes (22): ProjectsPageContent(), metadata, DeleteConfirmModal(), DeleteConfirmModalProps, ProjectCard(), filterButtons, ProjectFilters(), ProjectFiltersProps (+14 more)
+Cohesion: 0.08
+Nodes (25): ProjectsPageContent(), metadata, DeleteConfirmModal(), EmptyState(), EmptyStateProps, ProjectCard(), filterButtons, ProjectFilters() (+17 more)
 
 ### Community 24 - "BookingCalendar.tsx"
-Cohesion: 0.07
-Nodes (37): AuthErrorContent(), AuthErrorContentProps, BookingCalendar(), BookingCalendarProps, BookingFormData, BookingStep, formatDateLabel(), formatTimeRange() (+29 more)
+Cohesion: 0.06
+Nodes (41): BookingCalendar(), BookingCalendarProps, BookingFormData, BookingStep, formatDateLabel(), formatTimeRange(), INITIAL_FORM, isValidEmail() (+33 more)
 
 ### Community 25 - "admin/knowledge/route.ts"
 Cohesion: 0.12
@@ -395,57 +387,53 @@ Nodes (11): GET, handleGet(), handlePost(), POST, KnowledgeDocsService, CreateKn
 Cohesion: 0.05
 Nodes (40): dependencies, astro, @astrojs/node, @astrojs/react, @astrojs/sitemap, clsx, lucide-react, @naufalrf/contracts (+32 more)
 
-### Community 27 - "cn"
-Cohesion: 0.07
-Nodes (36): ChatHeader(), ChatHeaderProps, ChatInput(), ChatInputProps, ChatWindow(), ChatWindowProps, MarkdownMessage(), MarkdownMessageProps (+28 more)
+### Community 27 - "RulesTab.tsx"
+Cohesion: 0.06
+Nodes (61): Booking, BookingDetailPageContent(), BookingDetailPageContentProps, NotificationsPageContent(), metadata, ChatConversation(), ChatLog, ChatLogsTable() (+53 more)
 
 ### Community 28 - "analytics.service.ts"
-Cohesion: 0.11
-Nodes (19): handlePost(), POST, AnalyticsEventInsert, AnalyticsRange, AnalyticsService, asRecord(), getNullableString(), getRangeDays() (+11 more)
+Cohesion: 0.12
+Nodes (24): GaDashboardSummary, GaOverview, GaPageViewPoint, getClient(), getCredentials(), getDateRange(), getGaDashboardSummary(), getGaOverview() (+16 more)
 
 ### Community 29 - "drizzle/schema.ts"
 Cohesion: 0.07
 Nodes (36): accountsRelations, bookingSlotsRelations, bookingsRelations, guestbookEntriesRelations, projectContextsRelations, projectImagesRelations, projectsRelations, sessionsRelations (+28 more)
 
-### Community 30 - "KnowledgeTable.tsx"
-Cohesion: 0.25
-Nodes (13): ChatLog, ChatLogsTableProps, IngestButton(), KnowledgeDoc, KnowledgeTableProps, Table(), TableBody(), TableCaption() (+5 more)
+### Community 30 - "notifications/templates/index.ts"
+Cohesion: 0.07
+Nodes (37): GET(), POST(), BookingCreatedPayload, bookingCreatedPayloadSchema, renderBookingCreated(), BookingStatusChangedPayload, bookingStatusChangedPayloadSchema, renderBookingStatusChanged() (+29 more)
 
-### Community 31 - "admin/links/route.ts"
-Cohesion: 0.11
-Nodes (13): handlePost(), POST, GET, handleGet(), handlePost(), POST, ProfileLinksService, CreateProfileLinkInput (+5 more)
-
-### Community 32 - "AboutContent.tsx"
-Cohesion: 0.10
-Nodes (22): AboutContentProps, socialIcons, Achievement, AchievementCardProps, AchievementModal(), AchievementModalProps, AchievementsDisplay(), AchievementsDisplayProps (+14 more)
+### Community 32 - "googleCalendarService.ts"
+Cohesion: 0.13
+Nodes (16): BookingCalendarEventInput, BookingCalendarEventResult, buildCallbackUrl(), createOAuthClient(), decryptRefreshToken(), encryptRefreshToken(), getConfiguredRefreshToken(), getGoogleClientCredentials() (+8 more)
 
 ### Community 33 - "chat-service.ts"
-Cohesion: 0.16
-Nodes (25): ABOUT_FALLBACK_ACTION, AGENTIC_PATTERNS, buildAbstentionActions(), buildCitations(), buildSuggestedActions(), buildToolArguments(), buildToolProjectActions(), chat() (+17 more)
+Cohesion: 0.10
+Nodes (41): isPlaceholderValue(), stageCreateBooking(), ABOUT_FALLBACK_ACTION, AGENTIC_PATTERNS, answerMentionsAction(), buildAbstentionActions(), buildCitationActionCandidates(), buildCitations() (+33 more)
 
 ### Community 34 - "AnalyticsDashboard.tsx"
-Cohesion: 0.10
-Nodes (29): AnalyticsDashboard(), AnalyticsDashboardProps, CountryDistribution(), CountryDistributionProps, getFlagEmoji(), InteractionBreakdown(), countryCoordinates, InteractionLocationMap() (+21 more)
+Cohesion: 0.06
+Nodes (41): AboutPageContent(), metadata, ChatLog, KnowledgeDoc, KnowledgePageContent(), PaginationInfo, metadata, TabsContent (+33 more)
 
 ### Community 35 - "booking-settings.service.ts"
-Cohesion: 0.12
-Nodes (16): GET, handleGet(), GET, handleGet(), handlePut(), PUT, BookingSettingsRecord, BookingSettingsService (+8 more)
+Cohesion: 0.19
+Nodes (10): GET, handleGet(), handlePut(), PUT, BookingSettingsRecord, BookingSettingsUpdate, DEFAULT_SETTINGS, bookingSettings (+2 more)
 
-### Community 36 - "ui/index.ts"
-Cohesion: 0.09
-Nodes (29): FeaturedProjects(), LatestArticles(), badgeClass, BadgeTone, cloudIcons, SkillGroup, skillGroups, TechnicalExpertise() (+21 more)
+### Community 36 - "public-astro/src/types/index.ts"
+Cohesion: 0.07
+Nodes (42): SkillBadgesProps, BlogCard(), BlogCardProps, BlogsContentProps, BlogsGrid(), BlogsGridProps, AchievementsPreview(), AchievementsPreviewProps (+34 more)
 
 ### Community 37 - "chat-logs.service.ts"
 Cohesion: 0.09
 Nodes (19): GET(), POST(), GET, handleGet(), GET, handleGet(), handlePost(), POST (+11 more)
 
-### Community 38 - "EntryCard.tsx"
-Cohesion: 0.08
-Nodes (23): GuestbookPanel(), GuestbookPanelProps, DeleteConfirmModal(), DeleteConfirmModalProps, EmptyState(), EmptyStateProps, EntryCard(), EntryCardProps (+15 more)
+### Community 38 - "utils/logger.ts"
+Cohesion: 0.09
+Nodes (17): BookingStatusUpdate, PATCH, readBookingMetadata(), RouteContext, updateBookingStatusSchema, publicBookingSchema, RATE_LIMIT_CONFIG, createContactSchema (+9 more)
 
-### Community 39 - "ProjectDetail.tsx"
-Cohesion: 0.12
-Nodes (18): BlogCard(), BlogCardProps, BlogsContentProps, BlogsGrid(), BlogsGridProps, LatestArticlesProps, ProjectDetail(), ProjectDetailProps (+10 more)
+### Community 39 - "AboutContent.tsx"
+Cohesion: 0.10
+Nodes (22): AboutContentProps, socialIcons, Achievement, AchievementCardProps, AchievementModal(), AchievementModalProps, AchievementsDisplay(), AchievementsDisplayProps (+14 more)
 
 ### Community 40 - "booking-slots.service.ts"
 Cohesion: 0.16
@@ -457,61 +445,61 @@ Nodes (30): compilerOptions, allowJs, baseUrl, esModuleInterop, forceConsistentC
 
 ### Community 42 - "ContactContent.tsx"
 Cohesion: 0.10
-Nodes (29): ContactContent(), ContactContentProps, FAQS, Tab, ContactInfo(), ContactInfoProps, socialIcons, HeroFlipCard() (+21 more)
+Nodes (30): AboutContent(), ContactContent(), ContactContentProps, FAQS, Tab, ContactInfo(), ContactInfoProps, socialIcons (+22 more)
 
 ### Community 43 - "useProjectEdit.ts"
 Cohesion: 0.12
 Nodes (19): ProjectEditPageContent(), PageProps, ContentTab(), ContentTabProps, ImageTab(), ImageTabProps, extractLeadingJsonDocument(), JsonMark (+11 more)
 
 ### Community 44 - "shared/utils/index.ts"
-Cohesion: 0.13
-Nodes (5): formatMonthDate(), parseMonthDate(), calendarDateToMonthKey(), JAKARTA_TIMEZONE, monthKeyToCalendarDate()
+Cohesion: 0.12
+Nodes (5): formatDateISO(), formatMonthDate(), isToday(), parseMonthDate(), JAKARTA_TIMEZONE
 
 ### Community 45 - "AvailabilityTab.tsx"
-Cohesion: 0.14
-Nodes (24): ActionButton(), ActionButtonProps, AddSlotModal(), AvailabilityTab(), DetailField(), DetailFieldProps, SettingsCard(), dateKeyToInstant() (+16 more)
+Cohesion: 0.15
+Nodes (28): availableSlotsQuerySchema, calculateEndTime(), GET(), AddSlotModal(), ValidationErrors, AvailabilityTab(), BulkAddModal(), BulkAddModalProps (+20 more)
 
 ### Community 46 - "server.ts"
 Cohesion: 0.12
 Nodes (29): broadcastOverview(), broadcastState(), clampCoordinate(), ClientMessage, configuredAllowedOrigins, ConnectionData, createCorsHeaders(), getRoom() (+21 more)
 
 ### Community 47 - "llm-config-service.ts"
-Cohesion: 0.11
-Nodes (18): embedTexts(), generateText(), LogEntry, LogLevel, AdminLlmConfigResponse, buildEnvFallbackConfig(), doFetchLlmConfigFromAdmin(), fetchLlmConfigFromAdmin() (+10 more)
+Cohesion: 0.12
+Nodes (17): embedTexts(), generateText(), RagServiceError, AdminLlmConfigResponse, buildEnvFallbackConfig(), doFetchLlmConfigFromAdmin(), fetchLlmConfigFromAdmin(), internalToken() (+9 more)
 
 ### Community 48 - "NaufalRF Portfolio Platform"
 Cohesion: 0.07
 Nodes (28): 1. Install dependencies, 2. Create environment files, 3. Run the local stack, AI and retrieval separation, App-local development, Application Matrix, Architecture, Canonical machine-readable site guidance (+20 more)
 
 ### Community 49 - "[]"
-Cohesion: 0.12
-Nodes (21): initial, icons, Theme, ThemeToggler(), containsKeyword(), detectSocialPlatform(), getLinkTokens(), getUrlMetadata() (+13 more)
+Cohesion: 0.11
+Nodes (27): initial, icons, Theme, ThemeToggler(), getAboutData(), getLinksPageData(), getProfileLinks(), LinksPageData (+19 more)
 
 ### Community 50 - "buildSubmissionProxyHeaders"
 Cohesion: 0.13
 Nodes (21): applyRateLimitHeaders(), getClientIp(), getRateLimitState(), RateLimitConfig, RateLimitResult, RateLimitState, rateLimitStore, buildSubmissionProxyHeaders() (+13 more)
 
-### Community 51 - "EditKnowledgePageContent.tsx"
-Cohesion: 0.22
-Nodes (8): EditKnowledgePageContent(), EditKnowledgePageContentProps, KnowledgeDoc, metadata, PageProps, DeleteConfirmModal(), DeleteConfirmModalProps, KnowledgeForm()
+### Community 51 - "contact-settings/route.ts"
+Cohesion: 0.23
+Nodes (8): GET, handleGet(), handlePut(), PUT, ContactSettingsService, contactSettings, UpdateContactSettingsInput, updateContactSettingsSchema
 
 ### Community 52 - "Guestbook.tsx"
-Cohesion: 0.15
-Nodes (19): PublicSignInForm(), PublicSignInFormProps, SyncedUser, buildRows(), Guestbook(), repeatForRow(), SYNC_KEYS, buildGuestAlias() (+11 more)
+Cohesion: 0.10
+Nodes (27): PublicSignInForm(), PublicSignInFormProps, SyncedUser, buildRows(), Guestbook(), GuestbookProps, GuestbookResponse, repeatForRow() (+19 more)
 
-### Community 53 - "storage.ts"
-Cohesion: 0.14
-Nodes (17): handlePost(), POST, ALLOWED_DOCUMENT_TYPES, ALLOWED_IMAGE_TYPES, AssetValue, extractStorageKeyFromUrl(), getBucketName(), getCredentials() (+9 more)
+### Community 53 - "NotificationChannelsService"
+Cohesion: 0.13
+Nodes (5): NotificationChannelsDatabase, NotificationChannelsService, channel, CreateChannelInput, UpdateChannelInput
 
-### Community 54 - "about-read.service.ts"
-Cohesion: 0.29
-Nodes (10): AboutSkill, asString(), normalizeAboutSkills(), normalizeSkillCategory(), AboutMeRecord, getAboutMeRecord(), isMissingFreelanceProfileColumnError(), normalizeAboutRecord() (+2 more)
+### Community 54 - "date.ts"
+Cohesion: 0.13
+Nodes (17): WibClock(), DATE_KEY_LABEL_FORMATTER, formatJakartaKey(), formatJakartaTime(), formatRelativeTime(), getJakartaHour(), getJakartaMonthKey(), getValidDate() (+9 more)
 
-### Community 55 - "content-export.service.ts"
-Cohesion: 0.12
-Nodes (20): FreelanceProfileIntentContext, hasFreelanceProfileContent(), normalizeFreelanceProfile(), RagAboutContent, RagBlogContent, RagContentExport, RagKnowledgeDocument, RagProjectContent (+12 more)
+### Community 55 - "about-read.service.ts"
+Cohesion: 0.26
+Nodes (11): AboutSkill, asString(), normalizeAboutSkills(), normalizeSkillCategory(), AboutMeRecord, getAboutMeRecord(), isMissingFreelanceProfileColumnError(), normalizeAboutRecord() (+3 more)
 
-### Community 56 - "+page.svelte"
+### Community 56 - "LivePresenceBadge.svelte"
 Cohesion: 0.12
 Nodes (11): clearTimers(), connect(), scheduleReconnect(), ./$types, BaseHTTPRequestHandler, HTTPStatus, Handler, json_response() (+3 more)
 
@@ -524,40 +512,40 @@ Cohesion: 0.09
 Nodes (22): ES2022, **/*.js, **/*.jsx, compilerOptions, allowJs, baseUrl, isolatedModules, jsx (+14 more)
 
 ### Community 59 - "bookings.service.ts"
-Cohesion: 0.15
-Nodes (17): GET, handleGet(), GET, handleGet(), handlePost(), POST, bookingsService, BookingQueryInput (+9 more)
+Cohesion: 0.16
+Nodes (16): GET, handleGet(), GET, handleGet(), handlePost(), POST, bookingsService, BookingQueryInput (+8 more)
 
-### Community 60 - "date.ts"
-Cohesion: 0.10
-Nodes (28): ChatConversation(), ChatConversationProps, ChatMessage, ChatLogsTable(), DeleteConfirmModal(), DeleteConfirmModalProps, ChatMessage, MessageBubble() (+20 more)
+### Community 60 - "useChat.ts"
+Cohesion: 0.14
+Nodes (19): apiFetch(), ChatServiceError, confirmAction(), sendChatMessage(), SendChatMessageOptions, ChatRequest, clearStoredMessages(), generateId() (+11 more)
 
 ### Community 61 - "rag-service/package.json"
-Cohesion: 0.09
-Nodes (21): dependencies, hono, postgres, devDependencies, @types/bun, typescript, postgres, @types/bun (+13 more)
+Cohesion: 0.08
+Nodes (25): dependencies, hono, @naufalrf/contracts, @naufalrf/http, postgres, devDependencies, @types/bun, typescript (+17 more)
 
-### Community 62 - "repository.ts"
-Cohesion: 0.16
-Nodes (20): chunkText(), ingest(), ingestAbout(), ingestBlog(), ingestKnowledgeDoc(), ingestProject(), ingestTextDocument(), asJsonValue() (+12 more)
+### Community 62 - "ingest-service.ts"
+Cohesion: 0.17
+Nodes (21): chunkText(), ingest(), ingestAbout(), ingestBlog(), ingestKnowledgeDoc(), ingestProject(), ingestTextDocument(), asJsonValue() (+13 more)
 
-### Community 63 - "ContactsService"
-Cohesion: 0.14
-Nodes (10): ContactDetailPageContent(), ContactDetailPage(), generateMetadata(), PageProps, getContactById(), markContactAsRead(), normalizeContact(), ContactsService (+2 more)
+### Community 63 - "logQuery.service.ts"
+Cohesion: 0.08
+Nodes (23): CursorPosition, cursorPositionSchema, decodeCursor(), encodeCursor(), getCursorPredicate(), AppLogRow, defaultDatabase, LevelCountRow (+15 more)
 
 ### Community 64 - "env.ts"
 Cohesion: 0.08
 Nodes (43): expectGated(), manifest, missing, manifest, manifest, FeatureManifest, manifest, manifest (+35 more)
 
 ### Community 65 - "admin/messages/route.ts"
-Cohesion: 0.10
-Nodes (13): PATCH(), RouteContext, AnonymousMessageCreateInput, GET, handleGet(), handlePost(), POST, AnonymousMessagesService (+5 more)
+Cohesion: 0.11
+Nodes (11): AnonymousMessageCreateInput, GET, handleGet(), handlePost(), POST, AnonymousMessagesService, isMissingMetadataColumnError(), CreateAnonymousMessageInput (+3 more)
 
-### Community 66 - "SettingsTab.tsx"
-Cohesion: 0.09
-Nodes (38): FormData, initialFormData, ProjectModalProps, CardContent(), CardDescription(), CardHeader(), CardTitle(), Input() (+30 more)
+### Community 66 - "button.tsx"
+Cohesion: 0.05
+Nodes (53): ContactActionsProps, EditKnowledgePageContent(), EditKnowledgePageContentProps, KnowledgeDoc, metadata, PageProps, DeleteConfirmModalProps, DeleteConfirmModal() (+45 more)
 
 ### Community 67 - "agentic-tools.ts"
-Cohesion: 0.21
-Nodes (13): AgenticToolName, executeCreateBooking(), executeSendMessage(), executeSubmitGuestbook(), FIELD_LIMITS, isPlaceholderValue(), PendingAction, PLACEHOLDER_VALUES (+5 more)
+Cohesion: 0.18
+Nodes (15): AgenticToolName, executeCreateBooking(), executeSendMessage(), executeSubmitGuestbook(), fetchAvailableBookingSlots(), FIELD_LIMITS, jakartaSlotDateTimeIso(), jakartaSlotLabel() (+7 more)
 
 ### Community 68 - "components.json"
 Cohesion: 0.11
@@ -567,13 +555,13 @@ Nodes (18): aliases, components, hooks, lib, ui, utils, iconLibrary, registries 
 Cohesion: 0.07
 Nodes (29): 1. Apps/Services Overview, 2. Modul Fitur — apps/admin, 3. Modul Fitur — Frontend Apps, 4. Modul Fitur — rag-service, 5. Skema Database Lengkap (Drizzle — `apps/admin/src/lib/db/schema.ts`), 6. Inventory API Route Lengkap, 7. Checklist Inkonsistensi (terverifikasi via grep/read, bukan spekulasi), 8.1 HIGH — sudah difix (+21 more)
 
-### Community 70 - "card.tsx"
-Cohesion: 0.15
-Nodes (11): Card(), AnalyticsSummary, AnalyticsSummaryCard(), Tone, TONE_TINT_CLASS, QuickActionButton(), QuickActionButtonProps, WelcomeCardProps (+3 more)
+### Community 70 - "about.schema.ts"
+Cohesion: 0.14
+Nodes (14): FreelanceProfileIntentContext, RagAboutContent, AboutSkill, aboutSkillSchema, assetValueSchema, ExperienceItem, experienceItemSchema, FreelanceFeaturePrice (+6 more)
 
-### Community 71 - "public/about/route.ts"
-Cohesion: 0.19
-Nodes (16): asString(), Experience, getUrlMetadata(), hasKeyword(), inferPlatform(), normalizeComparableUrl(), normalizeExperience(), normalizeProfileLinksAsSocialLinks() (+8 more)
+### Community 71 - "getSubmissionContext"
+Cohesion: 0.20
+Nodes (18): getCityFromHeaders(), getClientIp(), getCountryCodeFromHeaders(), getLanguage(), getReferrerDomain(), getRegionFromHeaders(), getSubmissionContext(), inferCountryCodeFromTimezone() (+10 more)
 
 ### Community 72 - "slidedeck/package.json"
 Cohesion: 0.08
@@ -588,16 +576,16 @@ Cohesion: 0.18
 Nodes (10): dmSans, metadata, plusJakarta, AnalyticsPageView(), GoogleAnalytics(), GoogleAnalyticsProps, isGAReady(), trackPageView() (+2 more)
 
 ### Community 75 - "DashboardPageContent.tsx"
-Cohesion: 0.12
-Nodes (14): DashboardPageContent(), DashboardStatsContent(), DashboardStatsGridProps, metadata, EmptyState(), StatCard(), WelcomeCard(), QUICK_ACTIONS (+6 more)
+Cohesion: 0.08
+Nodes (22): DashboardPageContent(), DashboardStatsContent(), DashboardStatsGridProps, metadata, AnalyticsSuspense(), DataListSuspense(), ProjectGridSuspense(), StatCardsSuspense() (+14 more)
 
 ### Community 76 - "booking-availability.service.ts"
 Cohesion: 0.15
 Nodes (8): AvailabilityQueryInput, BookingAvailabilityRecord, BookingAvailabilityService, BookingAvailabilityUpdate, BulkUpdateAvailabilityInput, CreateBookingAvailabilityInput, UpdateBookingAvailabilityInput, bookingAvailability
 
 ### Community 77 - "dependencies"
-Cohesion: 0.15
-Nodes (13): dependencies, clsx, lucide-react, next-auth, @radix-ui/react-avatar, @radix-ui/react-checkbox, vaul, clsx (+5 more)
+Cohesion: 0.06
+Nodes (35): ai, dependencies, ai, class-variance-authority, @dnd-kit/sortable, @google-cloud/storage, lucide-react, mammoth (+27 more)
 
 ### Community 78 - "useLiveCursorPresence.ts"
 Cohesion: 0.15
@@ -608,20 +596,20 @@ Cohesion: 0.17
 Nodes (8): SettingsPageContent(), SettingsPageContentProps, surfaceStyles, SignOutButton(), surfaceStyles, Avatar(), AvatarFallback(), AvatarImage()
 
 ### Community 80 - "ProjectArticle.tsx"
-Cohesion: 0.25
-Nodes (14): ARTICLE_STYLES, extractLeadingJsonDocument(), getNormalizedContent(), isSafeImageUrl(), isSafeUrl(), JsonNode, MarkdownArticle(), parseJsonSafely() (+6 more)
+Cohesion: 0.13
+Nodes (26): ARTICLE_STYLES, ArticleSection, buildMarkdownSections(), buildMarkdownShowAll(), buildTiptapSections(), buildTiptapShowAllNodes(), createSlugger(), extractLeadingJsonDocument() (+18 more)
 
 ### Community 81 - "tool-service.ts"
 Cohesion: 0.40
 Nodes (14): normalizeLanguage(), asFloat(), asFreelanceProfile(), asReferencePrices(), asString(), asStringList(), executeFeaturePricingQuote(), executeFreelanceProfileLookup() (+6 more)
 
 ### Community 82 - "errorResponse"
-Cohesion: 0.14
-Nodes (23): handlePost(), POST, RouteContext, extractGeminiDimension(), extractOpenAiDimension(), handlePost(), POST, probeSchema (+15 more)
+Cohesion: 0.12
+Nodes (25): GET, handleGet(), extractGeminiDimension(), extractOpenAiDimension(), handlePost(), POST, probeSchema, extractGeminiModels() (+17 more)
 
-### Community 83 - "http/src/index.ts"
-Cohesion: 0.16
-Nodes (14): buildAnalyticsProxyHeaders(), POST(), MessageResult, submitMessage(), submitMessageWithContext(), POST(), actions, AdminApiEnvelope (+6 more)
+### Community 83 - "rules/route.ts"
+Cohesion: 0.08
+Nodes (23): GET, handleGet(), GET, handleGet(), handleSave(), POST, PUT, drizzleNotificationOutboxDatabase (+15 more)
 
 ### Community 84 - "scripts"
 Cohesion: 0.14
@@ -635,21 +623,21 @@ Nodes (13): compilerOptions, allowJs, checkJs, esModuleInterop, forceConsistentC
 Cohesion: 0.15
 Nodes (13): dependencies, @naufalrf/contracts, @naufalrf/design-tokens, @naufalrf/http, @sveltejs/adapter-node, tailwindcss, @tailwindcss/vite, @naufalrf/contracts (+5 more)
 
-### Community 87 - "SettingsCard.tsx"
-Cohesion: 0.14
-Nodes (19): AddSlotModalProps, BulkAddModal(), BulkAddModalProps, DayCard(), DayCardProps, SlotCard(), SlotCardProps, COMMON_TIMES (+11 more)
-
-### Community 88 - "ResponsiveModal"
-Cohesion: 0.17
-Nodes (14): Booking, BookingDetailPageContent(), BookingDetailPageContentProps, Badge(), badgeVariants, ResponsiveModal(), Textarea(), BookingsTab() (+6 more)
-
-### Community 89 - "FileUpload.tsx"
-Cohesion: 0.23
-Nodes (10): FileUpload(), FileUploadProps, formatFileSize(), isDirectUrl(), isSignedStorageUrl(), ProgressBar(), UploadState, Achievement (+2 more)
-
-### Community 90 - "src/types.ts"
+### Community 87 - "BookingsTab.tsx"
 Cohesion: 0.15
-Nodes (15): RagServiceError, app, ChatMetadata, ChatRequest, ChatResponse, ChunkWritePayload, Citation, ConfirmRequest (+7 more)
+Nodes (18): ActionButton(), ActionButtonProps, AddSlotModalProps, BookingsTab(), BookingsTabProps, DayCardProps, DetailField(), DetailFieldProps (+10 more)
+
+### Community 88 - "internal/logs/route.ts"
+Cohesion: 0.07
+Nodes (26): GET(), POST(), GET, handleGet(), handlePost(), POST, DEFAULT_RETENTION_DAYS, LogSettingsService (+18 more)
+
+### Community 89 - "public/about/route.ts"
+Cohesion: 0.20
+Nodes (17): asString(), Experience, GET(), getUrlMetadata(), hasKeyword(), inferPlatform(), normalizeComparableUrl(), normalizeExperience() (+9 more)
+
+### Community 90 - "rag-service/src/index.ts"
+Cohesion: 0.09
+Nodes (23): app, CHAT_CONFIRM_RATE_LIMIT_CONFIG, CHAT_RATE_LIMIT_CONFIG, checkRateLimit(), cleanupExpiredEntries(), getRateLimitHeaders(), lastCleanup, RateLimitConfig (+15 more)
 
 ### Community 91 - "Bagian B — Sisa Pekerjaan (dari PROJECT_AUDIT.md §8.6)"
 Cohesion: 0.10
@@ -672,32 +660,32 @@ Cohesion: 0.17
 Nodes (11): devDependencies, @naufalrf/tsconfig, typescript, exports, @naufalrf/tsconfig, typescript, main, name (+3 more)
 
 ### Community 96 - "http/package.json"
-Cohesion: 0.17
-Nodes (11): devDependencies, @naufalrf/tsconfig, typescript, exports, @naufalrf/tsconfig, typescript, main, name (+3 more)
+Cohesion: 0.13
+Nodes (14): dependencies, @naufalrf/contracts, devDependencies, @naufalrf/tsconfig, typescript, exports, @naufalrf/contracts, @naufalrf/tsconfig (+6 more)
 
 ### Community 97 - "AGENTS.md"
 Cohesion: 0.18
 Nodes (9): 1. Project Context, 2. Technology Baseline, 3. Architecture and Structure Rules, 4. Operational Command Set, 5. Git Workflow Rules, 6. Agent Behavior, 7. Authority Order, 8. Self-Learn and Learned Rules (+1 more)
 
-### Community 98 - "LivePresencePill.tsx"
-Cohesion: 0.25
-Nodes (10): buildGuestIdentity(), getColorFromSeed(), getHealthUrl(), getSocketUrl(), hashString(), LivePresencePill(), LivePresencePillProps, PresenceMessage (+2 more)
+### Community 98 - "ngl-svelte/src/lib/api.ts"
+Cohesion: 0.15
+Nodes (13): buildAnalyticsProxyHeaders(), logger, POST(), logger, MessageResult, submitMessage(), submitMessageWithContext(), POST() (+5 more)
 
-### Community 99 - "links-astro/src/lib/api.ts"
-Cohesion: 0.20
-Nodes (13): apiFetch(), getAboutData(), getLinksPageData(), getProfileLinks(), LinksPageData, AboutData, ApiClientError, apiFetch() (+5 more)
+### Community 99 - "FileUpload.tsx"
+Cohesion: 0.15
+Nodes (14): FileUpload(), FileUploadProps, formatFileSize(), isDirectUrl(), isSignedStorageUrl(), ProgressBar(), UploadFolder, UploadState (+6 more)
 
-### Community 100 - "useChat.ts"
-Cohesion: 0.16
-Nodes (17): ChatServiceError, confirmAction(), sendChatMessage(), SendChatMessageOptions, ChatMetadata, ChatRequest, ChatResponse, ChatState (+9 more)
+### Community 100 - "chatbot/types.ts"
+Cohesion: 0.15
+Nodes (16): MarkdownMessage(), MarkdownMessageProps, MessageBubble(), MessageBubbleProps, GREETING_MESSAGE, MessageList(), MessageListProps, getLastAssistantMessageId() (+8 more)
 
 ### Community 101 - "compilerOptions"
 Cohesion: 0.18
 Nodes (10): compilerOptions, esModuleInterop, exactOptionalPropertyTypes, forceConsistentCasingInFileNames, moduleResolution, noUncheckedIndexedAccess, skipLibCheck, strict (+2 more)
 
 ### Community 102 - "admin/AGENTS.md"
-Cohesion: 0.20
-Nodes (8): 1. Project Context, 2. Technology Baseline, 3. Architecture and Structure Rules, 4. Operational Command Set, 5. Git Workflow Rules, 6. Agent Behavior, 7. Authority Order, 8. Self-Learn and Learned Rules
+Cohesion: 0.18
+Nodes (9): 1. Project Context, 2. Technology Baseline, 3. Architecture and Structure Rules, 4. Operational Command Set, 5. Git Workflow Rules, 6. Agent Behavior, 7. Authority Order, 8. Self-Learn and Learned Rules (+1 more)
 
 ### Community 103 - "ngl-svelte/AGENTS.md"
 Cohesion: 0.20
@@ -712,24 +700,24 @@ Cohesion: 0.20
 Nodes (8): 1. Project Context, 2. Technology Baseline, 3. Architecture and Structure Rules, 4. Operational Command Set, 5. Git Workflow Rules, 6. Agent Behavior, 7. Authority Order, 8. Self-Learn and Learned Rules
 
 ### Community 106 - "admin-client.ts"
-Cohesion: 0.29
-Nodes (10): adminRequest(), getChatLog(), getContentExport(), getFreelanceIntentContext(), getKnowledgeDocById(), internalToken(), markKnowledgeDocIndexed(), saveChatLog() (+2 more)
+Cohesion: 0.33
+Nodes (9): adminRequest(), getChatLog(), getContentExport(), getFreelanceIntentContext(), getKnowledgeDocById(), internalToken(), markKnowledgeDocIndexed(), saveChatLog() (+1 more)
 
 ### Community 107 - "src/config.ts"
-Cohesion: 0.25
-Nodes (11): config, env(), envBool(), envFloat(), envInt(), bootstrap(), Sql, consumeAction() (+3 more)
+Cohesion: 0.19
+Nodes (15): config, env(), envBool(), envFloat(), envInt(), bootstrap(), Sql, logger (+7 more)
 
 ### Community 108 - "start-standalone.mjs"
 Cohesion: 0.22
 Nodes (8): publicSourceDir, publicTargetDir, rootDir, serverEntry, standaloneDir, standaloneNextDir, staticSourceDir, staticTargetDir
 
-### Community 109 - "getSubmissionContext"
-Cohesion: 0.20
-Nodes (18): getCityFromHeaders(), getClientIp(), getCountryCodeFromHeaders(), getLanguage(), getReferrerDomain(), getRegionFromHeaders(), getSubmissionContext(), inferCountryCodeFromTimezone() (+10 more)
+### Community 109 - "callback/route.ts"
+Cohesion: 0.32
+Nodes (11): GET(), GET(), forbiddenResponse(), createGoogleCalendarOAuthState(), encodeBase64Url(), getStateSecret(), GoogleCalendarOAuthStatePayload, normalizeGoogleCalendarReturnTo() (+3 more)
 
-### Community 110 - "projects/types/index.ts"
-Cohesion: 0.25
-Nodes (7): FILTER_BUTTONS, SURFACE_STYLES, FilterMode, Project, ProjectCardProps, ProjectTableProps, ViewMode
+### Community 110 - ".error"
+Cohesion: 0.24
+Nodes (8): AdminBookingNotificationData, AdminContactNotificationData, BookingConfirmationData, BookingStatusUpdateData, ContactConfirmationData, ContactReplyData, EmailService, EmailServiceError
 
 ### Community 111 - "gtag.ts"
 Cohesion: 0.42
@@ -755,9 +743,9 @@ Nodes (8): App boundaries, Architecture, Data flow, Database ownership, Design b
 Cohesion: 0.22
 Nodes (8): compilerOptions, outDir, rootDir, extends, include, @naufalrf/tsconfig/base.json, src/**/*.ts, __tests__/drift-compile-check.ts
 
-### Community 117 - "responsive-modal.tsx"
-Cohesion: 0.22
-Nodes (9): Dialog(), DialogBody(), DialogContent(), DialogDescription(), DialogFooter(), DialogHeader(), DialogOverlay(), DialogTitle() (+1 more)
+### Community 117 - "notificationService.ts"
+Cohesion: 0.12
+Nodes (13): getLogErrorLevel(), NotificationEventType, drizzleNotificationDatabase, logLevelSchema, NotificationDatabase, NotificationRuleMatch, NotificationService, OutboxRecord (+5 more)
 
 ### Community 118 - "links-astro/AGENTS.md"
 Cohesion: 0.25
@@ -772,16 +760,16 @@ Cohesion: 0.25
 Nodes (7): compilerOptions, outDir, rootDir, extends, include, @naufalrf/tsconfig/base.json, src/**/*.ts
 
 ### Community 121 - "getErrorMessage"
-Cohesion: 0.12
+Cohesion: 0.11
 Nodes (24): SettingsCardProps, useAvailability(), useBookings(), useBookingSettings(), UseBookingSettingsResult, Booking, BookingAvailability, BookingSettings (+16 more)
 
 ### Community 122 - "devDependencies"
 Cohesion: 0.12
-Nodes (17): @commitlint/cli, @commitlint/config-conventional, eslint-plugin-react, lint-staged, devDependencies, @commitlint/cli, @commitlint/config-conventional, eslint (+9 more)
+Nodes (17): @commitlint/cli, devDependencies, @commitlint/cli, eslint, @eslint/js, globals, playwright, prettier (+9 more)
 
-### Community 123 - "ContentExportService"
-Cohesion: 0.36
-Nodes (3): ContentExportService, normalizeExperienceItems(), normalizeRagSkills()
+### Community 123 - "about.service.ts"
+Cohesion: 0.33
+Nodes (6): AboutInsert, AboutService, normalizeExperienceItems(), normalizeFreelanceProfile(), sanitizeAssetValue(), UpdateAboutInput
 
 ### Community 124 - "e2e/package.json"
 Cohesion: 0.12
@@ -812,24 +800,24 @@ Cohesion: 0.29
 Nodes (6): compilerOptions, baseUrl, paths, strictNullChecks, extends, astro/tsconfigs/strict
 
 ### Community 131 - "PROGRESS.md"
-Cohesion: 0.13
-Nodes (14): 2026-07-26 — Neu system fully removed (public-astro), 2026-07-26 — Projects/Contact/About token consistency sweep (public-astro), 2026-08-02 — GlobalScene circuit+flow fidelity pass (public-astro), 2026-08-04 — Home landing revamp: glass CTA, guestbook marquee rewrite, richer expertise (public-astro), 2026-08-16 -- .context refresh run (design contract, RAG rewrite, deploy path, dev compose repair), 2026-08-18 — RAG chat completion: blog ingestion, citations, Admin ingest hooks, quote tuning, 2026-08-26 — AI Config tab: live model listing + dimension probe + turbopack, 2026-08-26 — dev:all startup race + prod backup restore ke dev (+6 more)
+Cohesion: 0.14
+Nodes (13): 2026-07-26 — Neu system fully removed (public-astro), 2026-07-26 — Projects/Contact/About token consistency sweep (public-astro), 2026-08-26 — AI Config tab: live model listing + dimension probe + turbopack, 2026-08-26 — dev:all startup race + prod backup restore ke dev, 2026-08-26 — E2E plan + remaining-work roadmap, 2026-08-26 — Staged-action `/chat/confirm` + prod health-gate/rollback + admin dep cleanup, 2026-08-27 22:04, 2026-08-27 — Admin light mode diperbaiki + kontrak glass/tint/on-accent + penghapusan total kosakata neumorphic (+5 more)
 
 ### Community 132 - "contacts/route.ts"
-Cohesion: 0.16
-Nodes (13): handlePatch(), PATCH, GET, handleGet(), handlePost(), POST, contactForms, BulkContactActionInput (+5 more)
+Cohesion: 0.15
+Nodes (15): handlePatch(), PATCH, GET, handleGet(), handlePost(), POST, contactForms, BulkContactActionInput (+7 more)
 
-### Community 133 - "ContactTable.tsx"
-Cohesion: 0.28
-Nodes (9): IngestButtonProps, Checkbox(), Switch(), Tooltip(), TooltipContent(), TooltipProvider(), TooltipTrigger(), ContactTableProps (+1 more)
+### Community 133 - "GlobalScene.tsx"
+Cohesion: 0.17
+Nodes (14): GlobalScene(), initEngine(), isSceneName(), makeDotTexture(), pickStarClass(), routeDefault(), SCENE_MOODS, SCENE_ORDER (+6 more)
 
 ### Community 134 - "src/types.d.ts"
 Cohesion: 0.33
 Nodes (5): @auth/core/jwt, JWT, next-auth, Session, User
 
 ### Community 135 - "public-astro/src/lib/api.ts"
-Cohesion: 0.10
-Nodes (23): AboutContent(), FeaturedProjectsProps, ProjectCard(), ProjectCardProps, ProjectsGrid(), ProjectsGridProps, FALLBACK_ABOUT, FetchRequestInit (+15 more)
+Cohesion: 0.09
+Nodes (32): FeaturedProjects(), ProjectCard(), ProjectsGrid(), ApiFetchFailedError, createPublicApiSink(), FALLBACK_ABOUT, FALLBACK_SAME_AS, FetchRequestInit (+24 more)
 
 ### Community 136 - "Maintenance"
 Cohesion: 0.33
@@ -843,9 +831,9 @@ Nodes (5): Boundary rules, Contract-sensitive areas, Cross-app contract model, O
 Cohesion: 0.50
 Nodes (4): EXCLUDED_TABLES, main(), sql, TableRow
 
-### Community 139 - "admin/src/lib/utils.ts"
-Cohesion: 0.17
-Nodes (11): UnauthorizedPageContent(), UnauthorizedPageContentProps, buttonVariants, Calendar(), CalendarProps, DatePicker(), DatePickerProps, Popover() (+3 more)
+### Community 139 - "devDependencies"
+Cohesion: 0.06
+Nodes (33): devDependencies, drizzle-kit, eslint, eslint-config-next, geoip-lite, tailwindcss, @tailwindcss/postcss, tw-animate-css (+25 more)
 
 ### Community 140 - "design-tokens/package.json"
 Cohesion: 0.40
@@ -859,9 +847,13 @@ Nodes (4): b64, body, ext, MIME
 Cohesion: 0.50
 Nodes (3): __dirname, nextConfig, WORKSPACE_ROOT
 
-### Community 143 - "GlobalScene.tsx"
-Cohesion: 0.17
-Nodes (14): GlobalScene(), initEngine(), isSceneName(), makeDotTexture(), pickStarClass(), routeDefault(), SCENE_MOODS, SCENE_ORDER (+6 more)
+### Community 143 - "LivePresencePill.tsx"
+Cohesion: 0.25
+Nodes (10): buildGuestIdentity(), getColorFromSeed(), getHealthUrl(), getSocketUrl(), hashString(), LivePresencePill(), LivePresencePillProps, PresenceMessage (+2 more)
+
+### Community 144 - "public-auth/signin/page.tsx"
+Cohesion: 0.26
+Nodes (10): normalizeAdminCallbackUrl(), SignInPage(), SignInPageProps, normalizeCallbackUrl(), SignInForm(), SignInFormProps, normalizePublicCallbackUrl(), PublicGuestbookSignInPage() (+2 more)
 
 ### Community 145 - "e2e/tsconfig.json"
 Cohesion: 0.20
@@ -887,41 +879,49 @@ Nodes (7): boot(), loadText(), runCount(), wireNav(), wirePresent(), wireProgres
 Cohesion: 0.25
 Nodes (7): Adding a feature, Deliberate gaps, E2E — API-only, local pre-deploy, Environment, Features, Layout, Run
 
-### Community 154 - "(dashboard)/layout.tsx"
-Cohesion: 0.27
-Nodes (7): DashboardLayout(), BottomNav(), NavItem, Theme, ThemeToggler(), getAllowedEmails(), isEmailAllowed()
+### Community 155 - "AnimatedThemeToggler.tsx"
+Cohesion: 0.28
+Nodes (5): AnimatedThemeToggler(), AnimatedThemeTogglerProps, applyThemeAttr(), getCurrentTheme(), Theme
 
-### Community 157 - "button.tsx"
-Cohesion: 0.05
-Nodes (28): AnalyticsPageContent(), metadata, SURFACE_SHADOWS, ChatLog, ChatLogsPageContent(), ChatMessage, PaginationInfo, metadata (+20 more)
+### Community 157 - "BookingSettingsService"
+Cohesion: 0.43
+Nodes (3): BookingSettingsService, normalizeNullableText(), sanitizeBookingSettings()
 
 ### Community 163 - "start-dev.sh"
 Cohesion: 0.60
 Nodes (3): start-dev.sh script, start_service(), wait_ready()
 
-### Community 165 - "ga4.ts"
-Cohesion: 0.32
-Nodes (12): GaDashboardSummary, GaOverview, GaPageViewPoint, getClient(), getCredentials(), getDateRange(), getGaDashboardSummary(), getGaOverview() (+4 more)
-
 ### Community 168 - "shared/constants/index.ts"
 Cohesion: 0.17
 Nodes (10): BOOKING_STATUS_LABELS, COMMON_TIMES, COMMON_TIMEZONES, DAY_NAMES, PAGINATION_DEFAULT, REMINDER_DAYS, SHORT_DAY_NAMES, SLOT_DURATIONS (+2 more)
 
-### Community 228 - "about.service.ts"
+### Community 178 - "profile-link.schema.ts"
 Cohesion: 0.29
-Nodes (7): AboutInsert, AboutService, normalizeExperienceItems(), normalizeFreelanceProfile(), sanitizeAssetValue(), aboutMe, UpdateAboutInput
+Nodes (6): CreateProfileLinkInput, createProfileLinkSchema, ReorderProfileLinksInput, reorderProfileLinksSchema, UpdateProfileLinkInput, updateProfileLinkSchema
 
-### Community 230 - "AnimatedThemeToggler.tsx"
-Cohesion: 0.28
-Nodes (5): AnimatedThemeToggler(), AnimatedThemeTogglerProps, applyThemeAttr(), getCurrentTheme(), Theme
+### Community 198 - "2026-08-02 — GlobalScene circuit+flow fidelity pass (public-astro)"
+Cohesion: 0.50
+Nodes (4): 2026-08-02 — GlobalScene circuit+flow fidelity pass (public-astro), 2026-08-04 — Home landing revamp: glass CTA, guestbook marquee rewrite, richer expertise (public-astro), 2026-08-16 -- .context refresh run (design contract, RAG rewrite, deploy path, dev compose repair), 2026-08-18 — RAG chat completion: blog ingestion, citations, Admin ingest hooks, quote tuning
 
-### Community 232 - "MessageDetailModal.tsx"
-Cohesion: 0.42
-Nodes (7): MessageDetailModal(), COLORS, downloadMessageImage(), escapeHtml(), generateMessageImage(), ImageGeneratorOptions, shareToInstagramStory()
+### Community 228 - "storage.ts"
+Cohesion: 0.14
+Nodes (17): handlePost(), POST, ALLOWED_DOCUMENT_TYPES, ALLOWED_IMAGE_TYPES, AssetValue, extractStorageKeyFromUrl(), getBucketName(), getCredentials() (+9 more)
 
-### Community 233 - "DraggableImageGrid.tsx"
-Cohesion: 0.33
-Nodes (6): DeleteConfirmModal(), DeleteConfirmModalProps, DraggableImageGrid(), DraggableImageGridProps, ProjectImage, SortableImage()
+### Community 230 - "ProjectDetail.tsx"
+Cohesion: 0.14
+Nodes (13): LatestArticles(), ImageCarousel(), ImageCarouselProps, ProjectDetail(), getProjectBySlug(), formatDate(), DECK_INDEX_CANDIDATES, for() (+5 more)
+
+### Community 233 - "PageWrapper.tsx"
+Cohesion: 0.04
+Nodes (34): AnalyticsPageContent(), metadata, ChatLog, ChatLogsPageContent(), ChatMessage, PaginationInfo, metadata, ContactsPageContent() (+26 more)
+
+### Community 235 - "guestbook-token.ts"
+Cohesion: 0.36
+Nodes (8): buildSignInUrl(), GET(), createGuestbookToken(), encodeBase64Url(), getGuestbookSigningSecret(), GuestbookTokenPayload, sign(), verifyGuestbookToken()
+
+### Community 242 - "ContentExportService"
+Cohesion: 0.36
+Nodes (3): ContentExportService, normalizeExperienceItems(), normalizeRagSkills()
 
 ### Community 252 - "docker-prod-up.sh"
 Cohesion: 0.43
@@ -931,29 +931,29 @@ Nodes (4): compose(), PREVIOUS_IMAGE, rollback(), docker-prod-up.sh script
 Cohesion: 0.48
 Nodes (4): BookingDetailPage(), generateMetadata(), PageProps, getBookingById()
 
-### Community 270 - "ImageUploader.tsx"
-Cohesion: 0.33
-Nodes (4): UploadFolder, ImageUploader(), ImageUploaderProps, UploadFolder
+### Community 273 - "admin/package.json"
+Cohesion: 0.40
+Nodes (4): name, private, type, version
 
 ## Knowledge Gaps
-- **1423 isolated node(s):** `$schema`, `style`, `rsc`, `tsx`, `config` (+1418 more)
+- **1524 isolated node(s):** `$schema`, `style`, `rsc`, `tsx`, `config` (+1519 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **80 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **69 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `getErrorMessage()` connect `getErrorMessage` to `SettingsTab.tsx`, `links-astro/src/lib/api.ts`, `ExperienceModal.tsx`, `useProjectEdit.ts`, `AvailabilityTab.tsx`, `ImageUploader.tsx`, `contacts/components/index.ts`, `http/src/index.ts`, `projects/components/index.ts`, `SettingsCard.tsx`, `ResponsiveModal`, `FileUpload.tsx`?**
-  _High betweenness centrality (0.121) - this node is a cross-community bridge._
-- **Why does `Logger` connect `button.tsx` to `db/schema.ts`, `successResponse`, `admin/projects/route.ts`, `ga4.ts`, `public/about/route.ts`, `.error`, `messages/components/index.ts`, `AvailabilityTab.tsx`, `admin/achievements/route.ts`, `validationErrorResponse`, `storage.ts`, `FileUpload.tsx`, `analytics.service.ts`?**
-  _High betweenness centrality (0.066) - this node is a cross-community bridge._
-- **Why does `pdf-parse` connect `seed.ts` to `dependencies`, `ContactsPageContent.tsx`?**
-  _High betweenness centrality (0.037) - this node is a cross-community bridge._
+- **Why does `cn()` connect `cn` to `LogSettingsPanel.tsx`, `button.tsx`, `AnalyticsDashboard.tsx`, `FileUpload.tsx`, `PageWrapper.tsx`, `card.tsx`, `ExperienceModal.tsx`, `SettingsPageContent.tsx`, `lib/auth.ts`, `date.ts`, `RulesTab.tsx`?**
+  _High betweenness centrality (0.045) - this node is a cross-community bridge._
+- **Why does `pdf-parse` connect `seed.ts` to `button.tsx`, `dependencies`?**
+  _High betweenness centrality (0.043) - this node is a cross-community bridge._
+- **Why does `dependencies` connect `dependencies` to `admin/package.json`, `seed.ts`, `clsx`, `@dnd-kit/core`, `dom-to-image-more`, `dotenv`, `@google-analytics/data`, `@dnd-kit/utilities`, `googleapis`, `@hookform/resolvers`, `date-fns`, `drizzle-orm`, `@naufalrf/http`, `mapbox-gl`, `@naufalrf/contracts`, `@naufalrf/design-tokens`, `@paralleldrive/cuid2`, `postgres`, `@radix-ui/react-alert-dialog`, `@radix-ui/react-dialog`, `@radix-ui/react-label`, `@radix-ui/react-popover`, `@radix-ui/react-select`, `@radix-ui/react-slot`, `@radix-ui/react-switch`, `@radix-ui/react-tooltip`, `next-auth`, `react-hook-form`, `react-map-gl`, `@radix-ui/react-checkbox`, `vaul`, `use-debounce`, `zod`?**
+  _High betweenness centrality (0.041) - this node is a cross-community bridge._
 - **What connects `$schema`, `style`, `rsc` to the rest of the system?**
-  _1423 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _1524 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `db/schema.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.03333333333333333 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.027916251246261216 - nodes in this community are weakly interconnected._
 - **Should `successResponse` be split into smaller, more focused modules?**
-  _Cohesion score 0.053168044077134984 - nodes in this community are weakly interconnected._
-- **Should `skeleton.tsx` be split into smaller, more focused modules?**
-  _Cohesion score 0.1111111111111111 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.04202131738363622 - nodes in this community are weakly interconnected._
+- **Should `LogSettingsPanel.tsx` be split into smaller, more focused modules?**
+  _Cohesion score 0.07680491551459294 - nodes in this community are weakly interconnected._

@@ -3260,8 +3260,8 @@
     "semantic_hash": "c83350c48e57d4a55c7ce1706f8581f5"
   },
   "scripts/docker-prod-up.sh": {
-    "mtime": 1787720483.6684504,
-    "ast_hash": "4a17959088829ffecb05044695b4a3dc",
+    "mtime": 1787827140.774695,
+    "ast_hash": "6249610f8e922536cea13308c2f4b6a9",
     "semantic_hash": ""
   },
   "scripts/github-webhook-deploy.sh": {
@@ -3610,8 +3610,8 @@
     "semantic_hash": ""
   },
   "AGENTS.md": {
-    "mtime": 1787824037.503952,
-    "ast_hash": "0316448d86cf8b20157f4d0985138137",
+    "mtime": 1787827458.9743624,
+    "ast_hash": "a2af7db5ad863fd41f7af3b39c834591",
     "semantic_hash": ""
   },
   "DESIGN.md": {
@@ -3620,8 +3620,8 @@
     "semantic_hash": ""
   },
   "PROGRESS.md": {
-    "mtime": 1787824007.2217722,
-    "ast_hash": "b64fbcf40558e04691825970675da182",
+    "mtime": 1787827442.9492784,
+    "ast_hash": "bb79eea5d9eea679374be0a9ea3e3639",
     "semantic_hash": ""
   },
   "README.md": {
@@ -3690,13 +3690,13 @@
     "semantic_hash": ""
   },
   "docker-compose.dev.yml": {
-    "mtime": 1787823621.2904677,
-    "ast_hash": "cac30c3ac1fa0cd45805b3e233bfb3ff",
+    "mtime": 1787826931.3255987,
+    "ast_hash": "9f3f1cb05423c241a0142924aed8cc70",
     "semantic_hash": ""
   },
   "docker-compose.prod.yml": {
-    "mtime": 1787823712.2150133,
-    "ast_hash": "61af3384292fbb102a82bf6967a444bb",
+    "mtime": 1787826256.0770802,
+    "ast_hash": "1e82208f9c4e62a173744f9f530f8c09",
     "semantic_hash": ""
   },
   "data/Artikel Naufal By Fadlan.pdf": {
