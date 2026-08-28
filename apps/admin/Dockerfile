@@ -1,8 +1,8 @@
-FROM docker.io/oven/bun:1.3.6 AS dev
+FROM docker.io/oven/bun:1.3.14 AS dev
 WORKDIR /app
 CMD ["sh", "-lc", "bun install --frozen-lockfile && bun run dev"]
 
-FROM docker.io/oven/bun:1.3.6 AS builder
+FROM docker.io/oven/bun:1.3.14 AS builder
 ARG NEXT_PUBLIC_TURNSTILE_SITE_KEY=""
 ARG NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=""
 ARG NEXT_PUBLIC_GA_MEASUREMENT_ID=""
@@ -23,17 +23,27 @@ COPY e2e/package.json ./e2e/package.json
 RUN bun install --frozen-lockfile
 COPY apps/admin ./apps/admin
 WORKDIR /app/apps/admin
-RUN bun run build \
-  && mkdir -p .next/standalone/.next \
-  && cp -R .next/static .next/standalone/.next/static \
-  && if [ -d public ]; then cp -R public .next/standalone/public; fi
+# `bun run build` runs `next build --debug-prerender`, a required workaround
+# for an unpatched Next.js 16 bug where prerendering the internal
+# /_global-error page crashes (vercel/next.js#95741, #86178, #84994) —
+# --debug-prerender lets the build actually complete instead of aborting.
+# Bun itself then segfaults during its own post-build exit/cleanup on this
+# version (unrelated to the build result, and irrelevant at runtime since
+# the prod stage below runs the standalone output under plain Node, not
+# Bun) — tolerate that crash and verify the real build artifact exists
+# instead of trusting bun's exit code.
+RUN (bun run build || true) \
+  && test -f .next/standalone/apps/admin/server.js \
+  && mkdir -p .next/standalone/apps/admin/.next \
+  && cp -R .next/static .next/standalone/apps/admin/.next/static \
+  && if [ -d public ]; then cp -R public .next/standalone/apps/admin/public; fi
 
 FROM docker.io/library/node:22-bookworm-slim AS prod
-WORKDIR /app
+WORKDIR /app/apps/admin
 ENV NODE_ENV=production
 ENV HOSTNAME=0.0.0.0
 ENV PORT=3001
-COPY --from=builder --chown=node:node /app/apps/admin/.next/standalone ./
+COPY --from=builder --chown=node:node /app/apps/admin/.next/standalone /app
 USER node
 EXPOSE 3001
 CMD ["node", "server.js"]

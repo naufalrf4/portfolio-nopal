@@ -2,6 +2,8 @@ import { redirect } from 'next/navigation';
 import { safeAuth, isDemoAuthEnabled } from '@/lib/auth';
 import { SignInForm } from '@/app/auth/signin/sign-in-form';
 
+export const dynamic = 'force-dynamic';
+
 interface PublicGuestbookSignInPageProps {
   searchParams: Promise<{ callbackUrl?: string }>;
 }

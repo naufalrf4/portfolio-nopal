@@ -2,6 +2,8 @@ import { redirect } from 'next/navigation';
 import { auth, isDemoAuthEnabled } from '@/lib/auth';
 import { SignInForm } from './sign-in-form';
 
+export const dynamic = 'force-dynamic';
+
 interface SignInPageProps {
   searchParams: Promise<{ error?: string; callbackUrl?: string }>;
 }

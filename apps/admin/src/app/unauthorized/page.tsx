@@ -3,6 +3,8 @@ import { redirect } from 'next/navigation';
 import { safeAuth } from '@/lib/auth';
 import { UnauthorizedPageContent } from '@/app/(dashboard)/unauthorized/UnauthorizedPageContent';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'Access Denied',
   description: 'You do not have permission to access this application',

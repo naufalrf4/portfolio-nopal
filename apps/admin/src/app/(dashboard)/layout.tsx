@@ -9,6 +9,14 @@ import { NotificationBell } from '@/components/layout/NotificationBell';
 import { WibClock } from '@/components/layout/WibClock';
 import { isEmailAllowed } from '@/lib/auth-security';
 
+// Every route under this group requires a live session (safeAuth() below) and
+// renders SessionProvider/AppSidebar with per-user data, so it can never be
+// statically prerendered. Forcing dynamic here (cascades to all child pages)
+// also sidesteps a Next.js 16 static-worker regression where SessionProvider's
+// hooks crash with "useState of null" when a page under this layout gets
+// swept into a static-generation pass (vercel/next.js#95741, #86178).
+export const dynamic = 'force-dynamic';
+
 export default async function DashboardLayout({ children }: { children: ReactNode }) {
   const session = await safeAuth();
 

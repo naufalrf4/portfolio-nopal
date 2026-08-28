@@ -11,6 +11,14 @@ const nextConfig = {
   turbopack: {
     root: WORKSPACE_ROOT,
   },
+  experimental: {
+    // Caps static-generation worker parallelism to keep peak memory down
+    // during `next build` — the deploy VPS is memory-constrained and
+    // multiple workers building concurrently has caused OOM kills. This
+    // does NOT fix the /_global-error prerender crash (see --debug-prerender
+    // in package.json's build script for that); it's purely a resource knob.
+    cpus: 1,
+  },
   transpilePackages: ['react-map-gl', 'mapbox-gl'],
   serverExternalPackages: ['geoip-lite'],
   images: {
