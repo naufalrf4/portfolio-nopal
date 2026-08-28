@@ -19,7 +19,7 @@ async function handleGet(request: NextRequest) {
       return successResponse({ items: [], connected: false, selectedCalendarId: null });
     }
 
-    const items = await googleCalendarService.listCalendars(settings, request.nextUrl.origin);
+    const items = await googleCalendarService.listCalendars(settings);
     return successResponse({
       items,
       connected: true,

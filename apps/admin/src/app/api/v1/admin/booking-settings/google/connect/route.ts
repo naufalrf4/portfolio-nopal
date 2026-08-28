@@ -33,9 +33,6 @@ export async function GET(request: NextRequest) {
   }
 
   const state = createGoogleCalendarOAuthState({ userId, returnTo });
-  const authorizationUrl = googleCalendarService.buildAuthorizationUrl(
-    request.nextUrl.origin,
-    state
-  );
+  const authorizationUrl = googleCalendarService.buildAuthorizationUrl(state);
   return NextResponse.redirect(authorizationUrl);
 }

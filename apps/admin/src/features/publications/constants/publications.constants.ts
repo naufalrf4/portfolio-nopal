@@ -3,6 +3,7 @@ export const SURFACE_STYLES = {
   foreground: 'var(--text-primary)',
   muted: 'var(--text-secondary)',
   accent: 'var(--teal)',
+  accentForeground: 'var(--on-accent)',
   accentLight: 'var(--amber)',
   success: 'var(--teal)',
   shadows: {

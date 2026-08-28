@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const connection = await googleCalendarService.exchangeCode(request.nextUrl.origin, code);
+    const connection = await googleCalendarService.exchangeCode(code);
     await bookingSettingsService.updateInternal({
       googleCalendarRefreshToken: connection.encryptedRefreshToken,
       googleCalendarCalendarId: connection.defaultCalendarId,

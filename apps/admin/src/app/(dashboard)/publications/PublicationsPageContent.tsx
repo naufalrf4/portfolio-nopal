@@ -71,7 +71,7 @@ export function PublicationsPageContent() {
             style={{
               background: SURFACE_STYLES.accent,
               boxShadow: SURFACE_STYLES.shadows.small,
-              color: 'white',
+              color: SURFACE_STYLES.accentForeground,
             }}
           >
             <PlusIcon />
@@ -143,7 +143,7 @@ export function PublicationsPageContent() {
               style={{
                 background: SURFACE_STYLES.accent,
                 boxShadow: SURFACE_STYLES.shadows.small,
-                color: 'white',
+                color: SURFACE_STYLES.accentForeground,
               }}
             >
               <PlusIcon />

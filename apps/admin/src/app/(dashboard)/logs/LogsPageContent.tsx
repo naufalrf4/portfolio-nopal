@@ -12,6 +12,7 @@ import {
   LogsTable,
   LogFiltersComponent,
   LogSettingsPanel,
+  ClearLogsDialog,
 } from '@/features/logs';
 
 export function LogsPageContent() {
@@ -54,35 +55,38 @@ export function LogsPageContent() {
           { label: 'Info / Debug', value: counts.info + counts.debug },
         ]}
         actions={
-          <div className="flex items-center gap-1.5 p-1 rounded-xl bg-[var(--bg-elevated)] surface-raised-sm">
-            <Button
-              variant={activeTab === 'logs' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => setActiveTab('logs')}
-              className={cn(
-                'h-8 px-3 rounded-lg text-xs font-medium',
-                activeTab === 'logs'
-                  ? 'bg-[var(--teal)] text-on-accent'
-                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
-              )}
-            >
-              <TableIcon className="h-3.5 w-3.5 mr-1.5" />
-              Logs View
-            </Button>
-            <Button
-              variant={activeTab === 'settings' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => setActiveTab('settings')}
-              className={cn(
-                'h-8 px-3 rounded-lg text-xs font-medium',
-                activeTab === 'settings'
-                  ? 'bg-[var(--teal)] text-on-accent'
-                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
-              )}
-            >
-              <SlidersHorizontal className="h-3.5 w-3.5 mr-1.5" />
-              Capture Settings
-            </Button>
+          <div className="flex items-center gap-2">
+            <ClearLogsDialog onCleared={refreshLogs} />
+            <div className="flex items-center gap-1.5 p-1 rounded-xl bg-[var(--bg-elevated)] surface-raised-sm">
+              <Button
+                variant={activeTab === 'logs' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setActiveTab('logs')}
+                className={cn(
+                  'h-8 px-3 rounded-lg text-xs font-medium',
+                  activeTab === 'logs'
+                    ? 'bg-[var(--teal)] text-on-accent'
+                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                )}
+              >
+                <TableIcon className="h-3.5 w-3.5 mr-1.5" />
+                Logs View
+              </Button>
+              <Button
+                variant={activeTab === 'settings' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setActiveTab('settings')}
+                className={cn(
+                  'h-8 px-3 rounded-lg text-xs font-medium',
+                  activeTab === 'settings'
+                    ? 'bg-[var(--teal)] text-on-accent'
+                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                )}
+              >
+                <SlidersHorizontal className="h-3.5 w-3.5 mr-1.5" />
+                Capture Settings
+              </Button>
+            </div>
           </div>
         }
       />

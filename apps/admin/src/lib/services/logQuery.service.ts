@@ -13,6 +13,7 @@ type LevelCounts = Record<'debug' | 'info' | 'warn' | 'error', number>;
 interface LogDatabase {
   queryLogs(where: SQL | undefined, limit: number): PromiseLike<readonly AppLogRow[]>;
   queryLevelCounts(): PromiseLike<readonly LevelCountRow[]>;
+  deleteBefore(cutoff: string): PromiseLike<number>;
 }
 
 const LOG_LEVELS = ['debug', 'info', 'warn', 'error'] as const;
@@ -30,6 +31,13 @@ const defaultDatabase: LogDatabase = {
       .select({ level: appLogs.level, total: count() })
       .from(appLogs)
       .groupBy(appLogs.level),
+  deleteBefore: async (cutoff) => {
+    const deleted = await db
+      .delete(appLogs)
+      .where(lt(appLogs.timestamp, cutoff))
+      .returning({ id: appLogs.id });
+    return deleted.length;
+  },
 };
 
 export class LogQueryService {
@@ -77,6 +85,10 @@ export class LogQueryService {
     }
 
     return counts;
+  }
+
+  async deleteBefore(cutoff: Date): Promise<number> {
+    return this.database.deleteBefore(cutoff.toISOString());
   }
 }
 

@@ -71,6 +71,9 @@ services:
         limits:
           memory: 512m
           cpus: "1.0"
+        reservations:
+          memory: 256m
+          cpus: "0.5"
     networks:
       - internal
       - dokploy-network
@@ -156,6 +159,9 @@ services:
         limits:
           memory: 64m
           cpus: "0.1"
+        reservations:
+          memory: 32m
+          cpus: "0.05"
     networks:
       - internal
 
@@ -188,6 +194,9 @@ services:
         limits:
           memory: 64m
           cpus: "0.1"
+        reservations:
+          memory: 32m
+          cpus: "0.05"
     networks:
       - internal
 
@@ -245,6 +254,9 @@ services:
         limits:
           memory: 384m
           cpus: "0.5"
+        reservations:
+          memory: 192m
+          cpus: "0.25"
     depends_on:
       admin:
         condition: service_started
@@ -327,6 +339,9 @@ services:
         limits:
           memory: 256m
           cpus: "0.5"
+        reservations:
+          memory: 128m
+          cpus: "0.25"
     depends_on:
       admin:
         condition: service_started
@@ -378,6 +393,9 @@ services:
         limits:
           memory: 128m
           cpus: "0.25"
+        reservations:
+          memory: 64m
+          cpus: "0.1"
     depends_on:
       admin:
         condition: service_started
@@ -426,6 +444,9 @@ services:
         limits:
           memory: 128m
           cpus: "0.25"
+        reservations:
+          memory: 64m
+          cpus: "0.1"
     depends_on:
       admin:
         condition: service_started
@@ -469,6 +490,9 @@ services:
         limits:
           memory: 64m
           cpus: "0.25"
+        reservations:
+          memory: 32m
+          cpus: "0.1"
     networks:
       - internal
       - dokploy-network

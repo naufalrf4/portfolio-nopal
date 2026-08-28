@@ -46,11 +46,7 @@
 	/>
 	{#if gaMeasurementId}
 		<script async src={`https://www.googletagmanager.com/gtag/js?id=${gaMeasurementId}`}></script>
-		<script>
-			{
-				`window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', ${JSON.stringify(gaMeasurementId)}, { send_page_view: false });`;
-			}
-		</script>
+		{@html `<script>window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', ${JSON.stringify(gaMeasurementId)}, { send_page_view: false });</script>`}
 	{/if}
 </svelte:head>
 

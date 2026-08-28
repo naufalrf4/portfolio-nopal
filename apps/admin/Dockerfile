@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1.7
 FROM docker.io/oven/bun:1.3.14 AS dev
 WORKDIR /app
 CMD ["sh", "-lc", "bun install --frozen-lockfile && bun run dev"]
@@ -20,7 +21,8 @@ COPY apps/rag-service/package.json ./apps/rag-service/package.json
 COPY apps/live-presence/package.json ./apps/live-presence/package.json
 COPY apps/slidedeck/package.json ./apps/slidedeck/package.json
 COPY e2e/package.json ./e2e/package.json
-RUN bun install --frozen-lockfile
+RUN --mount=type=cache,id=bun-install-cache,target=/root/.bun/install/cache \
+    bun install --frozen-lockfile
 COPY apps/admin ./apps/admin
 WORKDIR /app/apps/admin
 # `bun run build` runs `next build --debug-prerender`, a required workaround
@@ -32,7 +34,8 @@ WORKDIR /app/apps/admin
 # the prod stage below runs the standalone output under plain Node, not
 # Bun) — tolerate that crash and verify the real build artifact exists
 # instead of trusting bun's exit code.
-RUN (bun run build || true) \
+RUN --mount=type=cache,id=admin-next-cache,target=/app/apps/admin/.next/cache \
+  (bun run build || true) \
   && test -f .next/standalone/apps/admin/server.js \
   && mkdir -p .next/standalone/apps/admin/.next \
   && cp -R .next/static .next/standalone/apps/admin/.next/static \

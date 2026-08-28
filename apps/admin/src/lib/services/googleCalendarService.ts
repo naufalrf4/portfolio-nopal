@@ -138,21 +138,30 @@ function getGoogleClientCredentials() {
   return { clientId, clientSecret };
 }
 
-function buildCallbackUrl(origin: string) {
-  return new URL('/api/v1/admin/booking-settings/google/callback', origin).toString();
+function getPublicOrigin() {
+  const publicUrl = process.env.NEXTAUTH_URL?.trim();
+
+  if (!publicUrl) {
+    throw new Error('NEXTAUTH_URL is required to build the Google OAuth redirect URI.');
+  }
+
+  return new URL(publicUrl).origin;
 }
 
-function createOAuthClient(origin: string) {
+function buildCallbackUrl() {
+  return new URL(
+    '/api/v1/admin/booking-settings/google/callback',
+    getPublicOrigin()
+  ).toString();
+}
+
+function createOAuthClient() {
   const credentials = getGoogleClientCredentials();
   if (!credentials) {
     return null;
   }
 
-  return new google.auth.OAuth2(
-    credentials.clientId,
-    credentials.clientSecret,
-    buildCallbackUrl(origin)
-  );
+  return new google.auth.OAuth2(credentials.clientId, credentials.clientSecret, buildCallbackUrl());
 }
 
 async function listCalendarsWithAuth(auth: InstanceType<typeof google.auth.OAuth2>) {
@@ -203,8 +212,8 @@ export const googleCalendarService = {
     return Boolean(getConfiguredRefreshToken(settings));
   },
 
-  buildAuthorizationUrl(origin: string, state: string) {
-    const client = createOAuthClient(origin);
+  buildAuthorizationUrl(state: string) {
+    const client = createOAuthClient();
     if (!client) {
       throw new Error('Google OAuth credentials are not configured.');
     }
@@ -219,8 +228,8 @@ export const googleCalendarService = {
     });
   },
 
-  async exchangeCode(origin: string, code: string): Promise<GoogleCalendarConnectionResult> {
-    const client = createOAuthClient(origin);
+  async exchangeCode(code: string): Promise<GoogleCalendarConnectionResult> {
+    const client = createOAuthClient();
     if (!client) {
       throw new Error('Google OAuth credentials are not configured.');
     }
@@ -251,8 +260,8 @@ export const googleCalendarService = {
     };
   },
 
-  async listCalendars(settings: BookingSettings, origin: string) {
-    const client = createOAuthClient(origin);
+  async listCalendars(settings: BookingSettings) {
+    const client = createOAuthClient();
     const refreshToken = getConfiguredRefreshToken(settings);
 
     if (!client || !refreshToken) {
@@ -264,7 +273,7 @@ export const googleCalendarService = {
   },
 
   async createBookingEvent({ booking, slot, message, settings }: BookingCalendarEventInput) {
-    const client = createOAuthClient('http://localhost');
+    const client = createOAuthClient();
     const refreshToken = getConfiguredRefreshToken(settings);
     const calendarId = getConfiguredCalendarId(settings);
 
@@ -329,7 +338,7 @@ export const googleCalendarService = {
   },
 
   async cancelBookingEvent(eventId: string, settings: BookingSettings) {
-    const client = createOAuthClient('http://localhost');
+    const client = createOAuthClient();
     const refreshToken = getConfiguredRefreshToken(settings);
     const calendarId = getConfiguredCalendarId(settings);
 

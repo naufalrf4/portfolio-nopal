@@ -25,7 +25,8 @@ export function IconSelector({ value, onChange, labelText, urlValue }: IconSelec
               <SelectItem key={option.value} value={option.value}>
                 <div className="flex items-center gap-3">
                   <div
-                    className="w-6 h-6 rounded-lg flex items-center justify-center border border-line-strong bg-accent/20 text-accent"
+                    className="w-6 h-6 rounded-lg flex items-center justify-center border border-line-strong text-white"
+                    style={{ backgroundColor: option.color }}
                   >
                     <Icon className="h-4 w-4" />
                   </div>
@@ -48,7 +49,8 @@ export function IconSelector({ value, onChange, labelText, urlValue }: IconSelec
           }}
         >
           <div
-            className="w-12 h-12 rounded-xl flex items-center justify-center border border-line-strong bg-accent text-accent-foreground"
+            className="w-12 h-12 rounded-xl flex items-center justify-center border border-line-strong text-white"
+            style={{ backgroundColor: getIconData(value).color }}
           >
             {(() => {
               const { icon: Icon } = getIconData(value);
