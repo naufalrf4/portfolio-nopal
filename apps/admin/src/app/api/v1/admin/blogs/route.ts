@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { withAdminAuth } from '@/lib/api/middleware/auth';
-import { blogLinksService } from '@/lib/api/handlers/blog-links.service';
+import { publicationLinksService } from '@/lib/api/handlers/publication-links.service';
 import { successResponse, errorResponse, validationErrorResponse } from '@/lib/api/responses';
 import { createBlogLinkSchema } from '@/lib/validations/blog-link.schema';
 import { z } from 'zod';
@@ -27,7 +27,7 @@ async function handleGet(req: NextRequest) {
     }
 
     logger.info('Fetching blog links', { requestId, operation: 'blogs.getAll' });
-    const blogLinks = await blogLinksService.getAll(validation.data);
+  const blogLinks = await publicationLinksService.getAll(validation.data);
 
     const signedBlogs = await signAssetUrlsMany(blogLinks, {
       fields: ['imageUrl'],
@@ -60,7 +60,7 @@ async function handlePost(req: NextRequest) {
       return validationErrorResponse(validation.error.format());
     }
 
-    const existingBlogLink = await blogLinksService.getAll({ visible: undefined });
+  const existingBlogLink = await publicationLinksService.getAll({ visible: undefined });
     const urlExists = existingBlogLink.some((blog) => blog.url === validation.data.url);
 
     if (urlExists) {
@@ -72,7 +72,7 @@ async function handlePost(req: NextRequest) {
       operation: 'blogs.create',
       url: validation.data.url,
     });
-    const blogLink = await blogLinksService.create(validation.data);
+  const blogLink = await publicationLinksService.create(validation.data);
 
     const signedBlog = await signAssetUrls(blogLink, {
       fields: ['imageUrl'],

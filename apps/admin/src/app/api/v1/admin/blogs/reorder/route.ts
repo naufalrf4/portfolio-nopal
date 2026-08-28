@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { withAdminAuth } from '@/lib/api/middleware/auth';
-import { blogLinksService } from '@/lib/api/handlers/blog-links.service';
+import { publicationLinksService } from '@/lib/api/handlers/publication-links.service';
 import { successResponse, validationErrorResponse, serverErrorResponse } from '@/lib/api/responses';
 import { reorderBlogLinksSchema } from '@/lib/validations/blog-link.schema';
 
@@ -13,7 +13,7 @@ async function handlePost(req: NextRequest) {
       return validationErrorResponse(validation.error.format());
     }
 
-    const blogLinks = await blogLinksService.reorder(validation.data.blogIds);
+  const blogLinks = await publicationLinksService.reorder(validation.data.blogIds);
     return successResponse({ blogLinks }, 'Blog links reordered successfully');
   } catch {
     return serverErrorResponse();
