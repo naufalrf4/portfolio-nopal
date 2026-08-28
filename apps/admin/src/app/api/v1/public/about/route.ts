@@ -42,6 +42,7 @@ interface PublicAboutData {
   skills: Skill[];
   experience: Experience[];
   socialLinks: SocialLink[];
+  updatedAt: string;
 }
 
 type StoredExperience = {
@@ -263,6 +264,7 @@ export async function GET() {
       skills: normalizeSkills(aboutMeData.skills),
       experience: normalizeExperience(aboutMeData.experience),
       socialLinks: normalizeProfileLinksAsSocialLinks(visibleProfileLinks),
+      updatedAt: aboutMeData.updatedAt,
     };
 
     const signedData = await signAssetUrls(publicData, {

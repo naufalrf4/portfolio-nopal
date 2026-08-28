@@ -40,6 +40,7 @@ export async function GET(req: NextRequest, context: RouteContext) {
       imageUrl: project.imageUrl,
       featured: project.featured,
       createdAt: project.createdAt,
+      updatedAt: project.updatedAt,
       projectDate: project.projectDate,
       images: project.projectImages,
     };

@@ -33,6 +33,7 @@ export async function GET(req: NextRequest) {
         imageUrl: projects.imageUrl,
         featured: projects.featured,
         createdAt: projects.createdAt,
+        updatedAt: projects.updatedAt,
       })
       .from(projects)
       .where(where)
