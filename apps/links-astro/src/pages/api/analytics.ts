@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { buildAnalyticsProxyHeaders } from '../../lib/analytics';
+import { logger } from '../../lib/api';
 
 const ADMIN_API_URL = import.meta.env.ADMIN_API_URL || 'http://localhost:3001';
 export const POST: APIRoute = async ({ request, clientAddress }) => {
@@ -24,7 +25,8 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
         'Content-Type': 'application/json',
       },
     });
-  } catch {
+  } catch (error) {
+    logger.error('Failed to track analytics event', error);
     return new Response(
       JSON.stringify({ success: false, error: { message: 'Failed to track analytics event.' } }),
       {

@@ -1,10 +1,32 @@
 import type { AboutData, ProfileLink } from '../types';
 import type { AboutData as AdminAboutData } from '@naufalrf/contracts';
-import { createAbortSignal, HttpError, isAbortError, isSuccessEnvelope } from '@naufalrf/http';
+import { createAbortSignal, createLogger, createLogShipper, HttpError, isAbortError, isSuccessEnvelope } from '@naufalrf/http';
+import type { LogEntryInput } from '@naufalrf/contracts';
 
 const API_BASE =
   process.env.ADMIN_API_URL?.trim() || import.meta.env.ADMIN_API_URL?.trim() || 'http://localhost:3001';
 const API_TIMEOUT_MS = 5000;
+
+const ADMIN_INTERNAL_API_TOKEN =
+  process.env.ADMIN_INTERNAL_API_TOKEN?.trim() ||
+  import.meta.env.ADMIN_INTERNAL_API_TOKEN?.trim() ||
+  process.env.ADMIN_SERVICE_TOKEN?.trim() ||
+  import.meta.env.ADMIN_SERVICE_TOKEN?.trim() ||
+  '';
+
+function createLinksApiSink(): ((entry: LogEntryInput) => void) | undefined {
+  if (!ADMIN_INTERNAL_API_TOKEN) return undefined;
+  const shipper = createLogShipper({
+    endpoint: `${API_BASE}/api/v1/internal/logs`,
+    token: ADMIN_INTERNAL_API_TOKEN,
+  });
+  return (entry) => shipper.enqueue(entry);
+}
+
+export const logger = createLogger({
+  service: 'links-astro',
+  sink: createLinksApiSink(),
+});
 
 interface LinksPageData {
   aboutData: AboutData;

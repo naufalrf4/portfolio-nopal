@@ -1,4 +1,25 @@
 import type { Handle } from '@sveltejs/kit';
+import { env } from '$env/dynamic/private';
+import { createLogger, createLogShipper } from '@naufalrf/http';
+import type { LogEntryInput } from '@naufalrf/contracts';
+
+const adminApiUrl = env.ADMIN_API_URL ?? 'http://localhost:3001';
+const adminInternalApiToken =
+	env.ADMIN_INTERNAL_API_TOKEN?.trim() || env.ADMIN_SERVICE_TOKEN?.trim() || '';
+
+function createNglApiSink(): ((entry: LogEntryInput) => void) | undefined {
+	if (!adminInternalApiToken) return undefined;
+	const shipper = createLogShipper({
+		endpoint: `${adminApiUrl}/api/v1/internal/logs`,
+		token: adminInternalApiToken
+	});
+	return (entry) => shipper.enqueue(entry);
+}
+
+export const logger = createLogger({
+	service: 'ngl-svelte',
+	sink: createNglApiSink()
+});
 
 export const handle: Handle = async ({ event, resolve }) => {
 	const response = await resolve(event);

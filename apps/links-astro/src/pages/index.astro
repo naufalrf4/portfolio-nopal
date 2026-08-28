@@ -6,7 +6,7 @@ import { ThemeToggler } from '../components/ThemeToggler';
 import ProfileHeader from '../components/ProfileHeader.astro';
 import LinkButtons from '../components/LinkButtons.astro';
 import SocialIcons from '../components/SocialIcons.astro';
-import { getLinksPageData } from '../lib/api';
+import { getLinksPageData, logger } from '../lib/api';
 import { detectSocialPlatform, isSocialProfileLink, normalizeUrl } from '../lib/link-classification';
 import type { AboutData, ProfileLink, SocialLink } from '../types';
 
@@ -32,7 +32,7 @@ try {
   aboutData = pageData.aboutData;
   links = pageData.links;
 } catch (error) {
-  console.error('Failed to load profile links', error);
+  logger.error('Failed to load profile links', error);
   errorMessage = 'Failed to load links. Please try again later.';
 }
 

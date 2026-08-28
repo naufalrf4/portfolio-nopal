@@ -1,6 +1,7 @@
 import { env } from '$env/dynamic/private';
 import type { MessagePayload, MessageResponse } from '@naufalrf/contracts';
 import { buildProxyHeaders, createAbortSignal, isAbortError } from '@naufalrf/http';
+import { logger } from '../hooks.server';
 
 interface MessageResult extends MessageResponse {
 	status?: number;
@@ -51,6 +52,7 @@ export async function submitMessageWithContext(
 		};
 	} catch (error) {
 		if (isAbortError(error)) {
+			logger.error('NGL message submission timed out', error);
 			return {
 				success: false,
 				error: {
@@ -61,6 +63,7 @@ export async function submitMessageWithContext(
 			};
 		}
 
+		logger.error('NGL message submission failed', error);
 		return {
 			success: false,
 			error: {
