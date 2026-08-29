@@ -13,6 +13,9 @@ export const COLORS = {
   muted: 'var(--text-secondary)',
   accent: 'var(--teal)',
   amber: 'var(--amber)',
+  accentSoft: 'var(--teal-soft)',
+  amberSoft: 'var(--amber-soft)',
+  border: 'var(--border)',
 };
 
 export const FILTER_TABS: { key: FilterTab; label: string }[] = [

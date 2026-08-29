@@ -15,38 +15,42 @@ export function MessageCard({ message, onSelect, onToggleRead, onDelete }: Messa
   return (
     <div
       onClick={onSelect}
-      className="rounded-[var(--radius-container)] p-6 cursor-pointer transition-all duration-200 hover:scale-[1.01] relative overflow-hidden group"
+      className="rounded-[var(--radius-container)] p-6 cursor-pointer transition-all duration-200 hover:scale-[1.01] relative overflow-hidden group h-full flex flex-col"
       style={{
         backgroundColor: COLORS.background,
         boxShadow: SURFACE_SHADOWS.extruded,
         borderLeft: !message.read ? `4px solid ${COLORS.amber}` : '4px solid transparent',
       }}
     >
-      {!message.read && (
-        <div
-          className="absolute top-6 right-6 w-3 h-3 rounded-full pulse-amber"
-          style={{ backgroundColor: COLORS.amber }}
-        />
-      )}
-
       <div className="flex items-start gap-4 mb-4">
-        <div
-          className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 transition-transform duration-200 group-hover:scale-105"
-          style={{
-            backgroundColor: COLORS.background,
-            boxShadow: SURFACE_SHADOWS.inset,
-          }}
-        >
-          {message.read ? (
-            <MailOpen className="w-5 h-5" style={{ color: COLORS.accent }} />
-          ) : (
-            <Mail className="w-5 h-5" style={{ color: COLORS.amber }} />
+        <div className="relative flex-shrink-0">
+          <div
+            className="w-12 h-12 rounded-full flex items-center justify-center transition-transform duration-200 group-hover:scale-105"
+            style={{
+              backgroundColor: COLORS.background,
+              boxShadow: SURFACE_SHADOWS.inset,
+            }}
+          >
+            {message.read ? (
+              <MailOpen className="w-5 h-5" style={{ color: COLORS.accent }} />
+            ) : (
+              <Mail className="w-5 h-5" style={{ color: COLORS.amber }} />
+            )}
+          </div>
+          {!message.read && (
+            <div
+              className="absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full pulse-amber"
+              style={{ backgroundColor: COLORS.amber }}
+            />
           )}
         </div>
 
         <div className="flex-1 min-w-0">
-          <p className="text-base leading-relaxed mb-3" style={{ color: COLORS.foreground }}>
-            {truncate(message.content, 120)}
+          <p
+            className="text-base leading-relaxed mb-3 line-clamp-3 break-words"
+            style={{ color: COLORS.foreground }}
+          >
+            {truncate(message.content, 90)}
           </p>
 
           <p className="text-sm" style={{ color: COLORS.muted }}>
@@ -55,11 +59,13 @@ export function MessageCard({ message, onSelect, onToggleRead, onDelete }: Messa
         </div>
       </div>
 
-      <div className="flex items-center justify-between pt-4 border-t border-black/5">
+      <div
+        className="flex items-center justify-between pt-4 mt-auto border-t border-[var(--border)]"
+      >
         <span
           className="text-xs px-3 py-1.5 rounded-lg font-medium"
           style={{
-            backgroundColor: message.read ? `${COLORS.accent}15` : `${COLORS.amber}15`,
+            backgroundColor: message.read ? COLORS.accentSoft : COLORS.amberSoft,
             color: message.read ? COLORS.accent : COLORS.amber,
           }}
         >

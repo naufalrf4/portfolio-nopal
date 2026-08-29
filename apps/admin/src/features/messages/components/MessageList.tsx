@@ -10,7 +10,7 @@ interface MessageListProps {
 
 export function MessageList({ messages, onSelect, onToggleRead, onDelete }: MessageListProps) {
   return (
-    <div className="grid gap-6">
+    <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
       {messages.map((message) => (
         <MessageCard
           key={message.id}
