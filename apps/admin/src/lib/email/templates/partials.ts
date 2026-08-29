@@ -9,16 +9,16 @@ type ButtonTone = 'primary' | 'neutral' | 'danger';
 type StatusTone = 'info' | 'success' | 'danger' | 'warning';
 
 const buttonToneStyles: Record<ButtonTone, string> = {
-  primary: 'background:#1d4ed8;color:#ffffff;',
-  neutral: 'background:#e8eef9;color:#16355d;',
-  danger: 'background:#c2410c;color:#ffffff;',
+  primary: 'background:#0f8577;color:#ffffff;',
+  neutral: 'background:#f2eee6;color:#211c15;',
+  danger: 'background:#c2413d;color:#ffffff;',
 };
 
 const statusToneStyles: Record<StatusTone, string> = {
-  info: 'background:#dbeafe;color:#1d4ed8;',
-  success: 'background:#dcfce7;color:#166534;',
-  danger: 'background:#fee2e2;color:#b91c1c;',
-  warning: 'background:#fef3c7;color:#92400e;',
+  info: 'background:#e2f2f0;color:#0f8577;',
+  success: 'background:#e3f4e8;color:#15803d;',
+  danger: 'background:#f9e6e5;color:#a5322f;',
+  warning: 'background:#f7ecdd;color:#a8661b;',
 };
 
 export function renderHeader(title: string, intro: string): string {

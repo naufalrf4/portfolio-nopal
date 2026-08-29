@@ -1,9 +1,29 @@
+import { EMAIL_CONFIG } from '../config';
 import { escapeHtml } from './helper';
 
 type EmailLayoutOptions = {
   preheader: string;
   content: string;
 };
+
+const PALETTE = {
+  bg: '#faf8f4',
+  bgElevated: '#f2eee6',
+  bgCard: '#ffffff',
+  border: '#d4cdbf',
+  borderSoft: '#e4ded2',
+  textPrimary: '#211c15',
+  textSecondary: '#6b6558',
+  textTertiary: '#9a9384',
+  teal: '#0f8577',
+  amber: '#a8661b',
+} as const;
+
+const FONT_STACK =
+  "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
+
+const assetBase = EMAIL_CONFIG.publicSiteUrl.replace(/\/+$/, '');
+const logoUrl = `${assetBase}/logo-email.png`;
 
 export function emailLayout({ preheader, content }: EmailLayoutOptions): string {
   return `
@@ -17,9 +37,9 @@ export function emailLayout({ preheader, content }: EmailLayoutOptions): string 
     body {
       margin: 0;
       padding: 0;
-      background: #eef3fb;
-      color: #16355d;
-      font-family: 'Segoe UI', Arial, sans-serif;
+      background: ${PALETTE.bg};
+      color: ${PALETTE.textPrimary};
+      font-family: ${FONT_STACK};
     }
     .preheader {
       display: none !important;
@@ -39,18 +59,33 @@ export function emailLayout({ preheader, content }: EmailLayoutOptions): string 
     .frame {
       max-width: 640px;
       margin: 0 auto;
-      background: #f8fbff;
-      border: 1px solid #d7e3f4;
-      border-radius: 28px;
+      background: ${PALETTE.bgCard};
+      border: 1px solid ${PALETTE.border};
+      border-radius: 16px;
       overflow: hidden;
-      box-shadow: 18px 18px 36px rgba(180, 196, 219, 0.38), -18px -18px 36px rgba(255, 255, 255, 0.9);
     }
     .top-line {
-      height: 6px;
-      background: linear-gradient(90deg, #2563eb 0%, #38bdf8 100%);
+      height: 4px;
+      background: linear-gradient(90deg, ${PALETTE.teal} 0%, ${PALETTE.amber} 100%);
+    }
+    .masthead {
+      padding: 24px 32px 0;
+    }
+    .masthead-logo {
+      display: block;
+      border: 0;
+      outline: none;
+      text-decoration: none;
+    }
+    .masthead-wordmark {
+      margin: 12px 0 0;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: ${PALETTE.textPrimary};
     }
     .hero {
-      padding: 32px 32px 12px;
+      padding: 24px 32px 12px;
     }
     .eyebrow {
       margin: 0 0 10px;
@@ -58,36 +93,35 @@ export function emailLayout({ preheader, content }: EmailLayoutOptions): string 
       font-weight: 700;
       letter-spacing: 0.14em;
       text-transform: uppercase;
-      color: #2563eb;
+      color: ${PALETTE.teal};
     }
     .hero h1 {
       margin: 0 0 12px;
-      font-size: 30px;
-      line-height: 1.15;
-      color: #102a4c;
+      font-size: 28px;
+      line-height: 1.2;
+      color: ${PALETTE.textPrimary};
     }
     .hero-copy {
       margin: 0;
       font-size: 15px;
       line-height: 1.6;
-      color: #47688f;
+      color: ${PALETTE.textSecondary};
     }
     .content {
       padding: 0 32px 32px;
     }
     .card {
-      background: #ffffff;
-      border: 1px solid #dfe9f6;
-      border-radius: 22px;
+      background: ${PALETTE.bgCard};
+      border: 1px solid ${PALETTE.border};
+      border-radius: 12px;
       padding: 20px;
-      box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.95), 0 12px 30px rgba(184, 200, 221, 0.16);
       margin-top: 16px;
     }
     .details-table {
       border-collapse: collapse;
     }
     .details-table tr + tr td {
-      border-top: 1px solid #ebf1f8;
+      border-top: 1px solid ${PALETTE.borderSoft};
     }
     .detail-label,
     .detail-value {
@@ -98,11 +132,11 @@ export function emailLayout({ preheader, content }: EmailLayoutOptions): string 
     }
     .detail-label {
       width: 38%;
-      color: #6a87ac;
+      color: ${PALETTE.textTertiary};
       padding-right: 16px;
     }
     .detail-value {
-      color: #102a4c;
+      color: ${PALETTE.textPrimary};
       font-weight: 600;
       word-break: break-word;
     }
@@ -118,9 +152,9 @@ export function emailLayout({ preheader, content }: EmailLayoutOptions): string 
     .message-block {
       margin-top: 16px;
       padding: 16px 18px;
-      border-radius: 18px;
-      background: #f4f8fd;
-      border: 1px solid #dfe9f6;
+      border-radius: 12px;
+      background: ${PALETTE.bgElevated};
+      border: 1px solid ${PALETTE.border};
     }
     .message-label {
       margin: 0 0 8px;
@@ -128,13 +162,13 @@ export function emailLayout({ preheader, content }: EmailLayoutOptions): string 
       font-weight: 700;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: #5b7da6;
+      color: ${PALETTE.textSecondary};
     }
     .message-body {
       margin: 0;
       font-size: 14px;
       line-height: 1.7;
-      color: #1b3658;
+      color: ${PALETTE.textPrimary};
     }
     .button-group {
       margin-top: 18px;
@@ -144,7 +178,7 @@ export function emailLayout({ preheader, content }: EmailLayoutOptions): string 
       display: inline-block;
       margin: 0 12px 12px 0;
       padding: 12px 18px;
-      border-radius: 14px;
+      border-radius: 8px;
       text-decoration: none;
       font-size: 14px;
       font-weight: 700;
@@ -153,46 +187,43 @@ export function emailLayout({ preheader, content }: EmailLayoutOptions): string 
       margin: 14px 0 0;
       font-size: 13px;
       line-height: 1.6;
-      color: #5b7da6;
+      color: ${PALETTE.textSecondary};
     }
     .footer {
       padding: 0 32px 30px;
     }
     .footer-card {
-      background: #edf4fd;
-      border: 1px solid #d7e3f4;
-      border-radius: 18px;
+      background: ${PALETTE.bgElevated};
+      border: 1px solid ${PALETTE.border};
+      border-radius: 12px;
       padding: 18px 20px;
       font-size: 13px;
       line-height: 1.6;
-      color: #5b7da6;
+      color: ${PALETTE.textSecondary};
     }
     .footer-card strong {
-      color: #16355d;
+      color: ${PALETTE.textPrimary};
     }
     .footer-card a {
-      color: #2563eb;
+      color: ${PALETTE.teal};
       text-decoration: none;
     }
     @media only screen and (max-width: 640px) {
       .shell {
         padding: 12px;
       }
+      .masthead,
       .hero,
       .content,
       .footer {
         padding-left: 20px;
         padding-right: 20px;
       }
-      .hero {
-        padding-top: 24px;
-      }
       .hero h1 {
-        font-size: 25px;
+        font-size: 24px;
       }
       .card {
         padding: 16px;
-        border-radius: 18px;
       }
       .detail-label,
       .detail-value {
@@ -217,12 +248,22 @@ export function emailLayout({ preheader, content }: EmailLayoutOptions): string 
   <div class="shell">
     <div class="frame">
       <div class="top-line"></div>
+      <div class="masthead">
+        <img
+          src="${logoUrl}"
+          alt="NaufalRF"
+          width="40"
+          height="40"
+          class="masthead-logo"
+        />
+        <p class="masthead-wordmark">NaufalRF Portfolio</p>
+      </div>
       ${content}
       <div class="footer">
         <div class="footer-card">
           <strong>NaufalRF Portfolio</strong><br />
           Booking updates, inbox replies, and portfolio support<br />
-          <a href="https://naufalrf.net">naufalrf.net</a>
+          <a href="${assetBase}">${assetBase.replace(/^https?:\/\//, '')}</a>
         </div>
       </div>
     </div>
