@@ -170,24 +170,14 @@ export function buildProjectCollectionSchema(
 }
 
 /**
- * The publications list deliberately mixes self-authored writing with
- * third-party coverage *about* the work, so authorship cannot be asserted for
- * every entry. Only these sources are first-party; anything else gets a
- * `publisher` but no `author`, because claiming authorship of someone else's
- * article would be a false statement in the markup.
- */
-const FIRST_PARTY_SOURCES = new Set(['blog', 'personal', 'self', 'naufalrf', 'portfolio']);
-
-function isFirstPartySource(source: string | null | undefined): boolean {
-  if (!source) return false;
-  return FIRST_PARTY_SOURCES.has(source.trim().toLowerCase());
-}
-
-/**
- * Publications are a mix of self-authored posts and third-party coverage, and
- * the two must not be conflated: `author` is only claimed when the item is not
- * externally sourced. Every entry links out, so each is modelled as an
- * `Article` at its real off-site `url`.
+ * The publications list deliberately mixes writing Naufal authored with press
+ * coverage written *about* him, and the `Blog` contract carries no authorship
+ * field to tell them apart - real `source` values are publisher names like
+ * `IPB University`, `Medium`, `Jurnal`, and `Metropolitan`. Guessing from a
+ * publisher name would assert authorship of someone else's article, so no
+ * `author` is emitted at all: each entry gets its true `publisher` and links
+ * to its real off-site `url`. Add `author` here only once the API exposes an
+ * explicit authored/coverage flag.
  */
 export function buildPublicationCollectionSchema(
   blogs: readonly Blog[],
@@ -221,7 +211,6 @@ export function buildPublicationCollectionSchema(
           datePublished: isoDate(blog.publishedAt),
           articleSection: blog.category,
           publisher: blog.source ? compact({ '@type': 'Organization', name: blog.source }) : undefined,
-          author: isFirstPartySource(blog.source) ? { '@id': personId(siteUrl) } : undefined,
         }),
       })),
     },
