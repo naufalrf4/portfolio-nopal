@@ -4,10 +4,11 @@ import { cn } from '@/lib/utils';
 
 interface TurnstileRenderOptions {
   sitekey: string;
-  theme: 'light' | 'dark' | 'auto';
-  callback: (token: string) => void;
-  'expired-callback': () => void;
-  'error-callback': () => void;
+  action: string;
+theme: 'light' | 'dark' | 'auto';
+callback: (token: string) => void;
+'expired-callback': () => void;
+'error-callback': () => void;
 }
 
 interface TurnstileApi {
@@ -23,20 +24,22 @@ declare global {
 
 interface TurnstileWidgetProps {
   siteKey: string;
-  resetKey?: number;
-  onTokenChange: (token: string) => void;
-  onErrorChange?: (message: string | null) => void;
-  className?: string;
+  action: string;
+resetKey?: number;
+onTokenChange: (token: string) => void;
+onErrorChange?: (message: string | null) => void;
+className?: string;
 }
 
 const TURNSTILE_SCRIPT_ID = 'public-turnstile-script';
 
 export function TurnstileWidget({
   siteKey,
-  resetKey = 0,
-  onTokenChange,
-  onErrorChange,
-  className,
+  action,
+resetKey = 0,
+onTokenChange,
+onErrorChange,
+className,
 }: TurnstileWidgetProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const widgetIdRef = useRef<string | null>(null);
@@ -56,8 +59,9 @@ export function TurnstileWidget({
         return;
       }
 
-      widgetIdRef.current = window.turnstile.render(containerRef.current, {
+widgetIdRef.current = window.turnstile.render(containerRef.current, {
         sitekey: siteKey,
+        action,
         theme: 'light',
         callback: (token) => {
           onTokenChange(token);
@@ -110,7 +114,7 @@ export function TurnstileWidget({
       script.removeEventListener('load', handleLoad);
       window.clearInterval(intervalId);
     };
-  }, [hasTurnstile, onErrorChange, onTokenChange, siteKey]);
+  }, [action, hasTurnstile, onErrorChange, onTokenChange, siteKey]);
 
   useEffect(() => {
     onTokenChange('');

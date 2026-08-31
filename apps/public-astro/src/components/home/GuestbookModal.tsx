@@ -225,6 +225,7 @@ export function GuestbookModal({
             {(!hasTurnstile || shouldShowTurnstile) && (
               <TurnstileWidget
                 siteKey={turnstileSiteKey}
+                action="guestbook"
                 resetKey={turnstileResetKey}
                 onTokenChange={setTurnstileToken}
                 onErrorChange={setTurnstileError}

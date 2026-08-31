@@ -11,6 +11,7 @@
 			container: HTMLElement,
 			options: {
 				sitekey: string;
+				action: string;
 				theme?: 'light' | 'dark';
 				callback: (token: string) => void;
 				'expired-callback'?: () => void;
@@ -113,6 +114,7 @@
 
 		turnstileWidgetId = turnstile.render(turnstileContainer, {
 			sitekey: PUBLIC_TURNSTILE_SITE_KEY,
+			action: 'ngl-message',
 			theme: 'light',
 			callback: (token: string) => {
 				turnstileToken = token;

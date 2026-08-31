@@ -552,6 +552,7 @@ export function BookingCalendar({ turnstileSiteKey }: BookingCalendarProps) {
             {(!hasTurnstile || shouldShowTurnstile) && (
               <TurnstileWidget
                 siteKey={turnstileSiteKey}
+                action="booking"
                 resetKey={turnstileResetKey}
                 onTokenChange={setTurnstileToken}
                 onErrorChange={setTurnstileError}

@@ -14,6 +14,7 @@ interface TurnstileVerifyResult {
   errorCodes?: string[];
   timestamp?: string;
   hostname?: string;
+  action?: string;
 }
 
 interface TurnstileValidationResult {
@@ -23,7 +24,16 @@ interface TurnstileValidationResult {
   message?: string;
 }
 
+interface TurnstileValidationInput {
+  token?: string;
+  expectedAction: string;
+  remoteIp?: string;
+}
+
 const TURNSTILE_VERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
+const TURNSTILE_MAX_TOKEN_LENGTH = 2048;
+const TURNSTILE_VERIFY_TIMEOUT_MS = 10_000;
+const GENERIC_FAILURE_MESSAGE = 'CAPTCHA verification failed. Please try again.';
 
 export const RAG_SERVICE_TOKEN_HEADER = 'X-Service-Token';
 
@@ -44,7 +54,10 @@ export function isRagServiceTokenValid(provided: string | null): boolean {
   return timingSafeEqual(providedBuffer, expectedBuffer);
 }
 
-export async function verifyTurnstileToken(token: string): Promise<TurnstileVerifyResult> {
+export async function verifyTurnstileToken(
+  token: string,
+  remoteIp?: string
+): Promise<TurnstileVerifyResult> {
   const secretKey = process.env.TURNSTILE_SECRET_KEY;
 
   if (!secretKey) {
@@ -58,29 +71,46 @@ export async function verifyTurnstileToken(token: string): Promise<TurnstileVeri
     };
   }
 
-  const response = await fetch(TURNSTILE_VERIFY_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({
-      secret: secretKey,
-      response: token,
-    }),
+  const body = new URLSearchParams({
+    secret: secretKey,
+    response: token,
   });
 
-  if (!response.ok) {
+  if (remoteIp) {
+    body.set('remoteip', remoteIp);
+  }
+
+  let data: TurnstileVerifyResponse;
+
+  try {
+    const response = await fetch(TURNSTILE_VERIFY_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      signal: AbortSignal.timeout(TURNSTILE_VERIFY_TIMEOUT_MS),
+      body,
+    });
+
+    if (!response.ok) {
+      return {
+        success: false,
+        errorCodes: ['turnstile-service-error'],
+      };
+    }
+
+    data = await response.json();
+  } catch {
     return {
       success: false,
       errorCodes: ['turnstile-service-error'],
     };
   }
 
-  const data: TurnstileVerifyResponse = await response.json();
-
   return {
     success: data.success,
     errorCodes: data['error-codes'],
     timestamp: data.challenge_ts,
     hostname: data.hostname,
+    action: data.action,
   };
 }
 
@@ -88,7 +118,20 @@ export function isTurnstileConfigured(): boolean {
   return Boolean(process.env.TURNSTILE_SECRET_KEY);
 }
 
-export async function validateTurnstileToken(token?: string): Promise<TurnstileValidationResult> {
+function getExpectedHostnames(): Set<string> {
+  return new Set(
+    (process.env.TURNSTILE_HOSTNAMES ?? '')
+      .split(',')
+      .map((hostname) => hostname.trim())
+      .filter(Boolean)
+  );
+}
+
+export async function validateTurnstileToken({
+  token,
+  expectedAction,
+  remoteIp,
+}: TurnstileValidationInput): Promise<TurnstileValidationResult> {
   const turnstileConfigured = isTurnstileConfigured();
   const shouldEnforce = process.env.NODE_ENV === 'production' || turnstileConfigured;
 
@@ -105,6 +148,17 @@ export async function validateTurnstileToken(token?: string): Promise<TurnstileV
     };
   }
 
+  const expectedHostnames = getExpectedHostnames();
+
+  if (expectedHostnames.size === 0) {
+    return {
+      success: false,
+      status: 503,
+      code: 'TURNSTILE_HOSTNAMES_NOT_CONFIGURED',
+      message: 'CAPTCHA verification is temporarily unavailable.',
+    };
+  }
+
   if (!token || token.trim() === '') {
     return {
       success: false,
@@ -114,14 +168,41 @@ export async function validateTurnstileToken(token?: string): Promise<TurnstileV
     };
   }
 
-  const result = await verifyTurnstileToken(token);
+  if (token.length > TURNSTILE_MAX_TOKEN_LENGTH) {
+    return {
+      success: false,
+      status: 400,
+      code: 'TURNSTILE_VERIFICATION_FAILED',
+      message: GENERIC_FAILURE_MESSAGE,
+    };
+  }
+
+  const result = await verifyTurnstileToken(token, remoteIp);
 
   if (!result.success) {
     return {
       success: false,
       status: 400,
       code: 'TURNSTILE_VERIFICATION_FAILED',
-      message: 'CAPTCHA verification failed. Please try again.',
+      message: GENERIC_FAILURE_MESSAGE,
+    };
+  }
+
+  if (result.action !== expectedAction) {
+    return {
+      success: false,
+      status: 400,
+      code: 'TURNSTILE_ACTION_MISMATCH',
+      message: GENERIC_FAILURE_MESSAGE,
+    };
+  }
+
+  if (!result.hostname || !expectedHostnames.has(result.hostname)) {
+    return {
+      success: false,
+      status: 400,
+      code: 'TURNSTILE_HOSTNAME_MISMATCH',
+      message: GENERIC_FAILURE_MESSAGE,
     };
   }
 

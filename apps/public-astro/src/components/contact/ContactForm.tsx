@@ -175,6 +175,7 @@ export function ContactForm({ turnstileSiteKey }: ContactFormProps) {
       {(!hasTurnstile || shouldShowTurnstile) && (
         <TurnstileWidget
           siteKey={turnstileSiteKey}
+          action="contact"
           resetKey={turnstileResetKey}
           onTokenChange={setTurnstileToken}
           onErrorChange={setTurnstileError}

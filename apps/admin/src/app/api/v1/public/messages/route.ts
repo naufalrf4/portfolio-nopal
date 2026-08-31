@@ -73,7 +73,11 @@ export async function POST(request: NextRequest) {
 
     const turnstileValidation = bypassTurnstile
       ? { success: true as const }
-      : await validateTurnstileToken(turnstileToken);
+      : await validateTurnstileToken({
+          token: turnstileToken,
+          expectedAction: 'ngl-message',
+          remoteIp: submissionContext.ipAddress ?? undefined,
+        });
     if (!turnstileValidation.success) {
       return errorResponse(
         turnstileValidation.message ?? 'CAPTCHA verification failed. Please try again.',

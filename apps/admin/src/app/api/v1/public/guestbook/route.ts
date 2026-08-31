@@ -88,7 +88,11 @@ export async function POST(request: NextRequest) {
 
     const { message, guestbookToken, turnstileToken } = parsed.data;
 
-    const turnstileValidation = await validateTurnstileToken(turnstileToken);
+    const turnstileValidation = await validateTurnstileToken({
+      token: turnstileToken,
+      expectedAction: 'guestbook',
+      remoteIp: submissionContext.ipAddress ?? undefined,
+    });
     if (!turnstileValidation.success) {
       const response = errorResponse(
         turnstileValidation.message ?? 'CAPTCHA verification failed. Please try again.',
