@@ -6,6 +6,7 @@ import { AchievementsPreview } from '../components/home/AchievementsPreview';
 import { Guestbook } from '../components/home/Guestbook';
 import { LatestArticles } from '../components/home/LatestArticles';
 import { TechnicalExpertise } from '../components/home/TechnicalExpertise';
+import ServicesPreview from '../components/home/ServicesPreview.astro';
 import { Meteors } from '../components/ui/Meteors';
 import { getAbout, getProjects, getBlogs, getGuestbookEntries, getAchievements, ApiFetchFailedError } from '../lib/api';
 import { serviceUnavailableResponse } from '../lib/site';
@@ -46,6 +47,7 @@ const description =
     <div>
       <TechnicalExpertise client:visible />
     </div>
+    <ServicesPreview />
     <div>
       <FeaturedProjects client:load projects={projectsData.projects} />
     </div>

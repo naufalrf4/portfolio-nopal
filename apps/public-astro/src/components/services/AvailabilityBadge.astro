@@ -1,0 +1,29 @@
+---
+import { AVAILABILITY_COPY } from './data';
+
+interface Props {
+  status?: string | null;
+}
+
+const { status } = Astro.props;
+const availability = status ? AVAILABILITY_COPY[status] : null;
+---
+
+{
+  availability && (
+    <div class="-mt-6 mb-16 flex homepage-reveal-soft md:-mt-10" style={{ animationDelay: '0.2s' }}>
+      <div class="inline-flex items-center gap-2.5 rounded-full border border-line bg-bg-elevated px-4 py-2">
+        <span
+          class:list={[
+            'h-2 w-2 rounded-full',
+            availability.dotClass,
+            availability.pulse && 'status-dot',
+          ]}
+        />
+        <span class="font-mono text-xs uppercase tracking-wider text-text-secondary">
+          {availability.label}
+        </span>
+      </div>
+    </div>
+  )
+}
