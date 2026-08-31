@@ -117,11 +117,17 @@ describe('emailLayout branding', () => {
     expect(img).toContain('height="');
   });
 
-  test('keeps a visible text wordmark alongside the image', () => {
-    const html = layout();
+  test('does not repeat the wordmark in the masthead', () => {
+    const masthead = layout().match(/<div class="masthead">[\s\S]*?<\/div>/)?.[0] ?? '';
 
-    expect(html).toContain('NaufalRF');
-    expect(html.replace(/<img[^>]*>/g, '')).toContain('NaufalRF');
+    expect(masthead).toContain('<img');
+    expect(masthead).not.toContain('NaufalRF Portfolio');
+  });
+
+  test('keeps a single visible wordmark in the footer for attribution', () => {
+    const body = layout().split('<body>')[1] ?? '';
+
+    expect(body.match(/NaufalRF Portfolio/g)?.length).toBe(1);
   });
 
   test('still escapes the preheader', () => {

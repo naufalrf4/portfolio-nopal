@@ -77,13 +77,6 @@ export function emailLayout({ preheader, content }: EmailLayoutOptions): string 
       outline: none;
       text-decoration: none;
     }
-    .masthead-wordmark {
-      margin: 12px 0 0;
-      font-size: 15px;
-      font-weight: 700;
-      letter-spacing: -0.01em;
-      color: ${PALETTE.textPrimary};
-    }
     .hero {
       padding: 24px 32px 12px;
     }
@@ -256,7 +249,6 @@ export function emailLayout({ preheader, content }: EmailLayoutOptions): string 
           height="40"
           class="masthead-logo"
         />
-        <p class="masthead-wordmark">NaufalRF Portfolio</p>
       </div>
       ${content}
       <div class="footer">
