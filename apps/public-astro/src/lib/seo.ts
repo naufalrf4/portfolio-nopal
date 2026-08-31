@@ -281,3 +281,53 @@ export function buildServiceSchema(
     },
   });
 }
+
+/**
+ * A project case study is a `CreativeWork`, not an `Article`: these pages
+ * describe something that was built, not a piece of writing. `Article` also
+ * implies editorial content Google may evaluate against news/author signals
+ * these pages do not have.
+ *
+ * `author` references the shared Person `@id` rather than restating the name
+ * inline, so the case study attaches to the same entity as every other page
+ * instead of creating a second, unlinked Person.
+ *
+ * Dates are normalized through `isoDate`: the Admin API returns Postgres
+ * timestamps like `2026-09-01 03:25:31.827+07`, which is NOT valid ISO 8601 -
+ * Schema.org requires ISO 8601, so passing the raw value through would emit a
+ * date consumers can legitimately reject.
+ */
+export function buildProjectSchema(
+  project: Project,
+  siteUrl = getSiteUrl()
+): JsonLd {
+  const pageUrl = `${siteUrl}/projects/${project.slug}`;
+  const images = (project.images ?? [])
+    .map((image) => absoluteUrl(image.url, siteUrl))
+    .filter((url): url is string => Boolean(url));
+  const primaryImage = absoluteUrl(project.imageUrl, siteUrl);
+  const allImages = [...new Set([primaryImage, ...images].filter((u): u is string => Boolean(u)))];
+
+  return compact({
+    '@context': 'https://schema.org',
+    '@type': 'CreativeWork',
+    '@id': pageUrl,
+    url: pageUrl,
+    name: project.title,
+    headline: project.title,
+    description: project.summary,
+    image: allImages,
+    genre: project.category,
+    keywords: project.techStack?.length ? project.techStack.join(', ') : undefined,
+    dateCreated: isoDate(project.projectDate) || isoDate(project.createdAt),
+    datePublished: isoDate(project.createdAt),
+    dateModified: isoDate(project.updatedAt),
+    author: { '@id': personId(siteUrl) },
+    creator: { '@id': personId(siteUrl) },
+    isPartOf: { '@id': `${siteUrl}/${WEBSITE_ID}` },
+    // `codeRepository` and `sameAs` are only meaningful when the project
+    // actually exposes them; many are client work with neither.
+    sameAs: project.liveUrl ? [project.liveUrl] : undefined,
+    ...(project.repoUrl ? { codeRepository: project.repoUrl } : {}),
+  });
+}
