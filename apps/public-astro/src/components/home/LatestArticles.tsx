@@ -21,7 +21,7 @@ export function LatestArticles({ blogs }: LatestArticlesProps) {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {}
         <BlurFade direction="up" offset={24} className="mb-10 flex flex-col items-start">
-          <span className="font-mono text-xs uppercase tracking-[0.25em] text-teal mb-4">04 / Field Notes</span>
+          <span className="font-mono text-xs uppercase tracking-[0.25em] text-teal mb-4">05 / Field Notes</span>
           <h2 className="font-display text-3xl font-bold tracking-tight text-text-primary md:text-5xl lg:text-6xl">
             Latest Articles
           </h2>

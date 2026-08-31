@@ -22,7 +22,7 @@ export function FeaturedProjects({ projects }: FeaturedProjectsProps) {
         {}
         <BlurFade direction="up" offset={24} className="mb-10 flex flex-col items-start">
           <span className="font-mono text-xs uppercase tracking-[0.25em] text-teal mb-4">
-            02 / Selected Work
+            03 / Selected Work
           </span>
           <h2 className="max-w-lg font-display text-3xl font-bold tracking-tight text-text-primary md:text-5xl lg:text-6xl">
             Featured Projects

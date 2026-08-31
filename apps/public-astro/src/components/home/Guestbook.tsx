@@ -324,7 +324,7 @@ title={heroTitle}
 
           {}
           <BlurFade delay={0.4} inView className="order-1 flex flex-col justify-center lg:order-2">
-            <span className="mb-4 font-mono text-xs uppercase tracking-[0.25em] text-teal">05 / Guestbook</span>
+            <span className="mb-4 font-mono text-xs uppercase tracking-[0.25em] text-teal">06 / Guestbook</span>
             <h2 className="font-display text-3xl font-bold tracking-tight text-text-primary md:text-4xl lg:text-5xl">
               Guestbook
             </h2>
