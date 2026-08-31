@@ -1,4 +1,4 @@
-import type { AboutData, Blog, Project } from '../types';
+import type { AboutData, BlogLink, Project } from '../types';
 import { getSiteUrl } from './site';
 
 /**
@@ -84,14 +84,24 @@ export function buildProfilePageSchema(
     .map((skill) => skill.name)
     .filter((name): name is string => Boolean(name && name.trim()));
 
-  const worksFor = (about.experience ?? [])
-    .filter((item) => item.endDate === null && Boolean(item.organization?.trim()))
-    .map((item) =>
-      compact({
-        '@type': 'Organization',
-        name: item.organization,
-      })
-    );
+  // `experience` is a single mixed list distinguished only by `type`
+  // (work / education / certification / organizational - see
+  // components/about/ExperienceTabs.tsx). Certifications legitimately carry no
+  // end date, so filtering on `endDate === null` alone would promote every
+  // issuer into `worksFor` and claim AWS, Cisco, and Microsoft as employers.
+  // Each type must therefore map to the property that is actually true of it.
+  const experienceItems = about.experience ?? [];
+
+  const namedOrgsOfType = (type: string, currentOnly = false) =>
+    experienceItems
+      .filter((item) => item.type?.trim().toLowerCase() === type)
+      .filter((item) => Boolean(item.organization?.trim()))
+      .filter((item) => (currentOnly ? item.endDate === null : true))
+      .map((item) => compact({ '@type': 'Organization', name: item.organization }));
+
+  const worksFor = namedOrgsOfType('work', true);
+  const alumniOf = namedOrgsOfType('education');
+  const memberOf = namedOrgsOfType('organizational');
 
   const person = compact({
     '@type': 'Person',
@@ -103,8 +113,18 @@ export function buildProfilePageSchema(
     image: absoluteUrl(about.avatarUrl, siteUrl),
     url: absoluteUrl(options.canonicalPath, siteUrl),
     knowsAbout: skillNames,
-    sameAs: (about.socialLinks ?? []).map((link) => link.url).filter(Boolean),
+    // `socialLinks` also carries the contact address and the site's own URL.
+    // `sameAs` is for *other* profiles identifying the same person: a mailto
+    // is not a profile (email already has its own property), and listing the
+    // canonical host as an alias of itself asserts nothing.
+    sameAs: (about.socialLinks ?? [])
+      .map((link) => link.url)
+      .filter((url): url is string => Boolean(url))
+      .filter((url) => !url.toLowerCase().startsWith('mailto:'))
+      .filter((url) => url.replace(/\/$/, '') !== siteUrl.replace(/\/$/, '')),
     worksFor: worksFor.length > 0 ? worksFor : undefined,
+    alumniOf: alumniOf.length > 0 ? alumniOf : undefined,
+    memberOf: memberOf.length > 0 ? memberOf : undefined,
     homeLocation: about.location
       ? compact({ '@type': 'Place', name: about.location })
       : undefined,
@@ -180,7 +200,7 @@ export function buildProjectCollectionSchema(
  * explicit authored/coverage flag.
  */
 export function buildPublicationCollectionSchema(
-  blogs: readonly Blog[],
+  blogs: readonly BlogLink[],
   options: { canonicalPath: string; name: string; description: string },
   siteUrl = getSiteUrl()
 ): JsonLd {
