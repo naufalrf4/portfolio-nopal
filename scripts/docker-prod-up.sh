@@ -3,6 +3,7 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 WAIT_TIMEOUT="${PROD_HEALTH_WAIT_TIMEOUT:-240}"
+BUILD_PARALLEL="${PROD_BUILD_PARALLEL:-2}"
 ROLLBACK_FILE="$ROOT_DIR/.docker-prod-rollback.yml"
 
 ALL_SERVICES=(admin admin-cron notification-dispatch rag public links ngl live-presence)
@@ -14,6 +15,7 @@ fi
 
 compose() {
   docker compose \
+    --parallel "$BUILD_PARALLEL" \
     --env-file "$ROOT_DIR/.env.docker.prod" \
     -f "$ROOT_DIR/docker-compose.prod.yml" \
     "$@"
