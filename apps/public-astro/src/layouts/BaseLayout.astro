@@ -13,7 +13,15 @@ import { GlobalScene } from '../components/shared/GlobalScene';
 
 const SITE_NAME = 'NaufalRF Portfolio';
 const about = await getAboutSafe();
-const sameAs = about.socialLinks.map((link) => link.url);
+// `sameAs` means "other profiles identifying this same person". The social
+// links list also carries the contact address and the site's own URL: a mailto
+// is not a profile (email has its own property), and naming the canonical host
+// as an alias of itself asserts nothing.
+const sameAs = about.socialLinks
+  .map((link) => link.url)
+  .filter((url) => Boolean(url))
+  .filter((url) => !url.toLowerCase().startsWith('mailto:'))
+  .filter((url) => url.replace(/\/$/, '') !== getSiteUrl().replace(/\/$/, ''));
 const twitterProfile = about.socialLinks.find((link) => {
   const platform = link.platform.toLowerCase();
   const url = link.url.toLowerCase();
@@ -57,17 +65,14 @@ const personSchema = {
   name: about.fullName || 'Naufal Rizqullah Firdaus',
   alternateName: 'NaufalRF',
   description: about.shortBio || about.tagline || description,
-  jobTitle: 'System & Automation Engineer',
-  knowsAbout: [
-    'System Integration Engineering',
-    'Automation Engineering',
-    'IoT Systems Development',
-    'ESP32 MQTT IoT systems',
-    'automation workflows with n8n and Python',
-    'cloud-based system architecture on AWS',
-    'AI integration with LangChain and LLM systems',
-    'Next.js Laravel full-stack systems',
-  ],
+  // Both this global Person and the ProfilePage on /about publish under the
+  // same `@id`, so hardcoding a title here contradicted the CMS-driven one and
+  // asserted two different job titles for one entity. Read the real value and
+  // fall back only when the profile has no roles at all.
+  jobTitle: about.roles?.find((role) => role.trim().length > 0) || 'System & Automation Engineer',
+  knowsAbout: (about.skills ?? [])
+    .map((skill) => skill.name)
+    .filter((name) => Boolean(name && name.trim())),
   address: {
     '@type': 'PostalAddress',
     addressLocality: 'Depok',
