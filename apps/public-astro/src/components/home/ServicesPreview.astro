@@ -1,6 +1,6 @@
 ---
 import { ArrowUpRight } from 'lucide-react';
-import { technicalServices } from '@/components/services/data';
+import { beyondTheCode, technicalServices } from '@/components/services/data';
 import { MOTIF_PANEL_GRID, MOTIF_SIGNAL } from '@/components/services/motifs';
 
 // Teaser for /services. Reuses the canonical service data and motifs from the
@@ -122,6 +122,37 @@ const preview = technicalServices;
             ))
           }
         </div>
+      </div>
+    </div>
+
+    <div
+      class="mt-16 border-t border-line pt-8 md:mt-20 md:pt-10"
+      data-reveal
+      style={{ '--reveal-delay': '0.32s' }}
+    >
+      <span class="mb-4 block font-mono text-xs uppercase tracking-[0.25em] text-amber">
+        02a / Beyond the code
+      </span>
+      <div class="flex flex-col gap-3 sm:flex-row">
+        {
+          beyondTheCode.map((offer, i) => (
+            <a
+              href="/services"
+              class="card-base group flex flex-1 items-center gap-3 px-4 py-3 transition-colors duration-300 hover:border-amber/40"
+              data-reveal
+              style={{ '--reveal-delay': `${0.38 + i * 0.06}s` }}
+            >
+              <span class="flex-1">
+                <span class="block text-sm font-semibold text-text-primary">{offer.title}</span>
+                <span class="block text-xs leading-snug text-text-tertiary">{offer.outcome}</span>
+              </span>
+              <ArrowUpRight
+                size={13}
+                class="shrink-0 text-text-tertiary transition-colors duration-300 group-hover:text-amber"
+              />
+            </a>
+          ))
+        }
       </div>
     </div>
   </div>
