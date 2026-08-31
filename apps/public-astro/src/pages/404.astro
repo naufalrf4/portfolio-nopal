@@ -1,10 +1,18 @@
 ---
-import PageLayout from '../layouts/PageLayout.astro';---
+import PageLayout from '../layouts/PageLayout.astro';
+
+// Astro serves this page for unmatched routes but does not set the status for
+// us on the SSR node adapter: without this it answers 200, which tells
+// crawlers the missing URL is a real, indexable page (a soft 404).
+//
+// There is also deliberately no canonicalUrl: a not-found response should not
+// nominate itself as the canonical version of the URL the user requested.
+Astro.response.status = 404;---
 
 <PageLayout
   title="Page Not Found"
   description="The page you are looking for does not exist or may have moved."
-  canonicalUrl="/404"
+  noindex
 >
   <section class="min-h-screen px-4 py-16 sm:px-6 lg:px-8">
     <div class="mx-auto max-w-3xl rounded-xl border border-line bg-bg-card p-10 text-center">

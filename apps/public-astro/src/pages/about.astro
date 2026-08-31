@@ -4,6 +4,7 @@ import { AboutContent } from '../components/about/AboutContent';
 import { getAbout, getAchievements, ApiFetchFailedError } from '../lib/api';
 import { serviceUnavailableResponse } from '../lib/site';
 import { formatDate } from '../lib/utils';
+import { buildBreadcrumbSchema, buildProfilePageSchema } from '../lib/seo';
 
 let about, achievementsData;
 try {
@@ -16,7 +17,13 @@ try {
 }
 
 const title = "About";
-const description = "Naufal Rizqullah Firdaus is a System & Automation Engineer and Computer Engineering student at IPB University, building software, cloud, IoT, and AI systems from Depok, Indonesia.";---
+const description = "Naufal Rizqullah Firdaus is a System & Automation Engineer and Computer Engineering student at IPB University, building software, cloud, IoT, and AI systems from Depok, Indonesia.";
+
+const profileSchema = buildProfilePageSchema(about, { canonicalPath: '/about', description });
+const breadcrumbSchema = buildBreadcrumbSchema([
+  { name: 'Home', path: '/' },
+  { name: 'About', path: '/about' },
+]);---
 
 <PageLayout
   title={title}
@@ -24,6 +31,10 @@ const description = "Naufal Rizqullah Firdaus is a System & Automation Engineer 
   canonicalUrl="/about"
   ogType="profile"
 >
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(profileSchema)} />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+  </Fragment>
   <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 md:py-12 lg:px-8">
     <AboutContent
       client:load

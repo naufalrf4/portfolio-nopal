@@ -8,6 +8,8 @@ import ServiceGrid from '@/components/services/ServiceGrid.astro';
 import ServicesCta from '@/components/services/ServicesCta.astro';
 import PageLayout from '@/layouts/PageLayout.astro';
 import { getAboutSafe } from '@/lib/api';
+import { beyondTheCode, technicalServices } from '@/components/services/data';
+import { buildBreadcrumbSchema, buildServiceSchema } from '@/lib/seo';
 
 // Services page renders fine even without profile data (availability status,
 // resume link are optional enhancements), so this uses the non-throwing
@@ -18,9 +20,32 @@ const about = await getAboutSafe();
 const title = 'Services';
 const description =
   'How to work with Naufal Rizqullah Firdaus: system integration, IoT builds, automation, and AI engineering, plus talks and mentoring.';
+
+// The offer catalog is built from the same static data the page renders, so
+// the markup can never advertise a service the page does not actually list.
+const serviceSchema = buildServiceSchema(
+  [...technicalServices, ...beyondTheCode].map((offering) => ({
+    name: offering.title,
+    description: offering.outcome,
+  })),
+  {
+    canonicalPath: '/services',
+    name: 'Engineering, automation, and AI system services',
+    description,
+    areaServed: 'Indonesia',
+  }
+);
+const breadcrumbSchema = buildBreadcrumbSchema([
+  { name: 'Home', path: '/' },
+  { name: 'Services', path: '/services' },
+]);
 ---
 
-<PageLayout title={title} description={description}>
+<PageLayout title={title} description={description} canonicalUrl="/services">
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(serviceSchema)} />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+  </Fragment>
   <div class="py-12 md:py-16">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <PageHero

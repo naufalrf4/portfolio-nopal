@@ -27,6 +27,7 @@ interface Props {
   ogImage?: string;
   canonicalUrl?: string;
   ogType?: 'website' | 'article' | 'profile';
+  noindex?: boolean;
   hideFooter?: boolean;
 }
 
@@ -38,6 +39,7 @@ const {
   ogImage = '/og-image.png',
   canonicalUrl,
   ogType = 'website',
+  noindex = false,
   hideFooter = false
 } = Astro.props;
 
@@ -45,7 +47,7 @@ const title = rawTitle === SITE_NAME ? SITE_NAME : `${rawTitle} - ${SITE_NAME}`;
 
 const currentPath = Astro.url.pathname;
 const siteUrl = getSiteUrl();
-const canonical = canonicalUrl || new URL(currentPath, siteUrl).href;
+const canonical = new URL(canonicalUrl || currentPath, siteUrl).href;
 const presenceSocketUrl = getPresenceSocketUrl();
 
 const personSchema = {
@@ -79,8 +81,13 @@ const personSchema = {
 const websiteSchema = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
+  '@id': `${siteUrl}/#website`,
   name: SITE_NAME,
+  // Google's site-name system reads alternateName as a shorter display
+  // candidate, and the handle is what people actually search for.
+  alternateName: 'NaufalRF',
   url: siteUrl,
+  inLanguage: 'en',
   description,
   publisher: {
     '@id': `${siteUrl}/#person`,
@@ -116,6 +123,7 @@ const websiteSchema = {
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
+    {noindex ? <meta name="robots" content="noindex, follow" /> : null}
 
     <meta property="og:type" content={ogType} />
     <meta property="og:locale" content="en_US" />
