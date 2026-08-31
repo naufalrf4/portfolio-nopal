@@ -1,6 +1,6 @@
 import { createHmac, timingSafeEqual } from 'node:crypto';
 
-const GUESTBOOK_TOKEN_TTL_SECONDS = 10 * 60;
+const GUESTBOOK_TOKEN_TTL_SECONDS = 7 * 24 * 60 * 60;  // 7 days
 
 interface GuestbookTokenPayload {
   sub: string;
