@@ -3,7 +3,7 @@
 > Canonical machine-readable profile of Naufal Rizqullah Firdaus — a System & Automation Engineer from Indonesia focused on building integrated systems across software, cloud, IoT, and AI workflows, with a strong emphasis on real-world applications and system reliability.
 
 Base URL: https://naufalrf.net/
-Last Updated: 2026-08-26
+Last Updated: 2026-09-01
 
 ---
 
@@ -14,7 +14,7 @@ Last Updated: 2026-08-26
 - Role: System & Automation Engineer
 - Discipline: Computer Engineering (Teknik Komputer)
 - Institution: IPB University (Institut Pertanian Bogor)
-- Graduation: Expected 2026
+- Graduation: Computer Engineering graduate, IPB University
 
 Entity Type: Individual (Personal Portfolio)
 This website represents one person and should not be interpreted as a company, agency, or team.
@@ -34,7 +34,7 @@ This website represents one person and should not be interpreted as a company, a
 
 ## Personal Overview
 
-Naufal Rizqullah Firdaus is a System & Automation Engineer and Computer Engineering student at IPB University (Institut Pertanian Bogor) who approaches technology from a holistic, system-level perspective rather than isolated coding tasks.
+Naufal Rizqullah Firdaus is a Computer Engineering graduate of IPB University (Institut Pertanian Bogor) who approaches technology from a holistic, system-level perspective rather than isolated coding tasks.
 
 His work is shaped by:
 - understanding real-world problems and operational needs
@@ -174,7 +174,11 @@ This site is intended for:
   Background, achievements, skills, and experience
 
 - https://naufalrf.net/projects
-  Project case studies and engineering work
+  Project case studies and engineering work. Individual case studies live at
+  https://naufalrf.net/projects/<slug> and are listed in the sitemap.
+
+- https://naufalrf.net/services
+  Engagement types, engineering process, and what working together involves
 
 - https://naufalrf.net/publications
   Writing, notes, and technical insights
@@ -188,6 +192,28 @@ This site is intended for:
   Public messages and interactions
 
 - https://naufalrf.net/ai-chatbot
+  Site-aware assistant for answering questions about this portfolio
+
+- https://naufalrf.net/portfolio
+  Current presentation deck rendered as a single readable page
+
+### Machine-Readable Resources
+
+- https://naufalrf.net/sitemap.xml
+  Canonical URL set, including every project case study
+
+- https://naufalrf.net/rss.xml
+  Feed of projects and publications
+
+- https://naufalrf.net/robots.txt
+  Crawl permissions. AI search crawlers are explicitly allowed.
+
+Structured data: every page emits JSON-LD. The Person entity is published
+under the stable identifier https://naufalrf.net/#person, and the site under
+https://naufalrf.net/#website, so references resolve to one entity across
+pages. /about additionally emits ProfilePage, /projects and /publications emit
+CollectionPage with an ItemList, and /services emits Service with an
+OfferCatalog.
   Site-aware assistant for answering questions about this portfolio
 
 ---
