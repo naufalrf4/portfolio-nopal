@@ -898,3 +898,48 @@ Chronological timeline of meaningful project work, discoveries, decisions, and b
 ### Blocked on the site owner (cannot be fixed in code)
 
 - **Cloudflare is injecting a managed `robots.txt` block that disallows AI crawlers**, delimited by `# BEGIN Cloudflare Managed content`, setting `Content-Signal: search=yes,ai-train=no,use=reference` plus `Disallow: /` for `GPTBot`, `ClaudeBot`, `CCBot`, `Google-Extended`, `Applebot-Extended`, `Bytespider`, `meta-externalagent`, and `Amazonbot`. Cloudflare *prepends* this at the edge, so the app's own `robots.txt` route cannot remove or override it. Per RFC 9309 §2.2.1 a conforming parser merges duplicate groups and the equal `Allow: /` should win, but OpenAI and  publish no guarantee about duplicate-group conflict resolution, so this must not be relied on. Disable at: Cloudflare Dashboard -> zone -> Security Settings -> filter "Bot traffic" -> "Set your preference to block training in robots.txt" -> off. Also check AI Crawl Control -> Security for per-crawler Block actions, which create WAF rules that reject crawlers even after `robots.txt` is corrected.
+
+## 2026-09-01 — Public SEO: non-branded title/description targeting
+
+- Task: keyword research and on-page targeting for `https://naufalrf.net`, continuing the same no-UI-changes constraint
+- Mode: implementation
+- Files: `apps/public-astro/src/pages/{index,about,services,publications,contact}.astro`, `apps/public-astro/src/pages/projects/index.astro`
+- Status: done, deployed, verified live
+- Commit: `393004c`
+
+### Problem
+
+Every title tag was purely branded — `NaufalRF Portfolio`, `Projects - NaufalRF Portfolio`, `Services - NaufalRF Portfolio`. The site could therefore only be found by people who already knew the name, and captured zero non-branded search. Headings had the same gap (`/projects` = "Stuff I've built", `/services` = "Ways to work with me"): good voice, no topical signal for either a crawler or an AI answer engine.
+
+Descriptions ran 218–271 characters against a ~155 display limit, so all were truncated.
+
+### Fixed
+
+Titles now describe the subject and stay inside ~60 chars *including* the ` - NaufalRF Portfolio` suffix `BaseLayout` appends (`About Naufal Rizqullah Firdaus` 51, `IoT, Web & Hardware Projects` 49, `Web, IoT & Automation Services` 51, `Publications & Engineering Notes` 53, `Contact & Hire` 35). The homepage title stays branded on purpose: it is what name-searchers use and what Google's site-name system reads. All six descriptions are now ≤149 chars.
+
+Two factual errors corrected against the live Admin API: the homepage and `/about` both called Naufal a "Computer Engineering **student**" when the CMS says he has graduated, and project copy said "automation engineering" rather than the real stack.
+
+### Learned
+
+- **Verify project stacks against the live API before writing them into metadata.** SIMONAIR hardware is **Raspberry Pi 4** with pH/TDS/dissolved-oxygen sensors, *not* ESP32 — ESP32 belongs to the PT Nutech internship (power monitoring over MQTT). `veilproxy` is **Go + SQLite**, not Rust. Assuming ESP32 across the board would have shipped a false technical claim.
+- Live CMS values that metadata must not contradict: tagline `Full-Stack & AI-Augmented Engineer`, `roles[0]` = `AI-Augmented Engineer`, `shortBio` = "Fresh Computer Engineering graduate…", location `Depok, Indonesia`, availability `available`.
+- `BaseLayout` appends ` - NaufalRF Portfolio` (21 chars) to every non-homepage title, so a page title budget is ~39 chars, not 60.
+
+### Keyword findings (research, not yet acted on)
+
+Head terms like `jasa pembuatan website` are dominated by agencies and marketplaces (Sribulancer, Fastwork, software houses) and an individual portfolio will not outrank them. Realistic openings are narrow service-plus-location and technical case-study queries. Ranked candidates worth targeting later, by page:
+
+1. `jasa pembuatan sistem monitoring IoT` (ID, commercial, medium) → services
+2. `jasa IoT developer Jakarta / Jabodetabek` (ID, commercial/hiring, medium) → services + about
+3. `monitoring kualitas air IoT dengan dashboard web` (ID, technical, low–medium) → SIMONAIR case study
+4. `jasa automasi workflow n8n` / `jasa setup n8n self-hosted` (ID, commercial, low–medium) → services/automation
+5. `Tauri Rust desktop app serial control` (EN, technical/citation, low) → Photobon desktop case study
+6. `full-stack developer Indonesia hardware software` (EN, hiring, low–medium) → homepage/about
+
+**Blocked by thin content:** every project case study is only ~193–205 words with **zero H2 headings**. They are now discoverable via the fixed sitemap, but there is not enough substance to rank competitively or to be cited as a source. Depth on SIMONAIR (sensor calibration, MQTT reliability) and Photobon (Tauri↔hardware serial control) is the highest-value next content work, because that is first-hand experience competitors do not have.
+
+**Out of scope for this site:** `sewa photobooth` / `receipt photobooth` has real commercial demand, but that buyer-intent traffic belongs on Photobon.id's own product site. The portfolio should reference Photobon as engineering proof, not act as a rental landing page.
+
+### Still blocked on the site owner
+
+The Cloudflare managed `robots.txt` block was **still being injected as of 2026-09-01 06:45 WIB** with `Cf-Cache-Status: MISS` (confirmed fresh, not cached): `GPTBot`, `ClaudeBot`, `CCBot`, `Google-Extended`, `Applebot-Extended`, `Bytespider`, `meta-externalagent`, `Amazonbot`, and `CloudflareBrowserRenderingCrawler` all still carry `Disallow: /` above the app's own rules. The owner reported changing the Cloudflare setting, so either a different toggle governs this, it is set at account rather than zone scope, or it had not propagated. The app-level rules in the same response are current (they include the new `Disallow: /api/`, `/auth/`, and `Sitemap: /sitemap.xml`), which proves the deploy landed and the remaining block is purely edge-injected.
