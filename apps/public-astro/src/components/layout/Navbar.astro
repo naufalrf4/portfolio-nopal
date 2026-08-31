@@ -1,10 +1,12 @@
 ---
 import { NAV_ITEMS, OTHER_LINKS } from '../../lib/constants';
+import { getPresenceSocketUrl } from '@/lib/site';
 import { ChevronDown, ExternalLink } from 'lucide-react';
 import { AnimatedThemeToggler } from '@/components/ui';
 import { PresenceChip } from '@/components/shared';
 
 const currentPath = Astro.url.pathname;
+const presenceSocketUrl = getPresenceSocketUrl();
 
 const isActive = (href: string) => {
   if (href === '/') return currentPath === '/';
@@ -90,7 +92,7 @@ const isActive = (href: string) => {
         </div>
 
         <AnimatedThemeToggler client:load className="ml-1" />
-        <PresenceChip client:load currentPath={currentPath} socketUrl={import.meta.env.PUBLIC_CURSOR_WS_URL?.trim() || 'ws://localhost:3006/ws'} />
+        <PresenceChip client:load currentPath={currentPath} socketUrl={presenceSocketUrl} />
       </div>
     </div>
   </nav>

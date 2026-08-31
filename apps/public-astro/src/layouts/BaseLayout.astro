@@ -2,7 +2,7 @@
 import { ClientRouter } from 'astro:transitions';
 import '../styles/globals.css';
 import { getAboutSafe } from '@/lib/api';
-import { getSiteUrl } from '@/lib/site';
+import { getSiteUrl, getPresenceSocketUrl } from '@/lib/site';
 import Navbar from '../components/layout/Navbar.astro';
 import Footer from '../components/layout/Footer.astro';
 import { MobileBottomNav } from '../components/layout/MobileBottomNav';
@@ -46,8 +46,7 @@ const title = rawTitle === SITE_NAME ? SITE_NAME : `${rawTitle} - ${SITE_NAME}`;
 const currentPath = Astro.url.pathname;
 const siteUrl = getSiteUrl();
 const canonical = canonicalUrl || new URL(currentPath, siteUrl).href;
-const presenceSocketUrl =
-  process.env.PUBLIC_CURSOR_WS_URL?.trim() || import.meta.env.PUBLIC_CURSOR_WS_URL?.trim() || 'ws://localhost:3006/ws';
+const presenceSocketUrl = getPresenceSocketUrl();
 
 const personSchema = {
   '@context': 'https://schema.org',
