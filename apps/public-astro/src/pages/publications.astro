@@ -16,9 +16,11 @@ try {
   throw error;
 }
 
-const title = 'Publication';
+// The real list is IoT water-quality research, MQTT protocol writing, and
+// sensor-calibration work, per the live blogs API - not generic "automation".
+const title = 'Publications & Engineering Notes';
 const description =
-  'Articles, engineering notes, and published journals or thesis work from Naufal Rizqullah Firdaus, covering automation, IoT, cloud software, and AI.';
+  'Research and writing on IoT water quality monitoring, MQTT versus HTTP for connected devices, and dissolved oxygen sensor calibration.';
 
 const collectionSchema = buildPublicationCollectionSchema(blogs, {
   canonicalPath: '/publications',

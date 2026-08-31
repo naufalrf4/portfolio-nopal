@@ -32,9 +32,12 @@ const turnstileSiteKey =
   import.meta.env.PUBLIC_TURNSTILE_SITE_KEY?.trim() ||
   '';
 
+// The homepage title is the one place branded phrasing is correct: it is what
+// people who already know the name search for, and Google's site-name system
+// reads it. Non-branded targeting belongs on the pages that describe the work.
 const title = 'NaufalRF Portfolio';
 const description =
-  'Naufal Rizqullah Firdaus is a System & Automation Engineer and Computer Engineering student at IPB University (Institut Pertanian Bogor) based in Depok, building integrated systems across software, cloud, IoT, and AI workflows for real-world operations in Indonesia and beyond.';
+  'Full-stack and IoT engineer in Depok, Indonesia. Builds custom hardware, cloud systems, and modern web apps, with AI workflows grounded in real data.';
 ---
 
 <PageLayout title={title} description={description}>

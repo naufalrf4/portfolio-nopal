@@ -16,8 +16,11 @@ try {
   throw error;
 }
 
-const title = "About";
-const description = "Naufal Rizqullah Firdaus is a System & Automation Engineer and Computer Engineering student at IPB University, building software, cloud, IoT, and AI systems from Depok, Indonesia.";
+// BaseLayout appends " - NaufalRF Portfolio", so keep this short enough that
+// the combined title stays inside the ~60 chars search results display.
+const title = 'About Naufal Rizqullah Firdaus';
+const description =
+  'Computer Engineering graduate in Depok, Indonesia. Builds full-stack web apps, IoT sensor systems, and AI-augmented workflows. CTO at Photobon.id.';
 
 const profileSchema = buildProfilePageSchema(about, { canonicalPath: '/about', description });
 const breadcrumbSchema = buildBreadcrumbSchema([

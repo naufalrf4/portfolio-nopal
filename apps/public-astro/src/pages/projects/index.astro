@@ -16,8 +16,12 @@ try {
   throw error;
 }
 
-const title = "Projects";
-const description = 'Explore integrated system projects by Naufal Rizqullah Firdaus across automation engineering, IoT development, cloud-backed software, and AI workflows shaped by real operational constraints.';
+// "Projects" alone targets nothing. The category names come from the live
+// project data (Web Development / IoT & Hardware / Desktop Application), so
+// the title describes what is actually on the page.
+const title = 'IoT, Web & Hardware Projects';
+const description =
+  'Engineering case studies: IoT water-quality monitoring over MQTT, full-stack platforms in Next.js and Laravel, and Rust and Tauri desktop apps.';
 
 const siteUrl = getSiteUrl();
 const breadcrumbSchema = buildBreadcrumbSchema([
