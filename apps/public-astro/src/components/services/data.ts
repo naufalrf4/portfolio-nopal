@@ -11,6 +11,7 @@ import {
   MOTIF_MENTORING,
   MOTIF_NETWORK,
   MOTIF_SPEAKING,
+  MOTIF_WEB,
   STAGE_BRIEF,
   STAGE_BUILD,
   STAGE_DEAL,
@@ -74,6 +75,15 @@ export const AVAILABILITY_COPY: Record<string, AvailabilityCopy> = {
 export const technicalServices: readonly TechnicalService[] = [
   {
     index: '01',
+    motif: MOTIF_WEB,
+    title: 'Full-Stack Web & Product Development',
+    outcome: 'A product that runs end to end, not a demo with a database attached.',
+    description:
+      'I build the whole thing: Next.js on the front, Laravel or Node underneath, Postgres or MySQL holding the data, deployed and monitored so it keeps running after launch day instead of needing you on call.',
+    stack: ['Next.js', 'Laravel', 'PostgreSQL'],
+  },
+  {
+    index: '02',
     motif: MOTIF_NETWORK,
     title: 'System Integration',
     outcome: 'Five tools that finally behave like one system.',
@@ -82,7 +92,7 @@ export const technicalServices: readonly TechnicalService[] = [
     stack: ['REST', 'AWS', 'Postgres'],
   },
   {
-    index: '02',
+    index: '03',
     motif: MOTIF_IOT,
     title: 'IoT & Hardware Builds',
     outcome: 'Hardware that keeps reporting after you walk away.',
@@ -91,7 +101,7 @@ export const technicalServices: readonly TechnicalService[] = [
     stack: ['ESP32', 'MQTT', 'Telemetry'],
   },
   {
-    index: '03',
+    index: '04',
     motif: MOTIF_AUTOMATION,
     title: 'Automation Workflows',
     outcome: 'The morning routine nobody should still be doing by hand.',
@@ -100,7 +110,7 @@ export const technicalServices: readonly TechnicalService[] = [
     stack: ['n8n', 'Python', 'Alerting'],
   },
   {
-    index: '04',
+    index: '05',
     motif: MOTIF_AI,
     title: 'AI Integration',
     outcome: 'An assistant that cites your data instead of inventing it.',

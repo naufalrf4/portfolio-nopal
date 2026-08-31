@@ -47,6 +47,17 @@ export const MOTIF_AI = `<svg viewBox="0 0 200 88" fill="none" class="h-full w-f
   <circle cx="176" cy="55" r="5.5" fill="currentColor" opacity="0.5" />
 </svg>`;
 
+export const MOTIF_WEB = `<svg viewBox="0 0 200 88" fill="none" class="h-full w-full" aria-hidden="true">
+  <rect x="30" y="10" width="140" height="20" rx="4" stroke="currentColor" stroke-width="2.2" />
+  <rect x="30" y="34" width="140" height="20" rx="4" stroke="currentColor" stroke-width="1.9" opacity="0.8" />
+  <rect x="30" y="58" width="140" height="20" rx="4" stroke="currentColor" stroke-width="1.6" opacity="0.6" />
+  <circle cx="40" cy="20" r="2.4" fill="currentColor" />
+  <circle cx="48" cy="20" r="2.4" fill="currentColor" opacity="0.7" />
+  <circle cx="40" cy="44" r="2.2" fill="currentColor" opacity="0.85" />
+  <circle cx="40" cy="68" r="2" fill="currentColor" opacity="0.65" />
+  <path d="M100 30v4M100 54v4" stroke="currentColor" stroke-width="1.6" opacity="0.5" stroke-linecap="round" />
+</svg>`;
+
 export const MOTIF_SPEAKING = `<svg viewBox="0 0 200 88" fill="none" class="h-full w-full" aria-hidden="true">
   <rect x="91" y="18" width="18" height="32" rx="9" stroke="currentColor" stroke-width="2.2" />
   <path d="M100 50v14M88 64h24" stroke="currentColor" stroke-width="2.2" opacity="0.9" stroke-linecap="round" />
