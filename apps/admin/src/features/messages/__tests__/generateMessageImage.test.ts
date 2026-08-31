@@ -65,17 +65,18 @@ describe('buildStoryHtml', () => {
     expect(html).toContain('1920px');
   });
 
-  test('does not embed the Astro default favicon glyph as the brand mark', () => {
+  test('renders the shared favicon brand mark next to the wordmark', () => {
     const html = buildStoryHtml(message);
 
-    expect(html).not.toContain('M50.4 78.5');
+    expect(html).toContain('brand-mark');
+    expect(html).toContain('/brand-mark.png');
+    expect(html).toContain('Anonymous Message');
   });
 
-  test('renders the NaufalRF monogram tile as the brand mark', () => {
-    const html = buildStoryHtml(message);
+  test('accepts a pre-fetched data URI so rasterization does not depend on a network fetch', () => {
+    const html = buildStoryHtml(message, 'data:image/png;base64,AAAA');
 
-    expect(html).toContain(STORY_DARK_PALETTE.teal);
-    expect(html).toContain('brand-mark');
-    expect(html).toContain('<circle');
+    expect(html).toContain('data:image/png;base64,AAAA');
+    expect(html).not.toContain('src="/brand-mark.png"');
   });
 });

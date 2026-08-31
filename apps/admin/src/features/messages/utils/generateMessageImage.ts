@@ -28,7 +28,7 @@ export const STORY_DARK_PALETTE = {
 const STORY_FONT_STYLESHEET =
   'https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap';
 
-const BRAND_MONOGRAM_PATH = 'M74 182V74h26l56 74V74h26v108h-26L100 108v74z';
+const BRAND_MARK_URL = '/brand-mark.png';
 
 function escapeHtml(value: string): string {
   return value
@@ -39,7 +39,7 @@ function escapeHtml(value: string): string {
     .replace(/'/g, '&#39;');
 }
 
-export function buildStoryHtml(message: StoryMessage): string {
+export function buildStoryHtml(message: StoryMessage, brandMarkSrc: string = BRAND_MARK_URL): string {
   const c = STORY_DARK_PALETTE;
 
   return `<!DOCTYPE html>
@@ -267,11 +267,7 @@ export function buildStoryHtml(message: StoryMessage): string {
     <div class="header">
       <div class="brand">
         <div class="brand-mark">
-          <svg width="52" height="52" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
-            <rect width="256" height="256" rx="56" fill="${c.teal}" />
-            <path d="${BRAND_MONOGRAM_PATH}" fill="${c.onAccent}" />
-            <circle cx="176" cy="170" r="13" fill="${c.onAccent}" />
-          </svg>
+          <img src="${brandMarkSrc}" width="52" height="52" alt="" />
         </div>
         <div class="brand-text">Anonymous Message</div>
       </div>
@@ -304,6 +300,26 @@ export function buildStoryHtml(message: StoryMessage): string {
 </html>`;
 }
 
+async function loadBrandMarkDataUrl(): Promise<string> {
+  try {
+    const response = await fetch(BRAND_MARK_URL);
+    if (!response.ok) {
+      return BRAND_MARK_URL;
+    }
+
+    const blob = await response.blob();
+
+    return await new Promise<string>((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(typeof reader.result === 'string' ? reader.result : BRAND_MARK_URL);
+      reader.onerror = () => resolve(BRAND_MARK_URL);
+      reader.readAsDataURL(blob);
+    });
+  } catch {
+    return BRAND_MARK_URL;
+  }
+}
+
 export async function generateMessageImage({
   message,
   onProgress,
@@ -312,7 +328,10 @@ export async function generateMessageImage({
     throw new Error('Image generation only works in browser');
   }
 
-  const domtoimage = await import('dom-to-image-more');
+  const [domtoimage, brandMarkSrc] = await Promise.all([
+    import('dom-to-image-more'),
+    loadBrandMarkDataUrl(),
+  ]);
 
   onProgress?.(10);
 
@@ -340,7 +359,7 @@ export async function generateMessageImage({
     }
 
     iframeDoc.open();
-    iframeDoc.write(buildStoryHtml(message));
+    iframeDoc.write(buildStoryHtml(message, brandMarkSrc));
     iframeDoc.close();
 
     onProgress?.(30);
