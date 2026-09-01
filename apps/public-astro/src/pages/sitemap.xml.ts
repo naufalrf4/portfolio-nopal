@@ -17,9 +17,9 @@ const STATIC_ROUTES: ReadonlyArray<{ path: string; changefreq: string; priority:
   { path: '/publications', changefreq: 'weekly', priority: '0.8' },
   { path: '/contact', changefreq: 'yearly', priority: '0.7' },
   { path: '/ai-chatbot', changefreq: 'monthly', priority: '0.6' },
-  { path: '/portfolio', changefreq: 'monthly', priority: '0.6' },
   { path: '/guestbook', changefreq: 'weekly', priority: '0.5' },
 ];
+
 
 function escapeXml(value: string): string {
   return value
