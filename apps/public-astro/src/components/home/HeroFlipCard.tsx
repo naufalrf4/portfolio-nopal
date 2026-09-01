@@ -262,6 +262,8 @@ const role = about.roles?.[0] ?? 'System & Automation Engineer';
                   src={about.avatarUrl}
                   alt={fullName}
                   loading="eager"
+                  fetchPriority="high"
+                  decoding="sync"
                   className="h-full w-full object-cover opacity-90 transition-all duration-700 ease-out group-hover:scale-[1.03] group-hover:opacity-100"
                 />
               ) : (

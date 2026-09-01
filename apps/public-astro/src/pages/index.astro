@@ -52,7 +52,7 @@ const description =
     </div>
     <ServicesPreview />
     <div>
-      <FeaturedProjects client:load projects={projectsData.projects} />
+      <FeaturedProjects client:visible projects={projectsData.projects} />
     </div>
     <div>
       <AchievementsPreview client:visible achievements={achievementsData.achievements} />
@@ -62,7 +62,7 @@ const description =
     </div>
     <div>
       <Guestbook
-        client:load
+        client:visible
         initialEntries={guestbookData.entries}
         turnstileSiteKey={turnstileSiteKey}
       />
