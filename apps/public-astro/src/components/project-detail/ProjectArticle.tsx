@@ -670,7 +670,6 @@ export function ProjectArticle({ content, className }: ProjectArticleProps) {
   }
 
   const activeIndex = Math.min(active, sections.length - 1);
-  const activeSection = sections[activeIndex];
 
   return (
     <article className={cn(ARTICLE_STYLES.article, className)}>
@@ -684,16 +683,32 @@ export function ProjectArticle({ content, className }: ProjectArticleProps) {
         }}
         onToggleShowAll={() => setShowAll((value) => !value)}
       />
-      {showAll ? (
-        <>
-          {tiptapSections.length > 0 && renderChildren(buildTiptapShowAllNodes(tiptapSections), 'article-all')}
-          {markdownSections.length > 0 && <MarkdownArticle content={buildMarkdownShowAll(markdownSections)} />}
-        </>
-      ) : activeSection.kind === 'tiptap' ? (
-        renderChildren(activeSection.nodes, `section-${activeSection.id}`)
-      ) : (
-        <MarkdownArticle content={activeSection.body} />
-      )}
+      {/*
+        Every section is rendered into the DOM, not just the active one, and the
+        inactive ones are hidden with CSS. Rendering only the active tab meant
+        crawlers and answer engines received a single section - about a fifth of
+        the writing - because the rest never reached the served HTML. Visually
+        this is unchanged: exactly one section is visible at a time.
+      */}
+      {showAll
+        ? sections.map((section) => (
+            <div key={`all-${section.id}`}>
+              {section.kind === 'tiptap' ? (
+                renderChildren(buildTiptapShowAllNodes([section]), `article-all-${section.id}`)
+              ) : (
+                <MarkdownArticle content={buildMarkdownShowAll([section])} />
+              )}
+            </div>
+          ))
+        : sections.map((section, index) => (
+            <div key={`section-${section.id}`} hidden={index !== activeIndex}>
+              {section.kind === 'tiptap' ? (
+                renderChildren(section.nodes, `section-${section.id}`)
+              ) : (
+                <MarkdownArticle content={section.body} />
+              )}
+            </div>
+          ))}
     </article>
   );
 }
