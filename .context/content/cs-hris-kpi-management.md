@@ -20,7 +20,7 @@ An HRIS module on **Next.js**, **Tailwind CSS**, and **PostgreSQL**, focused on 
 
 **One interface for the whole flow.** Managers define objectives, track progress, and run appraisals in the same place, which removes the gap where spreadsheet versions used to diverge.
 
-Part of a broader HRIS suite. Demo at [mbo-demo.wisebyte.web.id](https://mbo-demo.wisebyte.web.id).
+Built for a client as part of a broader HRIS suite. Demo at [mbo-demo.wisebyte.web.id](https://mbo-demo.wisebyte.web.id).
 
 ## RESULT
 
@@ -30,7 +30,7 @@ The engineering interest here is entirely in the modelling. This is a workflow t
 
 ## Ringkasan
 
-Modul HRIS untuk penetapan objektif, pelacakan KPI, dan penilaian kinerja bergaya Management by Objectives. Dibangun dengan **Next.js**, **Tailwind CSS**, dan **PostgreSQL**. Demo di mbo-demo.wisebyte.web.id.
+Modul HRIS milik klien untuk penetapan objektif, pelacakan KPI, dan penilaian kinerja bergaya Management by Objectives. Dibangun dengan **Next.js**, **Tailwind CSS**, dan **PostgreSQL**. Demo di mbo-demo.wisebyte.web.id.
 
 Penilaian kinerja biasanya berakhir di spreadsheet, dan spreadsheet tidak mampu menampung bentuk sebuah siklus penilaian. Objektif ditetapkan di awal periode. KPI menempel pada objektif itu. Progres terkumpul sepanjang periode. Penilaian terjadi di akhir, diukur terhadap yang disepakati di awal, dan harus bisa dibandingkan dengan penilaian di divisi lain.
 

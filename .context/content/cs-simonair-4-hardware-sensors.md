@@ -20,13 +20,11 @@ The Pi was chosen over an ESP32 or Arduino for four concrete reasons, each one a
 
 **Headroom for fast, accurate reads.** Signal conditioning and filtering happen inline without stalling the sampling loop.
 
-The rig also computes a **risk index**: pH, TDS, dissolved oxygen, and temperature combined into a single composite water-quality score. Four raw numbers require interpretation; one score answers the actual question, which is whether the tank is safe right now.
-
 Built solo end to end: sensor wiring, calibration, firmware, network transmission.
 
 ## RESULT
 
-The rig streams continuous multi-parameter water quality data and feeds an ongoing academic research programme on discus fish aquarium monitoring at IPB University, published as *Implementation of an IoT-Based Water Quality Monitoring System for Discus Fish Aquariums with a Risk Index*.
+The rig streams continuous multi-parameter water quality data and feeds ongoing academic research into discus fish aquarium monitoring at IPB University.
 
 What it demonstrates is range rather than a single skill. The same person specified the sensors, corrected their drift, wrote the firmware, designed the offline-first sync, and shipped the dashboard that consumes it: from first wire to live telemetry, with no handoff in between.
 
@@ -36,6 +34,4 @@ Sistem monitoring kualitas air berbasis IoT untuk akuarium ikan discus, dibangun
 
 Raspberry Pi dipilih menggantikan mikrokontroler karena empat kebutuhan nyata: penyimpanan lokal dengan autosync saat koneksi putus, kalibrasi dan alerting langsung di perangkat, kanal MQTT dua arah sehingga konfigurasi bisa diubah dari cloud, dan tenaga proses yang cukup untuk pembacaan cepat dan akurat.
 
-Sistem juga menghitung **risk index**: skor gabungan dari keempat parameter sensor menjadi satu angka status kualitas air, sehingga pemilik akuarium tidak perlu menafsirkan empat angka mentah sekaligus.
-
-Mendukung riset akademik di IPB University yang sudah dipublikasikan. Relevan untuk kebutuhan jasa pembuatan sistem monitoring IoT, integrasi sensor ke dashboard web, dan pemantauan kualitas air untuk akuakultur di Indonesia.
+Mendukung riset akademik tentang pemantauan akuarium ikan discus di IPB University. Relevan untuk kebutuhan jasa pembuatan sistem monitoring IoT, integrasi sensor ke dashboard web, dan pemantauan kualitas air untuk akuakultur di Indonesia.

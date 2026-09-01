@@ -1,5 +1,10 @@
 # Validasi Fakta Case Study
 
+**Sudah dikoreksi 2026-09-01:** risk index dipindah dari SIMONAIR ke ELSA
+dashboard (dikembangkan untuk penelitian tugas akhir ikan discus), ELSA memakai
+Firebase bukan MQTT, HRIS milik klien, SEMAPOR hanya proyek kompetisi. Empat
+klaim itu sudah dihapus dari daftar di bawah.
+
 Tandai setiap klaim: **OK**, **SALAH: <koreksi>**, atau **HAPUS**.
 
 Yang ada di bawah ini hanya klaim yang **saya tambahkan atau simpulkan sendiri**,
@@ -12,14 +17,12 @@ bukan yang sudah tertulis di CMS. Itu bagian yang paling mungkin salah.
 - Ikan discus butuh pemantauan terus-menerus, pembacaan manual 2x sehari
 - Alasan Raspberry Pi: offline storage + autosync, kalibrasi & alerting di perangkat, MQTT dua arah, tenaga proses
 - MQTT dua arah dipakai untuk mengubah interval polling & threshold dari cloud
-- Risk index = skor gabungan pH + TDS + DO + suhu
 - Lokasi riset sering mati listrik dan sinyal drop
 - Dibangun sendiri penuh (solo)
 
 ## 2. simonair-4-web-dashboard
 
 - Penggunanya peternak ikan & peneliti, bukan engineer
-- Risk index ditampilkan paling depan, 4 parameter mentah di bawahnya
 - UI memberi tahu saat sensor berhenti mengirim
 - Mobile-first karena dipakai sambil berdiri di depan tangki
 - Dashboard subscribe langsung ke MQTT (bukan lewat backend)
@@ -81,7 +84,6 @@ bukan yang sudah tertulis di CMS. Itu bagian yang paling mungkin salah.
 - Sisi petugas berupa antrean dengan status & penugasan
 - Juara 1 DINACOM 2024
 - **Beneran untuk Kota Semarang, atau nama saja?**
-- **Sudah dipakai pemerintah, atau proyek kompetisi?**
 
 ## 10. islamicverse
 
@@ -106,7 +108,6 @@ bukan yang sudah tertulis di CMS. Itu bagian yang paling mungkin salah.
 - ESP32-S3 dipilih: Wi-Fi built-in, cukup untuk polling + publish
 - Sasarannya penghobi & usaha kecil
 - ELSA melepas kalibrasi di perangkat & tenaga proses
-- **ELSA pakai MQTT juga, atau langsung ke Firebase?**
 - **Sensor apa saja? (SIMONAIR 4 parameter, ELSA berapa?)**
 
 ## 13. elsa-iot-web-dashboard
@@ -114,7 +115,6 @@ bukan yang sudah tertulis di CMS. Itu bagian yang paling mungkin salah.
 - Firebase dipilih supaya tidak perlu rawat server
 - Real-time sync dari Firebase, bukan dibangun sendiri
 - Responsive karena dicek dari ponsel
-- **Apakah ELSA juga punya risk index seperti SIMONAIR?**
 
 ## 14. lease-asset-management
 
@@ -131,7 +131,6 @@ bukan yang sudah tertulis di CMS. Itu bagian yang paling mungkin salah.
 - MBO dipilih supaya penilaian terukur & sebanding antar tim
 - Siklus review dimodelkan sebagai data
 - Bagian dari suite HRIS yang lebih besar
-- **Milik siapa? (link demo ke wisebyte.web.id, klien atau produk sendiri?)**
 - **Sudah dipakai perusahaan, atau masih demo?**
 
 ## 16. designlabs

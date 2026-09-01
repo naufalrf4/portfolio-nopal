@@ -10,7 +10,7 @@ Two more constraints came from the site rather than the screen. Sensors go quiet
 
 A mobile-first dashboard subscribing to the same MQTT stream the rig publishes to, rendering live readings the moment they arrive.
 
-**The risk index leads.** The composite score computed on the device is the first thing on screen, because it answers the actual question in one glance. The four raw parameters sit underneath for anyone who wants to verify or dig in: visible, but not the thing you have to decode first.
+**Four parameters, read together.** pH, TDS, dissolved oxygen, and temperature are presented so they can be assessed as one picture rather than four unrelated gauges. Reading them in isolation is what makes the raw feed hard to use.
 
 **Trend over snapshot.** A single reading tells you where the tank is; the line tells you where it is heading. Drift is a slope, so the interface shows movement rather than isolated points.
 
@@ -30,7 +30,7 @@ The pairing is what matters here: the same engineer built the rig publishing the
 
 Dashboard web mobile-first yang mengubah data sensor kualitas air menjadi informasi yang langsung bisa dipahami peternak ikan dan peneliti: bukan sekadar menampilkan angka mentah.
 
-Terhubung ke aliran MQTT yang sama dengan perangkat sensornya. **Risk index** ditampilkan paling depan sebagai satu skor status kualitas air, sementara empat parameter mentah (pH, TDS, dissolved oxygen, suhu) tetap tersedia di bawahnya untuk verifikasi.
+Terhubung ke aliran MQTT yang sama dengan perangkat sensornya. Empat parameter (pH, TDS, dissolved oxygen, suhu) disajikan supaya bisa dibaca sebagai satu gambaran utuh, bukan empat pengukur yang berdiri sendiri.
 
 Tiga keputusan desain yang berangkat dari kondisi lapangan: menampilkan tren bukan sekadar nilai sesaat karena drift itu berupa kemiringan grafik, secara eksplisit memberi tahu ketika sensor berhenti mengirim daripada membiarkan angka lama terlihat seolah masih aktual, dan dirancang untuk layar ponsel karena tidak ada yang memantau akuarium dari meja kerja.
 

@@ -18,6 +18,8 @@ A **Next.js** and **Tailwind CSS** dashboard with **Firebase** handling cloud sy
 
 **Responsive because it is checked from a phone.** Nobody monitors a tank from a desk. The interface is built for the device people actually have with them.
 
+**A risk index rather than four raw numbers.** pH, TDS, dissolved oxygen, and temperature are combined into a single composite water quality score. This is where the risk index lives, developed as part of final-year research into discus fish aquarium monitoring. Four raw parameters require interpretation; one score answers the question that was actually being asked, which is whether the water is safe right now.
+
 **The tradeoff stated plainly.** Leaning on Firebase gives up architectural control and portability. In return development was fast and ongoing maintenance is close to nothing. For a lightweight companion to SIMONAIR that is the right side of the trade. For the research rig it would not have been, which is why SIMONAIR is built differently.
 
 Live at [elsaiot.nrflabs.net](https://elsaiot.nrflabs.net).
@@ -26,7 +28,9 @@ Live at [elsaiot.nrflabs.net](https://elsaiot.nrflabs.net).
 
 Users get remote, real time visibility into water quality without the cost or operational weight of a heavier platform.
 
-Read alongside SIMONAIR, this is the more interesting result: two monitoring systems by the same engineer, built on deliberately different foundations because the requirements differed. Right sizing a stack is a judgement call, and it shows up more clearly in the cheap system than the expensive one.
+It is also where the research contribution sits. The risk index was developed here as part of final-year work on discus fish aquarium monitoring, published as *Implementation of an IoT-Based Water Quality Monitoring System for Discus Fish Aquariums with a Risk Index* through IPB University.
+
+Read alongside SIMONAIR, the pairing is the more interesting result: two monitoring systems by the same engineer on deliberately different foundations, because the requirements differed. Right sizing a stack is a judgement call, and it shows up more clearly in the cheap system than the expensive one.
 
 ## Ringkasan
 
@@ -39,6 +43,8 @@ Itu jebakan umum pada proyek IoT kecil: alatnya murah, lalu perangkat lunak di s
 Penggunanya penghobi dan usaha kecil. Mereka ingin memeriksa kualitas air dari ponsel, tanpa harus punya infrastruktur.
 
 Firebase dipilih supaya infrastrukturnya dikelola pihak lain: tidak ada server yang perlu ditambal, tidak ada basis data yang perlu dicadangkan. Sinkronisasi real-time juga sudah tersedia sebagai kemampuan dasar, bukan sesuatu yang harus dibangun sendiri.
+
+Di sinilah **risk index** diterapkan: pH, TDS, dissolved oxygen, dan suhu digabung menjadi satu skor status kualitas air. Indeks ini dikembangkan sebagai bagian dari penelitian tugas akhir tentang pemantauan akuarium ikan discus, dan sudah dipublikasikan melalui IPB University. Empat angka mentah menuntut penafsiran, satu skor langsung menjawab pertanyaan sebenarnya: apakah airnya aman sekarang.
 
 Konsekuensinya disebut terbuka: bersandar pada Firebase berarti melepas kendali arsitektur dan portabilitas, ditukar dengan pengembangan cepat dan perawatan mendekati nol. Untuk pendamping ringan SIMONAIR itu pilihan yang tepat, dan justru karena itu SIMONAIR dibangun dengan cara berbeda.
 

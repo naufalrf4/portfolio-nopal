@@ -22,7 +22,7 @@ SEMAPOR, short for Semarang Lapor, a civic reporting platform on **Laravel** and
 
 SEMAPOR won **1st place at DINACOM 2024**, judged against other entries on both execution and real world relevance.
 
-The award matters less than what it validates. Civic tech fails when it is designed for only one of its two audiences, and the win says the two sided workflow held up under external scrutiny. It is a product thinking result as much as an engineering one.
+It was built for the competition rather than deployed with a city government, so the result to read here is the design work: civic tech fails when it serves only one of its two audiences, and the win says the two sided workflow held up under external scrutiny. That is a product thinking outcome as much as an engineering one.
 
 ## Ringkasan
 
@@ -34,4 +34,4 @@ Tantangan sesungguhnya adalah dua sisi pengguna yang sangat berbeda. Warga butuh
 
 Karena itu status laporan, penugasan petugas, dan riwayat penyelesaian dimodelkan secara eksplisit di basis data. Itu yang membedakan sistem yang bisa dipertanggungjawabkan dari sekadar kotak keluhan.
 
-**Meraih juara 1 DINACOM 2024.** Relevan untuk kebutuhan jasa pembuatan sistem informasi pemerintahan, platform pelaporan masyarakat, dan aplikasi web custom untuk instansi publik.
+**Meraih juara 1 DINACOM 2024.** Dibangun untuk kompetisi, bukan diterapkan bersama pemerintah kota, jadi yang dibuktikan di sini adalah rancangan alur kerjanya. Relevan untuk kebutuhan jasa pembuatan sistem informasi pemerintahan, platform pelaporan masyarakat, dan aplikasi web custom untuk instansi publik.
