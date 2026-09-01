@@ -28,8 +28,6 @@ The platform digitised participant sign-up and organiser administration for a na
 
 What it demonstrates is delivery against real constraints rather than technical novelty: a public-facing government surface, unpredictable load, and data quality requirements that cannot be cleaned up after the fact.
 
----
-
 ## Ringkasan
 
 Platform pendaftaran yang mendigitalkan proses registrasi peserta dan administrasi penyelenggara untuk program pemerintah nasional di bawah Kemendukbangga.

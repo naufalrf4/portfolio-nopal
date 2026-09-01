@@ -28,8 +28,6 @@ The platform runs rental and sales operations for Photobon.id across **Bali, Ban
 
 It closes the loop on a product built end to end by one engineer: the cabinet, the software running on it, and the system the business is operated from. Because the same person built all three, the contracts between them were designed rather than negotiated.
 
----
-
 ## Ringkasan
 
 Platform web dan cloud yang menjalankan operasional penyewaan dan penjualan unit photobooth di tiga wilayah: Bali, Bandung, dan Jabodetabek.

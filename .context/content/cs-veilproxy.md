@@ -28,8 +28,6 @@ veilproxy gives individuals and small teams a practical way to keep personal dat
 
 It is also the clearest example of a habit visible across this portfolio: the interesting engineering is rarely the model call. It is the boundary around it, where correctness has consequences.
 
----
-
 ## Ringkasan
 
 Proxy lokal open-source yang membersihkan data pribadi dari prompt sebelum sampai ke penyedia LLM. Dibangun dengan **Go** dan **SQLite**.

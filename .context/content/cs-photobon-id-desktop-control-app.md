@@ -26,8 +26,6 @@ The app runs on-site at every Photobon.id unit across **Bali, Bandung, and Jabod
 
 It is the layer that makes the physical product a system. The same engineer built the cabinet it runs on and the cloud platform it reports to, so the boundaries between hardware, local software, and backend were designed once instead of negotiated across teams.
 
----
-
 ## Ringkasan
 
 Aplikasi desktop native yang berjalan langsung di setiap unit photobooth, mengendalikan hardware dan menyinkronkan data sesi ke cloud.

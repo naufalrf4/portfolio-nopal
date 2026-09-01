@@ -26,8 +26,6 @@ The dashboard turns a raw four-parameter sensor feed into a readable water quali
 
 The pairing is what matters here: the same engineer built the rig publishing the data and the interface consuming it, so the contract between them was designed once rather than negotiated between two parties.
 
----
-
 ## Ringkasan
 
 Dashboard web mobile-first yang mengubah data sensor kualitas air menjadi informasi yang langsung bisa dipahami peternak ikan dan peneliti: bukan sekadar menampilkan angka mentah.

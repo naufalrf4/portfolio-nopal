@@ -26,8 +26,6 @@ The unit runs at live events as a commercial product, not a prototype: sold and 
 
 This is the hardware layer of a product where the same engineer also built the desktop control application driving it and the cloud platform running the business around it. The physical device, the software on it, and the system it reports to were designed as one thing.
 
----
-
 ## Ringkasan
 
 Unit photobooth struk (receipt photobooth) yang dirancang dan dibangun khusus untuk beroperasi di acara nyata: bukan prototipe lab.

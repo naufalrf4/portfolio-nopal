@@ -30,8 +30,6 @@ The rig streams continuous multi-parameter water quality data and feeds an ongoi
 
 What it demonstrates is range rather than a single skill. The same person specified the sensors, corrected their drift, wrote the firmware, designed the offline-first sync, and shipped the dashboard that consumes it: from first wire to live telemetry, with no handoff in between.
 
----
-
 ## Ringkasan
 
 Sistem monitoring kualitas air berbasis IoT untuk akuarium ikan discus, dibangun sendiri dari nol. Raspberry Pi 4 membaca sensor pH, TDS, dissolved oxygen, dan suhu, lalu mengirimkannya lewat MQTT ke dashboard web secara real-time.

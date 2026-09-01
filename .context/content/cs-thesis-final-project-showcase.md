@@ -24,8 +24,6 @@ The thesis became something people could explore before the defence and read aft
 
 Small project, but it reflects a preference visible throughout this portfolio: choosing the format that makes the work legible to whoever needs it, rather than defaulting to the one the process expects.
 
----
-
 ## Ringkasan
 
 Situs interaktif bergaya pixel-art yang mengubah tugas akhir dari dokumen padat menjadi sesuatu yang bisa dijelajahi. Dibangun dengan **Next.js** dan **Tailwind CSS**.
