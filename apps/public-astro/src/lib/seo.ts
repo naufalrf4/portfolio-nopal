@@ -271,7 +271,21 @@ export interface ServiceOffering {
  */
 export function buildServiceSchema(
   offerings: readonly ServiceOffering[],
-  options: { canonicalPath: string; name: string; description: string; areaServed?: string },
+  options: {
+    canonicalPath: string;
+    name: string;
+    description: string;
+    areaServed?: string | readonly string[];
+    /**
+     * Indonesian phrasings for the same services. Commercial demand here is
+     * searched in Indonesian ("jasa pembuatan sistem monitoring IoT"), but the
+     * visible copy is English, so the page has nothing for those queries to
+     * match. These belong in `alternateName` rather than in the UI: they are
+     * genuine alternate labels for services actually offered, not keyword
+     * padding, and they keep the visible design untouched.
+     */
+    alternateNames?: readonly string[];
+  },
   siteUrl = getSiteUrl()
 ): JsonLd {
   const pageUrl = absoluteUrl(options.canonicalPath, siteUrl);
@@ -282,12 +296,15 @@ export function buildServiceSchema(
     '@id': pageUrl,
     url: pageUrl,
     name: options.name,
+    alternateName: options.alternateNames?.length ? [...options.alternateNames] : undefined,
     description: options.description,
     serviceType: options.name,
     provider: { '@id': personId(siteUrl) },
-    areaServed: options.areaServed
-      ? compact({ '@type': 'Place', name: options.areaServed })
-      : undefined,
+    areaServed: Array.isArray(options.areaServed)
+      ? options.areaServed.map((place) => compact({ '@type': 'Place', name: place }))
+      : options.areaServed
+        ? compact({ '@type': 'Place', name: options.areaServed })
+        : undefined,
     hasOfferCatalog: {
       '@type': 'OfferCatalog',
       name: options.name,

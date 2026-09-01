@@ -32,7 +32,18 @@ const serviceSchema = buildServiceSchema(
     canonicalPath: '/services',
     name: 'Engineering, automation, and AI system services',
     description,
-    areaServed: 'Indonesia',
+    // The visible copy is English, but commercial demand in this market is
+    // searched in Indonesian. These are real alternate labels for services the
+    // page already lists, kept in structured data so the design is untouched.
+    alternateNames: [
+      'Jasa pembuatan sistem monitoring IoT',
+      'Jasa IoT developer Jakarta Jabodetabek',
+      'Jasa pembuatan aplikasi web custom',
+      'Jasa integrasi sistem dan API',
+      'Jasa otomasi workflow n8n',
+      'Jasa pembuatan chatbot AI dengan data perusahaan',
+    ],
+    areaServed: ['Indonesia', 'Jakarta', 'Depok', 'Jabodetabek'],
   }
 );
 const breadcrumbSchema = buildBreadcrumbSchema([
