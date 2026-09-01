@@ -3,7 +3,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { Badge } from '../shared/Badge';
 import { Button } from '../shared/Button';
 import { Card } from '../shared/Card';
-import { formatDate } from '../../lib/utils';
+import { formatDate, formatMonthYear } from '../../lib/utils';
 import type { Project } from '../../types';
 import { ImageCarousel } from './ImageCarousel';
 import { ProjectArticle } from './ProjectArticle';
@@ -108,7 +108,7 @@ export function ProjectDetail({ project, lastUpdated }: ProjectDetailProps) {
                       <div className="flex items-center gap-2 text-text-primary">
                         <Calendar size={16} className="text-teal" />
                         <span className="font-medium">
-                          {formatDate(project.projectDate || project.createdAt)}
+                          {formatMonthYear(project.projectDate || project.createdAt)}
                         </span>
                       </div>
                     </div>

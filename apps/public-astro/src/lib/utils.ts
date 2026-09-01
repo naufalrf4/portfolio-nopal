@@ -57,6 +57,32 @@ export function formatDateShort(date: string | Date): string {
   });
 }
 
+// `projectDate` is a free-text column (`text()`, validated as `z.string().max(50)`),
+// so it holds things like '2025', '2024-06', or a range such as '2023 - 2024'.
+// Bare years and unparseable ranges are returned untouched instead of being coerced
+// into a fabricated month, and anything date-like is narrowed to month + year.
+export function formatMonthYear(value: string | Date): string {
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    if (/^\d{4}$/.test(trimmed)) return trimmed;
+
+    const parsed = new Date(trimmed);
+    if (Number.isNaN(parsed.getTime())) return trimmed;
+
+    return parsed.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      timeZone: JAKARTA_TIME_ZONE,
+    });
+  }
+
+  return value.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    timeZone: JAKARTA_TIME_ZONE,
+  });
+}
+
 export function getJakartaYear(date: string | Date = new Date()): number {
   return Number(
     getValidDate(date).toLocaleDateString('en-CA', {
