@@ -1,4 +1,4 @@
-# Draft Case Study — Naufal Rizqullah Firdaus
+# Draft Case Study: Naufal Rizqullah Firdaus
 
 Status: menunggu isian dari Naufal. Dibuat 2026-09-01.
 Isi mentah dari produksi ada di `project-content-current.md`.
@@ -8,7 +8,7 @@ Isi mentah dari produksi ada di `project-content-current.md`.
 ## TEMUAN PENTING SEBELUM MENULIS
 
 **1. Koreksi klaim saya sebelumnya.** Saya sempat bilang case study "nol H2".
-Itu salah — saya membacanya dari HTML, bukan dari sumbernya. Field `content`
+Itu salah: saya membacanya dari HTML, bukan dari sumbernya. Field `content`
 di Admin SUDAH punya struktur H2 (`## CONTEXT`, `## ARCHITECTURE`, `## ROLE`,
 `## CHALLENGE`/`## DECISIONS`, `## RESULT`). Rata-rata 5 section per project,
 total 1717 kata di 8 project.
@@ -26,12 +26,12 @@ yang masuk HTML. Terverifikasi di produksi pada `simonair-4-hardware-sensors`:
 
 Artinya: **crawler dan mesin jawaban AI hanya melihat section pertama.**
 Sisanya baru dirender setelah user mengklik tab. Menambah konten tanpa
-memperbaiki ini tidak akan menaikkan apa pun — teks barunya tidak akan
+memperbaiki ini tidak akan menaikkan apa pun: teks barunya tidak akan
 terindeks.
 
 Ada tombol "show all" di komponen itu, jadi kemungkinan perbaikannya kecil:
 render semua section di HTML, lalu sembunyikan lewat CSS/JS untuk interaksi
-tab. Perlu hati-hati karena menyentuh UI — tampilan tab harus tetap sama.
+tab. Perlu hati-hati karena menyentuh UI: tampilan tab harus tetap sama.
 
 **Urutan yang benar: perbaiki renderer dulu, baru tambah konten.**
 
@@ -43,13 +43,13 @@ keputusan spesifik: angka, kegagalan, alasan memilih A bukan B.
 
 ---
 
-## YANG SAYA TIDAK TAHU — TOLONG ISI
+## YANG SAYA TIDAK TAHU: TOLONG ISI
 
 Saya tidak akan mengarang detail teknis. Semua di bawah ini kosong karena
 tidak ada di API produksi. Jawab sesingkat mungkin, saya yang susun jadi
 prosa.
 
-### SIMONAIR 4.0 — Hardware & Sensors
+### SIMONAIR 4.0: Hardware & Sensors
 
 Yang sudah ada: Raspberry Pi 4, MQTT, sensor pH/TDS/DO/suhu, riset akuakultur
 ikan hias air tawar, iterasi ke-4, solo build.
@@ -61,14 +61,14 @@ ikan hias air tawar, iterasi ke-4, solo build.
 - "Signal conditioning" itu konkretnya apa? Moving average? Median filter?
   Buang outlier?
 - Interval polling berapa? Kenapa angka itu?
-- Kalau koneksi/listrik putus di lokasi — apa yang terjadi ke data? Ada buffer
+- Kalau koneksi/listrik putus di lokasi: apa yang terjadi ke data? Ada buffer
   lokal, atau hilang?
 - QoS MQTT berapa? Kenapa?
 - Sudah jalan berapa lama? Ada temuan dari datanya yang tidak terlihat dari
   pembacaan manual?
 - Ada yang pernah rusak/gagal di lapangan? Apa penyebabnya?
 
-### SIMONAIR 4.0 — Web Dashboard
+### SIMONAIR 4.0: Web Dashboard
 
 Yang sudah ada: React, Tailwind, MQTT, mobile-friendly, untuk peternak ikan.
 
@@ -80,7 +80,7 @@ Yang sudah ada: React, Tailwind, MQTT, mobile-friendly, untuk peternak ikan.
 - Bagian mana yang paling sering dipakai, dan mana yang ternyata tidak
   dipakai sama sekali?
 
-### Photobon.id — Hardware Device
+### Photobon.id: Hardware Device
 
 Yang sudah ada: embedded hardware, modul kamera, integrasi thermal printer,
 dipakai di event nyata.
@@ -92,7 +92,7 @@ dipakai di event nyata.
 - Berapa unit sudah dibuat? Dipakai di kota mana saja?
 - Ada iterasi hardware? Versi 1 gagal di mana?
 
-### Photobon.id — Desktop Control App
+### Photobon.id: Desktop Control App
 
 Yang sudah ada: Rust, Tauri, React, jalan di setiap unit, kontrol hardware +
 sync ke cloud.
@@ -104,7 +104,7 @@ sync ke cloud.
 - Bagaimana update aplikasi dikirim ke unit yang tersebar di berbagai kota?
 - Bug paling sulit yang pernah kamu kejar di sini?
 
-### Photobon.id — Web & Cloud Platform
+### Photobon.id: Web & Cloud Platform
 
 Yang sudah ada: Next.js, React, PostgreSQL, cloud storage, operasi rental +
 penjualan lintas kota (Bali, Bandung, Jabodetabek).
@@ -129,11 +129,11 @@ pemerintah nasional, live di `siapimpact.kemendukbangga.id`.
 - Kamu kerja sendiri atau dalam tim? Bagian mana yang kamu pegang?
 - Ada kendala khusus karena ini proyek pemerintah? Audit, keamanan, aksesibilitas?
 
-### Thesis Final Project — Interactive Showcase
+### Thesis Final Project: Interactive Showcase
 
 Yang sudah ada: Next.js, Tailwind, gaya pixel-art, untuk presentasi tesis.
 
-- Tesisnya tentang apa? (ini penting — bisa jadi konten teknis kuat)
+- Tesisnya tentang apa? (ini penting: bisa jadi konten teknis kuat)
 - Kenapa pixel-art? Ada alasan selain estetika?
 - Apa yang berhasil dilakukan situs ini yang tidak bisa dilakukan slide?
 - Reaksi dosen penguji?
@@ -174,7 +174,7 @@ dari prompt sebelum sampai ke penyedia LLM, repo publik di GitHub.
 1. Perbaiki `ProjectArticle.tsx` supaya semua section masuk HTML (tanpa
    mengubah tampilan tab)
 2. Saya susun jawaban jadi prosa, pertahankan struktur H2 yang sudah ada
-3. Masuk ke field `content` di Admin — langsung live tanpa deploy
+3. Masuk ke field `content` di Admin: langsung live tanpa deploy
 4. Verifikasi frasa dari setiap section benar-benar ada di HTML produksi
 
 Target realistis: 600-900 kata per project, naik dari ~200 sekarang. Cukup
