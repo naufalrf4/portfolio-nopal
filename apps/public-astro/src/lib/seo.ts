@@ -40,6 +40,27 @@ function absoluteUrl(path: string | null | undefined, siteUrl: string): string |
   }
 }
 
+/**
+ * Media in Admin is served from Google Cloud Storage as *signed* URLs that
+ * carry `X-Goog-Expires` (currently 3600s). Those are fine for an `<img>` the
+ * visitor loads immediately, but they must never be published in structured
+ * data: Google fetches schema images long after the page render, by which time
+ * the signature is dead and the fetch 403s. A broken `image` is worse than an
+ * absent one, so an expiring URL is treated as no image at all.
+ */
+function isExpiringSignedUrl(url: string): boolean {
+  return /[?&]X-Goog-Expires=/i.test(url) || /[?&]X-Amz-Expires=/i.test(url);
+}
+
+export function stableImageUrl(
+  path: string | null | undefined,
+  siteUrl: string = getSiteUrl()
+): string | undefined {
+  const resolved = absoluteUrl(path, siteUrl);
+  if (!resolved) return undefined;
+  return isExpiringSignedUrl(resolved) ? undefined : resolved;
+}
+
 function isoDate(value: string | null | undefined): string | undefined {
   if (!value) return undefined;
   const parsed = new Date(value);
@@ -110,7 +131,7 @@ export function buildProfilePageSchema(
     description: about.shortBio || about.tagline || options.description,
     jobTitle,
     email: about.email ? `mailto:${about.email}` : undefined,
-    image: absoluteUrl(about.avatarUrl, siteUrl),
+    image: stableImageUrl(about.avatarUrl, siteUrl),
     url: absoluteUrl(options.canonicalPath, siteUrl),
     knowsAbout: skillNames,
     // `socialLinks` also carries the contact address and the site's own URL.
@@ -178,7 +199,7 @@ export function buildProjectCollectionSchema(
           url: `${siteUrl}/projects/${project.slug}`,
           name: project.title,
           description: project.summary,
-          image: absoluteUrl(project.imageUrl, siteUrl),
+          image: stableImageUrl(project.imageUrl, siteUrl),
           genre: project.category,
           keywords: project.techStack?.length ? project.techStack.join(', ') : undefined,
           dateModified: isoDate(project.updatedAt),
@@ -227,7 +248,7 @@ export function buildPublicationCollectionSchema(
           url: blog.url,
           headline: blog.title,
           description: blog.description,
-          image: blog.imageUrl,
+          image: stableImageUrl(blog.imageUrl, siteUrl),
           datePublished: isoDate(blog.publishedAt),
           articleSection: blog.category,
           publisher: blog.source ? compact({ '@type': 'Organization', name: blog.source }) : undefined,
@@ -303,9 +324,9 @@ export function buildProjectSchema(
 ): JsonLd {
   const pageUrl = `${siteUrl}/projects/${project.slug}`;
   const images = (project.images ?? [])
-    .map((image) => absoluteUrl(image.url, siteUrl))
+    .map((image) => stableImageUrl(image.url, siteUrl))
     .filter((url): url is string => Boolean(url));
-  const primaryImage = absoluteUrl(project.imageUrl, siteUrl);
+  const primaryImage = stableImageUrl(project.imageUrl, siteUrl);
   const allImages = [...new Set([primaryImage, ...images].filter((u): u is string => Boolean(u)))];
 
   return compact({

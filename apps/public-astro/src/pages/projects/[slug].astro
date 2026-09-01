@@ -4,7 +4,7 @@ import { ProjectDetail } from '../../components/project-detail/ProjectDetail';
 import { getProjectBySlug } from '../../lib/api';
 import { getSiteUrl } from '../../lib/site';
 import { formatDate } from '../../lib/utils';
-import { buildBreadcrumbSchema, buildProjectSchema } from '../../lib/seo';
+import { buildBreadcrumbSchema, buildProjectSchema, stableImageUrl } from '../../lib/seo';
 
 const { slug } = Astro.params;
 
@@ -30,7 +30,7 @@ const breadcrumbSchema = buildBreadcrumbSchema([
 <PageLayout
   title={project.title}
   description={project.summary}
-  ogImage={project.imageUrl || undefined}
+  ogImage={stableImageUrl(project.imageUrl)}
   ogType="article"
 >
   <div>
