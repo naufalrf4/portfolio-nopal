@@ -368,7 +368,7 @@ function initEngine(
   }
   document.addEventListener('visibilitychange', onVisibility);
 
-  const clock = new THREE.Clock();
+  const timer = new THREE.Timer();
   let rafId = 0;
 
   const BASE_SPEED = 3.0;     
@@ -376,12 +376,13 @@ function initEngine(
   const SCROLL_SPEED = 40;    
   const MOOD_LERP = 1 - Math.pow(0.12, 1 / 60); 
 
-  function render(): void {
+  function render(timestamp?: number): void {
     rafId = requestAnimationFrame(render);
     if (!tabVisible) return;
 
-    const dt = Math.min(clock.getDelta(), 0.05);
-    const time = clock.getElapsedTime();
+    timer.update(timestamp);
+    const dt = Math.min(timer.getDelta(), 0.05);
+    const time = timer.getElapsed();
 
     if (targetScene !== currentScene) {
       currentScene = targetScene;
@@ -505,7 +506,6 @@ function initEngine(
     renderer.render(scene, camera);
   }
 
-  clock.start();
   render();
 
   return () => {
