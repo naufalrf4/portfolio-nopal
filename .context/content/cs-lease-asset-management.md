@@ -24,7 +24,7 @@ A lease and asset management system on **Laravel** with **MySQL**, built for a b
 
 The bank gained a centralised view of lease obligations and asset placement across its retail and ATM network, replacing manual outlet by outlet record keeping.
 
-This is unglamorous back office software, and that is the point. It is the category real financial institutions depend on daily, and delivering it under a confidential banking engagement means the work met enterprise expectations for accuracy and auditability rather than demo standards.
+This is unglamorous back office software of the kind financial institutions depend on daily, delivered under a confidential banking engagement with the accuracy and auditability expectations that come with it.
 
 ## Ringkasan
 

@@ -24,7 +24,7 @@ An **ESP32-S3** wired to water quality sensors, pushing telemetry straight to Fi
 
 The unit delivers reliable telemetry at a fraction of the cost and complexity of a research grade rig, sized for lighter monitoring.
 
-The judgement worth noting is the restraint. Knowing when not to reach for the more capable option is a harder skill than being able to build it, and here the hardware tier was chosen against the requirements rather than out of habit.
+The hardware tier was chosen against the requirements rather than out of habit, which is what keeps the unit cheap enough to deploy on every tank.
 
 ## Ringkasan
 

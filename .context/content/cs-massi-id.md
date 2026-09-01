@@ -26,7 +26,7 @@ Live at [massi.id](https://massi.id).
 
 The symposium's programme, host institutions, and partner network are presented in a format that holds up in front of an international academic and industry audience.
 
-The engineering note worth making is Inertia.js. Pairing it with Laravel removes an entire layer most teams build by default, and choosing to leave something out is usually the better decision when the requirement does not call for it.
+Pairing Inertia.js with Laravel removed an entire layer most teams build by default, which was the right call here because nothing in the requirements needed a separate API.
 
 ## Ringkasan
 

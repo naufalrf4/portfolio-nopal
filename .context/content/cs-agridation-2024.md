@@ -20,7 +20,7 @@ A **Laravel** and **MySQL** site presenting the programme, schedules, and compet
 
 Organisers had a clear, central place to communicate event details ahead of the date, supporting participant turnout and coordination.
 
-Modest project, and worth including for that reason. Not every requirement deserves an interesting architecture, and recognising which ones do not is part of shipping reliably against real deadlines.
+A modest project. Not every requirement calls for an interesting architecture, and this one called for arriving before the event date.
 
 ## Ringkasan
 

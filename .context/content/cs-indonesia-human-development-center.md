@@ -24,7 +24,7 @@ Live at [idn-hdc.id](https://www.idn-hdc.id/).
 
 A clean, fast landing page that communicates the organisation's work clearly, without complexity it has no use for.
 
-The point worth making is restraint. Matching technical effort to what a client project actually needs is a harder discipline than reaching for the biggest stack available, and on a site whose entire purpose is being read quickly, the simpler build is the better engineering.
+On a site whose entire purpose is being read quickly, the simpler build is the correct one. Technical effort was matched to what the project needed rather than to what the stack could do.
 
 ## Ringkasan
 

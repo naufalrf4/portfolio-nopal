@@ -26,7 +26,7 @@ Live in production at [siapimpact.kemendukbangga.id](https://siapimpact.kemenduk
 
 The platform digitised participant sign-up and organiser administration for a national programme run under Kemendukbangga, replacing manual handling with a system the organisers operate directly.
 
-What it demonstrates is delivery against real constraints rather than technical novelty: a public-facing government surface, unpredictable load, and data quality requirements that cannot be cleaned up after the fact.
+The constraints were the difficulty rather than the technology: a public-facing government surface, load arriving in unpredictable spikes, and data quality requirements that cannot be cleaned up after the fact.
 
 ## Ringkasan
 

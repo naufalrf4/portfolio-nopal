@@ -22,7 +22,7 @@ A pixel-art styled site built with **Next.js** and **Tailwind CSS**, presenting 
 
 The thesis became something people could explore before the defence and read afterwards, at a URL rather than as an attachment.
 
-Small project, and worth including for what it chose: the format that makes the work legible to whoever needs it, rather than the one the process expects by default.
+A small project that picked the format making the work legible to whoever needs it, rather than the one the process expects by default.
 
 ## Ringkasan
 

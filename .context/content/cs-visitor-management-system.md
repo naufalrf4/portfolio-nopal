@@ -26,7 +26,7 @@ Built during a hardware engineering internship at PT Nutech Integrasi, TelkomGro
 
 The system replaced manual visitor logbooks with automated, verifiable entry tracking, deployed as a real internship deliverable rather than an exercise.
 
-What it demonstrates is the join between layers. Frontend, API, relational schema, biometric pipeline, and physical card readers had to agree on one model of identity, and getting that agreement right is the actual work. It is the same pattern that runs through the IoT projects: the interesting engineering sits at the boundary where hardware meets software.
+The hard part was the join between layers. Frontend, API, relational schema, biometric pipeline, and physical card readers all had to agree on one model of identity, and getting that agreement right is where the work actually went.
 
 ## Ringkasan
 

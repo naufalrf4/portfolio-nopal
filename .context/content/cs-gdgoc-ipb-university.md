@@ -26,7 +26,7 @@ Live at [gdgipb.site](https://gdgipb.site).
 
 Registration and role management for the GDGoC IPB University chapter became self service and organised, cutting the manual coordination the leadership team repeated every cycle.
 
-The judgement worth noting is choosing the boring option. A community tool that outlives its author has to be cheap to keep running, and picking managed infrastructure over a custom backend was a decision about the next maintainer rather than about this build.
+A community tool that outlives its author has to be cheap to keep running, so picking managed infrastructure over a custom backend was a decision about the next maintainer rather than about this build.
 
 ## Ringkasan
 

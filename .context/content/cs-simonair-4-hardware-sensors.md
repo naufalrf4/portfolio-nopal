@@ -26,7 +26,7 @@ Built solo end to end: sensor wiring, calibration, firmware, network transmissio
 
 The rig streams continuous multi-parameter water quality data and feeds ongoing academic research into discus fish aquarium monitoring at IPB University.
 
-What it demonstrates is range rather than a single skill. The same person specified the sensors, corrected their drift, wrote the firmware, designed the offline-first sync, and shipped the dashboard that consumes it: from first wire to live telemetry, with no handoff in between.
+The build covered every layer: sensor specification, drift correction, firmware, offline-first sync, and the network transmission that feeds the dashboard. First wire to live telemetry, no handoff in between.
 
 ## Ringkasan
 

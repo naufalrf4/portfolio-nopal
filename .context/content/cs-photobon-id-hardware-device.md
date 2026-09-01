@@ -24,7 +24,7 @@ Deployed to clients across **Bali, Bandung, and Jabodetabek**, operating as rent
 
 The unit runs at live events as a commercial product, not a prototype: sold and rented to clients across three regions, with the reliability requirements that come from revenue depending on it working.
 
-What it demonstrates is hardware built to a commercial standard rather than a demonstration one: designed for venues instead of benches, and legible enough that the person nearest the problem can solve it.
+The unit is built to a commercial standard rather than a demonstration one: designed for venues instead of benches, and legible enough that the person nearest a jam can clear it without calling anyone.
 
 ## Ringkasan
 

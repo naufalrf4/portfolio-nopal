@@ -30,7 +30,7 @@ Users get remote, real time visibility into water quality without the cost or op
 
 It is also where the research contribution sits. The risk index was developed here as part of final-year work on discus fish aquarium monitoring, published as *Implementation of an IoT-Based Water Quality Monitoring System for Discus Fish Aquariums with a Risk Index* through IPB University.
 
-The judgement worth noting is right sizing. A lean stack delivered a production IoT dashboard with a real research contribution attached, and choosing managed infrastructure over a custom backend is what kept it maintainable rather than abandoned.
+A lean stack delivered a production IoT dashboard with a research contribution attached, and choosing managed infrastructure over a custom backend is what keeps it running rather than abandoned.
 
 ## Ringkasan
 
