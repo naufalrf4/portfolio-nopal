@@ -114,9 +114,9 @@
     "semantic_hash": "b69d8d2d793dd7cfe0d737f86a586181"
   },
   "apps/admin/drizzle/meta/_journal.json": {
-    "mtime": 1787901973.9240115,
-    "seen": 1788236077.87813,
-    "ast_hash": "f885d3e0316c57b6ba411e78ebe5b49b",
+    "mtime": 1788240073.6106546,
+    "seen": 1788242142.5719488,
+    "ast_hash": "3732aef754071c0d8cbc55fd1f05b032",
     "semantic_hash": ""
   },
   "apps/admin/drizzle/relations.ts": {
@@ -132,15 +132,15 @@
     "semantic_hash": "f5641a8fba02be1137563b6ec98d152c"
   },
   "apps/admin/eslint.config.mjs": {
-    "mtime": 1787763047.9815521,
-    "seen": 1788236077.878135,
-    "ast_hash": "3643e2170b0a1dd19d2f06719353f36e",
+    "mtime": 1788242226.1275766,
+    "seen": 1788244047.640788,
+    "ast_hash": "a663b28f04354b535cdd8b0568c819c7",
     "semantic_hash": ""
   },
   "apps/admin/next-env.d.ts": {
-    "mtime": 1787987703.5227876,
-    "seen": 1788236077.8781369,
-    "ast_hash": "aa94238a90e7d04b7a47ecc3145ba6a0",
+    "mtime": 1788244080.1324434,
+    "seen": 1788244486.8207128,
+    "ast_hash": "8195d2c60ce847a459ae9d308d6a5724",
     "semantic_hash": ""
   },
   "apps/admin/next.config.js": {
@@ -150,9 +150,9 @@
     "semantic_hash": ""
   },
   "apps/admin/package.json": {
-    "mtime": 1787937102.0605881,
-    "seen": 1788236077.87814,
-    "ast_hash": "6c1a58a4fe6bc4eb1469740df86a73e3",
+    "mtime": 1788242980.7448087,
+    "seen": 1788244047.640793,
+    "ast_hash": "109a9610a638db53e91c85a4ba4e3ba0",
     "semantic_hash": ""
   },
   "apps/admin/postcss.config.js": {
@@ -450,9 +450,9 @@
     "semantic_hash": "3c816175ced400823175958591f8d32e"
   },
   "apps/admin/src/app/(dashboard)/layout.tsx": {
-    "mtime": 1787936435.2622688,
-    "seen": 1788236077.8782325,
-    "ast_hash": "03c090a5954f4df08ca761b917f452a9",
+    "mtime": 1788244252.88455,
+    "seen": 1788244486.8207805,
+    "ast_hash": "b9431a77206b0de45b78dac12921b8c1",
     "semantic_hash": ""
   },
   "apps/admin/src/app/(dashboard)/links/LinksPageContent.tsx": {
@@ -1080,9 +1080,9 @@
     "semantic_hash": ""
   },
   "apps/admin/src/app/layout.tsx": {
-    "mtime": 1787938059.4830906,
-    "seen": 1788236077.8784494,
-    "ast_hash": "b80afea64f8471ba0d1ef2d5714ef866",
+    "mtime": 1788241251.825846,
+    "seen": 1788242142.5721831,
+    "ast_hash": "d46448254480e8bf3a1f9c0c9ca0fdaf",
     "semantic_hash": ""
   },
   "apps/admin/src/app/not-found.tsx": {
@@ -2610,9 +2610,9 @@
     "semantic_hash": "90931e656490c373f8946b18fbb1d541"
   },
   "apps/admin/src/lib/db/schema.ts": {
-    "mtime": 1787901973.9372003,
-    "seen": 1788236077.8789353,
-    "ast_hash": "038bdb4e9688c2492b0450ebd2d9995a",
+    "mtime": 1788239995.796532,
+    "seen": 1788242142.5725417,
+    "ast_hash": "5af9ed8faf1aa321dc8c8b1f1b259128",
     "semantic_hash": ""
   },
   "apps/admin/src/lib/email/config.ts": {
@@ -3792,10 +3792,10 @@
     "semantic_hash": ""
   },
   "scripts/docker-prod-migrate.sh": {
-    "mtime": 1785071671.7823431,
-    "seen": 1788236077.8794534,
-    "ast_hash": "c83350c48e57d4a55c7ce1706f8581f5",
-    "semantic_hash": "c83350c48e57d4a55c7ce1706f8581f5"
+    "mtime": 1788242957.399865,
+    "seen": 1788244047.6417897,
+    "ast_hash": "8b41954cfb5f563d3b4b1f9dca77e674",
+    "semantic_hash": ""
   },
   "scripts/docker-prod-up.sh": {
     "mtime": 1788155754.8418348,
@@ -3804,9 +3804,9 @@
     "semantic_hash": ""
   },
   "scripts/github-webhook-deploy.sh": {
-    "mtime": 1788155766.8111548,
-    "seen": 1788236077.8794582,
-    "ast_hash": "23b6f9d2d78075b32c074fcb7862c54d",
+    "mtime": 1788243042.4374876,
+    "seen": 1788244047.641792,
+    "ast_hash": "db58faea9e20cb3c82a7ec782603b998",
     "semantic_hash": ""
   },
   "scripts/github_webhook_server.py": {
@@ -3864,9 +3864,9 @@
     "semantic_hash": ""
   },
   "apps/public-astro/src/components/home/HeroFlipCard.tsx": {
-    "mtime": 1787901973.9510114,
-    "seen": 1788236077.8791838,
-    "ast_hash": "c0b88f62151c35a8bec456a454e8688c",
+    "mtime": 1788237573.401873,
+    "seen": 1788242142.572716,
+    "ast_hash": "43a5c1989f559a39f158d2506daf7f7a",
     "semantic_hash": ""
   },
   "apps/public-astro/src/components/shared/GlobalScene.tsx": {
@@ -4230,9 +4230,9 @@
     "semantic_hash": ""
   },
   "PROGRESS.md": {
-    "mtime": 1788230408.2426348,
-    "seen": 1788236077.8795238,
-    "ast_hash": "561d955e5e9f900e8e457a29e2b2ec09",
+    "mtime": 1788244429.8416784,
+    "seen": 1788244486.821788,
+    "ast_hash": "3b0c17c2fbf5c3f89e6dc6fd12d88993",
     "semantic_hash": ""
   },
   "README.md": {
@@ -4242,9 +4242,9 @@
     "semantic_hash": ""
   },
   "apps/admin/AGENTS.md": {
-    "mtime": 1787901973.9230115,
-    "seen": 1788236077.8795288,
-    "ast_hash": "a60682d37017dfe0dcbc5cd59e878adc",
+    "mtime": 1788244455.0048385,
+    "seen": 1788244486.8217916,
+    "ast_hash": "08ca0cb91c4433b857b90ae0276aeb76",
     "semantic_hash": ""
   },
   "apps/links-astro/AGENTS.md": {
@@ -5136,9 +5136,9 @@
     "semantic_hash": ""
   },
   "apps/admin/src/lib/services/__tests__/logIngest.service.test.ts": {
-    "mtime": 1787893528.5339966,
-    "seen": 1788236077.878981,
-    "ast_hash": "bd66e4f27487d645c95f37f3f4b15703",
+    "mtime": 1788241019.6207497,
+    "seen": 1788242142.5725732,
+    "ast_hash": "f9377993b99c63e180e65446acc17d9b",
     "semantic_hash": ""
   },
   "apps/admin/src/lib/services/__tests__/logQuery.service.test.ts": {
@@ -5148,9 +5148,9 @@
     "semantic_hash": ""
   },
   "apps/admin/src/lib/services/__tests__/notificationService.test.ts": {
-    "mtime": 1787899629.7217226,
-    "seen": 1788236077.8789876,
-    "ast_hash": "882962cb1acbbcd72cbaf63f88ac3645",
+    "mtime": 1788240763.36392,
+    "seen": 1788242142.5725777,
+    "ast_hash": "fea5430bafab3a85805f0cfc3db98bed",
     "semantic_hash": ""
   },
   "apps/admin/src/lib/services/__tests__/telegramService.test.ts": {
@@ -5160,9 +5160,9 @@
     "semantic_hash": ""
   },
   "apps/admin/src/lib/services/logIngest.service.ts": {
-    "mtime": 1787893573.7120728,
-    "seen": 1788236077.8789957,
-    "ast_hash": "968767218249635fddddc06f282f73bf",
+    "mtime": 1788240960.8981583,
+    "seen": 1788242142.5725844,
+    "ast_hash": "b4c6c14329be1b9bab78a1d8931bed06",
     "semantic_hash": ""
   },
   "apps/admin/src/lib/services/logQuery.service.ts": {
@@ -5172,9 +5172,9 @@
     "semantic_hash": ""
   },
   "apps/admin/src/lib/services/notificationService.ts": {
-    "mtime": 1787899705.422891,
-    "seen": 1788236077.8790019,
-    "ast_hash": "92c731cd2b47b57b52320386f2e7763a",
+    "mtime": 1788240378.3418424,
+    "seen": 1788242142.5725896,
+    "ast_hash": "5b8546d68fba1d93344b6543eee5e091",
     "semantic_hash": ""
   },
   "apps/admin/src/lib/services/telegramService.ts": {
@@ -5262,9 +5262,9 @@
     "semantic_hash": ""
   },
   "apps/admin/src/app/(dashboard)/notifications/NotificationsPageContent.tsx": {
-    "mtime": 1787900538.8616264,
-    "seen": 1788236077.878254,
-    "ast_hash": "ccd8ce7ba264d9ba16b8c5ff929866b3",
+    "mtime": 1788241817.439985,
+    "seen": 1788242142.5720384,
+    "ast_hash": "287137804daa049cf01f09a182e6b4ac",
     "semantic_hash": ""
   },
   "apps/admin/src/app/(dashboard)/notifications/error.tsx": {
@@ -5315,52 +5315,34 @@
     "ast_hash": "dc890b254919a51642426ddb3410e62f",
     "semantic_hash": ""
   },
-  "apps/admin/src/app/api/v1/admin/notifications/rules/[id]/route.ts": {
-    "mtime": 1787900449.0105221,
-    "seen": 1788236077.8783913,
-    "ast_hash": "929303964930eb5a1d370974f3e7eac5",
-    "semantic_hash": ""
-  },
-  "apps/admin/src/app/api/v1/admin/notifications/rules/route.ts": {
-    "mtime": 1787900449.0101717,
-    "seen": 1788236077.8783925,
-    "ast_hash": "a640b395e41c122b88c2aa60363872e8",
-    "semantic_hash": ""
-  },
   "apps/admin/src/features/notifications/components/ChannelsTab.tsx": {
-    "mtime": 1787911436.0689082,
-    "seen": 1788236077.878782,
-    "ast_hash": "e7893535c241d2c504adea108d9c7134",
+    "mtime": 1788242367.7439208,
+    "seen": 1788244047.6412897,
+    "ast_hash": "fc91dedd994fce5d092ee8d308a1feba",
     "semantic_hash": ""
   },
   "apps/admin/src/features/notifications/components/OutboxTab.tsx": {
-    "mtime": 1787900520.124675,
-    "seen": 1788236077.8787832,
-    "ast_hash": "de0b2600c3818a8788eb3040fa12dbc5",
-    "semantic_hash": ""
-  },
-  "apps/admin/src/features/notifications/components/RulesTab.tsx": {
-    "mtime": 1787900507.895564,
-    "seen": 1788236077.8787851,
-    "ast_hash": "88fe4abad1aa42779bfb9a8b5fc65017",
+    "mtime": 1788241817.4389849,
+    "seen": 1788242142.572435,
+    "ast_hash": "7a93fa0ea18e75fa86d0ad8acfe62aee",
     "semantic_hash": ""
   },
   "apps/admin/src/features/notifications/components/index.ts": {
-    "mtime": 1787900524.4815974,
-    "seen": 1788236077.8787866,
-    "ast_hash": "3a497ea2203a1815ea5ba31fd60860e3",
+    "mtime": 1788241415.4991992,
+    "seen": 1788242142.572437,
+    "ast_hash": "63fc8b9168d02851c48665406c158bc6",
     "semantic_hash": ""
   },
   "apps/admin/src/features/notifications/constants/notifications.constants.ts": {
-    "mtime": 1787901491.4179013,
-    "seen": 1788236077.8787882,
-    "ast_hash": "745b12eaaba53b2f0cdd41ec2b32247d",
+    "mtime": 1788241295.0062015,
+    "seen": 1788242142.5724382,
+    "ast_hash": "feea549fb2f925231c50fbe105328892",
     "semantic_hash": ""
   },
   "apps/admin/src/features/notifications/hooks/index.ts": {
-    "mtime": 1787911319.6630783,
-    "seen": 1788236077.87879,
-    "ast_hash": "eb70d5e3075f0bfab4374e57ce741193",
+    "mtime": 1788241414.455142,
+    "seen": 1788242142.5724397,
+    "ast_hash": "3fe77aaaf3e24bc929a2fabfe5441cfa",
     "semantic_hash": ""
   },
   "apps/admin/src/features/notifications/hooks/useNotificationChannels.ts": {
@@ -5370,15 +5352,9 @@
     "semantic_hash": ""
   },
   "apps/admin/src/features/notifications/hooks/useNotificationOutbox.ts": {
-    "mtime": 1787900487.3825228,
-    "seen": 1788236077.8787956,
-    "ast_hash": "bf3b39b5ea11f25a80388823525a1040",
-    "semantic_hash": ""
-  },
-  "apps/admin/src/features/notifications/hooks/useNotificationRules.ts": {
-    "mtime": 1787900483.111514,
-    "seen": 1788236077.8787975,
-    "ast_hash": "27fb71e6845a2500c809d17cfc6c0688",
+    "mtime": 1788242294.8781867,
+    "seen": 1788244047.6413035,
+    "ast_hash": "3438447b0bcfc209e944d8e9e05c04c1",
     "semantic_hash": ""
   },
   "apps/admin/src/features/notifications/index.ts": {
@@ -5388,39 +5364,39 @@
     "semantic_hash": ""
   },
   "apps/admin/src/features/notifications/types/notifications.types.ts": {
-    "mtime": 1787911279.4219944,
-    "seen": 1788236077.8788018,
-    "ast_hash": "2762caade33b49fd5d806252a613e139",
+    "mtime": 1788241281.4570956,
+    "seen": 1788242142.5724497,
+    "ast_hash": "70bc2cb6fd87175ad6454a7e0456d319",
     "semantic_hash": ""
   },
   "apps/admin/src/lib/api/handlers/__tests__/notification-channels.service.test.ts": {
-    "mtime": 1787900535.1076188,
-    "seen": 1788236077.8788776,
-    "ast_hash": "60323023da588a05977761ee9fb16af9",
+    "mtime": 1788240670.7747047,
+    "seen": 1788242142.5725045,
+    "ast_hash": "2bc3c9b3e0ee917e09b7ec834555eac1",
     "semantic_hash": ""
   },
   "apps/admin/src/lib/api/handlers/__tests__/notification-outbox.service.test.ts": {
-    "mtime": 1787900577.1297033,
-    "seen": 1788236077.8788793,
-    "ast_hash": "858313a5e1f828380e438933ce8d55c3",
+    "mtime": 1788240823.9436526,
+    "seen": 1788242142.5725064,
+    "ast_hash": "26d85b7e93250ea2ee3d6d933b72e1f9",
     "semantic_hash": ""
   },
   "apps/admin/src/lib/api/handlers/notification-channels.service.ts": {
-    "mtime": 1787900398.1543424,
-    "seen": 1788236077.878914,
-    "ast_hash": "13f3b65f47218367a1c0f25612c9658d",
+    "mtime": 1788240657.004513,
+    "seen": 1788242142.572525,
+    "ast_hash": "1c4d3ef7672bb0813382ef0ed9141c07",
     "semantic_hash": ""
   },
   "apps/admin/src/lib/api/handlers/notification-outbox.service.ts": {
-    "mtime": 1787900632.3399143,
-    "seen": 1788236077.8789155,
-    "ast_hash": "9eeaef4b2aa41d2c58f2d0df6c8a6962",
+    "mtime": 1788240502.5991323,
+    "seen": 1788242142.5725272,
+    "ast_hash": "bf8d69e7a84859c598a9192ab17c8279",
     "semantic_hash": ""
   },
   "apps/admin/src/lib/validations/notifications.schema.ts": {
-    "mtime": 1787900535.106619,
-    "seen": 1788236077.8790624,
-    "ast_hash": "7501e9a8257bc093c19287decac7a77c",
+    "mtime": 1788240476.6926856,
+    "seen": 1788242142.5726323,
+    "ast_hash": "a514c35bd427d1ae9e09dcb9789dcff3",
     "semantic_hash": ""
   },
   "apps/admin/src/app/api/cron/cleanup-logs/route.ts": {
@@ -5430,21 +5406,21 @@
     "semantic_hash": ""
   },
   "apps/admin/src/app/api/cron/dispatch-notifications/route.ts": {
-    "mtime": 1787901620.4272082,
-    "seen": 1788236077.8783004,
-    "ast_hash": "446db9082aa7d0f6414444c7fe33d2f5",
+    "mtime": 1788240429.5248322,
+    "seen": 1788242142.5720708,
+    "ast_hash": "0b83a8bbfa64f43410b580b5916e5343",
     "semantic_hash": ""
   },
   "apps/admin/src/components/layout/NotificationBell.tsx": {
-    "mtime": 1787908078.600917,
-    "seen": 1788236077.878494,
-    "ast_hash": "ee3687b8cd7120501ed4a6e0b4466b96",
+    "mtime": 1788242097.3907797,
+    "seen": 1788242142.5722182,
+    "ast_hash": "8dd1e8dee69c92f1bb698c637b14fcf9",
     "semantic_hash": ""
   },
   "apps/admin/src/features/notifications/hooks/useNotificationBell.ts": {
-    "mtime": 1787901441.2057788,
-    "seen": 1788236077.878791,
-    "ast_hash": "b81ff1ab6cf930054999743d8a33b88b",
+    "mtime": 1788241346.501614,
+    "seen": 1788242142.5724409,
+    "ast_hash": "5f3cbc6578b521cf031ecb5e4e69848f",
     "semantic_hash": ""
   },
   "apps/admin/src/lib/services/__tests__/logRetention.service.test.ts": {
@@ -5454,9 +5430,9 @@
     "semantic_hash": ""
   },
   "apps/admin/src/lib/services/__tests__/notificationDispatch.service.test.ts": {
-    "mtime": 1787902095.450279,
-    "seen": 1788236077.878986,
-    "ast_hash": "a41a39b5407877efdd474a445cdf6746",
+    "mtime": 1788240717.933339,
+    "seen": 1788242142.572577,
+    "ast_hash": "3baa8530347d1f0023d7ac80c08dc3c7",
     "semantic_hash": ""
   },
   "apps/admin/src/lib/services/logRetention.service.ts": {
@@ -5466,9 +5442,9 @@
     "semantic_hash": ""
   },
   "apps/admin/src/lib/services/notificationDispatch.service.ts": {
-    "mtime": 1787902095.4492788,
-    "seen": 1788236077.879001,
-    "ast_hash": "ce8d9c3d767a8e329aab61430789f521",
+    "mtime": 1788242618.3431954,
+    "seen": 1788244047.6414547,
+    "ast_hash": "e8220dd97cfff4eee457cbe611c5d824",
     "semantic_hash": ""
   },
   "apps/public-astro/src/pages/services.astro": {
@@ -5829,6 +5805,186 @@
     "mtime": 1788224850.4647377,
     "seen": 1788236077.879582,
     "ast_hash": "5ceb23a17dec7f6a9ba04a4c639cf822",
+    "semantic_hash": ""
+  },
+  "apps/admin/drizzle/0016_lying_mandrill.sql": {
+    "mtime": 1788240073.6106546,
+    "seen": 1788242142.5719225,
+    "ast_hash": "c15e7d465ff6a235c084129adcf02fc7",
+    "semantic_hash": ""
+  },
+  "apps/admin/drizzle/meta/0016_snapshot.json": {
+    "mtime": 1788240073.6106546,
+    "seen": 1788242142.5719473,
+    "ast_hash": "1ec26392c1ed0e436fd3548363bf04fc",
+    "semantic_hash": ""
+  },
+  "apps/admin/public/sw.js": {
+    "mtime": 1788241214.2145286,
+    "seen": 1788242142.5719588,
+    "ast_hash": "765729a403a9586c06ec4fb2dc02fbe0",
+    "semantic_hash": ""
+  },
+  "apps/admin/src/app/api/v1/admin/notifications/inbox/[id]/route.ts": {
+    "mtime": 1788240605.366766,
+    "seen": 1788242142.5721323,
+    "ast_hash": "64fd1cd83f6e979f9e9b1495b212a138",
+    "semantic_hash": ""
+  },
+  "apps/admin/src/app/api/v1/admin/notifications/inbox/read-all/route.ts": {
+    "mtime": 1788240607.8678033,
+    "seen": 1788242142.5721333,
+    "ast_hash": "d3cc486d426bfe7a33cf155b5722ed55",
+    "semantic_hash": ""
+  },
+  "apps/admin/src/app/api/v1/admin/notifications/inbox/route.ts": {
+    "mtime": 1788240589.884533,
+    "seen": 1788242142.5721345,
+    "ast_hash": "6821fc071343f0d72576bb3b0330613d",
+    "semantic_hash": ""
+  },
+  "apps/admin/src/app/api/v1/admin/notifications/preferences/route.ts": {
+    "mtime": 1788240616.177624,
+    "seen": 1788242142.5721388,
+    "ast_hash": "ccb24f41111345eec3465ac0b9142e77",
+    "semantic_hash": ""
+  },
+  "apps/admin/src/app/api/v1/admin/notifications/push/[id]/route.ts": {
+    "mtime": 1788240632.5331647,
+    "seen": 1788242142.5721397,
+    "ast_hash": "8b4926a0e8df5ab534db630777a92b8b",
+    "semantic_hash": ""
+  },
+  "apps/admin/src/app/api/v1/admin/notifications/push/route.ts": {
+    "mtime": 1788240622.7590227,
+    "seen": 1788242142.5721407,
+    "ast_hash": "0c02c724be124627e1cd209555748209",
+    "semantic_hash": ""
+  },
+  "apps/admin/src/features/notifications/components/DevicesTab.tsx": {
+    "mtime": 1788242097.3897798,
+    "seen": 1788242142.572433,
+    "ast_hash": "7944ce8e8df90c88e93b44330c904ccf",
+    "semantic_hash": ""
+  },
+  "apps/admin/src/features/notifications/components/InboxTab.tsx": {
+    "mtime": 1788242097.3887799,
+    "seen": 1788242142.572434,
+    "ast_hash": "3c2ac866549aabe732c8c4f8ae441370",
+    "semantic_hash": ""
+  },
+  "apps/admin/src/features/notifications/components/PreferencesTab.tsx": {
+    "mtime": 1788242097.3897798,
+    "seen": 1788242142.5724356,
+    "ast_hash": "2cdff7e9eade346312054dcc32d86685",
+    "semantic_hash": ""
+  },
+  "apps/admin/src/features/notifications/hooks/useNotificationInbox.ts": {
+    "mtime": 1788241324.60244,
+    "seen": 1788242142.5724428,
+    "ast_hash": "538d6835983a73d0cb71eab4012e0254",
+    "semantic_hash": ""
+  },
+  "apps/admin/src/features/notifications/hooks/useNotificationPreferences.ts": {
+    "mtime": 1788241399.5270276,
+    "seen": 1788242142.5724447,
+    "ast_hash": "5ec3729f673533badf07720b84865ba8",
+    "semantic_hash": ""
+  },
+  "apps/admin/src/features/notifications/hooks/usePushNotifications.ts": {
+    "mtime": 1788242269.2289188,
+    "seen": 1788244047.6413062,
+    "ast_hash": "55eba3feb460ff20c3e734d9c0827850",
+    "semantic_hash": ""
+  },
+  "apps/admin/src/lib/api/handlers/notification-inbox.service.ts": {
+    "mtime": 1788240528.5745654,
+    "seen": 1788242142.5725257,
+    "ast_hash": "f51af86b7943d1a38f2e569d284af3d2",
+    "semantic_hash": ""
+  },
+  "apps/admin/src/lib/api/handlers/notification-preferences.service.ts": {
+    "mtime": 1788240574.6502993,
+    "seen": 1788242142.5725281,
+    "ast_hash": "31c4fd262b8f59d4ac399f768784b16a",
+    "semantic_hash": ""
+  },
+  "apps/admin/src/lib/api/handlers/push-subscriptions.service.ts": {
+    "mtime": 1788240552.8569574,
+    "seen": 1788242142.572532,
+    "ast_hash": "75d6dbe396044d9f6020e01e9d573c97",
+    "semantic_hash": ""
+  },
+  "apps/admin/src/lib/notifications/channels.ts": {
+    "mtime": 1788240337.5270011,
+    "seen": 1788242142.5725613,
+    "ast_hash": "26d002dfec2450cdbe5324ac64f4715b",
+    "semantic_hash": ""
+  },
+  "apps/admin/src/lib/notifications/content.ts": {
+    "mtime": 1788240245.0039005,
+    "seen": 1788242142.5725622,
+    "ast_hash": "fd1b7f86e9cd48b19abddf52689e1bbb",
+    "semantic_hash": ""
+  },
+  "apps/admin/src/lib/services/__tests__/logEscalation.service.test.ts": {
+    "mtime": 1788242300.8902488,
+    "seen": 1788244047.6414382,
+    "ast_hash": "df015d31c82e5853ba31ec1d547ab76b",
+    "semantic_hash": ""
+  },
+  "apps/admin/src/lib/services/logEscalation.service.ts": {
+    "mtime": 1788240894.021447,
+    "seen": 1788242142.5725834,
+    "ast_hash": "4f6607b74d56bf2049223032d81fa953",
+    "semantic_hash": ""
+  },
+  "apps/admin/src/lib/services/webPushService.ts": {
+    "mtime": 1788240268.6544647,
+    "seen": 1788242142.572596,
+    "ast_hash": "59e5073cbc8477601f57bd0bc38b516a",
+    "semantic_hash": ""
+  },
+  "apps/admin/public/icons/apple-touch-icon.png": {
+    "mtime": 1788241099.8385136,
+    "seen": 1788242142.5730102,
+    "ast_hash": "433f8fd034b4fbb6b2dc748c0a0ed580",
+    "semantic_hash": ""
+  },
+  "apps/admin/public/icons/icon-192.png": {
+    "mtime": 1788241099.752513,
+    "seen": 1788242142.573011,
+    "ast_hash": "2148f04cdaefbe3f170dd06c2e39a2fa",
+    "semantic_hash": ""
+  },
+  "apps/admin/public/icons/icon-512.png": {
+    "mtime": 1788241099.7975132,
+    "seen": 1788242142.5730116,
+    "ast_hash": "3893c59297ad6a0f60a33b0c90f83aa2",
+    "semantic_hash": ""
+  },
+  "apps/admin/public/icons/maskable-192.png": {
+    "mtime": 1788241099.8035133,
+    "seen": 1788242142.5730126,
+    "ast_hash": "8bfbd3089ea61c0c72520a348ebaaec7",
+    "semantic_hash": ""
+  },
+  "apps/admin/public/icons/maskable-512.png": {
+    "mtime": 1788241099.8325136,
+    "seen": 1788242142.5730133,
+    "ast_hash": "ec886fd3d468a29812a30ea9e67fa582",
+    "semantic_hash": ""
+  },
+  "apps/admin/scripts/verify-migrations.ts": {
+    "mtime": 1788242972.9469798,
+    "seen": 1788244047.6408021,
+    "ast_hash": "3c6d62ba4c8766c9cab20a682c705a33",
+    "semantic_hash": ""
+  },
+  "apps/admin/src/components/providers/ServiceWorkerRegistrar.tsx": {
+    "mtime": 1788244217.5843244,
+    "seen": 1788244486.8210027,
+    "ast_hash": "6373d181108bf58089235a7ca7d1d741",
     "semantic_hash": ""
   }
 }
