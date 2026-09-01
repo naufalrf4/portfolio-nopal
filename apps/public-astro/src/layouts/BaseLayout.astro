@@ -12,6 +12,7 @@ import { ScrollToTopButton } from '../components/shared/ScrollToTopButton';
 import { GlobalScene } from '../components/shared/GlobalScene';
 
 const SITE_NAME = 'NaufalRF Portfolio';
+const DEFAULT_OG_IMAGE = '/og-image.png';
 const about = await getAboutSafe();
 // `sameAs` means "other profiles identifying this same person". The social
 // links list also carries the contact address and the site's own URL: a mailto
@@ -33,6 +34,7 @@ interface Props {
   title: string;
   description: string;
   ogImage?: string;
+  ogImageAlt?: string;
   canonicalUrl?: string;
   ogType?: 'website' | 'article' | 'profile';
   noindex?: boolean;
@@ -44,7 +46,8 @@ const {
   description,
   // Generated at build time via `sharp` from `public/og-image.svg` - run
   // `bun run scripts/generate-og-image.ts` to regenerate after editing the SVG.
-  ogImage = '/og-image.png',
+  ogImage = DEFAULT_OG_IMAGE,
+  ogImageAlt,
   canonicalUrl,
   ogType = 'website',
   noindex = false,
@@ -52,6 +55,18 @@ const {
 } = Astro.props;
 
 const title = rawTitle === SITE_NAME ? SITE_NAME : `${rawTitle} - ${SITE_NAME}`;
+
+// Only the bundled default is a known 1200x630. Declaring those dimensions for
+// a CMS image we have not measured would tell scrapers to lay out a card at the
+// wrong size, so the hints are emitted only when we can actually vouch for them.
+const isDefaultOgImage = ogImage === DEFAULT_OG_IMAGE;
+const ogImageAltText = ogImageAlt || title;
+
+// Share cards already display the site name separately via `og:site_name`, so
+// repeating it in `og:title` wastes the limited line a card gets before it
+// truncates. The <title> element keeps the suffix - it is what search results
+// and the browser tab need.
+const socialTitle = rawTitle;
 
 const currentPath = Astro.url.pathname;
 const siteUrl = getSiteUrl();
@@ -134,17 +149,21 @@ const websiteSchema = {
     <meta property="og:locale" content="en_US" />
     <meta property="og:site_name" content="NaufalRF Portfolio" />
     <meta property="og:url" content={canonical} />
-    <meta property="og:title" content={title} />
+    <meta property="og:title" content={socialTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:image" content={new URL(ogImage, siteUrl).href} />
+    {isDefaultOgImage ? <meta property="og:image:width" content="1200" /> : null}
+    {isDefaultOgImage ? <meta property="og:image:height" content="630" /> : null}
+    <meta property="og:image:alt" content={ogImageAltText} />
 
     <meta name="twitter:card" content="summary_large_image" />
     {twitterHandle ? <meta name="twitter:site" content={`@${twitterHandle}`} /> : null}
     {twitterHandle ? <meta name="twitter:creator" content={`@${twitterHandle}`} /> : null}
     <meta name="twitter:url" content={canonical} />
-    <meta name="twitter:title" content={title} />
+    <meta name="twitter:title" content={socialTitle} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={new URL(ogImage, siteUrl).href} />
+    <meta name="twitter:image:alt" content={ogImageAltText} />
 
     <script type="application/ld+json" set:html={JSON.stringify(personSchema)} />
     <script type="application/ld+json" set:html={JSON.stringify(websiteSchema)} />

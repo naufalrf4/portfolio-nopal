@@ -5,18 +5,20 @@ interface Props {
   title: string;
   description: string;
   ogImage?: string;
+  ogImageAlt?: string;
   canonicalUrl?: string;
   ogType?: 'website' | 'article' | 'profile';
   noindex?: boolean;
   hideFooter?: boolean;
 }
 
-const { title, description, ogImage, canonicalUrl, ogType, noindex, hideFooter } = Astro.props;---
+const { title, description, ogImage, ogImageAlt, canonicalUrl, ogType, noindex, hideFooter } = Astro.props;---
 
 <BaseLayout
   title={title}
   description={description}
   ogImage={ogImage}
+  ogImageAlt={ogImageAlt}
   canonicalUrl={canonicalUrl}
   ogType={ogType}
   noindex={noindex}
