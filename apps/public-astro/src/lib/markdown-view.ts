@@ -1,5 +1,5 @@
-import type { AboutData, BlogLink, Project } from '../types';
-import { getAbout, getAboutSafe, getBlogs, getProjectBySlug, getProjects } from './api';
+import type { Achievement, AboutData, BlogLink, Project } from '../types';
+import { getAbout, getAboutSafe, getAchievements, getBlogs, getProjectBySlug, getProjects } from './api';
 import { beyondTheCode, servedAreas, technicalServices } from '../components/services/data';
 import { getSiteUrl } from './site';
 
@@ -74,7 +74,15 @@ function experienceByType(about: AboutData, type: string): string {
     .join('\n\n');
 }
 
-function aboutMarkdown(about: AboutData): string {
+function achievementsMarkdown(achievements: readonly Achievement[]): string {
+  return list(
+    achievements.map((achievement) =>
+      bullet(achievement.name, [achievement.location, achievement.monthYear].filter(Boolean).join(', '))
+    )
+  );
+}
+
+function aboutMarkdown(about: AboutData, achievements: readonly Achievement[]): string {
   const jobTitle = about.roles?.find((role) => role.trim().length > 0);
 
   return join([
@@ -99,6 +107,7 @@ function aboutMarkdown(about: AboutData): string {
     experienceByType(about, 'organizational')
       ? join([heading(2, 'Organizational Experience'), experienceByType(about, 'organizational')])
       : null,
+    achievements.length ? join([heading(2, 'Recognition'), achievementsMarkdown(achievements)]) : null,
     about.socialLinks?.length
       ? join([
           heading(2, 'Links'),
@@ -285,7 +294,8 @@ export async function buildMarkdown(pathname: string): Promise<string | null> {
   }
 
   if (normalized === '/about') {
-    return aboutMarkdown(await getAbout());
+    const [about, achievements] = await Promise.all([getAbout(), getAchievements()]);
+    return aboutMarkdown(about, achievements.achievements);
   }
 
   if (normalized === '/projects') {

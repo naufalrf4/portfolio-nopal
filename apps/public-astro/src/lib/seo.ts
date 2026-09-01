@@ -1,4 +1,4 @@
-import type { AboutData, BlogLink, Project } from '../types';
+import type { Achievement, AboutData, BlogLink, Project } from '../types';
 import { getSiteUrl } from './site';
 
 /**
@@ -150,6 +150,7 @@ export function buildFaqSchema(
 export function buildProfilePageSchema(
   about: AboutData,
   options: { canonicalPath: string; description: string },
+  achievements: readonly Achievement[] = [],
   siteUrl = getSiteUrl()
 ): JsonLd {
   const jobTitle = about.roles?.find((role) => role.trim().length > 0) ?? undefined;
@@ -201,6 +202,14 @@ export function buildProfilePageSchema(
     homeLocation: about.location
       ? compact({ '@type': 'Place', name: about.location })
       : undefined,
+    // Schema.org `award` is a flat text list, not a structured entity - it has
+    // no dedicated `Award` type, so each competition result is rendered as a
+    // single descriptive string rather than an object.
+    award: achievements
+      .map((achievement) =>
+        [achievement.name, achievement.location, achievement.monthYear].filter(Boolean).join(' — ')
+      )
+      .filter((entry) => entry.trim().length > 0),
   });
 
   return compact({
