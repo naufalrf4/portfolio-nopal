@@ -257,3 +257,5 @@ export const workingDetails: readonly WorkingDetail[] = [
   { label: 'Reply time', value: 'Within a day, usually' },
   { label: 'Languages', value: 'English, Bahasa Indonesia' },
 ];
+
+export const servedAreas: readonly string[] = ['Indonesia', 'Jakarta', 'Depok', 'Jabodetabek'];

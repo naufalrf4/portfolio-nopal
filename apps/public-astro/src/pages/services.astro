@@ -8,7 +8,7 @@ import ServiceGrid from '@/components/services/ServiceGrid.astro';
 import ServicesCta from '@/components/services/ServicesCta.astro';
 import PageLayout from '@/layouts/PageLayout.astro';
 import { getAboutSafe } from '@/lib/api';
-import { beyondTheCode, technicalServices } from '@/components/services/data';
+import { beyondTheCode, servedAreas, technicalServices } from '@/components/services/data';
 import { buildBreadcrumbSchema, buildServiceSchema } from '@/lib/seo';
 
 // Services page renders fine even without profile data (availability status,
@@ -43,7 +43,7 @@ const serviceSchema = buildServiceSchema(
       'Jasa otomasi workflow n8n',
       'Jasa pembuatan chatbot AI dengan data perusahaan',
     ],
-    areaServed: ['Indonesia', 'Jakarta', 'Depok', 'Jabodetabek'],
+    areaServed: servedAreas,
   }
 );
 const breadcrumbSchema = buildBreadcrumbSchema([
