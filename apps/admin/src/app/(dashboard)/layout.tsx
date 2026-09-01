@@ -8,6 +8,7 @@ import { ThemeToggler } from '@/components/layout/ThemeToggler';
 import { NotificationBell } from '@/components/layout/NotificationBell';
 import { WibClock } from '@/components/layout/WibClock';
 import { ServiceWorkerRegistrar } from '@/components/providers/ServiceWorkerRegistrar';
+import { NotificationSummaryProvider } from '@/features/notifications/context/NotificationSummaryContext';
 import { isEmailAllowed } from '@/lib/auth-security';
 
 // Every route under this group requires a live session (safeAuth() below) and
@@ -36,30 +37,32 @@ export default async function DashboardLayout({ children }: { children: ReactNod
   return (
     <div className="min-h-screen bg-background">
       <SidebarProvider>
-        <div className="hidden md:block">
-          <AppSidebar session={session} />
-        </div>
+        <NotificationSummaryProvider>
+          <div className="hidden md:block">
+            <AppSidebar session={session} />
+          </div>
 
-        <SidebarInset className="w-full bg-background">
-          <header className="sticky top-3 z-40 mx-4 mt-3 hidden md:flex h-16 shrink-0 items-center gap-4 glass-bar shape-container border border-line-strong surface-raised-lg px-4 md:mx-6 md:px-6 lg:mx-8">
-            <SidebarTrigger className="icon-btn h-10 w-10 text-foreground/70 hover:text-foreground" />
+          <SidebarInset className="w-full bg-background">
+            <header className="sticky top-3 z-40 mx-4 mt-3 hidden md:flex h-16 shrink-0 items-center gap-4 glass-bar shape-container border border-line-strong surface-raised-lg px-4 md:mx-6 md:px-6 lg:mx-8">
+              <SidebarTrigger className="icon-btn h-10 w-10 text-foreground/70 hover:text-foreground" />
 
-            <div className="flex-1" />
+              <div className="flex-1" />
 
-            <div className="flex items-center gap-3">
-              <WibClock />
-              <NotificationBell />
-              <ThemeToggler />
-            </div>
-          </header>
+              <div className="flex items-center gap-3">
+                <WibClock />
+                <NotificationBell />
+                <ThemeToggler />
+              </div>
+            </header>
 
-          <main className="flex-1 p-4 pb-24 md:p-6 md:pb-8 lg:p-8">
-            <div className="mx-auto max-w-7xl">{children}</div>
-          </main>
-        </SidebarInset>
+            <main className="flex-1 p-4 pb-24 md:p-6 md:pb-8 lg:p-8">
+              <div className="mx-auto max-w-7xl">{children}</div>
+            </main>
+          </SidebarInset>
 
-        <BottomNav />
-        <ServiceWorkerRegistrar />
+          <BottomNav />
+          <ServiceWorkerRegistrar />
+        </NotificationSummaryProvider>
       </SidebarProvider>
     </div>
   );

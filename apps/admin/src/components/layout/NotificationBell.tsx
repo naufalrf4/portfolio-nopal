@@ -7,10 +7,10 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { formatRelativeTime } from '@/lib/utils/date';
-import { useNotificationBell } from '@/features/notifications';
+import { useSharedNotificationSummary } from '@/features/notifications';
 
 export function NotificationBell({ className }: { className?: string }) {
-  const { items, unreadCount, loading, markAsRead, markAllAsRead } = useNotificationBell();
+  const { items, unreadCount, loading, markAsRead, markAllAsRead } = useSharedNotificationSummary();
   const router = useRouter();
 
   const handleNotificationClick = async (id: string, link: string | null) => {

@@ -17,6 +17,7 @@ import {
   Link as LinkIcon,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useSharedNotificationSummary } from '@/features/notifications';
 
 interface NavItem {
   name: string;
@@ -30,7 +31,7 @@ export function BottomNav() {
   const pathname = usePathname();
   const router = useRouter();
   const [contactUpdatesCount, setContactUpdatesCount] = useState(0);
-  const [unreadNotificationsCount, setUnreadNotificationsCount] = useState(0);
+  const { unreadCount: unreadNotificationsCount } = useSharedNotificationSummary();
   const [isMoreOpen, setIsMoreOpen] = useState(false);
   const moreMenuRef = useRef<HTMLDivElement>(null);
 
@@ -39,19 +40,16 @@ export function BottomNav() {
 
     async function fetchContactUpdates() {
       try {
-        const [contactsResponse, messagesResponse, bookingsResponse, inboxResponse] =
-          await Promise.all([
-            fetch('/api/v1/admin/contacts', { signal: controller.signal }),
-            fetch('/api/v1/admin/messages', { signal: controller.signal }),
-            fetch('/api/v1/admin/bookings?limit=100', { signal: controller.signal }),
-            fetch('/api/v1/admin/notifications/inbox?limit=1', { signal: controller.signal }),
-          ]);
+        const [contactsResponse, messagesResponse, bookingsResponse] = await Promise.all([
+          fetch('/api/v1/admin/contacts', { signal: controller.signal }),
+          fetch('/api/v1/admin/messages', { signal: controller.signal }),
+          fetch('/api/v1/admin/bookings?limit=100', { signal: controller.signal }),
+        ]);
 
-        const [contactsData, messagesData, bookingsData, inboxData] = await Promise.all([
+        const [contactsData, messagesData, bookingsData] = await Promise.all([
           contactsResponse.json(),
           messagesResponse.json(),
           bookingsResponse.json(),
-          inboxResponse.json(),
         ]);
 
         const unreadContacts = contactsData.success ? (contactsData.data.unreadCount ?? 0) : 0;
@@ -64,7 +62,6 @@ export function BottomNav() {
             : 0;
 
         setContactUpdatesCount(unreadContacts + unreadMessages + pendingBookings);
-        setUnreadNotificationsCount(inboxData.success ? (inboxData.data.unreadCount ?? 0) : 0);
       } catch (error) {
         if ((error as Error).name !== 'AbortError') {
           void error;
@@ -104,10 +101,6 @@ export function BottomNav() {
     setIsMoreOpen(false);
   }, [pathname]);
 
-  // `primary` marks what sits in the bar itself; everything else goes to the
-  // More sheet. This list must stay in parity with AppSidebar, plus
-  // Notifications, which is bottom-nav only because the mobile header that
-  // holds NotificationBell is `hidden md:flex`.
   const allNavItems: NavItem[] = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, primary: true },
     { name: 'Contact', href: '/contacts', icon: Send, badge: contactUpdatesCount, primary: true },

@@ -48,6 +48,8 @@ export const OUTBOX_LIMIT_OPTIONS = [25, 50, 100, 200] as const;
 
 export const INBOX_PAGE_SIZE = 20;
 
+export const INBOX_SUMMARY_LIMIT = 8;
+
 export const BELL_POLL_INTERVAL_MS = 30_000;
 
 export const STATUS_BADGE_VARIANTS: Record<

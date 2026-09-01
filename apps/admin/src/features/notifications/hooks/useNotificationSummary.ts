@@ -1,12 +1,10 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { BELL_POLL_INTERVAL_MS } from '../constants/notifications.constants';
+import { BELL_POLL_INTERVAL_MS, INBOX_SUMMARY_LIMIT } from '../constants/notifications.constants';
 import type { AppNotification, InboxPage } from '../types/notifications.types';
 
-const BELL_ITEM_LIMIT = 8;
-
-interface UseNotificationBellReturn {
+export interface NotificationSummary {
   readonly items: readonly AppNotification[];
   readonly unreadCount: number;
   readonly loading: boolean;
@@ -15,17 +13,18 @@ interface UseNotificationBellReturn {
   refresh: () => void;
 }
 
-export function useNotificationBell(): UseNotificationBellReturn {
+export function useNotificationSummary(): NotificationSummary {
   const [items, setItems] = useState<readonly AppNotification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const abortRef = useRef<AbortController | null>(null);
 
-  const fetchRecent = useCallback(async (signal?: AbortSignal) => {
+  const load = useCallback(async (signal?: AbortSignal) => {
     try {
-      const res = await fetch(`/api/v1/admin/notifications/inbox?limit=${BELL_ITEM_LIMIT}`, {
-        ...(signal ? { signal } : {}),
-      });
+      const res = await fetch(
+        `/api/v1/admin/notifications/inbox?limit=${INBOX_SUMMARY_LIMIT}`,
+        signal ? { signal } : {}
+      );
       const json = await res.json();
 
       if (json.success) {
@@ -45,17 +44,17 @@ export function useNotificationBell(): UseNotificationBellReturn {
   useEffect(() => {
     const controller = new AbortController();
     abortRef.current = controller;
-    void fetchRecent(controller.signal);
+    void load(controller.signal);
 
     const interval = setInterval(() => {
-      void fetchRecent();
+      void load();
     }, BELL_POLL_INTERVAL_MS);
 
     return () => {
       controller.abort();
       clearInterval(interval);
     };
-  }, [fetchRecent]);
+  }, [load]);
 
   const markAsRead = useCallback(
     async (id: string) => {
@@ -71,11 +70,11 @@ export function useNotificationBell(): UseNotificationBellReturn {
 
       try {
         await fetch(`/api/v1/admin/notifications/inbox/${id}`, { method: 'PATCH' });
-      } catch {
-        void fetchRecent();
+      } finally {
+        void load();
       }
     },
-    [fetchRecent, items]
+    [items, load]
   );
 
   const markAllAsRead = useCallback(async () => {
@@ -86,9 +85,9 @@ export function useNotificationBell(): UseNotificationBellReturn {
     try {
       await fetch('/api/v1/admin/notifications/inbox/read-all', { method: 'POST' });
     } finally {
-      void fetchRecent();
+      void load();
     }
-  }, [fetchRecent, unreadCount]);
+  }, [load, unreadCount]);
 
   return {
     items,
@@ -96,6 +95,6 @@ export function useNotificationBell(): UseNotificationBellReturn {
     loading,
     markAsRead,
     markAllAsRead,
-    refresh: () => void fetchRecent(),
+    refresh: () => void load(),
   };
 }

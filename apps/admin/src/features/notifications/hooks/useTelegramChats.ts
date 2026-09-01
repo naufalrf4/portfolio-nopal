@@ -1,3 +1,5 @@
+'use client';
+
 import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
 import type { DiscoveredChat } from '../types/notifications.types';
