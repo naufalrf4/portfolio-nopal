@@ -90,6 +90,11 @@ export interface BreadcrumbCrumb {
   path: string;
 }
 
+export interface FaqSchemaEntry {
+  readonly question: string;
+  readonly answer: string;
+}
+
 /**
  * BreadcrumbList is one of the few structured-data types Google still renders
  * as a Search feature, so every page below the root should emit one.
@@ -105,6 +110,35 @@ export function buildBreadcrumbSchema(crumbs: readonly BreadcrumbCrumb[], siteUr
       item: absoluteUrl(crumb.path, siteUrl),
     })),
   };
+}
+
+/**
+ * `FAQPage` is only valid when the questions and answers are both visible on
+ * the page itself, so this takes the same `faqs` array the UI renders rather
+ * than a separate copy written for crawlers. Answers are plain text: Google
+ * rejects `acceptedAnswer` text containing markup, and these are prose anyway.
+ */
+export function buildFaqSchema(
+  faqs: readonly FaqSchemaEntry[],
+  canonicalPath: string,
+  siteUrl = getSiteUrl()
+): JsonLd {
+  const pageUrl = absoluteUrl(canonicalPath, siteUrl);
+
+  return compact({
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    '@id': pageUrl ? `${pageUrl}#faq` : undefined,
+    url: pageUrl,
+    mainEntity: faqs.map((faq) => ({
+      '@type': 'Question',
+      name: faq.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: faq.answer,
+      },
+    })),
+  });
 }
 
 /**

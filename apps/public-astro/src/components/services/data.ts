@@ -60,6 +60,12 @@ export interface WorkingDetail {
   readonly value: string;
 }
 
+export interface FaqItem {
+  readonly id: string;
+  readonly question: string;
+  readonly answer: string;
+}
+
 export interface AvailabilityCopy {
   readonly label: string;
   readonly dotClass: string;
@@ -259,3 +265,54 @@ export const workingDetails: readonly WorkingDetail[] = [
 ];
 
 export const servedAreas: readonly string[] = ['Indonesia', 'Jakarta', 'Depok', 'Jabodetabek'];
+
+export const faqs: readonly FaqItem[] = [
+  {
+    id: 'engagement-models',
+    question: 'How do you usually work with clients?',
+    answer:
+      'Six ways: freelance for a scoped build at a fixed price, contract for ongoing engineering capacity across three to six months with milestone billing, full-time for systems roles, remote as the default, plus speaking and mentoring. If a project does not fit any of them, I say so early instead of forcing it into one.',
+  },
+  {
+    id: 'what-i-build',
+    question: 'What kind of work do you take on?',
+    answer:
+      'Full-stack web and product development, system integration between tools that refuse to talk to each other, IoT and hardware builds on ESP32 and MQTT, automation workflows in n8n and Python, and AI integration with retrieval that cites your own data. If something sits outside that, you hear it before any money moves.',
+  },
+  {
+    id: 'pricing',
+    question: 'Do I know the price before work starts?',
+    answer:
+      'Yes. Scope, price, and timeline are written down before anything gets built, and the price is fixed against that scope. Revisions inside the agreed scope are already part of it rather than a change request. Anything genuinely new gets quoted honestly instead of absorbed quietly.',
+  },
+  {
+    id: 'progress',
+    question: 'How do I see progress while you build?',
+    answer:
+      'Work lands milestone by milestone, and every milestone is something you can actually run on your own data, not a screenshot. You get a demo, a changelog, and a list of what is still open, whether or not you ask for it.',
+  },
+  {
+    id: 'handover',
+    question: 'What do I get when the project ends?',
+    answer:
+      'Source, deploy setup, documentation, and a short support window. It is deployed and handed over so your team can run it without me: no lock-in and no undocumented magic.',
+  },
+  {
+    id: 'location-timezone',
+    question: 'Where are you based, and does remote work?',
+    answer:
+      'Depok, Indonesia, working in GMT+7 and comfortable across Jakarta and Jabodetabek in person. Remote is the default and async is fine: written handoffs mean overlapping office hours are not a requirement.',
+  },
+  {
+    id: 'reply-time',
+    question: 'How quickly do you reply, and in which language?',
+    answer:
+      'Usually within a day. Write in English or Bahasa Indonesia, whichever is more natural for you, and I reply in the same language.',
+  },
+  {
+    id: 'message-or-call',
+    question: 'Should I send a message or book a call?',
+    answer:
+      'Send a message for an intro, a short question, or when you are not sure yet. Book a call when the topic needs back-and-forth, planning, or live context. Either way the first step is the same: what breaks, what is slow, what keeps landing back on your desk.',
+  },
+];

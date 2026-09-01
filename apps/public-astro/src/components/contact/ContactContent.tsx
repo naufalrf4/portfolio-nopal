@@ -3,6 +3,7 @@ import { Calendar, ChevronDown, HelpCircle, Mail } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import type { AboutData } from '../../types';
 import { filterPublicSocialLinks } from '@/lib/social-links';
+import { faqs } from '@/components/services/data';
 import { Card } from '../shared/Card';
 import { BookingCalendar } from './BookingCalendar';
 import { ContactForm } from './ContactForm';
@@ -13,33 +14,6 @@ interface ContactContentProps {
   aboutData: AboutData;
   turnstileSiteKey: string;
 }
-
-const FAQS = [
-  {
-    id: '1',
-    question: 'What kinds of conversations are welcome here?',
-    answer:
-      'You can use this page for general questions, consulting inquiries, collaboration ideas, speaking requests, or to book time for a deeper conversation.',
-  },
-  {
-    id: '2',
-    question: 'Can I use this for quick questions too?',
-    answer:
-      'Yes. If you are not sure whether something needs a full call, send a message first and I can point you in the right direction or suggest the next step.',
-  },
-  {
-    id: '3',
-    question: 'When should I book a call instead of sending a message?',
-    answer:
-      'Book a call when the topic needs back-and-forth discussion, planning, or live context. For simple intros or short questions, the message form is usually enough.',
-  },
-  {
-    id: '4',
-    question: 'Do you respond in English and Indonesian?',
-    answer:
-      'Yes. Feel free to write in whichever language is most natural for you and I will reply accordingly.',
-  },
-];
 
 type Tab = 'form' | 'booking';
 
@@ -123,25 +97,30 @@ export function ContactContent({ aboutData, turnstileSiteKey }: ContactContentPr
           </div>
 
           <div className="space-y-4">
-            {FAQS.map((faq, index) => {
+            {faqs.map((faq, index) => {
               const isOpen = openFaqId === faq.id;
               return (
                 <BlurFade key={faq.id} delay={0.1 + index * 0.06} inView>
-                  <Card
-                    className="cursor-pointer overflow-hidden transition-colors hover:border-line-hover"
-                    onClick={() => toggleFaq(faq.id)}
-                  >
-                    <div className="flex items-center justify-between">
+                  <Card className="overflow-hidden transition-colors hover:border-line-hover">
+                    <button
+                      type="button"
+                      onClick={() => toggleFaq(faq.id)}
+                      aria-expanded={isOpen}
+                      aria-controls={`faq-answer-${faq.id}`}
+                      className="flex w-full cursor-pointer items-center justify-between text-left"
+                    >
                       <h3 className="pr-4 font-semibold text-text-primary">{faq.question}</h3>
                       <ChevronDown
                         size={20}
+                        aria-hidden="true"
                         className={cn(
                           'flex-shrink-0 text-text-secondary transition-transform duration-300 ease-in-out',
                           isOpen && 'rotate-180'
                         )}
                       />
-                    </div>
+                    </button>
                     <div
+                      id={`faq-answer-${faq.id}`}
                       className={cn(
                         'grid transition-all duration-300 ease-in-out',
                         isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
