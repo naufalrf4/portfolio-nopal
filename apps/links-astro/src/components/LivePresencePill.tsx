@@ -49,7 +49,14 @@ function hashString(value: string) {
 }
 
 function getColorFromSeed(seed: string) {
-  const palette = ['var(--teal)', '#0f8577', '#f2a64c', '#b5701e', '#14b8a6', '#0ea5e9'];
+  const palette = [
+    'var(--teal)',
+    'var(--amber)',
+    'var(--green)',
+    'var(--tint-blue-fg)',
+    'var(--tint-purple-fg)',
+    'var(--tint-emerald-fg)',
+  ];
   return palette[hashString(seed) % palette.length] || 'var(--teal)';
 }
 
@@ -228,16 +235,16 @@ export function LivePresencePill({ socketUrl, pagePath, pageLabel }: LivePresenc
   }, [identity.color, identity.name, pageLabel, pagePath, socketUrl]);
 
   return (
-    <div className="fixed right-4 top-5 z-[52] flex justify-end px-4 md:right-6 md:top-6 md:px-0 lg:left-6 lg:right-auto lg:top-auto lg:bottom-8">
+    <div className="fixed right-16 top-4 z-[52] flex justify-end md:right-[4.5rem] lg:bottom-8 lg:left-6 lg:right-auto lg:top-auto lg:justify-start">
       <div className="pointer-events-auto flex flex-col items-end gap-3 lg:items-start">
         <button
           type="button"
           onClick={() => setIsOpen((open) => !open)}
-          className="inline-flex max-w-[calc(100vw-2.5rem)] items-center justify-center gap-2 rounded-full border border-[var(--border)] bg-[var(--bg-card)] px-2.5 py-1.5 text-[10px] font-semibold text-[var(--text-secondary)] shadow-surface-raised-sm transition-transform duration-200 hover:-translate-y-0.5 md:max-w-[260px] md:px-4 md:py-2 md:text-[11px]"
+          className="inline-flex max-w-[calc(100vw-2.5rem)] items-center justify-center gap-2 badge-pill border border-[var(--border)] bg-[var(--bg-card)] px-2.5 py-1.5 text-[10px] font-semibold text-[var(--text-secondary)] surface-raised-sm motion-base hover:-translate-y-0.5 md:max-w-[260px] md:px-4 md:py-2 md:text-[11px]"
         >
-          <span className="inline-flex items-center gap-2 rounded-full bg-[var(--bg-elevated)] px-2 py-1 shadow-surface-sunken md:px-2.5">
+          <span className="inline-flex items-center gap-2 badge-pill bg-[var(--bg-elevated)] px-2 py-1 surface-sunken-sm md:px-2.5">
             <span
-              className={`h-2.5 w-2.5 rounded-full ${status === 'connected' ? 'bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.75)]' : status === 'connecting' ? 'bg-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.65)]' : 'bg-slate-500 shadow-none'}`}
+              className={`h-2.5 w-2.5 avatar-round ${status === 'connected' ? 'bg-green' : status === 'connecting' ? 'bg-amber' : 'bg-[var(--text-tertiary)]'}`}
             />
             <Activity size={11} className="hidden text-[var(--teal)] md:block" />
             <span className="md:hidden">{participants.length} Online</span>
@@ -246,7 +253,7 @@ export function LivePresencePill({ socketUrl, pagePath, pageLabel }: LivePresenc
         </button>
 
         {isOpen ? (
-          <div className="w-[min(92vw,360px)] rounded-[24px] border border-[var(--border)] bg-[var(--bg-card)] p-3 shadow-surface-raised">
+          <div className="w-[min(calc(100vw-5.5rem),360px)] shape-container border border-[var(--border)] bg-[var(--bg-card)] p-3 surface-raised lg:w-[min(92vw,360px)]">
             <div className="mb-2 flex items-center justify-between px-1">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--text-tertiary)]">
@@ -256,7 +263,7 @@ export function LivePresencePill({ socketUrl, pagePath, pageLabel }: LivePresenc
                   Shared portfolio presence
                 </p>
               </div>
-              <span className="rounded-full bg-[var(--bg-elevated)] px-2.5 py-1 text-[10px] font-semibold text-[var(--teal)] shadow-surface-sunken">
+              <span className="badge-pill bg-[var(--bg-elevated)] px-2.5 py-1 text-[10px] font-semibold text-[var(--teal)] surface-sunken-sm">
                 {participants.length}
               </span>
             </div>
@@ -265,12 +272,12 @@ export function LivePresencePill({ socketUrl, pagePath, pageLabel }: LivePresenc
               {participants.map((participant) => (
                 <div
                   key={`${participant.id}-${participant.pageLabel}`}
-                  className="flex items-start justify-between gap-3 rounded-[18px] border border-[var(--border)] bg-[var(--bg-elevated)] px-3 py-2.5 shadow-surface-raised-sm"
+                  className="flex items-start justify-between gap-3 shape-base border border-[var(--border)] bg-[var(--bg-elevated)] px-3 py-2.5 surface-raised-sm"
                 >
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
                       <span
-                        className="h-2.5 w-2.5 rounded-full"
+                        className="h-2.5 w-2.5 avatar-round"
                         style={{ background: participant.color }}
                       />
                       <p className="truncate text-sm font-semibold text-[var(--text-primary)]">
@@ -285,7 +292,7 @@ export function LivePresencePill({ socketUrl, pagePath, pageLabel }: LivePresenc
                     </p>
                   </div>
                   {participant.id === selfId ? (
-                    <span className="shrink-0 rounded-full bg-teal-900 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--teal)]">
+                    <span className="shrink-0 badge-pill bg-[var(--teal-soft)] px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--teal)]">
                       Here
                     </span>
                   ) : null}

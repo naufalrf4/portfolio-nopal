@@ -33,10 +33,10 @@ const icons = {
         data-entity-id={link.id}
         data-entity-label={link.label}
         data-entity-url={link.url}
-        class="group flex items-center p-3.5 md:px-5 md:py-4 bg-surface rounded-container shadow-surface-raised hover:shadow-surface-raised-hover active:shadow-surface-sunken transition-all duration-300 transform hover:-translate-y-1"
+        class="group flex items-center p-3.5 md:px-5 md:py-4 bg-surface shape-container surface-raised hover:surface-raised-hover active:surface-sunken motion-base transform hover:-translate-y-1"
         style={`animation-delay: ${delay}`}
       >
-        <div class="w-10 h-10 md:w-11 md:h-11 rounded-full bg-surface shadow-surface-sunken flex items-center justify-center mr-3.5 text-accent group-hover:scale-110 transition-transform duration-300">
+        <div class="w-10 h-10 md:w-11 md:h-11 avatar-round bg-surface surface-sunken-sm flex items-center justify-center mr-3.5 text-accent group-hover:scale-110 motion-base">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"
@@ -51,7 +51,7 @@ const icons = {
             set:html={svgPath}
           />
         </div>
-        <span class="flex-1 font-semibold text-center text-[15px] md:text-base text-foreground/90 group-hover:text-foreground transition-colors duration-300 font-sans">
+        <span class="flex-1 font-semibold text-center text-[15px] md:text-base text-foreground/90 group-hover:text-foreground motion-base font-sans">
           {link.label}
         </span>
         <div class="w-8 flex justify-center">
@@ -65,7 +65,7 @@ const icons = {
             stroke-width="2"
             stroke-linecap="round"
             stroke-linejoin="round"
-            class="w-4 h-4 text-foreground-muted opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:translate-x-0.5"
+            class="w-4 h-4 text-foreground-muted opacity-0 group-hover:opacity-100 motion-base group-hover:translate-x-0.5"
             set:html={icons['external-link']}
           />
         </div>
