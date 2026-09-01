@@ -943,3 +943,49 @@ Head terms like `jasa pembuatan website` are dominated by agencies and marketpla
 ### Still blocked on the site owner
 
 The Cloudflare managed `robots.txt` block was **still being injected as of 2026-09-01 06:45 WIB** with `Cf-Cache-Status: MISS` (confirmed fresh, not cached): `GPTBot`, `ClaudeBot`, `CCBot`, `Google-Extended`, `Applebot-Extended`, `Bytespider`, `meta-externalagent`, `Amazonbot`, and `CloudflareBrowserRenderingCrawler` all still carry `Disallow: /` above the app's own rules. The owner reported changing the Cloudflare setting, so either a different toggle governs this, it is set at account rather than zone scope, or it had not propagated. The app-level rules in the same response are current (they include the new `Disallow: /api/`, `/auth/`, and `Sitemap: /sitemap.xml`), which proves the deploy landed and the remaining block is purely edge-injected.
+
+## 2026-09-01 — Case-study sections were invisible to crawlers
+
+- Task: lanjutan SEO/GEO, menyiapkan pendalaman konten case study
+- Files: `apps/public-astro/src/components/project-detail/ProjectArticle.tsx`, `.context/content/{project-content-current.md,case-study-draft.md}`, `.context/media/image-guide.md`, `apps/public-astro/scripts/generate-backgrounds.ts`
+- Commits: `63e645b`, `9b6c64d`
+- Status: fix terverifikasi live di 4 project
+
+### Koreksi klaim sebelumnya
+
+Saya sempat melaporkan case study "nol H2, ~200 kata". Itu **salah** — dibaca dari HTML render, bukan sumbernya. Field `content` di Admin **sudah** punya 4-6 section H2 per project (`CONTEXT`, `ARCHITECTURE`, `ROLE`/`DECISIONS`, `CHALLENGE`/`TRADEOFFS`/`OPERATIONS`, `RESULT`), total **1717 kata** di 8 project. Strukturnya sudah baik sejak awal.
+
+### Defect sebenarnya
+
+`ProjectArticle` merender section sebagai tab dan **hanya tab aktif yang masuk DOM**. Empat dari lima section tidak pernah sampai ke HTML yang disajikan, jadi crawler dan mesin jawaban AI hanya melihat sekitar seperlima tulisan yang ada.
+
+Terverifikasi di produksi sebelum fix pada `simonair-4-hardware-sensors`, `veilproxy`, dan `photobon-id-desktop-control-app`: frasa dari body setiap section selain yang pertama (`signal conditioning`, `drift-prone`, `Tauri was chosen over an Electron-based`, `Go was chosen for its strong`) **tidak ada** di markup.
+
+### Fix
+
+Semua section dirender ke DOM, yang tidak aktif disembunyikan dengan atribut `hidden`. Presentasi tidak berubah — diverifikasi di browser sungguhan bahwa tepat satu section terlihat dan klik tab masih menukar isinya.
+
+Hasil di produksi setelah deploy:
+
+| Project | Section di HTML | Kata |
+|---|---|---|
+| simonair-4-hardware-sensors | 5/5 | 214 → **365** |
+| photobon-id-web-cloud-platform | 6/6 | **417** |
+| veilproxy | 5/5 | **401** |
+| siap-impact-sakina | 5/5 | **347** |
+
+### Learned
+
+- **Jangan menilai kelengkapan konten dari HTML render tanpa membandingkan ke sumber CMS.** Komponen bertab, accordion, atau carousel bisa menyembunyikan konten yang sebenarnya ada — dan yang tersembunyi dari DOM tidak terindeks. Pola ini kemungkinan ada di komponen lain, patut diperiksa.
+- Uji keterindeksan dengan **frasa dari body**, bukan judul heading. Label tab tetap muncul di HTML meski body-nya tidak, jadi menghitung `<h2>` atau mencari nama section memberi hasil positif palsu.
+- Field `content` menerima markdown dan sudah dipakai dengan benar. Pendalaman konten cukup lewat Admin, tanpa deploy.
+
+### Aset media
+
+`apps/public-astro/public/backgrounds/` berisi 18 background polos hasil generate (cover 1600x900, LinkedIn 1584x396, OG 1200x630 × dark/light × dots/grid/clean), memakai palet dari `packages/design-tokens/tokens.css`. Panduan lengkap plus prompt AI ada di `.context/media/image-guide.md`.
+
+Catatan palet: `apps/public-astro/public/og-image.svg` memakai hex usang (`#14b8a6`, `#0a0f0d`) yang **tidak** cocok dengan design token (`#3ed9c4` dark / `#0f8577` light, `#0b0d10`). Untuk aset yang dipakai di kedua tema pakai `#0f8577` — satu-satunya teal yang lolos kontras 3:1 di card gelap (3.58) maupun terang (4.52).
+
+### Menunggu input Naufal
+
+`.context/content/case-study-draft.md` berisi pertanyaan teknis spesifik per project yang tidak ada di API dan tidak boleh dikarang: alasan memilih Raspberry Pi 4 ketimbang mikrokontroler, prosedur kalibrasi probe DO, perilaku saat koneksi putus, alasan Tauri ketimbang Electron, metode deteksi PII di veilproxy, jumlah peserta SAKINA. Target 600-900 kata per project.
