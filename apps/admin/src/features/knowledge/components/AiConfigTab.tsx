@@ -110,6 +110,7 @@ export function AiConfigTab() {
       slotName: 'main' | 'fallback' | 'embedding',
     ) => {
       setter((prev) => ({ ...prev, loadingModels: true }));
+      setError(null);
       try {
         const res = await fetch('/api/v1/admin/llm-config/models', {
           method: 'POST',
@@ -121,14 +122,21 @@ export function AiConfigTab() {
             slot: slotName,
           }),
         });
-        const payload = (await res.json()) as { data?: { models?: string[] } };
+        const payload = (await res.json()) as {
+          data?: { models?: string[] };
+          error?: { message?: string };
+        };
+        if (!res.ok) {
+          throw new Error(payload.error?.message ?? `Failed to load models (${res.status})`);
+        }
         setter((prev) => ({
           ...prev,
           modelOptions: payload.data?.models ?? [],
           loadingModels: false,
         }));
-      } catch {
+      } catch (err) {
         setter((prev) => ({ ...prev, modelOptions: [], loadingModels: false }));
+        setError(err instanceof Error ? err.message : 'Failed to load models');
       }
     },
     [],
