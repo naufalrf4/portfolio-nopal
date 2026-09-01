@@ -138,9 +138,9 @@
     "semantic_hash": ""
   },
   "apps/admin/next-env.d.ts": {
-    "mtime": 1788243494.6336188,
-    "seen": 1788244047.6407905,
-    "ast_hash": "aa94238a90e7d04b7a47ecc3145ba6a0",
+    "mtime": 1788244080.1324434,
+    "seen": 1788244486.8207128,
+    "ast_hash": "8195d2c60ce847a459ae9d308d6a5724",
     "semantic_hash": ""
   },
   "apps/admin/next.config.js": {
@@ -450,9 +450,9 @@
     "semantic_hash": "3c816175ced400823175958591f8d32e"
   },
   "apps/admin/src/app/(dashboard)/layout.tsx": {
-    "mtime": 1787936435.2622688,
-    "seen": 1788236077.8782325,
-    "ast_hash": "03c090a5954f4df08ca761b917f452a9",
+    "mtime": 1788244252.88455,
+    "seen": 1788244486.8207805,
+    "ast_hash": "b9431a77206b0de45b78dac12921b8c1",
     "semantic_hash": ""
   },
   "apps/admin/src/app/(dashboard)/links/LinksPageContent.tsx": {
@@ -4230,9 +4230,9 @@
     "semantic_hash": ""
   },
   "PROGRESS.md": {
-    "mtime": 1788243972.7247517,
-    "seen": 1788244047.6418478,
-    "ast_hash": "06c790f20368bb7f0b6a5ccee243ab5a",
+    "mtime": 1788244429.8416784,
+    "seen": 1788244486.821788,
+    "ast_hash": "3b0c17c2fbf5c3f89e6dc6fd12d88993",
     "semantic_hash": ""
   },
   "README.md": {
@@ -4242,9 +4242,9 @@
     "semantic_hash": ""
   },
   "apps/admin/AGENTS.md": {
-    "mtime": 1788244018.5431855,
-    "seen": 1788244047.6418514,
-    "ast_hash": "459e5383eb2a851293da65d190f9fd4f",
+    "mtime": 1788244455.0048385,
+    "seen": 1788244486.8217916,
+    "ast_hash": "08ca0cb91c4433b857b90ae0276aeb76",
     "semantic_hash": ""
   },
   "apps/links-astro/AGENTS.md": {
@@ -5979,6 +5979,12 @@
     "mtime": 1788242972.9469798,
     "seen": 1788244047.6408021,
     "ast_hash": "3c6d62ba4c8766c9cab20a682c705a33",
+    "semantic_hash": ""
+  },
+  "apps/admin/src/components/providers/ServiceWorkerRegistrar.tsx": {
+    "mtime": 1788244217.5843244,
+    "seen": 1788244486.8210027,
+    "ast_hash": "6373d181108bf58089235a7ca7d1d741",
     "semantic_hash": ""
   }
 }
