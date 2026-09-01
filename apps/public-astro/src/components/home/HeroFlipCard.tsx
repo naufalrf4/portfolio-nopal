@@ -231,14 +231,26 @@ const role = about.roles?.[0] ?? 'System & Automation Engineer';
           </div>
         </div>
 
-        {}
+        {/*
+          iOS Safari drops `backface-visibility: hidden` for a face whose subtree
+          spawns its own compositing layer, which is how the photo caption used to
+          bleed through the terminal side. So the back face keeps a 3D context only
+          when the tilt actually needs one - tilt is off for touch, which is exactly
+          where the bleed showed up. The caption itself stays flat: no translateZ,
+          no backdrop-filter.
+        */}
         <div
           className="absolute inset-0"
-          style={{ backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden', transform: 'rotateY(180deg)', transformStyle: 'preserve-3d' }}
+          style={{
+            backfaceVisibility: 'hidden',
+            WebkitBackfaceVisibility: 'hidden',
+            transform: 'rotateY(180deg)',
+            transformStyle: tiltEnabled ? 'preserve-3d' : 'flat',
+          }}
         >
           <motion.div
             className="relative h-full w-full overflow-hidden rounded-2xl border border-line bg-bg-card shadow-[0_24px_60px_-24px_rgba(0,0,0,0.7)]"
-            style={tiltEnabled && flipped ? { rotateX: rxs, rotateY: rys, transformStyle: 'preserve-3d' } : undefined}
+            style={tiltEnabled && flipped ? { rotateX: rxs, rotateY: rys, transformStyle: 'flat' } : { transformStyle: 'flat' }}
           >
             {}
             <div className="absolute inset-y-0 left-0 z-20 w-1 bg-gradient-to-b from-teal via-teal/40 to-transparent" />
@@ -263,7 +275,7 @@ const role = about.roles?.[0] ?? 'System & Automation Engineer';
             </div>
 
             {}
-            <div className="absolute inset-x-0 bottom-0 z-20 border-t border-line/60 bg-bg/60 px-5 py-4 backdrop-blur-sm" style={{ transform: 'translateZ(50px)' }}>
+            <div className="absolute inset-x-0 bottom-0 z-20 border-t border-line/60 bg-bg/90 px-5 py-4">
               <p className="font-display text-lg font-bold leading-tight text-text-primary">
                 {fullName}
               </p>
