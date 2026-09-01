@@ -1,7 +1,21 @@
 
 
 import { useEffect, useRef } from 'react';
-import type * as ThreeNS from 'three';
+import {
+  AdditiveBlending,
+  BufferAttribute,
+  BufferGeometry,
+  CanvasTexture,
+  LineBasicMaterial,
+  LineSegments,
+  PerspectiveCamera,
+  Points,
+  Scene,
+  ShaderMaterial,
+  Timer,
+  WebGLRenderer,
+} from 'three';
+import type { Texture } from 'three';
 
 const STAR_COLORS: ReadonlyArray<readonly [number, number, number]> = [
   [0.62, 0.72, 1.0],  
@@ -69,7 +83,7 @@ function shouldUseWebGL(): boolean {
   return true;
 }
 
-function makeDotTexture(THREE: typeof ThreeNS): ThreeNS.Texture {
+function makeDotTexture(): Texture {
   const S = 64;
   const cv = document.createElement('canvas');
   cv.width = S;
@@ -83,18 +97,15 @@ function makeDotTexture(THREE: typeof ThreeNS): ThreeNS.Texture {
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, S, S);
   }
-  const tex = new THREE.CanvasTexture(cv);
+  const tex = new CanvasTexture(cv);
   tex.needsUpdate = true;
   return tex;
 }
 
 const easeOutCubic = (t: number): number => 1 - Math.pow(1 - t, 3);
 
-function initEngine(
-  THREE: typeof ThreeNS,
-  container: HTMLDivElement
-): () => void {
-  const renderer = new THREE.WebGLRenderer({
+function initEngine(container: HTMLDivElement): () => void {
+  const renderer = new WebGLRenderer({
     alpha: true,
     antialias: true,
     powerPreference: 'high-performance',
@@ -107,8 +118,8 @@ function initEngine(
   renderer.domElement.style.height = '100%';
   container.appendChild(renderer.domElement);
 
-  const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(
+  const scene = new Scene();
+  const camera = new PerspectiveCamera(
     62,
     window.innerWidth / window.innerHeight,
     0.1,
@@ -153,17 +164,17 @@ function initEngine(
     twPhase[i] = Math.random() * Math.PI * 2;
   }
 
-  const dotGeo = new THREE.BufferGeometry();
-  dotGeo.setAttribute('position', new THREE.BufferAttribute(dotPositions, 3));
-  dotGeo.setAttribute('color', new THREE.BufferAttribute(dotColors, 3));
-  dotGeo.setAttribute('size', new THREE.BufferAttribute(dotSizes, 1));
+  const dotGeo = new BufferGeometry();
+  dotGeo.setAttribute('position', new BufferAttribute(dotPositions, 3));
+  dotGeo.setAttribute('color', new BufferAttribute(dotColors, 3));
+  dotGeo.setAttribute('size', new BufferAttribute(dotSizes, 1));
 
-  const dotMat = new THREE.ShaderMaterial({
+  const dotMat = new ShaderMaterial({
     transparent: true,
     depthWrite: false,
-    blending: THREE.AdditiveBlending,
+    blending: AdditiveBlending,
     uniforms: {
-      uTex: { value: null as ThreeNS.Texture | null },
+      uTex: { value: null as Texture | null },
       uTime: { value: 0 },
       uOpacity: { value: 1 },
       uPixelRatio: { value: Math.min(window.devicePixelRatio, 2) },
@@ -201,23 +212,23 @@ function initEngine(
     `,
     vertexColors: true,
   });
-  const dotPoints = new THREE.Points(dotGeo, dotMat);
+  const dotPoints = new Points(dotGeo, dotMat);
   dotPoints.frustumCulled = false;
   scene.add(dotPoints);
 
   const streakPositions = new Float32Array(COUNT * 6);
   const streakColors = new Float32Array(COUNT * 6);
-  const streakGeo = new THREE.BufferGeometry();
-  streakGeo.setAttribute('position', new THREE.BufferAttribute(streakPositions, 3));
-  streakGeo.setAttribute('color', new THREE.BufferAttribute(streakColors, 3));
-  const streakMat = new THREE.LineBasicMaterial({
+  const streakGeo = new BufferGeometry();
+  streakGeo.setAttribute('position', new BufferAttribute(streakPositions, 3));
+  streakGeo.setAttribute('color', new BufferAttribute(streakColors, 3));
+  const streakMat = new LineBasicMaterial({
     vertexColors: true,
     transparent: true,
     opacity: 0,
-    blending: THREE.AdditiveBlending,
+    blending: AdditiveBlending,
     depthWrite: false,
   });
-  const streaks = new THREE.LineSegments(streakGeo, streakMat);
+  const streaks = new LineSegments(streakGeo, streakMat);
   streaks.frustumCulled = false;
   scene.add(streaks);
 
@@ -250,7 +261,7 @@ function initEngine(
   }
   document.addEventListener('astro:page-load', onPageLoad);
 
-  const dotTexture = makeDotTexture(THREE);
+  const dotTexture = makeDotTexture();
   dotMat.uniforms.uTex.value = dotTexture;
 
   const baseColors = new Float32Array(dotColors);
@@ -269,7 +280,7 @@ function initEngine(
       dotColors[i * 3 + 1] = baseColors[i * 3 + 1] * rgb[1] * softMult[i];
       dotColors[i * 3 + 2] = baseColors[i * 3 + 2] * rgb[2] * softMult[i];
     }
-    (dotGeo.attributes.color as ThreeNS.BufferAttribute).needsUpdate = true;
+    (dotGeo.attributes.color as BufferAttribute).needsUpdate = true;
   }
 
   const initialSceneName = container.dataset.scene;
@@ -368,7 +379,7 @@ function initEngine(
   }
   document.addEventListener('visibilitychange', onVisibility);
 
-  const timer = new THREE.Timer();
+  const timer = new Timer();
   let rafId = 0;
 
   const BASE_SPEED = 3.0;     
@@ -410,7 +421,7 @@ function initEngine(
       for (let i = 0; i < COUNT * 3; i++) {
         dotColors[i] = baseColors[i] * ((i % 3 === 0) ? moodR : (i % 3 === 1) ? moodG : moodB) * softMult[Math.floor(i / 3)];
       }
-      (dotGeo.attributes.color as ThreeNS.BufferAttribute).needsUpdate = true;
+      (dotGeo.attributes.color as BufferAttribute).needsUpdate = true;
     }
     pingEnv = pingOn ? Math.max(0, Math.sin(time * 1.4) - 0.62) * 2.6 * moodK + pingEnv * (1 - moodK) : pingEnv * 0.9;
 
@@ -487,9 +498,9 @@ function initEngine(
       strIdx += 6;
     }
 
-    (dotGeo.attributes.position as ThreeNS.BufferAttribute).needsUpdate = true;
-    (streakGeo.attributes.position as ThreeNS.BufferAttribute).needsUpdate = true;
-    (streakGeo.attributes.color as ThreeNS.BufferAttribute).needsUpdate = true;
+    (dotGeo.attributes.position as BufferAttribute).needsUpdate = true;
+    (streakGeo.attributes.position as BufferAttribute).needsUpdate = true;
+    (streakGeo.attributes.color as BufferAttribute).needsUpdate = true;
 
     const streakTarget = streakActive ? Math.min((forward - 12) / 30, 0.8) : 0;
     streakMat.opacity += (streakTarget - streakMat.opacity) * 0.2;
@@ -540,20 +551,15 @@ export function GlobalScene() {
       return;
     }
 
-    let cancelled = false;
     let cleanup: (() => void) | undefined;
 
-    import('three').then((THREE) => {
-      if (cancelled || !containerRef.current) return;
-      try {
-        cleanup = initEngine(THREE, containerRef.current);
-      } catch {
-        containerRef.current.classList.add('scene-fallback');
-      }
-    });
+    try {
+      cleanup = initEngine(container);
+    } catch {
+      container.classList.add('scene-fallback');
+    }
 
     return () => {
-      cancelled = true;
       cleanup?.();
     };
   }, []);

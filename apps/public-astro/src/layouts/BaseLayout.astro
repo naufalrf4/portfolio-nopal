@@ -176,7 +176,7 @@ const websiteSchema = {
     >
     </div>
     <GlobalScene client:load transition:persist />
-    <LiveCursorBand client:load currentPath={currentPath} socketUrl={presenceSocketUrl} />
+    <LiveCursorBand client:idle currentPath={currentPath} socketUrl={presenceSocketUrl} />
     <ScrollToTopButton client:load currentPath={currentPath} />
     <Navbar />
     <main class="relative z-10 min-h-screen">
