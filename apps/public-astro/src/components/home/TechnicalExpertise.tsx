@@ -178,7 +178,7 @@ export function TechnicalExpertise() {
   return (
     <section data-scene="circuit" className="relative w-full border-t border-teal/30 py-16 md:py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-8">
+        <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:items-start lg:gap-8">
           {}
           <div className="flex flex-col gap-10">
             <BlurFade delay={0.1} inView>
@@ -233,7 +233,11 @@ export function TechnicalExpertise() {
           </div>
 
           {}
-          <BlurFade delay={0.3} inView className="flex w-full items-center justify-center lg:justify-end">
+          <BlurFade
+            delay={0.3}
+            inView
+            className="flex w-full items-center justify-center lg:sticky lg:top-24 lg:justify-end"
+          >
             <div className="relative overflow-hidden rounded-2xl border border-line bg-bg-card p-4">
               <IconCloud size={400} images={[...cloudIcons]} />
               <BorderBeam size={140} duration={12} colorFrom="var(--teal)" colorTo="var(--bg-elevated)" />
