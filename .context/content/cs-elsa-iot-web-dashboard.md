@@ -18,7 +18,7 @@ A **Next.js** and **Tailwind CSS** dashboard with **Firebase** handling cloud sy
 
 **Responsive because it is checked from a phone.** Nobody monitors a tank from a desk. The interface is built for the device people actually have with them.
 
-**A risk index rather than four raw numbers.** pH, TDS, dissolved oxygen, and temperature are combined into a single composite water quality score. This is where the risk index lives, developed as part of final-year research into discus fish aquarium monitoring. Four raw parameters require interpretation; one score answers the question that was actually being asked, which is whether the water is safe right now.
+**A risk index rather than four raw numbers.** pH, TDS, dissolved oxygen, and temperature are combined into a single composite water quality score, developed as part of final-year research into discus fish aquarium monitoring. Four raw parameters require interpretation; one score answers the question actually being asked, which is whether the water is safe right now.
 
 **The tradeoff stated plainly.** Leaning on Firebase gives up architectural control and portability. In return development was fast and ongoing maintenance is close to nothing. For a system whose whole premise is staying lightweight that is the right side of the trade. For research grade instrumentation it would not have been.
 
@@ -28,7 +28,7 @@ Live at [elsaiot.nrflabs.net](https://elsaiot.nrflabs.net).
 
 Users get remote, real time visibility into water quality without the cost or operational weight of a heavier platform.
 
-It is also where the research contribution sits. The risk index was developed here as part of final-year work on discus fish aquarium monitoring, published as *Implementation of an IoT-Based Water Quality Monitoring System for Discus Fish Aquariums with a Risk Index* through IPB University.
+The risk index work was published as *Implementation of an IoT-Based Water Quality Monitoring System for Discus Fish Aquariums with a Risk Index* through IPB University.
 
 A lean stack delivered a production IoT dashboard with a research contribution attached, and choosing managed infrastructure over a custom backend is what keeps it running rather than abandoned.
 
