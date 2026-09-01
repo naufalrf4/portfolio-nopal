@@ -22,7 +22,6 @@ import { filterPublicSocialLinks } from '@/lib/social-links';
 interface AboutContentProps {
   about: AboutData;
   achievements: Achievement[];
-  lastUpdated?: string;
 }
 
 const socialIcons: Record<string, ComponentType<{ size?: number; className?: string }>> = {
@@ -36,7 +35,7 @@ const socialIcons: Record<string, ComponentType<{ size?: number; className?: str
   website: Globe,
 };
 
-export const AboutContent: FC<AboutContentProps> = ({ about, achievements, lastUpdated }) => {
+export const AboutContent: FC<AboutContentProps> = ({ about, achievements }) => {
   const fullName = about.fullName?.trim() || 'NaufalRF';
   const socialLinksList = filterPublicSocialLinks(about.socialLinks);
   const [mobileTab, setMobileTab] = useState<'about' | 'skills'>('about');
@@ -73,9 +72,6 @@ export const AboutContent: FC<AboutContentProps> = ({ about, achievements, lastU
                 <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2 max-w-full break-words">{fullName}</h1>
                 {about.tagline && (
                   <p className="text-primary font-medium text-lg mb-2 max-w-full break-words">{about.tagline}</p>
-                )}
-                {lastUpdated && (
-                  <p className="text-xs text-muted-foreground mb-2">Last updated {lastUpdated}</p>
                 )}
 
                 <div className="flex w-full min-w-0 max-w-full flex-col items-center gap-2 text-sm text-muted-foreground mb-6">

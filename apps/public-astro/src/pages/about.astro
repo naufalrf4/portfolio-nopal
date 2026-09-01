@@ -3,7 +3,6 @@ import PageLayout from '../layouts/PageLayout.astro';
 import { AboutContent } from '../components/about/AboutContent';
 import { getAbout, getAchievements, ApiFetchFailedError } from '../lib/api';
 import { serviceUnavailableResponse } from '../lib/site';
-import { formatDate } from '../lib/utils';
 import { buildBreadcrumbSchema, buildProfilePageSchema } from '../lib/seo';
 
 let about, achievementsData;
@@ -43,7 +42,6 @@ const breadcrumbSchema = buildBreadcrumbSchema([
       client:load
       about={about}
       achievements={achievementsData.achievements}
-      lastUpdated={formatDate(about.updatedAt)}
     />
   </div>
 </PageLayout>
