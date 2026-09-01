@@ -67,6 +67,24 @@ function isoDate(value: string | null | undefined): string | undefined {
   return Number.isNaN(parsed.getTime()) ? undefined : parsed.toISOString();
 }
 
+// `projectDate` is free text (`text()`, validated as `z.string().max(50)`), so it
+// carries values like '2025', '2024-06', or a range such as '2023 - 2024'. Schema.org
+// Date accepts ISO 8601 at reduced precision, so partial values are emitted as-is
+// rather than coerced into a fabricated January 1st, and ranges are dropped instead
+// of being guessed at.
+function isoPartialDate(value: string | null | undefined): string | undefined {
+  if (!value) return undefined;
+  const trimmed = value.trim();
+  if (/^\d{4}(-\d{2}){0,2}$/.test(trimmed)) return trimmed;
+
+  const parsed = new Date(trimmed);
+  if (Number.isNaN(parsed.getTime())) return undefined;
+
+  return parsed
+    .toLocaleDateString('en-CA', { year: 'numeric', month: '2-digit', timeZone: 'Asia/Jakarta' })
+    .slice(0, 7);
+}
+
 export interface BreadcrumbCrumb {
   name: string;
   path: string;
@@ -330,10 +348,12 @@ export function buildServiceSchema(
  * inline, so the case study attaches to the same entity as every other page
  * instead of creating a second, unlinked Person.
  *
- * Dates are normalized through `isoDate`: the Admin API returns Postgres
+ * `dateModified` is normalized through `isoDate`: the Admin API returns Postgres
  * timestamps like `2026-09-01 03:25:31.827+07`, which is NOT valid ISO 8601 -
  * Schema.org requires ISO 8601, so passing the raw value through would emit a
- * date consumers can legitimately reject.
+ * date consumers can legitimately reject. `dateCreated` comes from the free-text
+ * `projectDate` instead, so it goes through `isoPartialDate` and keeps whatever
+ * precision the data actually has.
  */
 export function buildProjectSchema(
   project: Project,
@@ -357,7 +377,7 @@ export function buildProjectSchema(
     image: allImages,
     genre: project.category,
     keywords: project.techStack?.length ? project.techStack.join(', ') : undefined,
-    dateCreated: isoDate(project.projectDate),
+    dateCreated: isoPartialDate(project.projectDate),
     dateModified: isoDate(project.updatedAt),
     author: { '@id': personId(siteUrl) },
     creator: { '@id': personId(siteUrl) },
