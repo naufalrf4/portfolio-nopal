@@ -24,7 +24,7 @@ The result is one application that owns both sides: hardware control at the devi
 
 The app runs on-site at every Photobon.id unit across **Bali, Bandung, and Jabodetabek**, controlling the hardware and keeping session data synced to the platform.
 
-It is the layer that makes the physical product a system. The same engineer built the cabinet it runs on and the cloud platform it reports to, so the boundaries between hardware, local software, and backend were designed once instead of negotiated across teams.
+The engineering interest sits at the boundary. An application that both drives serial hardware and survives losing its network has to be correct in two directions at once, and Rust plus an offline first design is what makes that tractable.
 
 ## Ringkasan
 

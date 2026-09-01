@@ -26,7 +26,7 @@ A **Next.js** and **React** platform on **PostgreSQL**, with cloud storage for p
 
 The platform runs rental and sales operations for Photobon.id across **Bali, Bandung, and Jabodetabek**, holding unit inventory, bookings, and session output produced by hardware in the field.
 
-It closes the loop on a product built end to end by one engineer: the cabinet, the software running on it, and the system the business is operated from. Because the same person built all three, the contracts between them were designed rather than negotiated.
+The engineering value is in the schema rather than the interface. Availability across regions and double booking prevention are integrity problems, and solving them in the data model is what makes the platform trustworthy enough to run a business on.
 
 ## Ringkasan
 

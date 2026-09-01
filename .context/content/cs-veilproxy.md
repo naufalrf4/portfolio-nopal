@@ -26,7 +26,7 @@ Open source at [github.com/naufalrf4/veilproxy](https://github.com/naufalrf4/vei
 
 veilproxy gives individuals and small teams a practical way to keep personal data out of LLM prompts without changing how they work or buying enterprise tooling. It runs locally, adds negligible overhead, and applies rules the user controls.
 
-It is also the clearest example of a habit visible across this portfolio: the interesting engineering is rarely the model call. It is the boundary around it, where correctness has consequences.
+The engineering interest is not the model call. It is the boundary around it, where a missed pattern means real data leaves the machine and correctness has consequences.
 
 ## Ringkasan
 

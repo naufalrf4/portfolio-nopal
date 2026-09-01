@@ -22,9 +22,9 @@ React and Tailwind CSS on the front, MQTT over the wire: the same protocol the h
 
 ## RESULT
 
-The dashboard turns a raw four-parameter sensor feed into a readable water quality picture on a phone, and is the surface through which the SIMONAIR research data is actually used. Live at [simonair.web.id](https://simonair.web.id).
+The dashboard turns a raw four parameter sensor feed into a readable water quality picture on a phone, and is the surface through which the research data is actually used. Live at [simonair.web.id](https://simonair.web.id).
 
-The pairing is what matters here: the same engineer built the rig publishing the data and the interface consuming it, so the contract between them was designed once rather than negotiated between two parties.
+The design decisions that matter came from the site rather than the screen: showing movement instead of isolated readings, and admitting when a sensor has gone quiet rather than leaving a stale number looking current.
 
 ## Ringkasan
 

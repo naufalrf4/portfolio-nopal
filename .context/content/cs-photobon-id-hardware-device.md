@@ -24,7 +24,7 @@ Deployed to clients across **Bali, Bandung, and Jabodetabek**, operating as rent
 
 The unit runs at live events as a commercial product, not a prototype: sold and rented to clients across three regions, with the reliability requirements that come from revenue depending on it working.
 
-This is the hardware layer of a product where the same engineer also built the desktop control application driving it and the cloud platform running the business around it. The physical device, the software on it, and the system it reports to were designed as one thing.
+What it demonstrates is hardware built to a commercial standard rather than a demonstration one: designed for venues instead of benches, and legible enough that the person nearest the problem can solve it.
 
 ## Ringkasan
 
