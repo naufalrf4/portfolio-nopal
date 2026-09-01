@@ -450,9 +450,9 @@
     "semantic_hash": "3c816175ced400823175958591f8d32e"
   },
   "apps/admin/src/app/(dashboard)/layout.tsx": {
-    "mtime": 1788244252.88455,
-    "seen": 1788244486.8207805,
-    "ast_hash": "b9431a77206b0de45b78dac12921b8c1",
+    "mtime": 1788250462.7049682,
+    "seen": 1788251048.6040506,
+    "ast_hash": "fc141beab02f0a368848756a1ac8d1f9",
     "semantic_hash": ""
   },
   "apps/admin/src/app/(dashboard)/links/LinksPageContent.tsx": {
@@ -1230,9 +1230,9 @@
     "semantic_hash": ""
   },
   "apps/admin/src/components/layout/BottomNav.tsx": {
-    "mtime": 1787901973.9320114,
-    "seen": 1788236077.8784907,
-    "ast_hash": "983e1e820e147968dee9b29c43507e20",
+    "mtime": 1788250296.2977777,
+    "seen": 1788251048.604302,
+    "ast_hash": "ddc1098bee6f3285fc507ff3cf2c93ec",
     "semantic_hash": ""
   },
   "apps/admin/src/components/layout/FloatingActionButton.tsx": {
@@ -5334,21 +5334,21 @@
     "semantic_hash": ""
   },
   "apps/admin/src/features/notifications/constants/notifications.constants.ts": {
-    "mtime": 1788241295.0062015,
-    "seen": 1788242142.5724382,
-    "ast_hash": "feea549fb2f925231c50fbe105328892",
+    "mtime": 1788250149.336704,
+    "seen": 1788251048.6045856,
+    "ast_hash": "f5000b90c97fbf824bf23dd84e03d204",
     "semantic_hash": ""
   },
   "apps/admin/src/features/notifications/hooks/index.ts": {
-    "mtime": 1788241414.455142,
-    "seen": 1788242142.5724397,
-    "ast_hash": "3fe77aaaf3e24bc929a2fabfe5441cfa",
+    "mtime": 1788250175.7298987,
+    "seen": 1788251048.6045902,
+    "ast_hash": "f234b772847e2f30c721706a655f1cac",
     "semantic_hash": ""
   },
   "apps/admin/src/features/notifications/hooks/useNotificationChannels.ts": {
-    "mtime": 1787900476.3805006,
-    "seen": 1788236077.878793,
-    "ast_hash": "1565d5e9717cb2f50a4882b2edb9a81b",
+    "mtime": 1788250428.8547277,
+    "seen": 1788251048.6045916,
+    "ast_hash": "77005bf03b5b0c2b7c0ddebcb4eb3771",
     "semantic_hash": ""
   },
   "apps/admin/src/features/notifications/hooks/useNotificationOutbox.ts": {
@@ -5358,9 +5358,9 @@
     "semantic_hash": ""
   },
   "apps/admin/src/features/notifications/index.ts": {
-    "mtime": 1787900527.6236038,
-    "seen": 1788236077.8788002,
-    "ast_hash": "298f5e0ae13e86c268c8a07626a13ef8",
+    "mtime": 1788250176.9815867,
+    "seen": 1788251048.604603,
+    "ast_hash": "5e7346f780ef84c482256590a60c60f1",
     "semantic_hash": ""
   },
   "apps/admin/src/features/notifications/types/notifications.types.ts": {
@@ -5412,15 +5412,9 @@
     "semantic_hash": ""
   },
   "apps/admin/src/components/layout/NotificationBell.tsx": {
-    "mtime": 1788242097.3907797,
-    "seen": 1788242142.5722182,
-    "ast_hash": "8dd1e8dee69c92f1bb698c637b14fcf9",
-    "semantic_hash": ""
-  },
-  "apps/admin/src/features/notifications/hooks/useNotificationBell.ts": {
-    "mtime": 1788241346.501614,
-    "seen": 1788242142.5724409,
-    "ast_hash": "5f3cbc6578b521cf031ecb5e4e69848f",
+    "mtime": 1788250187.5309854,
+    "seen": 1788251048.6043046,
+    "ast_hash": "bc05658a9506c408288614ff6416fd9a",
     "semantic_hash": ""
   },
   "apps/admin/src/lib/services/__tests__/logRetention.service.test.ts": {
@@ -5502,9 +5496,9 @@
     "semantic_hash": ""
   },
   "apps/admin/src/features/notifications/hooks/useTelegramChats.ts": {
-    "mtime": 1787911301.7336032,
-    "seen": 1788236077.8787985,
-    "ast_hash": "5e1db08d748b2593b5ee2c0226cb1b45",
+    "mtime": 1788250436.8707848,
+    "seen": 1788251048.6046019,
+    "ast_hash": "9a0ca67206cf90b26b902d6c463ad2d0",
     "semantic_hash": ""
   },
   "apps/admin/src/lib/email/__tests__/emailTheme.test.ts": {
@@ -5532,9 +5526,9 @@
     "semantic_hash": ""
   },
   "apps/public-astro/src/components/home/ServicesPreview.astro": {
-    "mtime": 1788235326.2164369,
-    "seen": 1788236077.8791904,
-    "ast_hash": "2205c4785ac8af31344e338dffbcd540",
+    "mtime": 1788250754.8330138,
+    "seen": 1788251048.6049569,
+    "ast_hash": "4c70cee049d6e1f8df80c6889b8ec104",
     "semantic_hash": ""
   },
   "apps/public-astro/src/components/services/BeyondCode.astro": {
@@ -5778,9 +5772,9 @@
     "semantic_hash": ""
   },
   "CONVENTIONS.md": {
-    "mtime": 1788158949.6702921,
-    "seen": 1788236077.8795207,
-    "ast_hash": "2c8498c2b0dc425ed736a85dc25f7182",
+    "mtime": 1788245498.379495,
+    "seen": 1788251048.60527,
+    "ast_hash": "cd639bc49a7b778d7a762dcc9ec958d4",
     "semantic_hash": ""
   },
   "apps/admin/public/brand-mark.png": {
@@ -5982,9 +5976,21 @@
     "semantic_hash": ""
   },
   "apps/admin/src/components/providers/ServiceWorkerRegistrar.tsx": {
-    "mtime": 1788244217.5843244,
-    "seen": 1788244486.8210027,
-    "ast_hash": "6373d181108bf58089235a7ca7d1d741",
+    "mtime": 1788250313.1118991,
+    "seen": 1788251048.6043134,
+    "ast_hash": "ac3a5c419f60919d1338ff1cdefd23e6",
+    "semantic_hash": ""
+  },
+  "apps/admin/src/features/notifications/context/NotificationSummaryContext.tsx": {
+    "mtime": 1788250120.8464928,
+    "seen": 1788251048.6045878,
+    "ast_hash": "5e01398bbd9cda61e95a8706cfdfac9e",
+    "semantic_hash": ""
+  },
+  "apps/admin/src/features/notifications/hooks/useNotificationSummary.ts": {
+    "mtime": 1788250108.6794024,
+    "seen": 1788251048.604598,
+    "ast_hash": "b2dd054363794c1ba109d2bd82aa9bd3",
     "semantic_hash": ""
   }
 }
