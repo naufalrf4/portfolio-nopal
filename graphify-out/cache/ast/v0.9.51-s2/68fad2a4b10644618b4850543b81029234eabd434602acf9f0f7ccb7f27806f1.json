@@ -1,0 +1,1 @@
+{"nodes": [{"id": "$graphify-root$_apps_public_astro_src_layouts_pagelayout_astro", "label": "PageLayout.astro", "file_type": "code", "source_file": "apps/public-astro/src/layouts/PageLayout.astro", "source_location": "L1"}], "edges": [], "raw_calls": [], "parse_errors": {"first_error_line": 2, "multiline_error": false}}

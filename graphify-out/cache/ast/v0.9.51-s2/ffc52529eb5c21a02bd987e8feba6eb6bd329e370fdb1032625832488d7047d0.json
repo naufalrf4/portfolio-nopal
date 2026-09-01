@@ -1,0 +1,1 @@
+{"nodes": [{"id": "$graphify-root$_docker_postgres_init_001_rag_bootstrap_sql", "label": "001-rag-bootstrap.sql", "file_type": "code", "source_file": "docker/postgres/init/001-rag-bootstrap.sql", "source_location": null}], "edges": []}

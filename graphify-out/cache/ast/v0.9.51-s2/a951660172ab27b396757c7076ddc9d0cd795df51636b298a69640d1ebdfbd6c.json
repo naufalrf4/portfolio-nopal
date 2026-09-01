@@ -1,0 +1,1 @@
+{"nodes": [{"id": "$graphify-root$_apps_links_astro_src_components_errorstate_astro", "label": "ErrorState.astro", "file_type": "code", "source_file": "apps/links-astro/src/components/ErrorState.astro", "source_location": "L1"}], "edges": [], "raw_calls": [], "parse_errors": {"first_error_line": 2, "multiline_error": true}}
