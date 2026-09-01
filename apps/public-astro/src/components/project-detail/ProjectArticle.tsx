@@ -475,10 +475,12 @@ function renderNode(node: JsonNode, key: string): ReactNode {
     case 'heading': {
       const level = typeof node.attrs?.level === 'number' ? node.attrs.level : 2;
       if (level === 1) {
+        // Article body can't emit a second page-level H1: the project title
+        // above already owns it, so author-authored H1s demote to H2.
         return (
-          <h1 key={key} className={ARTICLE_STYLES.h1}>
+          <h2 key={key} className={ARTICLE_STYLES.h2}>
             {children}
-          </h1>
+          </h2>
         );
       }
       if (level === 2) {
@@ -569,7 +571,7 @@ function MarkdownArticle({ content }: { content: string }) {
       remarkPlugins={[remarkGfm]}
       urlTransform={(url) => (isSafeUrl(url) ? url : '')}
       components={{
-        h1: ({ children }) => <h1 className={ARTICLE_STYLES.h1}>{children}</h1>,
+        h1: ({ children }) => <h2 className={ARTICLE_STYLES.h2}>{children}</h2>,
         h2: ({ children }) => <h2 className={ARTICLE_STYLES.h2}>{children}</h2>,
         h3: ({ children }) => <h3 className={ARTICLE_STYLES.h3}>{children}</h3>,
         h4: ({ children }) => <h4 className={ARTICLE_STYLES.h4}>{children}</h4>,

@@ -13,7 +13,7 @@ export function AuthErrorContent({ message }: AuthErrorContentProps) {
       <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl border border-[var(--error)]/40 bg-[var(--error)]/10 text-[var(--error)]">
         <AlertTriangle size={32} />
       </div>
-      <h2 className="text-2xl font-bold text-text-primary">Guestbook sign-in failed</h2>
+      <h1 className="text-2xl font-bold text-text-primary">Guestbook sign-in failed</h1>
       <p className="mt-4 text-base leading-relaxed text-text-secondary">
         {message ||
           'We could not complete the guestbook sign-in flow. Please try again from the guestbook section.'}
