@@ -193,9 +193,11 @@ kosong. Delapan project lama semuanya `featured: true`. Perlu kamu putuskan mana
 yang layak tampil di homepage, karena sekarang homepage hanya menampilkan 8 yang
 lama.
 
-**`projectDate` kosong di 8 project lama** padahal 13 yang baru terisi. Akibatnya
-`dateCreated` di schema jatuh ke `createdAt`, yang isinya tanggal entri CMS
-(2026-09-01), bukan tahun proyek sebenarnya.
+**`projectDate` kosong di 8 project lama** padahal 13 yang baru terisi. Schema
+sekarang hanya memakai `projectDate`, jadi project tanpa nilai itu tidak
+mengeluarkan `dateCreated` sama sekali. Sebelumnya jatuh ke `createdAt` yang
+isinya tanggal entri CMS, sehingga proyek 2023 terbaca dibuat 2026. Mengisi
+`projectDate` di 8 project lama akan memulihkan tahun aslinya.
 
 **`imageUrl` dan `images` kosong di semua 21.** Sesuai keputusanmu, dibiarkan
 dulu sampai cover siap.
