@@ -31,7 +31,7 @@ function createHarness(logRows: readonly AppLogRow[], countRows: readonly LevelC
   const database = {
     queryLogs: async () => logRows,
     queryLevelCounts: async () => countRows,
-    deleteBefore: async () => 0,
+    clear: async () => 0,
   };
 
   return new LogQueryService(database);

@@ -18,15 +18,21 @@ async function handlePost(req: NextRequest) {
       return validationErrorResponse(validation.error.format());
     }
 
+    const { levels } = validation.data;
     const cutoff =
       validation.data.mode === 'last-n-days'
         ? subtractDaysFromNow(validation.data.days)
-        : new Date(validation.data.beforeDate);
+        : validation.data.mode === 'before-date'
+          ? new Date(validation.data.beforeDate)
+          : undefined;
 
-    const deletedCount = await logQueryService.deleteBefore(cutoff);
+    const deletedCount = await logQueryService.clear({
+      ...(cutoff === undefined ? {} : { cutoff }),
+      ...(levels === undefined ? {} : { levels }),
+    });
 
     return successResponse(
-      { deletedCount, cutoff: cutoff.toISOString() },
+      { deletedCount, cutoff: cutoff?.toISOString() ?? null },
       `Cleared ${deletedCount} log${deletedCount === 1 ? '' : 's'}`
     );
   } catch {

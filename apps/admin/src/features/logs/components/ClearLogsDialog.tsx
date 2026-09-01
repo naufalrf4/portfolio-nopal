@@ -26,9 +26,18 @@ import {
 import { DatePicker } from '@/components/ui/date-picker';
 import { formatDate } from '@/lib/utils/date';
 
-type ClearMode = 'last-n-days' | 'before-date';
+type ClearMode = 'last-n-days' | 'before-date' | 'all';
+
+type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
 const DAY_PRESETS = [7, 30, 90] as const;
+
+const LEVEL_OPTIONS: readonly { readonly value: LogLevel; readonly label: string }[] = [
+  { value: 'debug', label: 'Debug' },
+  { value: 'info', label: 'Info' },
+  { value: 'warn', label: 'Warn' },
+  { value: 'error', label: 'Error' },
+];
 
 interface ClearLogsDialogProps {
   onCleared?: () => void;
@@ -40,19 +49,31 @@ export function ClearLogsDialog({ onCleared }: ClearLogsDialogProps) {
   const [mode, setMode] = useState<ClearMode>('last-n-days');
   const [days, setDays] = useState<number>(30);
   const [beforeDate, setBeforeDate] = useState<Date | null>(null);
+  const [levels, setLevels] = useState<readonly LogLevel[]>([]);
   const [submitting, setSubmitting] = useState(false);
 
-  const canContinue = mode === 'last-n-days' ? days > 0 : Boolean(beforeDate);
+  const canContinue =
+    mode === 'last-n-days' ? days > 0 : mode === 'before-date' ? Boolean(beforeDate) : true;
 
-  const summary =
+  const levelSummary =
+    levels.length === 0 || levels.length === LEVEL_OPTIONS.length
+      ? 'all levels'
+      : levels.join(', ');
+
+  const rangeSummary =
     mode === 'last-n-days'
-      ? `all logs older than the last ${days} day${days === 1 ? '' : 's'}`
-      : `all logs recorded before ${beforeDate ? formatDate(beforeDate, 'long') : 'the selected date'}`;
+      ? `older than the last ${days} day${days === 1 ? '' : 's'}`
+      : mode === 'before-date'
+        ? `recorded before ${beforeDate ? formatDate(beforeDate, 'long') : 'the selected date'}`
+        : 'from any date';
+
+  const summary = `every log (${levelSummary}) ${rangeSummary}`;
 
   const resetSelection = () => {
     setMode('last-n-days');
     setDays(30);
     setBeforeDate(null);
+    setLevels([]);
   };
 
   const handleContinue = () => {
@@ -64,10 +85,17 @@ export function ClearLogsDialog({ onCleared }: ClearLogsDialogProps) {
   const handleConfirm = async () => {
     setSubmitting(true);
     try {
+      const levelFilter = levels.length > 0 ? { levels } : {};
       const body =
         mode === 'last-n-days'
-          ? { mode: 'last-n-days' as const, days }
-          : { mode: 'before-date' as const, beforeDate: (beforeDate as Date).toISOString() };
+          ? { mode: 'last-n-days' as const, days, ...levelFilter }
+          : mode === 'before-date'
+            ? {
+                mode: 'before-date' as const,
+                beforeDate: (beforeDate as Date).toISOString(),
+                ...levelFilter,
+              }
+            : { mode: 'all' as const, ...levelFilter };
 
       const res = await fetch('/api/v1/admin/logs/clear', {
         method: 'POST',
@@ -133,6 +161,15 @@ export function ClearLogsDialog({ onCleared }: ClearLogsDialogProps) {
               >
                 Specific Date
               </Button>
+              <Button
+                type="button"
+                variant={mode === 'all' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setMode('all')}
+                className="h-8 flex-1 rounded-lg px-3 text-xs font-medium"
+              >
+                All Time
+              </Button>
             </div>
 
             {mode === 'last-n-days' ? (
@@ -155,7 +192,7 @@ export function ClearLogsDialog({ onCleared }: ClearLogsDialogProps) {
                   ))}
                 </div>
               </div>
-            ) : (
+            ) : mode === 'before-date' ? (
               <div className="flex flex-col gap-2">
                 <p className="text-xs text-[var(--text-secondary)]">
                   Delete every log entry recorded before this date.
@@ -167,7 +204,42 @@ export function ClearLogsDialog({ onCleared }: ClearLogsDialogProps) {
                   maxDate={new Date()}
                 />
               </div>
+            ) : (
+              <p className="text-xs text-[var(--text-secondary)]">
+                Delete matching log entries regardless of when they were recorded.
+              </p>
             )}
+
+            <div className="flex flex-col gap-2 border-t border-line-strong pt-4">
+              <p className="text-xs font-medium text-[var(--text-primary)]">Levels</p>
+              <p className="text-xs text-[var(--text-secondary)]">
+                Leave every level unchecked to clear all of them.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {LEVEL_OPTIONS.map((option) => {
+                  const isSelected = levels.includes(option.value);
+                  return (
+                    <Button
+                      key={option.value}
+                      type="button"
+                      variant={isSelected ? 'primary' : 'outline'}
+                      size="sm"
+                      aria-pressed={isSelected}
+                      onClick={() =>
+                        setLevels((prev) =>
+                          prev.includes(option.value)
+                            ? prev.filter((level) => level !== option.value)
+                            : [...prev, option.value]
+                        )
+                      }
+                      className="h-9 rounded-xl text-xs"
+                    >
+                      {option.label}
+                    </Button>
+                  );
+                })}
+              </div>
+            </div>
           </DialogBody>
           <DialogFooter>
             <Button variant="outline" size="sm" onClick={() => setSelectOpen(false)}>

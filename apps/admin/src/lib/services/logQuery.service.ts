@@ -1,4 +1,4 @@
-import { and, count, desc, eq, gte, ilike, lt, lte, or } from 'drizzle-orm';
+import { and, count, desc, eq, gte, ilike, inArray, lt, lte, or } from 'drizzle-orm';
 import type { SQL } from 'drizzle-orm';
 import { decodeCursor, encodeCursor } from '@/features/logs/utils/cursor';
 import type { CursorPosition } from '@/features/logs/utils/cursor';
@@ -10,10 +10,17 @@ export type AppLogRow = typeof appLogs.$inferSelect;
 type LevelCountRow = { readonly level: string; readonly total: number };
 type LevelCounts = Record<'debug' | 'info' | 'warn' | 'error', number>;
 
+export type LogLevelName = (typeof LOG_LEVELS)[number];
+
+export type LogClearFilter = {
+  readonly cutoff?: string;
+  readonly levels?: readonly LogLevelName[];
+};
+
 interface LogDatabase {
   queryLogs(where: SQL | undefined, limit: number): PromiseLike<readonly AppLogRow[]>;
   queryLevelCounts(): PromiseLike<readonly LevelCountRow[]>;
-  deleteBefore(cutoff: string): PromiseLike<number>;
+  clear(input: LogClearFilter): PromiseLike<number>;
 }
 
 const LOG_LEVELS = ['debug', 'info', 'warn', 'error'] as const;
@@ -31,10 +38,15 @@ const defaultDatabase: LogDatabase = {
       .select({ level: appLogs.level, total: count() })
       .from(appLogs)
       .groupBy(appLogs.level),
-  deleteBefore: async (cutoff) => {
+  clear: async ({ cutoff, levels }) => {
+    const filters = [
+      cutoff === undefined ? undefined : lt(appLogs.timestamp, cutoff),
+      levels === undefined ? undefined : inArray(appLogs.level, [...levels]),
+    ].filter((filter): filter is SQL => filter !== undefined);
+
     const deleted = await db
       .delete(appLogs)
-      .where(lt(appLogs.timestamp, cutoff))
+      .where(filters.length === 0 ? undefined : and(...filters))
       .returning({ id: appLogs.id });
     return deleted.length;
   },
@@ -87,8 +99,11 @@ export class LogQueryService {
     return counts;
   }
 
-  async deleteBefore(cutoff: Date): Promise<number> {
-    return this.database.deleteBefore(cutoff.toISOString());
+  async clear(input: { readonly cutoff?: Date; readonly levels?: readonly LogLevelName[] }): Promise<number> {
+    return this.database.clear({
+      ...(input.cutoff === undefined ? {} : { cutoff: input.cutoff.toISOString() }),
+      ...(input.levels === undefined ? {} : { levels: input.levels }),
+    });
   }
 }
 
