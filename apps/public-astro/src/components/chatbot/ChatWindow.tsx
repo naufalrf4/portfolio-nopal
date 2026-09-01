@@ -4,6 +4,7 @@ import { ChatHeader } from './ChatHeader';
 import { MessageList } from './MessageList';
 import { ChatInput } from './ChatInput';
 import { ChatSidebar } from './ChatSidebar';
+import { PoweredBy } from './PoweredBy';
 import { AlertCircle } from 'lucide-react';
 
 interface ChatWindowProps {
@@ -57,6 +58,7 @@ export function ChatWindow({ onClose, isFullPage = false, className }: ChatWindo
       )}
 
       <ChatInput onSend={sendMessage} isLoading={isLoading} />
+      <PoweredBy className="border-t border-line bg-bg-elevated py-2" />
     </div>
   );
 

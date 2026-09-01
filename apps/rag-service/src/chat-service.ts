@@ -270,7 +270,7 @@ function messageToPayload(msg: ChatLogMessage): Record<string, unknown> {
   return payload;
 }
 
-const BOOKING_TRIGGER_REGEX = /\b(book|schedule|reserve|pesan|jadwalkan)\s+(a\s+)?(slot|booking|appointment)\b/i;
+const BOOKING_TRIGGER_REGEX = /\b(book|schedule|reserve|pesan|jadwalkan)\s+(a\s+)?(slot|booking|appointment|call|meeting|consultation|consult|chat)\b/i;
 
 const AGENTIC_PATTERNS: Array<{
   regex: RegExp;
