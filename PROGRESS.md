@@ -989,3 +989,50 @@ Catatan palet: `apps/public-astro/public/og-image.svg` memakai hex usang (`#14b8
 ### Menunggu input Naufal
 
 `.context/content/case-study-draft.md` berisi pertanyaan teknis spesifik per project yang tidak ada di API dan tidak boleh dikarang: alasan memilih Raspberry Pi 4 ketimbang mikrokontroler, prosedur kalibrasi probe DO, perilaku saat koneksi putus, alasan Tauri ketimbang Electron, metode deteksi PII di veilproxy, jumlah peserta SAKINA. Target 600-900 kata per project.
+
+## 2026-09-01 — AI crawler access unblocked, markdown for agents, llms.txt rewritten
+
+- Files: `apps/public-astro/src/middleware.ts` (new), `apps/public-astro/src/lib/markdown-view.ts` (new), `apps/public-astro/src/lib/seo.ts`, `apps/public-astro/src/components/services/data.ts`, `apps/public-astro/src/pages/{services.astro,sitemap.xml.ts}`, `apps/public-astro/public/llms.txt`
+- Commits: `293ef2a`, `f4c963e`, `151a0c7`, `4db85d2`, `13cf5cb`
+- Status: semua terverifikasi live
+
+### Cloudflare: dua kontrol terpisah, keduanya harus dimatikan
+
+Crawler AI diblokir di level **WAF**, bukan robots.txt — jadi tidak ada yang bisa diperbaiki dari kode. Yang menyesatkan: memarse `robots.txt` memberi hasil positif palsu. Enam crawler terlihat "bersih" di file itu padahal tetap 403 di edge.
+
+**Cara uji yang benar**: kirim User-Agent asli dan lihat status HTTP.
+
+```
+curl -s -o /dev/null -A "OAI-SearchBot/1.0" -w "%{http_code}" https://naufalrf.net/
+```
+
+Pola diagnostik yang berguna: saat masih diblokir, `/robots.txt` tetap 200 sementara `/about` dan `/sitemap.xml` 403 — crawler boleh membaca aturan lalu ditolak mengambil isinya. UA karangan (`MyOwnAIBot`) lolos 200, jadi blokirnya berbasis nama UA, bukan heuristik.
+
+Menyelesaikannya butuh **dua** perubahan di dashboard, bukan satu: setting **"Block AI bots"** di Security (opsinya: block all pages / block only on pages with ads / do not block) **dan** toggle per-crawler di **AI Crawl Control**. Selama yang pertama aktif, yang kedua terkunci — `Claude-SearchBot` yang toggle-nya sudah dimatikan tetap 403.
+
+Hasil akhir: semua crawler search 200. Googlebot, bingbot, WhatsApp, Twitterbot, LinkedInBot **tidak pernah** terpengaruh, jadi SEO klasik dan share preview aman sepanjang waktu.
+
+Sisa yang ambigu: `GPTBot`, `ClaudeBot`, `CCBot`, `Google-Extended` lolos di WAF tapi masih `Disallow: /` di blok managed Cloudflare sementara robots.txt app bilang `Allow: /`. Keempatnya crawler training, bukan search, jadi tidak merugikan sitasi. Belum dibersihkan.
+
+### Markdown for agents
+
+`src/middleware.ts` + `src/lib/markdown-view.ts` melayani `Accept: text/markdown` untuk `/`, `/about`, `/projects`, `/publications`, `/services`, `/contact`, dan setiap `/projects/:slug`. Respons membawa `Vary: Accept` dan header `Link` canonical ke URL HTML.
+
+Markdown-nya **dibangun dari Admin API**, bukan hasil scrape halaman render. Konsekuensinya: selalu sinkron dengan CMS, dan case study membawa field `content` penuh. Negosiasi hanya aktif kalau `text/markdown` punya q-value >= `text/html`, sehingga browser tidak terpengaruh.
+
+Nol nilai hardcoded: nama, role, lokasi, email, availability, dan skills semua lewat `getAboutSafe()`, yang sudah punya `FALLBACK_ABOUT` terpusat di `api.ts`. `servedAreas` dipindah ke `components/services/data.ts` supaya schema dan markdown berbagi satu sumber.
+
+### llms.txt
+
+Ditulis ulang dari data produksi. Sebelumnya masih menyebut "System & Automation Engineer" 3x dan "student" 2x — dan itu **yang dipantulkan kembali oleh mesin jawaban AI** saat ditanya tentang Naufal. Dua koreksi yang penting untuk pembacaan mesin:
+
+- Sertifikasi diberi label eksplisit sebagai diterbitkan oleh AWS, Cisco, Microsoft, bukan diletakkan berdampingan dengan employment
+- Bagian Interpretation Guidance kini menyatakan terang bahwa job title lama dan status student sudah usang, jadi model yang menimbang file ini melawan halaman pihak ketiga punya rujukan otoritatif
+
+### Learned
+
+- **Jangan simpulkan akses crawler dari robots.txt.** Blokir WAF terjadi sebelum request menyentuh file itu. Satu-satunya bukti yang sah adalah status HTTP dengan UA asli.
+- Cloudflare punya dua lapis kontrol crawler AI yang saling mengunci. Mematikan satu tidak cukup.
+- `apps/public-astro/src/layouts/Layout.astro` adalah starter shell yang **tidak dipakai halaman mana pun**. Rujukan dari file itu tidak berarti aset masih terpakai.
+- `og-image.png` sekarang aset buatan tangan, bukan hasil render SVG; `generate-og-image.ts` dan `og-image.svg` sudah dihapus. Jangan hidupkan lagi tanpa sumber SVG baru.
+- `scripts/generate-backgrounds.ts` masih ada untuk membuat plat background on-demand; PNG hasilnya sengaja tidak di-commit.
