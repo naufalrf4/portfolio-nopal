@@ -74,14 +74,28 @@ deploy_targets() {
 		;;
 	__FULL__)
 		printf 'shared config/dependency change (or first deploy); full rebuild\n'
-		bash "$ROOT_DIR/scripts/docker-prod-up.sh"
 		;;
 	*)
 		printf 'scoped rebuild: %s\n' "${DEPLOY_TARGETS[*]}"
+		;;
+	esac
+
+	# Migrate BEFORE starting app services. Starting first means new code boots
+	# against the old schema and crashes on missing relations (Postgres 42P01),
+	# and because `up` waits on healthchecks it can roll back before migrate ever
+	# runs. Additive migrations are backward compatible with the currently
+	# running image, so schema-first is the safe order.
+	bash "$ROOT_DIR/scripts/docker-prod-migrate.sh"
+
+	case "${DEPLOY_TARGETS[0]:-}" in
+	__NONE__) ;;
+	__FULL__)
+		bash "$ROOT_DIR/scripts/docker-prod-up.sh"
+		;;
+	*)
 		bash "$ROOT_DIR/scripts/docker-prod-up.sh" "${DEPLOY_TARGETS[@]}"
 		;;
 	esac
 
-	bash "$ROOT_DIR/scripts/docker-prod-migrate.sh"
 	printf '[%s] deploy success\n' "$(date -Iseconds)"
 } >>"$LOG_FILE" 2>&1

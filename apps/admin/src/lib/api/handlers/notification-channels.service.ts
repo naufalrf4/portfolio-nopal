@@ -1,7 +1,7 @@
 import { createId } from '@paralleldrive/cuid2';
-import { asc, count, eq } from 'drizzle-orm';
+import { and, asc, count, eq, inArray } from 'drizzle-orm';
 import { db } from '@/lib/db';
-import { notificationChannels, notificationRules } from '@/lib/db/schema';
+import { notificationChannels, notificationOutbox } from '@/lib/db/schema';
 import type {
   CreateChannelInput,
   UpdateChannelInput,
@@ -17,7 +17,7 @@ export interface NotificationChannelsDatabase {
   create(input: CreateRecord): Promise<NotificationChannel>;
   update(id: string, input: UpdateRecord): Promise<NotificationChannel | undefined>;
   remove(id: string): Promise<NotificationChannel | undefined>;
-  countRules(channelId: string): Promise<number>;
+  countPendingDeliveries(channelId: string): Promise<number>;
 }
 
 const drizzleNotificationChannelsDatabase: NotificationChannelsDatabase = {
@@ -54,11 +54,16 @@ const drizzleNotificationChannelsDatabase: NotificationChannelsDatabase = {
       .returning();
     return channel;
   },
-  async countRules(channelId) {
+  async countPendingDeliveries(channelId) {
     const [result] = await db
       .select({ total: count() })
-      .from(notificationRules)
-      .where(eq(notificationRules.channelId, channelId));
+      .from(notificationOutbox)
+      .where(
+        and(
+          eq(notificationOutbox.channelId, channelId),
+          inArray(notificationOutbox.status, ['pending', 'failed'])
+        )
+      );
     return result?.total ?? 0;
   },
 };
@@ -76,7 +81,7 @@ export type RemoveChannelResult =
   | {
       readonly ok: false;
       readonly code: 'channel_in_use';
-      readonly message: 'Channel is referenced by notification rules';
+      readonly message: 'Channel still has undelivered notifications queued';
     };
 
 export class NotificationChannelsService {
@@ -105,11 +110,11 @@ export class NotificationChannelsService {
   }
 
   async remove(id: string): Promise<RemoveChannelResult> {
-    if ((await this.database.countRules(id)) > 0) {
+    if ((await this.database.countPendingDeliveries(id)) > 0) {
       return {
         ok: false,
         code: 'channel_in_use',
-        message: 'Channel is referenced by notification rules',
+        message: 'Channel still has undelivered notifications queued',
       };
     }
 

@@ -7,6 +7,7 @@ import { BottomNav } from '@/components/layout/BottomNav';
 import { ThemeToggler } from '@/components/layout/ThemeToggler';
 import { NotificationBell } from '@/components/layout/NotificationBell';
 import { WibClock } from '@/components/layout/WibClock';
+import { ServiceWorkerRegistrar } from '@/components/providers/ServiceWorkerRegistrar';
 import { isEmailAllowed } from '@/lib/auth-security';
 
 // Every route under this group requires a live session (safeAuth() below) and
@@ -58,6 +59,7 @@ export default async function DashboardLayout({ children }: { children: ReactNod
         </SidebarInset>
 
         <BottomNav />
+        <ServiceWorkerRegistrar />
       </SidebarProvider>
     </div>
   );

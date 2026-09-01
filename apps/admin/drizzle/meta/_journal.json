@@ -113,6 +113,13 @@
       "when": 1787899487735,
       "tag": "0015_windy_imperial_guard",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1788240073611,
+      "tag": "0016_lying_mandrill",
+      "breakpoints": true
     }
   ]
 }

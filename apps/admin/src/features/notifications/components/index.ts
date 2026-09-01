@@ -1,3 +1,5 @@
 export * from './ChannelsTab';
-export * from './RulesTab';
+export * from './InboxTab';
+export * from './DevicesTab';
+export * from './PreferencesTab';
 export * from './OutboxTab';

@@ -8,8 +8,10 @@ import {
 const outboxRow: NotificationOutboxRow = {
   id: 'outbox-1',
   eventType: 'contact.created',
+  channel: 'telegram',
   channelId: 'channel-1',
   channelName: 'Operations',
+  target: null,
   status: 'dead',
   attempts: 5,
   lastError: 'Bad Request',

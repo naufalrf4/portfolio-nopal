@@ -1,21 +1,32 @@
 'use client';
 
 import { useState } from 'react';
-import { BellRing, Radio, Workflow, Send } from 'lucide-react';
+import { BellRing, Inbox, Radio, Send, Settings2, Smartphone } from 'lucide-react';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { PageWrapper } from '@/components/layout/PageWrapper';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   useNotificationChannels,
-  useNotificationRules,
+  useNotificationInbox,
   useNotificationOutbox,
+  useNotificationPreferences,
+  usePushNotifications,
   ChannelsTab,
-  RulesTab,
+  DevicesTab,
+  InboxTab,
   OutboxTab,
+  PreferencesTab,
 } from '@/features/notifications';
 
+const notificationTabs = ['inbox', 'devices', 'channels', 'preferences', 'outbox'] as const;
+type NotificationTab = (typeof notificationTabs)[number];
+
+function isNotificationTab(value: string): value is NotificationTab {
+  return notificationTabs.some((tab) => tab === value);
+}
+
 export function NotificationsPageContent() {
-  const [activeTab, setActiveTab] = useState<'channels' | 'rules' | 'outbox'>('channels');
+  const [activeTab, setActiveTab] = useState<NotificationTab>('inbox');
 
   const {
     channels,
@@ -28,21 +39,17 @@ export function NotificationsPageContent() {
     sendTestMessage,
   } = useNotificationChannels();
 
-  const {
-    rules,
-    loading: rulesLoading,
-    inlineError,
-    saveRule,
-    toggleRule,
-    updateMinLevel,
-    deleteRule,
-  } = useNotificationRules();
+  const inbox = useNotificationInbox();
+  const push = usePushNotifications();
+  const preferences = useNotificationPreferences();
 
   const {
     rows: outboxRows,
     loading: outboxLoading,
     statusFilter,
     setStatusFilter,
+    channelFilter,
+    setChannelFilter,
     limit,
     setLimit,
     retryingId,
@@ -50,21 +57,19 @@ export function NotificationsPageContent() {
     refresh: refreshOutbox,
   } = useNotificationOutbox();
 
-  const activeChannelsCount = channels.filter((c) => c.enabled).length;
-  const activeRulesCount = rules.filter((r) => r.enabled).length;
   const pendingOutboxCount = outboxRows.filter((r) => r.status === 'pending').length;
   const failedOutboxCount = outboxRows.filter((r) => r.status === 'failed' || r.status === 'dead').length;
 
   return (
     <PageWrapper>
       <PageHeader
-        title="Telegram Notifications"
-        description="Configure target Telegram channels, event routing matrix, and monitor delivery queue"
+        title="Notifications"
+        description="Review the in-app inbox, mirror delivery to registered devices, and configure Telegram extras."
         icon={<BellRing />}
         stats={[
-          { label: 'Configured Channels', value: channels.length },
-          { label: 'Active Channels', value: activeChannelsCount },
-          { label: 'Active Rules', value: activeRulesCount },
+          { label: 'Unread', value: inbox.unreadCount },
+          { label: 'Registered Devices', value: push.devices.length },
+          { label: 'Telegram Channels', value: channels.length },
           {
             label: 'Failed in Outbox',
             value: failedOutboxCount,
@@ -73,15 +78,24 @@ export function NotificationsPageContent() {
         ]}
       />
 
-      <Tabs value={activeTab} onValueChange={(val) => setActiveTab(val as 'channels' | 'rules' | 'outbox')}>
+      <Tabs value={activeTab} onValueChange={(value) => isNotificationTab(value) && setActiveTab(value)}>
         <TabsList className="mb-4">
+          <TabsTrigger value="inbox" className="gap-2">
+            <Inbox className="h-4 w-4" />
+            Inbox
+            {inbox.unreadCount > 0 ? <span className="ml-1 rounded-full bg-[var(--teal)]/20 px-1.5 py-0.5 text-[10px] font-mono text-[var(--teal)]">{inbox.unreadCount}</span> : null}
+          </TabsTrigger>
+          <TabsTrigger value="devices" className="gap-2">
+            <Smartphone className="h-4 w-4" />
+            Devices ({push.devices.length})
+          </TabsTrigger>
           <TabsTrigger value="channels" className="gap-2">
             <Radio className="h-4 w-4" />
-            Channels ({channels.length})
+            Telegram ({channels.length})
           </TabsTrigger>
-          <TabsTrigger value="rules" className="gap-2">
-            <Workflow className="h-4 w-4" />
-            Rules Matrix ({rules.length})
+          <TabsTrigger value="preferences" className="gap-2">
+            <Settings2 className="h-4 w-4" />
+            Events
           </TabsTrigger>
           <TabsTrigger value="outbox" className="gap-2">
             <Send className="h-4 w-4" />
@@ -93,6 +107,14 @@ export function NotificationsPageContent() {
             ) : null}
           </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="inbox">
+          <InboxTab {...inbox} />
+        </TabsContent>
+
+        <TabsContent value="devices">
+          <DevicesTab {...push} />
+        </TabsContent>
 
         <TabsContent value="channels">
           <ChannelsTab
@@ -107,17 +129,8 @@ export function NotificationsPageContent() {
           />
         </TabsContent>
 
-        <TabsContent value="rules">
-          <RulesTab
-            rules={rules}
-            channels={channels}
-            loading={rulesLoading}
-            inlineError={inlineError}
-            onSaveRule={saveRule}
-            onToggleRule={toggleRule}
-            onUpdateMinLevel={updateMinLevel}
-            onDeleteRule={deleteRule}
-          />
+        <TabsContent value="preferences">
+          <PreferencesTab {...preferences} />
         </TabsContent>
 
         <TabsContent value="outbox">
@@ -126,6 +139,8 @@ export function NotificationsPageContent() {
             loading={outboxLoading}
             statusFilter={statusFilter}
             setStatusFilter={setStatusFilter}
+            channelFilter={channelFilter}
+            setChannelFilter={setChannelFilter}
             limit={limit}
             setLimit={setLimit}
             retryingId={retryingId}

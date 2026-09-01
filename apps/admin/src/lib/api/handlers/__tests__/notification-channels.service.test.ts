@@ -14,7 +14,7 @@ const channel = {
   updatedAt: '2026-08-28T05:00:00.000Z',
 };
 
-function createHarness(ruleCount = 0) {
+function createHarness(pendingDeliveries = 0) {
   const createdInputs: Parameters<NotificationChannelsDatabase['create']>[0][] = [];
   const updatedInputs: Parameters<NotificationChannelsDatabase['update']>[1][] = [];
   const removedIds: string[] = [];
@@ -33,7 +33,7 @@ function createHarness(ruleCount = 0) {
       removedIds.push(id);
       return id === channel.id ? channel : undefined;
     },
-    countRules: async () => ruleCount,
+    countPendingDeliveries: async () => pendingDeliveries,
   };
 
   return {
@@ -71,7 +71,7 @@ describe('NotificationChannelsService', () => {
     expect(harness.updatedInputs[0]?.updatedAt).toBeString();
   });
 
-  it('blocks removal when rules reference the channel', async () => {
+  it('blocks removal while deliveries are still queued for the channel', async () => {
     const harness = createHarness(2);
 
     const result = await harness.service.remove(channel.id);
@@ -79,7 +79,7 @@ describe('NotificationChannelsService', () => {
     expect(result).toEqual({
       ok: false,
       code: 'channel_in_use',
-      message: 'Channel is referenced by notification rules',
+      message: 'Channel still has undelivered notifications queued',
     });
     expect(harness.removedIds).toHaveLength(0);
   });

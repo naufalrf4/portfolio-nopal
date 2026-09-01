@@ -101,12 +101,9 @@ export function ChannelsTab({
       ...(parsedThreadId !== undefined && !Number.isNaN(parsedThreadId) ? { messageThreadId: parsedThreadId } : {}),
     };
 
-    let ok = false;
-    if (editingChannel) {
-      ok = await onUpdateChannel(editingChannel.id, payload);
-    } else {
-      ok = await onCreateChannel(payload);
-    }
+    const ok = editingChannel
+      ? await onUpdateChannel(editingChannel.id, payload)
+      : await onCreateChannel(payload);
 
     setSubmitting(false);
     if (ok) {

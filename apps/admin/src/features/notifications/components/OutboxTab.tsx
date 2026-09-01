@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState } from 'react';
 import { RotateCw, RefreshCw, ChevronDown, ChevronRight, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -20,7 +22,10 @@ import {
 import { formatDateTime } from '@/lib/utils/date';
 import {
   OUTBOX_STATUS_OPTIONS,
+  OUTBOX_CHANNEL_OPTIONS,
   OUTBOX_LIMIT_OPTIONS,
+  CHANNEL_LABELS,
+  getEventTypeLabel,
   STATUS_BADGE_VARIANTS,
 } from '../constants/notifications.constants';
 import type { OutboxRow } from '../types/notifications.types';
@@ -30,6 +35,8 @@ interface OutboxTabProps {
   loading: boolean;
   statusFilter: string;
   setStatusFilter: (status: string) => void;
+  channelFilter: string;
+  setChannelFilter: (channel: string) => void;
   limit: number;
   setLimit: (limit: number) => void;
   retryingId: string | null;
@@ -42,6 +49,8 @@ export function OutboxTab({
   loading,
   statusFilter,
   setStatusFilter,
+  channelFilter,
+  setChannelFilter,
   limit,
   setLimit,
   retryingId,
@@ -60,7 +69,7 @@ export function OutboxTab({
         <div>
           <h2 className="text-base font-semibold text-[var(--text-primary)]">Notification Outbox</h2>
           <p className="text-xs text-[var(--text-secondary)]">
-            Asynchronous Telegram notification queue, delivery attempts, and retry tracking
+            Mirrored push and Telegram delivery attempts with retry tracking
           </p>
         </div>
 
@@ -72,6 +81,21 @@ export function OutboxTab({
               </SelectTrigger>
               <SelectContent>
                 {OUTBOX_STATUS_OPTIONS.map((opt) => (
+                  <SelectItem key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="w-32">
+            <Select value={channelFilter} onValueChange={setChannelFilter}>
+              <SelectTrigger size="sm" className="h-9 text-xs">
+                <SelectValue placeholder="Channel Filter" />
+              </SelectTrigger>
+              <SelectContent>
+                {OUTBOX_CHANNEL_OPTIONS.map((opt) => (
                   <SelectItem key={opt.value} value={opt.value}>
                     {opt.label}
                   </SelectItem>
@@ -108,13 +132,14 @@ export function OutboxTab({
         </div>
       </div>
 
-      <div className="rounded-2xl bg-[var(--bg-card)] surface-raised overflow-hidden">
+      <div className="overflow-x-auto rounded-2xl bg-[var(--bg-card)] surface-raised">
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead className="w-8"></TableHead>
               <TableHead>Event Type</TableHead>
               <TableHead>Channel</TableHead>
+              <TableHead>Target</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-center">Attempts</TableHead>
               <TableHead>Created (WIB)</TableHead>
@@ -125,13 +150,13 @@ export function OutboxTab({
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell colSpan={8} className="text-center py-8 text-[var(--text-secondary)]">
+                <TableCell colSpan={9} className="text-center py-8 text-[var(--text-secondary)]">
                   Loading outbox...
                 </TableCell>
               </TableRow>
             ) : rows.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={8} className="text-center py-8 text-[var(--text-secondary)]">
+                <TableCell colSpan={9} className="text-center py-8 text-[var(--text-secondary)]">
                   No notification outbox records found.
                 </TableCell>
               </TableRow>
@@ -162,13 +187,18 @@ export function OutboxTab({
                       </TableCell>
 
                       <TableCell className="font-mono text-xs text-[var(--text-primary)]">
-                        {row.eventType}
+                        {getEventTypeLabel(row.eventType)}
                       </TableCell>
 
                       <TableCell className="text-xs">
                         <span className="font-medium text-[var(--text-primary)]">
-                          {row.channelName || 'Unknown Channel'}
+                          {CHANNEL_LABELS[row.channel]}
                         </span>
+                        {row.channelName ? <span className="ml-1 text-[var(--text-tertiary)]">· {row.channelName}</span> : null}
+                      </TableCell>
+
+                      <TableCell className="max-w-48 truncate font-mono text-xs text-[var(--text-secondary)]" title={row.target ?? undefined}>
+                        {row.target ?? row.channelId ?? '—'}
                       </TableCell>
 
                       <TableCell>
@@ -216,7 +246,7 @@ export function OutboxTab({
 
                     {isExpanded && row.lastError ? (
                       <TableRow className="bg-[var(--bg-elevated)]/60">
-                        <TableCell colSpan={8} className="p-4">
+                        <TableCell colSpan={9} className="p-4">
                           <div className="flex items-start gap-2 p-3 rounded-xl bg-destructive/10 border border-destructive/20 text-xs">
                             <AlertTriangle className="h-4 w-4 text-destructive shrink-0 mt-0.5" />
                             <div className="flex flex-col gap-1 w-full overflow-hidden">

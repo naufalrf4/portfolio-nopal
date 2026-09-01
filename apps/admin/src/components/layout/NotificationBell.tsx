@@ -1,17 +1,24 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { BellRing, CheckCheck } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { formatRelativeTime } from '@/lib/utils/date';
 import { useNotificationBell } from '@/features/notifications';
-import { getEventTypeLabel, STATUS_BADGE_VARIANTS } from '@/features/notifications';
 
 export function NotificationBell({ className }: { className?: string }) {
   const { items, unreadCount, loading, markAsRead, markAllAsRead } = useNotificationBell();
+  const router = useRouter();
+
+  const handleNotificationClick = async (id: string, link: string | null) => {
+    await markAsRead(id);
+    if (link) {
+      router.push(link);
+    }
+  };
 
   return (
     <Popover>
@@ -29,7 +36,7 @@ export function NotificationBell({ className }: { className?: string }) {
             <span
               className={cn(
                 'absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center',
-                'rounded-full px-1 text-[10px] font-bold text-accent-foreground',
+                'rounded-full px-1 text-[10px] font-bold text-on-accent',
                 'bg-accent',
                 'surface-raised',
                 'animate-pulse'
@@ -48,7 +55,7 @@ export function NotificationBell({ className }: { className?: string }) {
             <Button
               variant="ghost"
               size="sm"
-              onClick={markAllAsRead}
+              onClick={() => void markAllAsRead()}
               className="h-7 px-2 text-[11px] text-[var(--teal)] hover:bg-[var(--teal)]/10"
             >
               <CheckCheck className="h-3 w-3 mr-1" />
@@ -69,31 +76,28 @@ export function NotificationBell({ className }: { className?: string }) {
               <button
                 key={item.id}
                 type="button"
-                onClick={() => markAsRead(item.id)}
+                onClick={() => void handleNotificationClick(item.id, item.link)}
                 className={cn(
                   'relative flex w-full flex-col gap-1 p-3 text-left transition-colors',
                   'border-b border-line-strong last:border-b-0',
-                  item.read ? 'bg-transparent' : 'bg-[var(--teal)]/5',
+                  item.readAt ? 'bg-transparent' : 'bg-[var(--teal)]/5',
                   'hover:bg-[var(--bg-elevated)]'
                 )}
               >
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-xs font-medium text-[var(--text-primary)] truncate">
-                    {getEventTypeLabel(item.eventType)}
+                    {item.title}
                   </span>
-                  <Badge variant={STATUS_BADGE_VARIANTS[item.status]} className="shrink-0 text-[10px] px-2 py-0.5">
-                    {item.status}
-                  </Badge>
                 </div>
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-[11px] text-[var(--text-secondary)] truncate">
-                    {item.channelName || 'Unknown channel'}
+                <div className="flex items-end justify-between gap-2">
+                  <span className="line-clamp-2 text-[11px] text-[var(--text-secondary)]">
+                    {item.body}
                   </span>
                   <span className="text-[10px] text-[var(--text-tertiary)] shrink-0">
                     {formatRelativeTime(item.createdAt)}
                   </span>
                 </div>
-                {!item.read && (
+                {!item.readAt && (
                   <span className="h-1.5 w-1.5 rounded-full bg-[var(--teal)] absolute right-2 top-2" />
                 )}
               </button>

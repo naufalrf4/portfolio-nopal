@@ -1036,3 +1036,74 @@ Ditulis ulang dari data produksi. Sebelumnya masih menyebut "System & Automation
 - `apps/public-astro/src/layouts/Layout.astro` adalah starter shell yang **tidak dipakai halaman mana pun**. Rujukan dari file itu tidak berarti aset masih terpakai.
 - `og-image.png` sekarang aset buatan tangan, bukan hasil render SVG; `generate-og-image.ts` dan `og-image.svg` sudah dihapus. Jangan hidupkan lagi tanpa sumber SVG baru.
 - `scripts/generate-backgrounds.ts` masih ada untuk membuat plat background on-demand; PNG hasilnya sengaja tidak di-commit.
+
+## 2026-09-01 — Notifikasi in-app-first + Admin jadi PWA, dan tiga bug yang saling menutupi
+
+### Gejala awal
+
+Log Admin penuh `Notification enqueue failed` (7x) dengan `error_message: "[object Object]"`, `errorName: "UnknownError"`, stack kosong. Tidak ada notifikasi yang pernah sampai ke mana pun.
+
+### Root cause: tiga bug bertumpuk
+
+**1. Migrasi 0015 tidak pernah diterapkan.** Journal drizzle berisi 16 entry (0000–0015) tapi `drizzle.__drizzle_migrations` cuma 15. `notification_channels`, `notification_rules`, `notification_outbox` tidak pernah ada di database. Setiap enqueue kena Postgres `42P01 relation does not exist`, ditangkap `try/catch`, lalu diringkas jadi satu baris log.
+
+**2. Error serialization membuang error aslinya.** Kontrak logger adalah `error(message, error?, context?)`, tapi `notificationService.ts:178` mengirim object context sebagai argumen ke-2. `describeError()` lalu jatuh ke cabang non-Error dan `String(obj)` menghasilkan `"[object Object]"` — `PostgresError` + pesan + stack hilang seluruhnya. Ini satu-satunya pemakaian salah dari 43 pemanggilan `logger.error` di repo (dipastikan dengan pemindai AST kecil, bukan grep).
+
+**3. Query dispatch memakai nama kolom yang salah.** `order by outbox.created_at` padahal kolomnya `"createdAt"` (camelCase, dikutip). Ada sejak HEAD, jadi **dispatch belum pernah benar-benar jalan**. Semua unit test lolos karena men-stub database — hanya eksekusi nyata yang menemukannya.
+
+### Kenapa 0015 lolos: urutan deploy terbalik
+
+`github-webhook-deploy.sh` menjalankan `docker-prod-up.sh` **lebih dulu**, baru `docker-prod-migrate.sh`. Artinya kode baru boot melawan skema lama. Lebih buruk: `up` memakai `--wait` pada healthcheck, jadi kalau healthcheck menyentuh tabel baru, rollback terjadi **sebelum** migrate pernah dijalankan. Build tetap hijau karena `next build` tidak menyentuh database.
+
+Diperbaiki:
+- migrate sekarang jalan **sebelum** `up` (migrasi aditif backward-compatible dengan image yang sedang berjalan, jadi schema-first aman)
+- `docker-prod-migrate.sh` build image dari checkout saat ini dulu — `compose run` memakai image basi kalau tidak
+- `bun run db:verify` (`apps/admin/scripts/verify-migrations.ts`) membandingkan journal di disk vs yang applied di DB, exit 1 dan **menyebut nama migrasi** yang belum jalan. Diuji dengan menghapus stamp 0016: gagal dengan benar, sebut `0016_lying_mandrill`, lalu dipulihkan.
+
+### Arsitektur notifikasi sekarang
+
+Sebelumnya Telegram-only dan berbasis "rules matrix". Sekarang:
+
+- **In-app selalu jalan.** `notifications` (title/body/link/level/readAt) adalah kanal utama, tidak bisa dimatikan. Tidak ada toggle.
+- **Push adalah cermin in-app, bukan kanal terpisah.** Mendaftarkan device **adalah** opt-in-nya — tidak ada toggle push per-event. Ini permintaan eksplisit user; `PREFERENCE_CHANNELS` sengaja cuma `['telegram']`.
+- **Telegram jadi extra opsional**, satu-satunya yang di-toggle per event type via `notification_preferences`.
+- Konsep `notification_rules` + `cross_channel_conflict` + `minLevel` per-rule **dihapus** (tabelnya kosong, jadi tidak ada data hilang).
+
+`notificationOutbox` sekarang punya `channel`, `notificationId` (FK cascade), `subscriptionId` (FK cascade); `channelId` jadi nullable karena baris webpush tidak punya channel Telegram.
+
+### Yang divalidasi dengan eksekusi nyata
+
+- enqueue tanpa device & tanpa Telegram → in-app tetap tercatat, `enqueued: 0`
+- 2 device terdaftar → 2 baris webpush, tanpa setting apa pun
+- Telegram aktif di `booking.created` saja → event itu 3 baris (2 push + 1 telegram), `contact.created` tetap 2 (push saja)
+- dispatch `claimed: 1, sent: 1` — bukti fix `createdAt`
+- VAPID/ECE nyata lewat `generateRequestDetails`: scheme `vapid`, JWT valid, `aes128gcm`, ciphertext **tidak** membocorkan plaintext
+- 410 Gone → subscription dihapus; kegagalan non-terminal → subscription dipertahankan
+- `clearRead` menghapus baris outbox lewat FK cascade
+- browser nyata (desktop + mobile 390px): 4 notifikasi render, mark-read 4→3, delete 4→3 baris, aria-label lengkap, tanpa overflow
+
+### Learned
+
+- **`logger.error(msg, error, context)` — jangan pernah kirim context sebagai argumen ke-2.** Hasilnya `"[object Object]"` dan error asli hilang total. Ini menyembunyikan bug #1 selama berhari-hari.
+- **Unit test yang men-stub database tidak bisa menangkap kolom yang salah nama.** `order by created_at` lolos 10 test dan gagal di eksekusi pertama yang nyata. Untuk SQL mentah, jalankan sekali kena DB asli.
+- **Kolom timestamp di repo ini campur konvensi**: `createdAt`/`updatedAt` camelCase dikutip, tapi `next_attempt_at`/`sent_at`/`read_at` snake_case. Di SQL mentah, `createdAt` **wajib** dikutip.
+- **Migrate harus jalan sebelum `up`, bukan sesudah.** Dengan `--wait` pada healthcheck, urutan terbalik bisa rollback sebelum migrate sempat jalan — dan build hijau tidak membuktikan skema sinkron.
+- **Service worker sengaja tanpa cache aset dan tanpa `fetch` handler.** Ini dashboard ber-auth; shell HTML basi atau response API ter-cache bisa menampilkan data admin setelah sign-out. Tugasnya cuma push.
+- **Eskalasi log wajib punya guard anti-loop.** Kegagalan notifikasi dilaporkan lewat `logger.error`, jadi mengeskalasi log error tanpa filter akan memicu notifikasi yang kegagalannya memicu notifikasi lagi. `logEscalation.service.ts` memblokir `operation: notification.enqueue|notification.dispatch`.
+- **`text-on-accent`/`text-on-error`, bukan `text-white`** — sudah jadi aturan repo, tetap relevan karena `--teal` terbalik antar tema.
+- Radix Tabs **tidak** berpindah panel dengan synthetic click dari tool browser; dipastikan ini batasan tool (halaman Contacts yang tidak disentuh juga sama), bukan regresi. Verifikasi isi tab lewat API-nya.
+- `bun x web-push generate-vapid-keys --json` menghasilkan keypair; `p256dh` dari browser adalah raw uncompressed P-256 point — key karangan ditolak dengan `Public key is not valid for specified curve`.
+- Library `web-push` menolak endpoint `http://` lokal (ECONNREFUSED walau server hidup); untuk verifikasi kriptografi tanpa jaringan pakai `generateRequestDetails`.
+
+### Koreksi saat QA akhir: service worker tidak pernah terdaftar sampai push diaktifkan
+
+Saat memeriksa ulang todo "PWA install" secara skeptis, ketemu cacat yang sempat diklaim selesai: `navigator.serviceWorker.register('/sw.js')` **hanya** dipanggil di dalam `subscribe()` pada `usePushNotifications.ts`. Konsekuensinya Admin belum installable sampai admin menekan "Enable on this device" — browser butuh registration yang aktif sebelum menawarkan install prompt.
+
+Diperbaiki dengan `src/components/providers/ServiceWorkerRegistrar.tsx`, dipasang di `(dashboard)/layout.tsx`. Registrasi jadi terjadi saat dashboard dimuat; `subscribe()` tetap memanggil `register()` sendiri (idempoten) supaya alur push tidak bergantung pada urutan mount.
+
+Juga diverifikasi di QA akhir: toggle Events (Telegram per event type) benar-benar upsert — tepat 1 baris di `notification_preferences` setelah ON lalu OFF, bukan dua — dan benar-benar mengubah fan-out (1 baris telegram → 0).
+
+### Learned (tambahan)
+
+- **Mendaftarkan service worker di dalam alur push saja tidak cukup untuk PWA.** Install prompt butuh registration aktif sejak halaman dimuat, jadi registrasi harus hidup di layout, bukan menunggu user mengaktifkan notifikasi.
+- `manifest.webmanifest` disajikan dengan `application/manifest+json` dan `sw.js` dengan `application/javascript` tanpa konfigurasi tambahan — file statis di `public/` sudah cukup, tidak perlu rewrite/header khusus di `next.config.ts`.

@@ -907,27 +907,71 @@ export const notificationChannels = pgTable('notification_channels', {
   updatedAt: timestamp({ precision: 3, withTimezone: true, mode: 'string' }).notNull(),
 });
 
-export const notificationRules = pgTable(
-  'notification_rules',
+export const notificationPreferences = pgTable(
+  'notification_preferences',
   {
     id: text().primaryKey().notNull(),
     eventType: text('event_type').notNull(),
-    channelId: text('channel_id')
-      .notNull()
-      .references(() => notificationChannels.id),
-    enabled: boolean().default(true).notNull(),
-    minLevel: text('min_level'),
+    channel: text().notNull(),
+    enabled: boolean().default(false).notNull(),
     createdAt: timestamp({ precision: 3, withTimezone: true, mode: 'string' })
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
     updatedAt: timestamp({ precision: 3, withTimezone: true, mode: 'string' }).notNull(),
   },
   (table) => [
-    unique('notification_rules_event_type_channel_id_unique').on(
+    unique('notification_preferences_event_type_channel_unique').on(
       table.eventType,
-      table.channelId
+      table.channel
     ),
   ]
+);
+
+export const notifications = pgTable(
+  'notifications',
+  {
+    id: text().primaryKey().notNull(),
+    eventType: text('event_type').notNull(),
+    title: text().notNull(),
+    body: text().notNull(),
+    link: text(),
+    level: text().default('info').notNull(),
+    payload: jsonb(),
+    readAt: timestamp('read_at', { precision: 3, withTimezone: true, mode: 'string' }),
+    createdAt: timestamp({ precision: 3, withTimezone: true, mode: 'string' })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+  },
+  (table) => [
+    index('notifications_created_at_idx').using(
+      'btree',
+      table.createdAt.desc().nullsLast().op('timestamptz_ops')
+    ),
+    index('notifications_read_at_created_at_idx').using(
+      'btree',
+      table.readAt.asc().nullsLast().op('timestamptz_ops'),
+      table.createdAt.desc().nullsLast().op('timestamptz_ops')
+    ),
+  ]
+);
+
+export const pushSubscriptions = pgTable(
+  'push_subscriptions',
+  {
+    id: text().primaryKey().notNull(),
+    endpoint: text().notNull(),
+    p256dh: text().notNull(),
+    auth: text().notNull(),
+    label: text(),
+    userAgent: text('user_agent'),
+    createdAt: timestamp({ precision: 3, withTimezone: true, mode: 'string' })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+    lastSeenAt: timestamp('last_seen_at', { precision: 3, withTimezone: true, mode: 'string' })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+  },
+  (table) => [unique('push_subscriptions_endpoint_unique').on(table.endpoint)]
 );
 
 export const notificationOutbox = pgTable(
@@ -935,9 +979,14 @@ export const notificationOutbox = pgTable(
   {
     id: text().primaryKey().notNull(),
     eventType: text('event_type').notNull(),
-    channelId: text('channel_id')
-      .notNull()
-      .references(() => notificationChannels.id),
+    notificationId: text('notification_id').references(() => notifications.id, {
+      onDelete: 'cascade',
+    }),
+    channel: text().default('telegram').notNull(),
+    channelId: text('channel_id').references(() => notificationChannels.id),
+    subscriptionId: text('subscription_id').references(() => pushSubscriptions.id, {
+      onDelete: 'cascade',
+    }),
     payload: jsonb().notNull(),
     status: text().default('pending').notNull(),
     attempts: integer().default(0).notNull(),
@@ -960,6 +1009,10 @@ export const notificationOutbox = pgTable(
       'btree',
       table.status.asc().nullsLast().op('text_ops'),
       table.nextAttemptAt.asc().nullsLast().op('timestamptz_ops')
+    ),
+    index('notification_outbox_notification_id_idx').using(
+      'btree',
+      table.notificationId.asc().nullsLast().op('text_ops')
     ),
   ]
 );

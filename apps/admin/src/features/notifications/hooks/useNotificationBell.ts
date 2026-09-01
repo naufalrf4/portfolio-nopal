@@ -1,50 +1,37 @@
-import { useCallback, useEffect, useState } from 'react';
-import type { OutboxRow } from '../types/notifications.types';
+'use client';
 
-const SEEN_STORAGE_KEY = 'admin-notifications-seen-ids';
-const POLL_INTERVAL_MS = 30000;
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { BELL_POLL_INTERVAL_MS } from '../constants/notifications.constants';
+import type { AppNotification, InboxPage } from '../types/notifications.types';
+
 const BELL_ITEM_LIMIT = 8;
 
-export interface NotificationBellItem extends OutboxRow {
-  read: boolean;
+interface UseNotificationBellReturn {
+  readonly items: readonly AppNotification[];
+  readonly unreadCount: number;
+  readonly loading: boolean;
+  markAsRead: (id: string) => Promise<void>;
+  markAllAsRead: () => Promise<void>;
+  refresh: () => void;
 }
 
-function loadSeenIds(): Set<string> {
-  if (typeof window === 'undefined') return new Set();
-  try {
-    const raw = window.localStorage.getItem(SEEN_STORAGE_KEY);
-    return raw ? new Set(JSON.parse(raw) as string[]) : new Set();
-  } catch {
-    return new Set();
-  }
-}
-
-function persistSeenIds(ids: Set<string>) {
-  try {
-    window.localStorage.setItem(SEEN_STORAGE_KEY, JSON.stringify(Array.from(ids)));
-  } catch {
-  }
-}
-
-export function useNotificationBell() {
-  const [rows, setRows] = useState<OutboxRow[]>([]);
-  const [seenIds, setSeenIds] = useState<Set<string>>(new Set());
+export function useNotificationBell(): UseNotificationBellReturn {
+  const [items, setItems] = useState<readonly AppNotification[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setSeenIds(loadSeenIds());
-    setMounted(true);
-  }, []);
+  const abortRef = useRef<AbortController | null>(null);
 
   const fetchRecent = useCallback(async (signal?: AbortSignal) => {
     try {
-      const res = await fetch('/api/v1/admin/notifications/outbox?limit=20', {
+      const res = await fetch(`/api/v1/admin/notifications/inbox?limit=${BELL_ITEM_LIMIT}`, {
         ...(signal ? { signal } : {}),
       });
-      const data = await res.json();
-      if (data.success && Array.isArray(data.data)) {
-        setRows(data.data);
+      const json = await res.json();
+
+      if (json.success) {
+        const page = json.data as InboxPage;
+        setItems(page.notifications);
+        setUnreadCount(page.unreadCount);
       }
     } catch (error) {
       if ((error as Error).name !== 'AbortError') {
@@ -57,11 +44,12 @@ export function useNotificationBell() {
 
   useEffect(() => {
     const controller = new AbortController();
+    abortRef.current = controller;
     void fetchRecent(controller.signal);
 
     const interval = setInterval(() => {
       void fetchRecent();
-    }, POLL_INTERVAL_MS);
+    }, BELL_POLL_INTERVAL_MS);
 
     return () => {
       controller.abort();
@@ -69,34 +57,38 @@ export function useNotificationBell() {
     };
   }, [fetchRecent]);
 
-  const sortedRows = [...rows].sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  const markAsRead = useCallback(
+    async (id: string) => {
+      const target = items.find((item) => item.id === id);
+
+      if (!target || target.readAt) {
+        return;
+      }
+
+      const readAt = new Date().toISOString();
+      setItems((prev) => prev.map((item) => (item.id === id ? { ...item, readAt } : item)));
+      setUnreadCount((prev) => Math.max(0, prev - 1));
+
+      try {
+        await fetch(`/api/v1/admin/notifications/inbox/${id}`, { method: 'PATCH' });
+      } catch {
+        void fetchRecent();
+      }
+    },
+    [fetchRecent, items]
   );
 
-  const items: NotificationBellItem[] = sortedRows.slice(0, BELL_ITEM_LIMIT).map((row) => ({
-    ...row,
-    read: seenIds.has(row.id),
-  }));
+  const markAllAsRead = useCallback(async () => {
+    if (unreadCount === 0) {
+      return;
+    }
 
-  const unreadCount = mounted ? sortedRows.filter((row) => !seenIds.has(row.id)).length : 0;
-
-  const markAsRead = useCallback((id: string) => {
-    setSeenIds((prev) => {
-      const next = new Set(prev);
-      next.add(id);
-      persistSeenIds(next);
-      return next;
-    });
-  }, []);
-
-  const markAllAsRead = useCallback(() => {
-    setSeenIds((prev) => {
-      const next = new Set(prev);
-      rows.forEach((row) => next.add(row.id));
-      persistSeenIds(next);
-      return next;
-    });
-  }, [rows]);
+    try {
+      await fetch('/api/v1/admin/notifications/inbox/read-all', { method: 'POST' });
+    } finally {
+      void fetchRecent();
+    }
+  }, [fetchRecent, unreadCount]);
 
   return {
     items,
@@ -104,6 +96,6 @@ export function useNotificationBell() {
     loading,
     markAsRead,
     markAllAsRead,
-    refresh: fetchRecent,
+    refresh: () => void fetchRecent(),
   };
 }

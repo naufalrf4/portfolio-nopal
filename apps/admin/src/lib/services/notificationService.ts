@@ -1,14 +1,19 @@
 import { createId } from '@paralleldrive/cuid2';
 import { meetsLevel } from '@naufalrf/contracts';
-import type { LogLevel } from '@naufalrf/contracts';
-import { and, eq, isNull } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '@/lib/db';
 import {
   notificationChannels,
   notificationOutbox,
-  notificationRules,
+  notificationPreferences,
+  notifications,
+  pushSubscriptions,
 } from '@/lib/db/schema';
+import { PREFERENCE_CHANNELS } from '@/lib/notifications/channels';
+import type { DeliveryChannel, PreferenceChannel } from '@/lib/notifications/channels';
+import { buildNotificationContent } from '@/lib/notifications/content';
+import type { NotificationContent } from '@/lib/notifications/content';
 import {
   getLogErrorLevel,
   notificationEventTypeSchema,
@@ -17,7 +22,7 @@ import {
 import type { NotificationEventType } from '@/lib/notifications/templates';
 import { logger } from '@/lib/utils/logger';
 
-export { notificationEventTypeSchema };
+export { notificationEventTypeSchema, getLogErrorLevel };
 export type { NotificationEventType };
 
 export const SUBMISSION_EVENT_TYPES = [
@@ -30,112 +35,102 @@ export const SUBMISSION_EVENT_TYPES = [
 
 const logLevelSchema = z.enum(['debug', 'info', 'warn', 'error']);
 
-export type NotificationRuleMatch = {
-  readonly channelId: string;
-  readonly minLevel: string | null;
-};
-
-export type RuleBinding = {
-  readonly eventType: string;
+export type SavePreferenceInput = {
+  readonly eventType: NotificationEventType;
+  readonly channel: PreferenceChannel;
+  readonly enabled: boolean;
 };
 
 type OutboxRecord = {
   readonly id: string;
   readonly eventType: NotificationEventType;
-  readonly channelId: string;
-  readonly payload: { readonly text: string };
+  readonly notificationId: string;
+  readonly channel: DeliveryChannel;
+  readonly channelId: string | null;
+  readonly subscriptionId: string | null;
+  readonly payload: Record<string, unknown>;
   readonly status: 'pending';
   readonly attempts: 0;
 };
 
-export type SaveRuleInput = {
-  readonly eventType: NotificationEventType;
-  readonly channelId: string;
-  readonly enabled: boolean;
-  readonly minLevel?: LogLevel | null;
+export type EnqueueResult = {
+  readonly notificationId: string | null;
+  readonly enqueued: number;
 };
 
-export type SaveRuleResult =
-  | { readonly ok: true }
-  | {
-      readonly ok: false;
-      readonly code: 'cross_channel_conflict';
-      readonly message: string;
-    };
-
 export interface NotificationDatabase {
-  findEnabledRules(eventType: NotificationEventType): Promise<readonly NotificationRuleMatch[]>;
-  insertOutbox(records: OutboxRecord[]): Promise<void>;
-  findRuleBindings(channelId: string): Promise<readonly RuleBinding[]>;
-  saveRule(input: SaveRuleInput): Promise<void>;
+  findEnabledPreferences(
+    eventType: NotificationEventType
+  ): Promise<readonly PreferenceChannel[]>;
+  insertNotification(record: {
+    readonly id: string;
+    readonly eventType: NotificationEventType;
+    readonly title: string;
+    readonly body: string;
+    readonly link: string | null;
+    readonly level: string;
+    readonly payload: unknown;
+  }): Promise<void>;
+  findTelegramChannelIds(): Promise<readonly string[]>;
+  findPushSubscriptionIds(): Promise<readonly string[]>;
+  insertOutbox(records: readonly OutboxRecord[]): Promise<void>;
+  savePreference(input: SavePreferenceInput): Promise<void>;
 }
 
 const drizzleNotificationDatabase: NotificationDatabase = {
-  async findEnabledRules(eventType) {
-    return db
-      .select({ channelId: notificationRules.channelId, minLevel: notificationRules.minLevel })
-      .from(notificationRules)
-      .innerJoin(
-        notificationChannels,
-        eq(notificationRules.channelId, notificationChannels.id)
-      )
+  async findEnabledPreferences(eventType) {
+    const rows = await db
+      .select({ channel: notificationPreferences.channel })
+      .from(notificationPreferences)
       .where(
         and(
-          eq(notificationRules.eventType, eventType),
-          eq(notificationRules.enabled, true),
-          eq(notificationChannels.enabled, true)
+          eq(notificationPreferences.eventType, eventType),
+          eq(notificationPreferences.enabled, true)
         )
       );
+
+    return rows
+      .map((row) => row.channel)
+      .filter((channel): channel is PreferenceChannel =>
+        PREFERENCE_CHANNELS.includes(channel as PreferenceChannel)
+      );
+  },
+  async insertNotification(record) {
+    await db.insert(notifications).values(record);
+  },
+  async findTelegramChannelIds() {
+    const rows = await db
+      .select({ id: notificationChannels.id })
+      .from(notificationChannels)
+      .where(eq(notificationChannels.enabled, true));
+
+    return rows.map((row) => row.id);
+  },
+  async findPushSubscriptionIds() {
+    const rows = await db.select({ id: pushSubscriptions.id }).from(pushSubscriptions);
+    return rows.map((row) => row.id);
   },
   async insertOutbox(records) {
-    await db.insert(notificationOutbox).values(records);
-  },
-  async findRuleBindings(channelId) {
-    const [channel] = await db
-      .select({ chatId: notificationChannels.chatId, messageThreadId: notificationChannels.messageThreadId })
-      .from(notificationChannels)
-      .where(eq(notificationChannels.id, channelId))
-      .limit(1);
-
-    if (!channel) {
-      return [];
+    if (records.length === 0) {
+      return;
     }
 
-    return db
-      .select({ eventType: notificationRules.eventType })
-      .from(notificationRules)
-      .innerJoin(
-        notificationChannels,
-        eq(notificationRules.channelId, notificationChannels.id)
-      )
-      .where(
-        and(
-          eq(notificationChannels.chatId, channel.chatId),
-          channel.messageThreadId === null
-            ? isNull(notificationChannels.messageThreadId)
-            : eq(notificationChannels.messageThreadId, channel.messageThreadId)
-        )
-      );
+    await db.insert(notificationOutbox).values([...records]);
   },
-  async saveRule(input) {
+  async savePreference(input) {
     const now = new Date().toISOString();
     await db
-      .insert(notificationRules)
+      .insert(notificationPreferences)
       .values({
         id: createId(),
         eventType: input.eventType,
-        channelId: input.channelId,
+        channel: input.channel,
         enabled: input.enabled,
-        minLevel: input.minLevel ?? null,
         updatedAt: now,
       })
       .onConflictDoUpdate({
-        target: [notificationRules.eventType, notificationRules.channelId],
-        set: {
-          enabled: input.enabled,
-          minLevel: input.minLevel ?? null,
-          updatedAt: now,
-        },
+        target: [notificationPreferences.eventType, notificationPreferences.channel],
+        set: { enabled: input.enabled, updatedAt: now },
       });
   },
 };
@@ -143,66 +138,115 @@ const drizzleNotificationDatabase: NotificationDatabase = {
 export class NotificationService {
   constructor(private readonly database: NotificationDatabase = drizzleNotificationDatabase) {}
 
-  async enqueue(
-    eventType: NotificationEventType,
-    payload: unknown
-  ): Promise<{ readonly enqueued: number }> {
+  async enqueue(eventType: NotificationEventType, payload: unknown): Promise<EnqueueResult> {
+    let content: NotificationContent;
+
     try {
-      const rules = await this.database.findEnabledRules(eventType);
-      const highestSeverity = eventType === 'log.error' ? getLogErrorLevel(payload) : undefined;
-      const survivingRules = rules.filter((rule) => {
-        if (highestSeverity === undefined || rule.minLevel === null) {
-          return true;
-        }
-
-        const threshold = logLevelSchema.safeParse(rule.minLevel);
-        return threshold.success && meetsLevel(highestSeverity, threshold.data);
-      });
-
-      if (survivingRules.length === 0) {
-        return { enqueued: 0 };
-      }
-
-      const text = renderNotification(eventType, payload);
-      const records: OutboxRecord[] = survivingRules.map((rule) => ({
-        id: createId(),
-        eventType,
-        channelId: rule.channelId,
-        payload: { text },
-        status: 'pending',
-        attempts: 0,
-      }));
-      await this.database.insertOutbox(records);
-      return { enqueued: records.length };
+      content = buildNotificationContent(eventType, payload);
     } catch (error) {
-      logger.error('Notification enqueue failed', {
+      logger.error('Notification content build failed', error, {
         operation: 'notification.enqueue',
         eventType,
-        error: error instanceof Error ? error.message : String(error),
       });
-      return { enqueued: 0 };
+      return { notificationId: null, enqueued: 0 };
+    }
+
+    const notificationId = createId();
+
+    try {
+      await this.database.insertNotification({
+        id: notificationId,
+        eventType,
+        title: content.title,
+        body: content.body,
+        link: content.link,
+        level: content.level,
+        payload: payload ?? null,
+      });
+    } catch (error) {
+      logger.error('In-app notification insert failed', error, {
+        operation: 'notification.enqueue',
+        eventType,
+      });
+      return { notificationId: null, enqueued: 0 };
+    }
+
+    try {
+      const records: OutboxRecord[] = [];
+
+      // Push mirrors the in-app notification to whichever devices the admin
+      // registered. No per-event toggle: subscribing a device IS the opt-in.
+      const subscriptionIds = await this.database.findPushSubscriptionIds();
+
+      for (const subscriptionId of subscriptionIds) {
+        records.push({
+          id: createId(),
+          eventType,
+          notificationId,
+          channel: 'webpush',
+          channelId: null,
+          subscriptionId,
+          payload: {
+            title: content.title,
+            body: content.body,
+            link: content.link,
+            tag: notificationId,
+          },
+          status: 'pending',
+          attempts: 0,
+        });
+      }
+
+      const enabled = await this.database.findEnabledPreferences(eventType);
+
+      if (enabled.includes('telegram')) {
+        const text = renderNotification(eventType, payload);
+        const channelIds = await this.database.findTelegramChannelIds();
+
+        for (const channelId of channelIds) {
+          records.push({
+            id: createId(),
+            eventType,
+            notificationId,
+            channel: 'telegram',
+            channelId,
+            subscriptionId: null,
+            payload: { text },
+            status: 'pending',
+            attempts: 0,
+          });
+        }
+      }
+
+      await this.database.insertOutbox(records);
+      return { notificationId, enqueued: records.length };
+    } catch (error) {
+      logger.error('Notification fan-out failed', error, {
+        operation: 'notification.enqueue',
+        eventType,
+        notificationId,
+      });
+      return { notificationId, enqueued: 0 };
     }
   }
 
-  async saveRule(input: SaveRuleInput): Promise<SaveRuleResult> {
-    const bindings = await this.database.findRuleBindings(input.channelId);
-    const isEscalation = input.eventType === 'log.error';
-    const hasConflictingBinding = bindings.some((binding) => {
-      const bindingType = notificationEventTypeSchema.safeParse(binding.eventType);
-      return bindingType.success && (bindingType.data === 'log.error') !== isEscalation;
-    });
-
-    if (hasConflictingBinding) {
-      return {
-        ok: false,
-        code: 'cross_channel_conflict',
-        message: 'Log escalation and submission events cannot share a Telegram destination',
-      };
-    }
-
-    await this.database.saveRule(input);
-    return { ok: true };
+  async savePreference(input: SavePreferenceInput): Promise<void> {
+    await this.database.savePreference(input);
   }
 }
 
 export const notificationService = new NotificationService();
+
+export function shouldEscalateLogLevel(
+  level: string,
+  threshold: string | null | undefined
+): boolean {
+  const parsedLevel = logLevelSchema.safeParse(level);
+  const parsedThreshold = logLevelSchema.safeParse(threshold ?? 'error');
+
+  if (!parsedLevel.success || !parsedThreshold.success) {
+    return false;
+  }
+
+  return meetsLevel(parsedLevel.data, parsedThreshold.data);
+}

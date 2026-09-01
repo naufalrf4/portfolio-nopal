@@ -42,9 +42,18 @@ function createHarness(captureSettings: LogCaptureSettings) {
     },
   };
 
+  const escalatedBatches: LogEntryInput[][] = [];
+  const escalationSource = {
+    escalate: async (entries: readonly LogEntryInput[]) => {
+      escalatedBatches.push([...entries]);
+      return entries.length;
+    },
+  };
+
   return {
-    service: new LogIngestService(database, settingsSource),
+    service: new LogIngestService(database, settingsSource, escalationSource),
     insertedBatches,
+    escalatedBatches,
     getSettingsCalls: () => settingsCalls,
   };
 }
@@ -157,5 +166,30 @@ describe('LogIngestService', () => {
 
     expect(result).toEqual({ accepted: 50, stored: 50 });
     expect(harness.getSettingsCalls()).toBe(1);
+  });
+
+  it('escalates only the captured entries, not the filtered ones', async () => {
+    const harness = createHarness(settings({ minLevel: 'warn' }));
+
+    await harness.service.ingest([entry('info'), entry('warn'), entry('error')]);
+
+    expect(harness.escalatedBatches).toHaveLength(1);
+    expect(harness.escalatedBatches[0]?.map((item) => item.level)).toEqual(['warn', 'error']);
+  });
+
+  it('does not escalate when capture is disabled', async () => {
+    const harness = createHarness(settings({ enabled: false }));
+
+    await harness.service.ingest([entry('error')]);
+
+    expect(harness.escalatedBatches).toHaveLength(0);
+  });
+
+  it('does not escalate when nothing met the threshold', async () => {
+    const harness = createHarness(settings({ minLevel: 'error' }));
+
+    await harness.service.ingest([entry('info')]);
+
+    expect(harness.escalatedBatches).toHaveLength(0);
   });
 });

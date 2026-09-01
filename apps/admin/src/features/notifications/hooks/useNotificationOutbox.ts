@@ -1,11 +1,14 @@
+'use client';
+
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import type { OutboxRow, OutboxStatus } from '../types/notifications.types';
+import type { OutboxRow } from '../types/notifications.types';
 
 export function useNotificationOutbox() {
   const [rows, setRows] = useState<OutboxRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [channelFilter, setChannelFilter] = useState<string>('all');
   const [limit, setLimit] = useState<number>(50);
   const [retryingId, setRetryingId] = useState<string | null>(null);
 
@@ -16,6 +19,9 @@ export function useNotificationOutbox() {
         const params = new URLSearchParams();
         if (statusFilter && statusFilter !== 'all') {
           params.set('status', statusFilter);
+        }
+        if (channelFilter && channelFilter !== 'all') {
+          params.set('channel', channelFilter);
         }
         params.set('limit', String(limit));
 
@@ -34,7 +40,7 @@ export function useNotificationOutbox() {
         setLoading(false);
       }
     },
-    [statusFilter, limit]
+    [statusFilter, channelFilter, limit]
   );
 
   useEffect(() => {
@@ -71,8 +77,10 @@ export function useNotificationOutbox() {
   return {
     rows,
     loading,
-    statusFilter,
+statusFilter,
     setStatusFilter,
+    channelFilter,
+    setChannelFilter,
     limit,
     setLimit,
     retryingId,

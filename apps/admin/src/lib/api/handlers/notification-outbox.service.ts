@@ -1,13 +1,16 @@
 import { and, desc, eq, inArray } from 'drizzle-orm';
+import type { SQL } from 'drizzle-orm';
 import { db } from '@/lib/db';
-import { notificationChannels, notificationOutbox } from '@/lib/db/schema';
+import { notificationChannels, notificationOutbox, pushSubscriptions } from '@/lib/db/schema';
 import type { OutboxQuery } from '@/lib/validations/notifications.schema';
 
 export type NotificationOutboxRow = {
   readonly id: string;
   readonly eventType: string;
-  readonly channelId: string;
-  readonly channelName: string;
+  readonly channel: string;
+  readonly channelId: string | null;
+  readonly channelName: string | null;
+  readonly target: string | null;
   readonly status: string;
   readonly attempts: number;
   readonly lastError: string | null;
@@ -36,8 +39,10 @@ export interface NotificationOutboxDatabase {
 const selection = {
   id: notificationOutbox.id,
   eventType: notificationOutbox.eventType,
+  channel: notificationOutbox.channel,
   channelId: notificationOutbox.channelId,
   channelName: notificationChannels.name,
+  target: pushSubscriptions.label,
   status: notificationOutbox.status,
   attempts: notificationOutbox.attempts,
   lastError: notificationOutbox.lastError,
@@ -47,23 +52,31 @@ const selection = {
   nextAttemptAt: notificationOutbox.nextAttemptAt,
 };
 
+// Left joins: a web-push row has no Telegram channel, and a Telegram row has no
+// push subscription. An inner join would silently drop half the queue.
+function baseQuery() {
+  return db
+    .select(selection)
+    .from(notificationOutbox)
+    .leftJoin(notificationChannels, eq(notificationOutbox.channelId, notificationChannels.id))
+    .leftJoin(pushSubscriptions, eq(notificationOutbox.subscriptionId, pushSubscriptions.id));
+}
+
 const drizzleNotificationOutboxDatabase: NotificationOutboxDatabase = {
   async list(input) {
-    return db
-      .select(selection)
-      .from(notificationOutbox)
-      .innerJoin(notificationChannels, eq(notificationOutbox.channelId, notificationChannels.id))
-      .where(input.status ? eq(notificationOutbox.status, input.status) : undefined)
+    const filters: (SQL | undefined)[] = [
+      input.status === undefined ? undefined : eq(notificationOutbox.status, input.status),
+      input.channel === undefined ? undefined : eq(notificationOutbox.channel, input.channel),
+    ];
+    const active = filters.filter((filter): filter is SQL => filter !== undefined);
+
+    return baseQuery()
+      .where(active.length === 0 ? undefined : and(...active))
       .orderBy(desc(notificationOutbox.createdAt))
       .limit(input.limit);
   },
   async findById(id) {
-    const [row] = await db
-      .select(selection)
-      .from(notificationOutbox)
-      .innerJoin(notificationChannels, eq(notificationOutbox.channelId, notificationChannels.id))
-      .where(eq(notificationOutbox.id, id))
-      .limit(1);
+    const [row] = await baseQuery().where(eq(notificationOutbox.id, id)).limit(1);
     return row;
   },
   async retry(input) {

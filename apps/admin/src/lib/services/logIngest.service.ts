@@ -8,6 +8,7 @@ import type {
 import { logSettingsService } from '@/lib/api/handlers/log-settings.service';
 import { db } from '@/lib/db';
 import { appLogs } from '@/lib/db/schema';
+import { logEscalationService } from '@/lib/services/logEscalation.service';
 
 type AppLogRecord = typeof appLogs.$inferInsert;
 
@@ -21,10 +22,15 @@ interface LogSettingsSource {
   getCaptureSettings(): Promise<LogCaptureSettings>;
 }
 
+interface LogEscalationSource {
+  escalate(entries: readonly LogEntryInput[]): Promise<number>;
+}
+
 export class LogIngestService {
   constructor(
     private readonly database: LogDatabase = db,
-    private readonly settingsSource: LogSettingsSource = logSettingsService
+    private readonly settingsSource: LogSettingsSource = logSettingsService,
+    private readonly escalationSource: LogEscalationSource = logEscalationService
   ) {}
 
   async ingest(entries: readonly LogEntryInput[]): Promise<LogIngestResult> {
@@ -35,33 +41,36 @@ export class LogIngestService {
       return { accepted, stored: 0 };
     }
 
-    const records: AppLogRecord[] = entries
-      .filter((entry) =>
-        meetsLevel(entry.level, effectiveLevelFor(entry.service, settings))
-      )
-      .map((entry) => ({
-        id: createId(),
-        timestamp: entry.timestamp,
-        level: entry.level,
-        service: entry.service,
-        message: entry.message,
-        ...(entry.context !== undefined ? { context: entry.context } : {}),
-        ...(entry.errorName !== undefined ? { errorName: entry.errorName } : {}),
-        ...(entry.errorMessage !== undefined ? { errorMessage: entry.errorMessage } : {}),
-        ...(entry.errorStack !== undefined ? { errorStack: entry.errorStack } : {}),
-        ...(entry.correlationId !== undefined
-          ? { correlationId: entry.correlationId }
-          : {}),
-        ...(entry.durationMs !== undefined ? { durationMs: entry.durationMs } : {}),
-        ...(entry.route !== undefined ? { route: entry.route } : {}),
-        ...(entry.statusCode !== undefined ? { statusCode: entry.statusCode } : {}),
-      }));
+    const captured = entries.filter((entry) =>
+      meetsLevel(entry.level, effectiveLevelFor(entry.service, settings))
+    );
+
+    const records: AppLogRecord[] = captured.map((entry) => ({
+      id: createId(),
+      timestamp: entry.timestamp,
+      level: entry.level,
+      service: entry.service,
+      message: entry.message,
+      ...(entry.context !== undefined ? { context: entry.context } : {}),
+      ...(entry.errorName !== undefined ? { errorName: entry.errorName } : {}),
+      ...(entry.errorMessage !== undefined ? { errorMessage: entry.errorMessage } : {}),
+      ...(entry.errorStack !== undefined ? { errorStack: entry.errorStack } : {}),
+      ...(entry.correlationId !== undefined ? { correlationId: entry.correlationId } : {}),
+      ...(entry.durationMs !== undefined ? { durationMs: entry.durationMs } : {}),
+      ...(entry.route !== undefined ? { route: entry.route } : {}),
+      ...(entry.statusCode !== undefined ? { statusCode: entry.statusCode } : {}),
+    }));
 
     if (records.length === 0) {
       return { accepted, stored: 0 };
     }
 
     await this.database.insert(appLogs).values(records);
+
+    // Escalation is a side channel: a notification failure must never make log
+    // ingestion fail, because the log itself is already durably stored.
+    await this.escalationSource.escalate(captured).catch(() => undefined);
+
     return { accepted, stored: records.length };
   }
 }
