@@ -1,6 +1,5 @@
 ---
 import { PageHero } from '@/components/shared';
-import AvailabilityBadge from '@/components/services/AvailabilityBadge.astro';
 import BeyondCode from '@/components/services/BeyondCode.astro';
 import EngagementPanel from '@/components/services/EngagementPanel.astro';
 import ProcessTimeline from '@/components/services/ProcessTimeline.astro';
@@ -60,12 +59,10 @@ const breadcrumbSchema = buildBreadcrumbSchema([
   <div class="py-12 md:py-16">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <PageHero
-        eyebrow="Availability"
+        eyebrow="Services"
         title="Ways to work with me"
         description="System integration, IoT builds, and AI workflows when something needs building. Talks and mentoring when something needs explaining."
       />
-
-      <AvailabilityBadge status={about.availabilityStatus} />
       <ServiceGrid />
       <ProcessTimeline />
       <BeyondCode />

@@ -1,24 +1,16 @@
 ---
 import { ArrowUpRight } from 'lucide-react';
-import SectionHeading from './SectionHeading.astro';
 import { technicalServices } from './data';
 import { MOTIF_PANEL_GRID } from './motifs';
 ---
 
 {/*
   Asymmetric bento: the first service takes a double-width feature cell with a
-  taller motif stage, the remaining three sit as standard cells. Project listing
+  taller motif stage, the remaining four sit as standard cells. Project listing
   does not support faceted tech filtering (no `?tech=` handling in ProjectsGrid),
   so each card links to the general /projects index rather than a filtered view.
 */}
-<section aria-labelledby="technical-services-heading" class="mb-24 md:mb-32">
-  <SectionHeading
-    id="technical-services-heading"
-    eyebrow="What I build"
-    title="Four kinds of work"
-    description="One habit runs through all of them: it has to still be running when I am no longer looking at it."
-  />
-
+<section aria-label="Technical services" class="mb-24 md:mb-32">
   <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
     {
       technicalServices.map((service, i) => {
