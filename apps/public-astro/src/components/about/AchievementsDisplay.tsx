@@ -1,7 +1,7 @@
-import { useState, useRef, useEffect, type FC, type MouseEvent as ReactMouseEvent } from 'react';
+import { useState, useEffect, type FC } from 'react';
 import { Button } from '../shared/Button';
 import { ResponsiveModal } from '../shared/ResponsiveModal';
-import { ThreeDCard, CardItem, BlurFade } from '@/components/ui';
+import { ThreeDCard, CardItem, Marquee } from '@/components/ui';
 import {
   Award,
   Calendar,
@@ -40,6 +40,11 @@ interface AchievementModalProps {
   onClose: () => void;
 }
 
+function repeatForRow(cardCount: number): number {
+  if (cardCount <= 0) return 4;
+  return Math.max(3, Math.ceil(6 / cardCount));
+}
+
 const mediaPlaceholder = (
   <div className="flex h-full w-full flex-col items-center justify-center gap-3 bg-bg-elevated px-5 text-center text-text-secondary">
     <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-bg-elevated">
@@ -59,10 +64,10 @@ const AchievementCard: FC<AchievementCardProps> = ({ achievement, onClick }) => 
   const firstPhoto = hasPhotos ? achievement.photos[0] : null;
 
   return (
-    <div className="flex w-[248px] flex-shrink-0 flex-col items-center sm:w-[272px] md:w-[286px]">
+    <div className="w-[248px] flex-shrink-0 sm:w-[272px] md:w-[286px]">
       <ThreeDCard className="w-full" maxTilt={8}>
         <button onClick={onClick} className="group block w-full cursor-pointer text-left">
-          <div className="flex h-full min-h-[272px] flex-col overflow-hidden rounded-xl bg-bg-card border border-line transition-colors duration-300 group-hover:border-line-hover">
+          <div className="flex h-[288px] flex-col overflow-hidden rounded-xl bg-bg-card border border-line transition-colors duration-300 group-hover:border-line-hover">
             <CardItem translateZ={25}>
               <div className="relative aspect-[16/10] w-full overflow-hidden rounded-b-[20px] bg-bg-elevated border border-line">
                 {firstPhoto ? (
@@ -78,27 +83,19 @@ const AchievementCard: FC<AchievementCardProps> = ({ achievement, onClick }) => 
               </div>
             </CardItem>
 
-            <CardItem translateZ={15}>
-              <div className="flex flex-1 flex-col justify-between px-4 pb-4 pt-4">
-                <div>
-                  <h3 className="line-clamp-2 text-[15px] font-bold leading-snug text-text-primary transition-colors group-hover:text-text-primary sm:text-base">
-                    {achievement.name}
-                  </h3>
-                  <p className="mt-2 text-xs font-medium uppercase tracking-[0.18em] text-text-secondary">
-                    {achievement.monthYear}
-                  </p>
-                </div>
+            <CardItem translateZ={15} className="flex flex-1 flex-col">
+              <div className="flex flex-1 flex-col px-4 pb-4 pt-4">
+                <h3 className="line-clamp-2 min-h-[2.6em] text-[15px] font-bold leading-snug text-text-primary sm:text-base">
+                  {achievement.name}
+                </h3>
+                <p className="mt-2 text-xs font-medium uppercase tracking-[0.18em] text-text-secondary">
+                  {achievement.monthYear}
+                </p>
               </div>
             </CardItem>
           </div>
         </button>
       </ThreeDCard>
-
-      <div className="relative z-10 mt-3">
-        <div className="flex h-[18px] w-[18px] items-center justify-center rounded-full border border-line bg-bg-elevated">
-          <div className="h-2 w-2 rounded-full bg-teal" />
-        </div>
-      </div>
     </div>
   );
 };
@@ -260,48 +257,6 @@ const AchievementModal: FC<AchievementModalProps> = ({ achievement, isOpen, onCl
 export const AchievementsDisplay: FC<AchievementsDisplayProps> = ({ achievements }) => {
   const items = achievements ?? [];
   const [selectedAchievement, setSelectedAchievement] = useState<Achievement | null>(null);
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const [isDragging, setIsDragging] = useState(false);
-  const [startX, setStartX] = useState(0);
-  const [scrollLeft, setScrollLeft] = useState(0);
-
-  useEffect(() => {
-    const container = scrollContainerRef.current;
-    if (!container) return;
-
-    const handleMouseMove = (event: MouseEvent) => {
-      if (!isDragging) return;
-      event.preventDefault();
-      const x = event.pageX - container.offsetLeft;
-      const walk = (x - startX) * 2;
-      container.scrollLeft = scrollLeft - walk;
-    };
-
-    const handleMouseUp = () => {
-      setIsDragging(false);
-      document.body.style.cursor = 'default';
-      document.body.style.userSelect = 'auto';
-    };
-
-    if (isDragging) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
-    }
-
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [isDragging, scrollLeft, startX]);
-
-  const handleMouseDown = (event: ReactMouseEvent<HTMLDivElement>) => {
-    if (!scrollContainerRef.current) return;
-    setIsDragging(true);
-    setStartX(event.pageX - scrollContainerRef.current.offsetLeft);
-    setScrollLeft(scrollContainerRef.current.scrollLeft);
-    document.body.style.cursor = 'grabbing';
-    document.body.style.userSelect = 'none';
-  };
 
   if (items.length === 0) {
     return null;
@@ -323,25 +278,22 @@ export const AchievementsDisplay: FC<AchievementsDisplayProps> = ({ achievements
         </div>
 
         <div className="relative">
-          <div
-            ref={scrollContainerRef}
-            onMouseDown={handleMouseDown}
-            className="scrollbar-hide cursor-grab overflow-x-auto pb-4 scroll-smooth active:cursor-grabbing"
-            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-          >
-            <div className="flex w-max gap-3 pb-2 md:gap-4">
-              {items.map((achievement, index) => (
-                <BlurFade key={achievement.id} delay={index * 0.06}>
-                  <AchievementCard
-                    achievement={achievement}
-                    onClick={() => setSelectedAchievement(achievement)}
-                  />
-                </BlurFade>
-              ))}
-            </div>
-          </div>
+          <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-12 bg-gradient-to-r from-[var(--bg-elevated)] to-transparent" />
+          <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-12 bg-gradient-to-l from-[var(--bg-elevated)] to-transparent" />
 
-          <div className="absolute bottom-[6px] left-0 right-0 h-[3px] rounded-full bg-[linear-gradient(90deg,transparent_0%,var(--border-hover)_50%,transparent_100%)]" />
+          <Marquee
+            pauseOnHover
+            repeat={repeatForRow(items.length)}
+            className="w-full [--duration:60s] [--gap:0.75rem] md:[--gap:1rem]"
+          >
+            {items.map((achievement) => (
+              <AchievementCard
+                key={achievement.id}
+                achievement={achievement}
+                onClick={() => setSelectedAchievement(achievement)}
+              />
+            ))}
+          </Marquee>
         </div>
       </div>
 
