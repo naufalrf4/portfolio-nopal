@@ -233,7 +233,6 @@ The admin shell is intentionally less cinematic. It prioritizes information dens
 - Links-astro and NGL retain `neu-*` class names in component markup; values resolve to shared dark-first tokens.
 - Public-astro Track E (persistent WebGL scene) is implemented in `apps/public-astro/src/components/shared/GlobalScene.tsx` and mounted from `BaseLayout.astro` with `transition:persist`. Scene state is driven by `[data-scene]` sections via IntersectionObserver, with a static CSS `.scene-fallback` for mobile, reduced motion, save-data, slow connections, and WebGL failure.
 - Public-astro homepage sections duplicate their own `<section>` + eyebrow + heading markup instead of using the shared `Section` / `SectionHeader` primitives. `SectionHeader` currently has no consumers. Consolidating the section rhythm into the shared primitives is deferred until the next homepage layout pass.
-- `graphify-out/` contains stale references to `neumorphic_styles` node labels from pre-migration code. These are generated artifacts and will self-update on the next `graphify update`.
 
 ---
 

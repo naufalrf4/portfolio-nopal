@@ -6,6 +6,10 @@ dist
 .next
 build
 
+# Generated code graphs
+graphify-out/
+apps/*/graphify-out/
+
 # Python
 .venv
 __pycache__
@@ -57,4 +61,3 @@ coverage
 
 # Playwright MCP QA cache
 .playwright-mcp/
-

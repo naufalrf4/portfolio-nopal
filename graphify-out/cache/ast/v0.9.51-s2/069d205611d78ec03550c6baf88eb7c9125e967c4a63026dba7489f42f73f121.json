@@ -1,1 +1,0 @@
-{"nodes": [{"id": "$graphify-root$_apps_links_astro_src_layouts_baselayout_astro", "label": "BaseLayout.astro", "file_type": "code", "source_file": "apps/links-astro/src/layouts/BaseLayout.astro", "source_location": "L1"}], "edges": [], "raw_calls": [], "parse_errors": {"first_error_line": 2, "multiline_error": true}}

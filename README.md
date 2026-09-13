@@ -1,260 +1,149 @@
-# NaufalRF Portfolio Platform
+<div align="center">
 
-> Multi-app portfolio platform with Admin as the content authority, Astro/Svelte consumer apps, a TypeScript RAG service, and realtime presence.
+# naufalrf-portfolio
 
-![Apps](https://img.shields.io/badge/apps-6-0f172a?style=for-the-badge)
-![Runtime](https://img.shields.io/badge/runtime-Bun%20Workspace-2563eb?style=for-the-badge)
-![Frontend](https://img.shields.io/badge/frontend-Next.js%2016%20%7C%20Astro%205%20%7C%20SvelteKit%202-0ea5e9?style=for-the-badge)
-![Database](https://img.shields.io/badge/database-Neon%20Postgres-14b8a6?style=for-the-badge)
-![AI](https://img.shields.io/badge/AI-RAG%20%2B%20Realtime-f97316?style=for-the-badge)
+**A multi-app portfolio platform with one content authority and focused public surfaces.**
 
-## Overview
+Next.js administration, Astro public apps, SvelteKit messaging, Bun services, and PostgreSQL—coordinated in one Bun workspace.
 
-This repository coordinates the full NaufalRF portfolio ecosystem:
+[![Runtime](https://img.shields.io/badge/runtime-Bun-f9f1e7?style=flat-square&logo=bun&logoColor=000000)](https://bun.sh)
+[![Admin](https://img.shields.io/badge/admin-Next.js%2016-111111?style=flat-square&logo=nextdotjs)](https://nextjs.org)
+[![Public](https://img.shields.io/badge/public-Astro%205-ff5d01?style=flat-square&logo=astro)](https://astro.build)
+[![Messaging](https://img.shields.io/badge/messaging-SvelteKit%202-ff3e00?style=flat-square&logo=svelte)](https://svelte.dev)
+[![Database](https://img.shields.io/badge/database-PostgreSQL%20%2B%20pgvector-4169e1?style=flat-square&logo=postgresql&logoColor=white)](https://www.postgresql.org)
 
-- `apps/admin` — the primary content authority, admin dashboard, public API authority, and internal coordination surface
-- `apps/public-astro` — the main public portfolio and AI chat entrypoint
-- `apps/links-astro` — the link-in-bio style profile surface
-- `apps/ngl-svelte` — the anonymous message experience
-- `apps/rag-service` — TypeScript (Bun + Hono) RAG service: retrieval, embeddings, grounding, and AI workflows
-- `apps/live-presence` — realtime presence and cursor state
+[**Quick start**](#quick-start) · [**Architecture**](#architecture) · [**Apps**](#apps) · [**Commands**](#commands) · [**Operations**](#operations)
 
-The root is a Bun workspace monorepo. A single `bun install` at the root installs all apps and shared packages.
+</div>
+
+---
+
+## Why
+
+The platform keeps content, validation, and public API contracts in one place: `apps/admin`. Public-facing apps consume those APIs instead of opening their own database connections. The RAG service is the deliberate exception: it reads approved RAG data directly from PostgreSQL and coordinates with Admin through internal APIs.
+
+- **One authority** — Admin owns portfolio content, public contracts, moderation, and operations.
+- **Independent experiences** — portfolio, links, anonymous messages, live presence, and AI retrieval can evolve without sharing a frontend runtime.
+- **Shared foundations** — TypeScript configuration, design tokens, HTTP helpers, and API contracts live in workspace packages.
+- **Clear boundaries** — browser apps never access the database directly; realtime presence stays ephemeral; RAG has an explicitly limited data role.
 
 ## Architecture
 
-```mermaid
-flowchart LR
-    Public[Public Portfolio\napps/public-astro]
-    Links[Links App\napps/links-astro]
-    NGL[NGL App\napps/ngl-svelte]
-    Admin[Admin CMS + Public/Internal APIs\napps/admin]
-    Presence[Realtime Presence\napps/live-presence]
-    RAG[RAG Service\napps/rag-service]
-    DB[(Neon Postgres)]
+```text
+public-astro ─┐
+links-astro ──┼──▶ admin APIs ───▶ PostgreSQL + pgvector
+ngl-svelte ───┘         ▲                  ▲
+                         │                  │
+                 rag-service ───────────────┘
 
-    Public --> Admin
-    Links --> Admin
-    NGL --> Admin
-    Public --> RAG
-    Public --> Presence
-    Links --> Presence
-    NGL --> Presence
-    Admin --> DB
-    RAG --> DB
-    RAG --> Admin
+public-astro ─┐
+links-astro ──┼──▶ live-presence (ephemeral WebSocket state)
+ngl-svelte ───┘
 ```
 
-## Application Matrix
+## Quick start
 
-| Surface          | Path                       | Stack                 | Default Port | Responsibility                                          |
-| ---------------- | -------------------------- | --------------------- | ------------ | ------------------------------------------------------- |
-| Public portfolio | `apps/public-astro`        | Astro 5 + React       | `3000`       | Main portfolio, SEO surface, AI chat entrypoint         |
-| Admin            | `apps/admin`               | Next.js 16            | `3001`       | CMS, content authority, dashboard, public/internal APIs |
-| Links            | `apps/links-astro`         | Astro 5 + React       | `3002`       | Compact links/profile surface                           |
-| NGL              | `apps/ngl-svelte`          | SvelteKit 2           | `3003`       | Anonymous messaging                                     |
-| RAG service      | `apps/rag-service`         | Bun + Hono + pgvector   | `3005`       | Retrieval, grounding, AI workflows                      |
-| Live presence    | `apps/live-presence`       | Bun WebSocket service | `3006`       | Realtime presence and cursor state                      |
-
-## Non-Negotiable Platform Rules
-
-- `apps/admin` is the **primary content and API authority**.
-- `apps/public-astro`, `apps/links-astro`, and `apps/ngl-svelte` are **API-only consumers** and must not bypass Admin for database access.
-- `apps/rag-service` is the approved direct database actor for RAG responsibilities and may call Admin internal APIs for coordination.
-- `apps/live-presence` is ephemeral and memory-only.
-- Root is a coordination layer only; do not treat it as a shared package or workspace app.
-
-## Current Platform Highlights
-
-### Unified admin communications hub
-
-Admin now consolidates submissions, bookings, availability, NGL messages, guestbook, and related settings under **Contact**. Older standalone list routes still exist as redirects, but the operational center is `/contacts?tab=...`.
-
-### Google Calendar + Meet reconnect flow lives in Admin
-
-Booking automation no longer has to be env-only. Admin now supports a dedicated Google Calendar reconnect flow from **Contact → Settings**:
-
-- reuse the existing Google OAuth client ID and secret already used by Admin sign-in
-- complete a separate Calendar OAuth grant
-- store the encrypted refresh token and selected calendar in `booking_settings`
-- generate Calendar events + Google Meet links when bookings are approved
-
-Important: the migration for the new `booking_settings` Google columns must be applied against a running Postgres instance before that flow works at runtime.
-
-### RAG fallback and intent handling were upgraded
-
-The TypeScript RAG service now:
-
-- handles personal/profile/contact/skills questions more accurately
-- uses a generic no-data / low-confidence fallback instead of portfolio-specific dead ends
-- supports deterministic freelance-profile lookup for service/rate/profile questions
-- preserves hybrid tool answers when retrieval is empty instead of over-abstaining
-
-### Canonical machine-readable site guidance
-
-The repo now uses the public portfolio file as the **canonical format source**:
-
-- `apps/public-astro/public/llms.txt`
-
-Public-facing apps should expose their own `llms.txt` files using that same structure, but each file must be rewritten for the app’s real context and hostname.
-
-Current public `llms.txt` surfaces:
-
-- `apps/public-astro/public/llms.txt`
-- `apps/links-astro/public/llms.txt`
-- `apps/ngl-svelte/static/llms.txt`
-
-`llms-full.txt` remains intentionally removed.
-
-### Shared presence UX across apps
-
-Public, Links, and NGL now share the same cross-app presence direction using the live-presence service, including the `... Online` wording and reveal-driven presence behavior.
-
-## Quick Start
-
-### 1. Install dependencies
-
-```bash
+```sh
+# Install the single workspace lockfile.
 bun install
-```
 
-### 2. Create environment files
-
-```bash
+# Copy the local configuration needed for the apps you will run.
 cp apps/admin/.env.example apps/admin/.env.local
 cp apps/public-astro/.env.example apps/public-astro/.env
 cp apps/links-astro/.env.example apps/links-astro/.env
 cp apps/ngl-svelte/.env.example apps/ngl-svelte/.env
 cp apps/live-presence/.env.example apps/live-presence/.env
 cp apps/rag-service/.env.example apps/rag-service/.env
-```
 
-### 3. Run the local stack
-
-```bash
+# Run the local multi-app stack.
 bun run dev:all
 ```
 
-This launches the multi-app development stack from the root orchestration script.
+To work on one surface, run its local command instead:
 
-## Core Commands
+```sh
+cd apps/public-astro && bun run dev
+```
 
-### Root helpers
+Never commit real credentials.
 
-```bash
+## Apps
+
+| Surface | Path | Stack | Port | Responsibility |
+|---|---|---|:---:|---|
+| Public portfolio | `apps/public-astro` | Astro + React | 3000 | Portfolio, SEO, booking, guestbook, AI chat entrypoint |
+| Admin | `apps/admin` | Next.js | 3001 | Content authority, CMS, dashboard, public and internal APIs |
+| Links | `apps/links-astro` | Astro + React | 3002 | Link-in-bio profile |
+| Anonymous messages | `apps/ngl-svelte` | SvelteKit | 3003 | Turnstile-protected anonymous messaging |
+| RAG service | `apps/rag-service` | Bun + Hono | 3005 | Retrieval, embeddings, grounding, AI workflows |
+| Live presence | `apps/live-presence` | Bun WebSocket | 3006 | Ephemeral presence and cursor state |
+| Slide deck | `apps/slidedeck` | Vite | — | Static presentation-deck build artifact |
+
+## Commands
+
+```sh
+# Development and build
 bun run dev:all
-bun run reset:seed
+bun run build
+
+# Quality gates
+bun run lint
+bun run typecheck
+bun run test:e2e
+bun run test:e2e:specs       # services must already be running
+
+# Local database lifecycle
 bun run docker:dev
 bun run docker:dev:down
 bun run docker:dev:migrate
 bun run docker:dev:seed
-bun run docker:dev:reset-seed
-bun run docker:prod
-bun run docker:prod:migrate
-bun run docker:prod:bootstrap
-bun run lint-staged
+bun run reset:seed
 ```
 
-### App-local development
+App-specific verification remains available where applicable:
 
-```bash
-cd apps/admin && bun run dev
-cd apps/public-astro && bun run dev
-cd apps/links-astro && bun run dev
-cd apps/ngl-svelte && bun run dev
-cd apps/live-presence && bun run dev
-cd apps/rag-service && bun run dev
-```
-
-### Verification commands
-
-```bash
+```sh
 cd apps/admin && bun run lint && bun run typecheck && bun run build
 cd apps/public-astro && bun run build
 cd apps/links-astro && bun run build
 cd apps/ngl-svelte && bun run lint && bun run check && bun run build
-cd apps/rag-service && bun x tsc --noEmit && bun test
-cd apps/rag-service && bun run build
+cd apps/rag-service && bun run typecheck && bun test && bun run build
 ```
 
-## Google Calendar / Meet Setup
-
-Admin reuses the same Google OAuth app as Admin sign-in, but Calendar authorization is a **separate grant**.
-
-Required env in `apps/admin/.env.local`:
-
-```env
-GOOGLE_CLIENT_ID=...
-GOOGLE_CLIENT_SECRET=...
-NEXTAUTH_SECRET=...
-```
-
-Required Google Cloud setup:
-
-- enable the Google Calendar API
-- keep the Admin sign-in callback already used by Auth.js
-- add this additional redirect URI for Calendar connect:
-  - `/api/v1/admin/booking-settings/google/callback`
-  - in production this must be the full Admin origin, for example `https://admin.example.com/api/v1/admin/booking-settings/google/callback`
-
-Runtime notes:
-
-- the OAuth refresh token is encrypted before being stored in `booking_settings`
-- the selected writable calendar is also stored in `booking_settings`
-- booking approval reads that stored connection state to generate Google Calendar events + Meet links
-- if the DB migration has not been applied yet, the UI may build successfully but the runtime connect flow cannot persist tokens
-
-## Production Characteristics
-
-### Centralized data authority
-
-All public JavaScript apps consume Admin APIs instead of opening direct database connections. This keeps validation, moderation, auth-aware behavior, and public data contracts centralized.
-
-### AI and retrieval separation
-
-The RAG service owns embeddings, retrieval, and AI workflows. It can access the database directly for approved RAG responsibilities and can call Admin internal APIs for sync and chat-log coordination.
-
-### Realtime presence isolation
-
-Realtime cursor and presence behavior lives in a dedicated Bun service so ephemeral state does not leak into Admin or database concerns.
-
-### Legacy-aware UI baseline
-
-The visual baseline still follows the legacy phase2 direction where required, even as newer work adds richer dashboard interactions, AI workflows, live presence, and SEO improvements.
-
-## Repository Layout
+## Workspace layout
 
 ```text
-apps/
-  admin/            Next.js CMS, auth, APIs, analytics, booking authority
-  public-astro/     Main public portfolio and AI chat entrypoint
-  links-astro/      Compact links/profile surface
-  ngl-svelte/       Anonymous message app
-  live-presence/    Bun realtime presence service
-  rag-service/      TypeScript Bun + Hono RAG service
-packages/
-  tsconfig/        Shared TypeScript config
-  design-tokens/    Shared design tokens
-  http/             Shared HTTP utilities
-  contracts/        Shared API contracts
-.context/           Shared repo context and architecture notes
-start-dev.sh        Multi-app local development launcher
-scripts/            Docker/dev/prod orchestration helpers (incl. docker-dev-reset-seed.sh)
+apps/                 standalone application runtimes
+packages/             shared contracts, tokens, HTTP helpers, TypeScript config
+data/                 seed and RAG-ingest content
+e2e/                  API-only cross-app verification
+scripts/              Docker and deployment orchestration
 ```
 
-## Operational Notes
+## Operations
 
-- Root hook/tooling uses Bun.
-- All apps use Bun workspaces; the RAG service is TypeScript on Bun (the Python/FastAPI service was removed).
-- `data/` is operational seed/ingest content and should stay local unless you intentionally version fixtures.
-- Secrets in `.env*` files must stay placeholders only.
-- For meaningful repo behavior, always check `PROGRESS.md` and the nearest `AGENTS.md` before changing architecture or workflows.
+### Data and service boundaries
 
-## Developer Documentation
+- `apps/admin` is the content and API authority.
+- `public-astro`, `links-astro`, and `ngl-svelte` are API-only consumers; they must not access PostgreSQL directly.
+- `rag-service` is an approved PostgreSQL actor for RAG responsibilities and may use Admin internal APIs for coordination.
+- `live-presence` holds only in-memory, elapsed-time state.
 
-For repo rules, learned constraints, and architecture details, read in this order:
+### Deployment
 
-1. `AGENTS.md`
-2. `PROGRESS.md`
-3. nearest app-level `AGENTS.md`
-4. relevant `.context/` documents
+Production deployment is pull-based. An HMAC-verified GitHub webhook triggers the production Docker update and migration scripts. PostgreSQL is Dokploy-managed in production; local development uses the dockerized `pgvector/pgvector` image.
+
+### Time
+
+Server-decided calendar behavior is pinned to `Asia/Jakarta` in application code, database sessions, containers, and deployment scripts. Visitor timezone telemetry intentionally remains visitor-local.
+
+## Documentation
+
+- [AGENTS.md](AGENTS.md) — repository rules and operational constraints
+- [DESIGN.md](DESIGN.md) — cross-app visual contract
+- [.context/README.md](.context/README.md) — durable architecture and workflow context
+- [PROGRESS.md](PROGRESS.md) — project timeline and current discoveries
+
+## License
+
+Private project. All rights reserved.

@@ -80,18 +80,6 @@ Authoritative AI control contract for this repository.
 - Root hook/tooling is Bun-aligned; remove stale pnpm lockfiles and pnpm-only root docs when updating repo shell docs.
 - Root deployment is pull-based: `scripts/github_webhook_server.py` (HMAC-verified, port 9010) triggers `scripts/github-webhook-deploy.sh` which fetches/checks out `main` and runs `scripts/docker-prod-up.sh` + `scripts/docker-prod-migrate.sh`. Production Postgres is Dokploy-managed (`DB_HOST:-db`). Do not turn this into a push-to-server file sync workflow unless the deployment architecture is intentionally changed.
 
-## graphify
-
-This project has a knowledge graph at graphify-out/ with god nodes, community structure, and cross-file relationships.
-
-When the user types `/graphify`, use the installed graphify skill or instructions before doing anything else.
-
-Rules:
-- For codebase questions, first run `graphify query "<question>"` when graphify-out/graph.json exists. Use `graphify path "<A>" "<B>"` for relationships and `graphify explain "<concept>"` for focused concepts. These return a scoped subgraph, usually much smaller than GRAPH_REPORT.md or raw grep output.
-- Dirty graphify-out/ files are expected after hooks or incremental updates; dirty graph files are not a reason to skip graphify. Only skip graphify if the task is about stale or incorrect graph output, or the user explicitly says not to use it.
-- If graphify-out/wiki/index.md exists, use it for broad navigation instead of raw source browsing.
-- Read graphify-out/GRAPH_REPORT.md only for broad architecture review or when query/path/explain do not surface enough context.
-- After modifying code, run `graphify update .` to keep the graph current (AST-only, no API cost).
 - The whole system is GMT+7 (Asia/Jakarta) deterministic regardless of deploy location, enforced at four layers: app code (Jakarta-pinned formatters and date-key math), DB session timezone (`connection: { timezone: 'Asia/Jakarta' }` in both `apps/admin/src/lib/db/index.ts` and `apps/rag-service/src/db.ts`), container env (`TZ: Asia/Jakarta` on every service in both compose files, plus `PGTZ` + `-c timezone=Asia/Jakarta` on the dev Postgres), and deploy scripts (`export TZ="${TZ:-Asia/Jakarta}"`). Do not remove a layer assuming another covers it.
 - Anything the SERVER decides must be Jakarta-pinned (analytics day buckets, retention cutoffs, booking slot day boundaries, email date labels, greeting hour, build-time copyright year, deploy log timestamps). Anything that records the VISITOR's own zone must stay visitor-local: the `Intl.DateTimeFormat().resolvedOptions().timeZone` telemetry captured in public-astro/links-astro/ngl-svelte layouts and `submission-context.ts` is intentional — do not "fix" it to Jakarta.
 - `apps/public-astro/src/lib/utils.ts` is that app's date authority (`formatDate`, `formatDateShort`, `formatDistanceToNow`, `getJakartaYear`, all Jakarta-explicit). Reuse it instead of adding raw `toLocaleDateString` calls without a `timeZone`. Build-time `new Date().getFullYear()` bakes in the BUILDER's timezone — derive the year through a Jakarta-pinned formatter.
