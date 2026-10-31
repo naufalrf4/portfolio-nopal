@@ -3,6 +3,10 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const WORKSPACE_ROOT = path.resolve(__dirname, '../..');
+const r2ImageHostname =
+  process.env.ADMIN_R2_ACCOUNT_ID && process.env.ADMIN_R2_BUCKET_NAME
+    ? `${process.env.ADMIN_R2_BUCKET_NAME}.${process.env.ADMIN_R2_ACCOUNT_ID}.r2.cloudflarestorage.com`
+    : null;
 
 const nextConfig = {
   reactStrictMode: true,
@@ -33,6 +37,15 @@ const nextConfig = {
         hostname: 'storage.googleapis.com',
         pathname: '/**',
       },
+      ...(r2ImageHostname
+        ? [
+            {
+              protocol: 'https',
+              hostname: r2ImageHostname,
+              pathname: '/**',
+            },
+          ]
+        : []),
       {
         protocol: 'https',
         hostname: 'lh3.googleusercontent.com',

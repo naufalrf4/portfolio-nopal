@@ -1,8 +1,24 @@
-﻿# PROGRESS.md
+# PROGRESS.md
 
 Chronological timeline of meaningful project work, discoveries, decisions, and blockers for future agents.
 
 ## Entries
+### 2026-10-31 12:25
+
+- Task: restore and stage the Portfolio stack on the temporary MonevHub Dokploy server
+- Mode: data restore + deployment preparation
+- Files: existing R2 storage adapter and Dokploy Compose changes; `PROGRESS.md`
+- Status: in progress; database restored and healthy, Compose service created, source and runtime configuration not deployed yet
+- Notes: Downloaded `portfolio-final-20261030.dump` from the private backup bucket and verified SHA-256 (`f43f813adbd293633e2e58d8490cbd5bf07e33c611ff7bd941671afcb4ec5cd0`). Restored it transactionally into the isolated Dokploy-managed `portfolio-db-zfihw2` PostgreSQL 17/pgvector resource; verified 40 users, 25 projects, and vector 0.8.7. All 11 `AboutMe` media references now resolve to objects in the private `nrflabs-portfolio-media-prod` bucket. Created `NRF Labs / Portfolio / Portfolio Platform` on remote `MonevHub Production` without changing DNS. Created bucket-scoped R2 credentials (backup read token revoked after use; runtime media token has object read/write on the Portfolio media bucket only), a Google OAuth web client restricted to the Admin callback, and a separate managed Turnstile widget for the Portfolio hostnames. OAuth is in testing mode with `naufalrf32@gmail.com` added as a test user. Typecheck, full workspace build, and `git diff --check` passed. DNS and GCP source were left unchanged. SMTP, analytics, and push notifications remain disabled because their production credentials were not recoverable from the source host.
+
+### 2026-10-31 06:00
+
+- Task: migrate the personal portfolio stack from GCS media storage to private R2 and stage it on the temporary MonevHub host
+- Mode: migration preflight + code implementation
+- Files: `apps/admin/src/lib/services/storage.ts`, `apps/admin/next.config.js`, `apps/admin/Dockerfile`, `docker-compose.dev.yml`, `docker-compose.prod.yml`, `.env.docker.*.example`, `.context/media/image-guide.md`, `AGENTS.md`, `PROGRESS.md`
+- Status: in progress; not deployed
+- Notes: Verified the latest R2 PostgreSQL custom dump checksum and restored it into a disposable network-isolated pgvector/PostgreSQL 17 container for inventory; the archive contains 40 users and 25 projects. The private media bucket has 63 objects (35.06 MB). Ten `about/` keys referenced by the database are missing from that bucket; the configured GCS bucket name returns 404, the corresponding public object URL returns 404, and those files are absent from the coding checkout. The repo identifies the old GCP host as `34.142.218.199` (`naufalrf32`, checkout `/opt/portfolio-nopal`), but SSH/HTTP/HTTPS all time out from the coding host; its `naufalrf-personal` tailnet peer is offline. Compute API activation in `naufalrf-portfolio` is blocked because no billing account is attached. No billing change or VM start was attempted. The GCP project available in the active account has no bucket; one unrelated project denies bucket-list access. Implemented the Admin R2 S3 adapter, signed GET/PUT, deletes, build-time Next Image host, runtime-only credentials, and legacy GCS URL-to-key normalization. Typecheck, lint (one existing unused-parameter warning), production build, Compose YAML parsing, diff checks, and offline presigning/legacy normalization checks passed. No Dokploy, DNS, production database, or public service was changed. Deployment still requires recovery of the ten referenced images and the existing production runtime secrets so the restored encrypted integrations and authentication remain usable.
+
 ### 2026-09-01 16:57
 
 - Task: continue autonomous SEO/GEO hardening loop on naufalrf.net, re-audit for remaining gaps after the earlier 2026-09-01 sitemap/canonical/schema work

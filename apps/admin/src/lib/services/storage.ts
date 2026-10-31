@@ -1,24 +1,20 @@
-import { Storage } from '@google-cloud/storage';
-
-interface ServiceAccountCredentials {
-  client_email?: string;
-  private_key?: string;
-}
+import {
+  DeleteObjectCommand,
+  GetObjectCommand,
+  PutObjectCommand,
+  S3Client,
+} from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 type AssetValue = string | null | undefined;
 
-function getCredentials(): ServiceAccountCredentials | undefined {
-  const rawCredentials = process.env.GCS_SERVICE_ACCOUNT_JSON?.trim();
+type R2EnvironmentKey =
+  | 'ADMIN_R2_ACCOUNT_ID'
+  | 'ADMIN_R2_BUCKET_NAME'
+  | 'ADMIN_R2_ACCESS_KEY_ID'
+  | 'ADMIN_R2_SECRET_ACCESS_KEY';
 
-  if (!rawCredentials) {
-    return undefined;
-  }
-
-  const parsed = JSON.parse(rawCredentials) as ServiceAccountCredentials;
-  return parsed.client_email && parsed.private_key ? parsed : undefined;
-}
-
-function getRequiredEnv(name: 'GCS_BUCKET_NAME' | 'GCS_PROJECT_ID'): string {
+function getRequiredEnv(name: R2EnvironmentKey): string {
   const value = process.env[name]?.trim();
 
   if (!value) {
@@ -28,34 +24,36 @@ function getRequiredEnv(name: 'GCS_BUCKET_NAME' | 'GCS_PROJECT_ID'): string {
   return value;
 }
 
-let cachedStorageClient: Storage | null = null;
+let cachedStorageClient: S3Client | null = null;
 
-function getStorageClient(): Storage {
+function getStorageClient(): S3Client {
   if (cachedStorageClient) {
     return cachedStorageClient;
   }
 
-  const credentials = getCredentials();
-  cachedStorageClient = new Storage({
-    projectId: getRequiredEnv('GCS_PROJECT_ID'),
-    ...(credentials ? { credentials } : {}),
+  const accountId = getRequiredEnv('ADMIN_R2_ACCOUNT_ID');
+  if (!/^[a-f0-9]{32}$/i.test(accountId)) {
+    throw new Error('ADMIN_R2_ACCOUNT_ID must be a 32-character Cloudflare account ID.');
+  }
+
+  cachedStorageClient = new S3Client({
+    region: 'auto',
+    endpoint: `https://${accountId}.r2.cloudflarestorage.com`,
+    credentials: {
+      accessKeyId: getRequiredEnv('ADMIN_R2_ACCESS_KEY_ID'),
+      secretAccessKey: getRequiredEnv('ADMIN_R2_SECRET_ACCESS_KEY'),
+    },
   });
 
   return cachedStorageClient;
 }
 
 function getBucketName(): string {
-  return getRequiredEnv('GCS_BUCKET_NAME');
+  return getRequiredEnv('ADMIN_R2_BUCKET_NAME');
 }
 
-function normalizePublicBaseUrl(value: string | undefined): string | null {
-  const trimmed = value?.trim();
-  if (!trimmed) {
-    return null;
-  }
-
-  return trimmed.replace(/\/+$/, '');
-}
+const LEGACY_GCS_BUCKET_NAME = 'media.naufalrf.net';
+const LEGACY_GCS_PUBLIC_BASE_URL = 'https://media.naufalrf.net';
 
 function normalizeStorageKeyCandidate(value: string): string | null {
   const [pathPart, queryPart] = value.split('?', 2);
@@ -87,6 +85,10 @@ function isLikelySignedStorageUrl(url: URL): boolean {
     'X-Goog-Credential',
     'X-Goog-Signature',
     'GoogleAccessId',
+    'X-Amz-Algorithm',
+    'X-Amz-Credential',
+    'X-Amz-Signature',
+    'X-Amz-Expires',
     'Expires',
     'Signature',
   ].some((key) => url.searchParams.has(key));
@@ -95,24 +97,20 @@ function isLikelySignedStorageUrl(url: URL): boolean {
 function extractStorageKeyFromUrl(value: string): string | null {
   try {
     const parsedUrl = new URL(value);
-    const bucketName = process.env.GCS_BUCKET_NAME?.trim();
-    const publicBaseUrl = normalizePublicBaseUrl(process.env.GCS_PUBLIC_BASE_URL);
-
-    if (publicBaseUrl && value.startsWith(`${publicBaseUrl}/`)) {
-      return decodeURIComponent(value.slice(publicBaseUrl.length + 1)) || null;
-    }
-
-    if (!bucketName) {
-      return null;
+    if (value.startsWith(`${LEGACY_GCS_PUBLIC_BASE_URL}/`)) {
+      return decodeURIComponent(value.slice(LEGACY_GCS_PUBLIC_BASE_URL.length + 1)) || null;
     }
 
     const rawPath = decodeURIComponent(parsedUrl.pathname.replace(/^\/+/, ''));
 
-    if (parsedUrl.hostname === 'storage.googleapis.com' && rawPath.startsWith(`${bucketName}/`)) {
-      return rawPath.slice(bucketName.length + 1) || null;
+    if (
+      parsedUrl.hostname === 'storage.googleapis.com' &&
+      rawPath.startsWith(`${LEGACY_GCS_BUCKET_NAME}/`)
+    ) {
+      return rawPath.slice(LEGACY_GCS_BUCKET_NAME.length + 1) || null;
     }
 
-    if (parsedUrl.hostname === `${bucketName}.storage.googleapis.com`) {
+    if (parsedUrl.hostname === `${LEGACY_GCS_BUCKET_NAME}.storage.googleapis.com`) {
       return rawPath || null;
     }
 
@@ -177,35 +175,31 @@ export class StorageService {
     const key = this.generateKey(file.name, folder);
     const buffer = Buffer.from(await file.arrayBuffer());
 
-    await getStorageClient()
-      .bucket(getBucketName())
-      .file(key)
-      .save(buffer, {
-        resumable: false,
-        metadata: {
-          contentType: file.type,
-          cacheControl: this.getCacheControl(folder),
-        },
-      });
+    await getStorageClient().send(
+      new PutObjectCommand({
+        Bucket: getBucketName(),
+        Key: key,
+        Body: buffer,
+        ContentType: file.type,
+        CacheControl: this.getCacheControl(folder),
+      })
+    );
 
     return { key };
   }
 
   async signGetUrl(key: string, expiresInSeconds = 3600): Promise<string> {
-    const [signedUrl] = await getStorageClient()
-      .bucket(getBucketName())
-      .file(key)
-      .getSignedUrl({
-        version: 'v4',
-        action: 'read',
-        expires: Date.now() + expiresInSeconds * 1000,
-      });
-
-    return signedUrl;
+    return getSignedUrl(
+      getStorageClient(),
+      new GetObjectCommand({ Bucket: getBucketName(), Key: key }),
+      { expiresIn: expiresInSeconds }
+    );
   }
 
   async deleteFile(key: string): Promise<void> {
-    await getStorageClient().bucket(getBucketName()).file(key).delete({ ignoreNotFound: true });
+    await getStorageClient().send(
+      new DeleteObjectCommand({ Bucket: getBucketName(), Key: key })
+    );
   }
 
   async getPresignedUploadUrl(
@@ -213,15 +207,15 @@ export class StorageService {
     folder: UploadFolder
   ): Promise<{ url: string; key: string }> {
     const key = this.generateKey(filename, folder);
-    const [url] = await getStorageClient()
-      .bucket(getBucketName())
-      .file(key)
-      .getSignedUrl({
-        version: 'v4',
-        action: 'write',
-        expires: Date.now() + 3600 * 1000,
-        contentType: 'application/octet-stream',
-      });
+    const url = await getSignedUrl(
+      getStorageClient(),
+      new PutObjectCommand({
+        Bucket: getBucketName(),
+        Key: key,
+        ContentType: 'application/octet-stream',
+      }),
+      { expiresIn: 3600 }
+    );
 
     return { url, key };
   }

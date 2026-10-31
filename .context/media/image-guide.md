@@ -165,7 +165,8 @@ merender alpha jadi hitam/putih tak terduga. Versi OG harus ber-background solid
 
 ## Kendala signed URL
 
-Media Admin dilayani sebagai signed URL GCS dengan `X-Goog-Expires=3600` (mati 1 jam).
+Media Admin disimpan di bucket R2 privat dan dilayani sebagai signed URL S3 dengan
+`X-Amz-Expires=3600` (mati 1 jam). Upload dan penghapusan berjalan server-side lewat Admin.
 
 - Aman untuk `<img>` yang langsung dimuat pengunjung
 - **Tidak bisa** dipakai di structured data atau `og:image` — Google/WhatsApp mengambil
@@ -175,7 +176,7 @@ Kode sudah otomatis membuang URL semacam itu dari schema (`stableImageUrl`), jad
 baik kosong daripada rusak. Artinya: setelah upload, thumbnail dan hero muncul, tapi
 **cover share belum**. Perlu salah satu:
 
-1. Bucket GCS dibuat public-read untuk folder media (URL permanen) — paling benar
+1. Bucket R2 dibuat public-read untuk folder media (URL permanen) — paling benar
 2. Gambar OG disimpan statis di `apps/public-astro/public/og/`
 
 ## Upload
