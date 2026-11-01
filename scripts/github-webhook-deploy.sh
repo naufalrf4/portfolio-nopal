@@ -39,9 +39,6 @@ deploy_targets() {
   local targets=()
   if printf '%s\n' "$changed" | grep -qE '^apps/admin(/|$)'; then targets+=(admin admin-cron notification-dispatch); fi
   if printf '%s\n' "$changed" | grep -qE '^apps/rag-service(/|$)'; then targets+=(rag); fi
-  if printf '%s\n' "$changed" | grep -qE '^apps/public-astro(/|$)'; then targets+=(public); fi
-  if printf '%s\n' "$changed" | grep -qE '^apps/links-astro(/|$)'; then targets+=(links); fi
-  if printf '%s\n' "$changed" | grep -qE '^apps/ngl-svelte(/|$)'; then targets+=(ngl); fi
   if printf '%s\n' "$changed" | grep -qE '^apps/live-presence(/|$)'; then targets+=(live-presence); fi
 
   if [ "${#targets[@]}" -eq 0 ]; then

@@ -88,17 +88,11 @@ services:
       - dokploy-network
 
   admin-migrate:
+    profiles: ['ops']
     build:
       context: .
       dockerfile: apps/admin/Dockerfile
-      target: builder
-      args:
-        NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${ADMIN_NEXT_PUBLIC_TURNSTILE_SITE_KEY}
-        NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN: ${ADMIN_NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}
-        NEXT_PUBLIC_GA_MEASUREMENT_ID: ${ADMIN_NEXT_PUBLIC_GA_MEASUREMENT_ID}
-        NEXT_PUBLIC_VAPID_PUBLIC_KEY: ${ADMIN_NEXT_PUBLIC_VAPID_PUBLIC_KEY}
-        ADMIN_R2_ACCOUNT_ID: ${ADMIN_R2_ACCOUNT_ID}
-        ADMIN_R2_BUCKET_NAME: ${ADMIN_R2_BUCKET_NAME}
+      target: migrator
     command: ['bun', 'run', 'db:migrate']
     environment:
       TZ: Asia/Jakarta
@@ -306,6 +300,9 @@ services:
       - dokploy-network
 
   public:
+    # Cloudflare Pages is the primary host. Enable this only for a VPS
+    # fallback: docker compose --profile vps-fallback up public.
+    profiles: ['vps-fallback']
     build:
       context: ./apps/public-astro
       dockerfile: Dockerfile
@@ -362,6 +359,7 @@ services:
       - dokploy-network
 
   links:
+    profiles: ['vps-fallback']
     build:
       context: ./apps/links-astro
       dockerfile: Dockerfile
@@ -412,6 +410,7 @@ services:
       - dokploy-network
 
   ngl:
+    profiles: ['vps-fallback']
     build:
       context: ./apps/ngl-svelte
       dockerfile: Dockerfile
@@ -504,6 +503,17 @@ services:
     networks:
       - internal
       - dokploy-network
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=dokploy-network
+      - "traefik.http.routers.presence-ws.rule=Host(`${ADMIN_DOMAIN}`) && PathPrefix(`/presence`)"
+      - traefik.http.routers.presence-ws.entrypoints=websecure
+      - traefik.http.routers.presence-ws.priority=100
+      - traefik.http.routers.presence-ws.tls.certresolver=letsencrypt
+      - traefik.http.routers.presence-ws.service=presence-ws
+      - traefik.http.routers.presence-ws.middlewares=presence-ws-strip
+      - traefik.http.middlewares.presence-ws-strip.stripprefix.prefixes=/presence
+      - traefik.http.services.presence-ws.loadbalancer.server.port=3006
 
 networks:
   internal:

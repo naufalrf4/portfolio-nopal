@@ -1236,3 +1236,52 @@ Juga diverifikasi di QA akhir: toggle Events (Telegram per event type) benar-ben
 - Change: default production image build parallelism reduced from two to one in `scripts/docker-prod-up.sh` to avoid concurrent image memory pressure that killed the Admin build; documented this production constraint in `AGENTS.md`.
 - Still blocked: root changes are not committed/pushed, so Dokploy cannot deploy the fixes; Dokploy has no route/domains and the configured public A-record target does not answer; seven source images have no available copy to upload. Pages custom domains/secrets and public ingress need live account configuration after the root revision is available.
 - Verification: prior RAG typecheck/tests/build passed (17 tests); Docker compose config, deploy script syntax and diff checks passed before this final change. Live HTTP probes to `naufalrf.net`, `links`, `ngl`, `admin`, and `presence` timed out. Dokploy UI shows its sole deployment record as "Running" but the Containers tab reports no containers.
+## 2026-11-01 13:15 WIB — Root push, Pages hostnames, and VPS ingress
+
+- Task: continue the production cutover after user requested the full system live.
+- Status: root commit `0fc2ff0` is pushed to `main`; GitHub started a Dokploy deployment for that SHA. Cloudflare Pages custom domains are configured for `naufalrf.net`, `links.naufalrf.net`, and `ngl.naufalrf.net`, with Pages-managed CNAME records. Dokploy routes are configured for Admin on port 3001 and Live Presence on port 3006 with HTTPS/Let's Encrypt.
+- Pages production environment: `ADMIN_INTERNAL_API_TOKEN` was submitted as an encrypted Secret for Public, Links, and NGL. Public and NGL Turnstile public site keys were submitted as encrypted runtime values; no secret value was printed.
+- Verification: `links.naufalrf.net` and `ngl.naufalrf.net` returned HTTP 200; `naufalrf.net` returned the app's 503 because Admin remains unavailable. Admin and Presence requests timed out. Dokploy's latest deployment remains marked Running, but its Containers tab still showed no containers; the deployment log view later showed 0 lines, so successful startup is not verified.
+- Remaining blockers: the restored database references seven missing project image objects. They are absent from the current repository, all Git history, and the R2 bucket; the old GCS bucket returns 404. Admin/Presence origins still do not answer on their current DNS target, and the Dokploy remote server is unreachable over its configured Tailscale address from this environment. Thus end-to-end API, OAuth, presence WebSocket, and image verification cannot pass yet.
+- Deployment caveat: the change to default webhook build parallelism only affects `scripts/docker-prod-up.sh`. Dokploy's native Compose auto-deploy bypasses that script; its current memory behavior must be assessed from the server build/deploy process.
+## 2026-11-01 13:27 WIB — Recheck after server restart
+
+- User reported the production server had been restarted. Rechecked public endpoints and Dokploy state.
+- `links.naufalrf.net` and `ngl.naufalrf.net` still return HTTP 200. `naufalrf.net` remains HTTP 503. Admin health and Presence still time out.
+- Dokploy still has no containers for Portfolio Platform. The deployment for `0fc2ff0` still reports the remote SSH handshake timeout. Its configured remote remains `100.64.0.5:2112`; a fresh Tailscale ping to `monevhub-prod` also timed out from this environment.
+- No change to the media audit: seven project media objects remain missing from R2 and are not recoverable from the old GCS bucket, current repository, or its Git history.
+
+## 2026-11-01 06:41 UTC — Recovery deployment attempt after user restart
+
+- SSH to the Beszel host works on port 22 after its restart; the Dokploy remote had been corrected to port 22 in the preceding session. Checkout `0fc2ff0` and all three pinned submodules are present on the host.
+- Dokploy's generated Compose checkout has a populated `.env` and valid Compose config, but no `.env.docker.prod`; the repository deploy/migrate scripts therefore cannot run there unchanged. The Dokploy-managed Compose file has injected routing labels and normalized YAML formatting.
+- Started a safe recovery using the existing Dokploy `.env`: build RAG bootstrap and Admin migration images, run RAG bootstrap + Admin migrations + migration verification, then deploy services serially. RAG bootstrap image built; Admin Next build compiled successfully and entered TypeScript checking.
+- During the Admin build, SSH, HTTP, and HTTPS to the host all became unreachable. The build command has not reported completion, so migrations and app deployment are not confirmed. This is consistent with host resource exhaustion but OOM/reboot is not proven. No database volume or source configuration was intentionally modified.
+- Next step: once the host is reachable again, inspect kernel/Docker state first, then build Admin alone (the previous `--parallel 1` still allowed BuildKit to progress multiple image stages concurrently). Complete DB migration verification and app startup before public endpoint checks.
+
+## 2026-11-01 06:45 UTC — Reduce production build memory pressure
+
+- Root cause in the attempted command: the `admin-migrate` Compose target pointed at the Admin Dockerfile `builder`, so a database migration image unnecessarily ran the full memory-heavy Next.js build. It was built in the same Compose build invocation as RAG bootstrap; `--parallel 1` did not prevent the two BuildKit graphs from overlapping.
+- Change: added a dedicated Admin `migrator` Dockerfile target that shares installed workspace dependencies but copies Drizzle source without running `next build`; pointed `admin-migrate` at that target. Production migration now builds RAG bootstrap and Admin migrator in separate Compose invocations. Production app images also build one service per invocation, followed by `up --no-build`.
+- Change: cap Admin build Node heap at 2560 MiB on this constrained VPS.
+- Verification: `bash -n` passed for production deploy/migrate/webhook scripts, production Compose parsed with the committed example env, and `git diff --check` passed. No Docker image was built locally. The VPS remains unreachable, so production migration/deploy and the suitability of the lower heap remain unverified.
+
+## 2026-11-01 06:52 UTC — Align default VPS stack with Pages hosting
+
+- Correction: the prior Compose defaults still included the three Pages apps and the one-shot migration service. That would make a native Dokploy Compose deploy build unnecessary fallback frontends and the migration image on every normal stack deployment.
+- Change: `public`, `links`, and `ngl` now require the explicit `vps-fallback` profile; `admin-migrate` joins `rag-bootstrap` in the `ops` profile. The default stack now contains only Admin, RAG, Presence, and the Admin sidecars. The normal webhook deploy target list matches this boundary; standalone Pages app changes no longer trigger duplicate VPS builds.
+- Change: production helper scripts resolve environment from `PROD_ENV_FILE`, `.env.docker.prod`, or Dokploy's generated `.env` in that order, fixing the missing env-file mismatch found on the server.
+- Verification: Compose default service list contains only core VPS/runtime services, fallback profile adds Public/Links/NGL, and `ops` keeps migration/bootstrap opt-in. Shell syntax, Compose parsing, and whitespace checks pass. Changes remain local and are not deployed because the VPS is unreachable.
+
+## 2026-11-01 07:04 UTC — Keep Admin, RAG, and Presence on one VPS stack
+
+- User clarified the target as one VPS Compose stack for Admin + RAG + Live Presence, with only Admin's hostname publicly routed. The earlier Admin-container-only interpretation was not the intended deployment.
+- Change: Traefik routes admin.naufalrf.net/presence/* to Live Presence after stripping /presence; the service still accepts only allowlisted browser Origins. RAG remains internal. The three Pages apps now use wss://admin.naufalrf.net/presence/ws in both production and preview Wrangler variables and docs. The unused Caddy config mirrors that path route.
+- Verification: /presence/ws maps to the service's existing /ws handler; there is no Admin /presence route conflict. Wrangler TOML, Docker Compose, shell syntax, and diff checks pass. VPS remains unreachable and Pages deployment envs have not been inspected in the browser, so public WebSocket routing is not live-verified yet.
+
+## 2026-11-01 07:33 UTC — Confirmed OOM and corrected Admin build runtime
+
+- VPS SSH recovered. Kernel logs confirm a Docker cgroup OOM event killed a Bun process with 2.73 GiB RSS. Admin/RAG/Presence application containers are still absent; restored Postgres remains up. The earlier migration command did not progress past image building.
+- Correction to the previous memory fix: setting NODE_OPTIONS around bun run build cannot bound Bun's memory. Admin's Docker builder now uses Node 22 to invoke the Next CLI directly with a 2 GiB heap limit; the separate migrator target still uses Bun without compiling Next.
+- Admin + RAG + Live Presence remain the target VPS stack, with Admin hostname only and Presence routed by /presence/ws; Pages frontends now reference that websocket path.
+- Verification: local Node 24 executed Next CLI v16.3.3, all three Wrangler TOML files parse, production Compose config parses, deploy scripts pass Bash syntax, and git diff --check passes. Production remains undeployed pending the updated repositories and a successful server build.

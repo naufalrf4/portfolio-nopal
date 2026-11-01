@@ -3,12 +3,22 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 WAIT_TIMEOUT="${PROD_HEALTH_WAIT_TIMEOUT:-240}"
-# Admin's Next.js build is memory intensive. Building two production images at
-# once caused Dokploy's host to SIGKILL the Admin build, leaving no containers.
-BUILD_PARALLEL="${PROD_BUILD_PARALLEL:-1}"
+# Build each service separately: Compose/BuildKit may overlap image stages even
+# with --parallel 1. Admin's Next.js build can exhaust memory on the VPS.
 ROLLBACK_FILE="$ROOT_DIR/.docker-prod-rollback.yml"
+ENV_FILE="${PROD_ENV_FILE:-$ROOT_DIR/.env.docker.prod}"
+if [ ! -f "$ENV_FILE" ] && [ -f "$ROOT_DIR/.env" ]; then
+  # Dokploy writes its Compose variables to .env in the deployed checkout.
+  ENV_FILE="$ROOT_DIR/.env"
+fi
+if [ ! -f "$ENV_FILE" ]; then
+  echo "production env file not found: set PROD_ENV_FILE or provide .env.docker.prod" >&2
+  exit 1
+fi
 
-ALL_SERVICES=(admin admin-cron notification-dispatch rag public links ngl live-presence)
+# Public/Links/NGL are hosted on Cloudflare Pages. Keep their Node containers
+# opt-in as VPS fallbacks; they are not part of the normal production deploy.
+ALL_SERVICES=(admin admin-cron notification-dispatch rag live-presence)
 if [ "$#" -gt 0 ]; then
   TARGETS=("$@")
 else
@@ -17,8 +27,7 @@ fi
 
 compose() {
   docker compose \
-    --parallel "$BUILD_PARALLEL" \
-    --env-file "$ROOT_DIR/.env.docker.prod" \
+    --env-file "$ENV_FILE" \
     -f "$ROOT_DIR/docker-compose.prod.yml" \
     "$@"
 }
@@ -59,7 +68,7 @@ rollback() {
   fi
 
   if docker compose \
-    --env-file "$ROOT_DIR/.env.docker.prod" \
+    --env-file "$ENV_FILE" \
     -f "$ROOT_DIR/docker-compose.prod.yml" \
     -f "$ROLLBACK_FILE" \
     up -d --no-build --wait --wait-timeout "$WAIT_TIMEOUT" "${TARGETS[@]}"; then
@@ -72,9 +81,11 @@ rollback() {
   return 1
 }
 
-compose build "${TARGETS[@]}"
+for svc in "${TARGETS[@]}"; do
+  compose build "$svc"
+done
 
-if ! compose up -d --wait --wait-timeout "$WAIT_TIMEOUT" "${TARGETS[@]}"; then
+if ! compose up -d --no-build --wait --wait-timeout "$WAIT_TIMEOUT" "${TARGETS[@]}"; then
   compose ps
   compose logs --tail 50 "${TARGETS[@]}" || true
   rollback

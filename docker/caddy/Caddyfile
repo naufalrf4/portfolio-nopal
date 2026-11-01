@@ -34,6 +34,15 @@
 		reverse_proxy host.docker.internal:9010
 	}
 
+	handle_path /presence/* {
+		reverse_proxy live-presence:3006 {
+			header_up Host {host}
+			header_up X-Forwarded-Host {host}
+			header_up X-Forwarded-Proto {scheme}
+			header_up X-Real-IP {remote_host}
+		}
+	}
+
 	reverse_proxy admin:3001 {
 		header_up Host {host}
 		header_up X-Forwarded-Host {host}
@@ -59,17 +68,6 @@
 	encode zstd gzip
 
 	reverse_proxy ngl:3003 {
-		header_up Host {host}
-		header_up X-Forwarded-Host {host}
-		header_up X-Forwarded-Proto {scheme}
-		header_up X-Real-IP {remote_host}
-	}
-}
-
-{$PRESENCE_DOMAIN} {
-	import security_headers
-
-	reverse_proxy live-presence:3006 {
 		header_up Host {host}
 		header_up X-Forwarded-Host {host}
 		header_up X-Forwarded-Proto {scheme}
