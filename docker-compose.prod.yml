@@ -86,6 +86,19 @@ services:
     networks:
       - internal
       - dokploy-network
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=dokploy-network
+      - "traefik.http.routers.portfolio-admin-web.rule=Host(`${ADMIN_DOMAIN}`)"
+      - traefik.http.routers.portfolio-admin-web.entrypoints=web
+      - traefik.http.routers.portfolio-admin-web.middlewares=portfolio-admin-https
+      - traefik.http.routers.portfolio-admin-web.service=portfolio-admin
+      - traefik.http.middlewares.portfolio-admin-https.redirectscheme.scheme=https
+      - "traefik.http.routers.portfolio-admin-websecure.rule=Host(`${ADMIN_DOMAIN}`)"
+      - traefik.http.routers.portfolio-admin-websecure.entrypoints=websecure
+      - traefik.http.routers.portfolio-admin-websecure.tls.certresolver=letsencrypt
+      - traefik.http.routers.portfolio-admin-websecure.service=portfolio-admin
+      - traefik.http.services.portfolio-admin.loadbalancer.server.port=3001
 
   admin-migrate:
     profiles: ['ops']
