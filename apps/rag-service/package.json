@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "bun run --watch src/index.ts",
-    "build": "bun build src/index.ts --target bun --outdir dist --minify",
+    "build": "bun build src/index.ts src/db-bootstrap.ts --target bun --outdir dist --minify",
     "start": "NODE_ENV=production bun run dist/index.js",
     "typecheck": "bun x tsc --noEmit",
     "db:bootstrap": "bun run src/db-bootstrap.ts",

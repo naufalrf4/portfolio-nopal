@@ -47,6 +47,16 @@ function rateLimitedResponse(c: Context, message: string, headers: Record<string
   );
 }
 
+function unauthorizedServiceResponse(c: Context) {
+  return c.json(
+    {
+      success: false,
+      error: { message: "Unauthorized.", code: "UNAUTHORIZED" },
+    },
+    401,
+  );
+}
+
 app.use(
   "*",
   cors({
@@ -75,6 +85,10 @@ app.get("/health", (c) => {
 });
 
 app.post("/chat", async (c) => {
+  if (!serviceTokenValid(c.req.header("X-Service-Token") ?? null)) {
+    return unauthorizedServiceResponse(c);
+  }
+
   const clientIp = getClientIp(c);
   const ipRateLimit = checkRateLimit(`chat:ip:${clientIp}`, CHAT_RATE_LIMIT_CONFIG);
   if (!ipRateLimit.allowed) {
@@ -140,6 +154,10 @@ app.post("/chat", async (c) => {
 });
 
 app.post("/chat/confirm", async (c) => {
+  if (!serviceTokenValid(c.req.header("X-Service-Token") ?? null)) {
+    return unauthorizedServiceResponse(c);
+  }
+
   const clientIp = getClientIp(c);
   const ipRateLimit = checkRateLimit(`chat-confirm:ip:${clientIp}`, CHAT_CONFIRM_RATE_LIMIT_CONFIG);
   if (!ipRateLimit.allowed) {
@@ -221,13 +239,7 @@ app.post("/chat/confirm", async (c) => {
 app.post("/ingest", async (c) => {
   const token = c.req.header("X-Service-Token") ?? null;
   if (!serviceTokenValid(token)) {
-    return c.json(
-      {
-        success: false,
-        error: { message: "Unauthorized.", code: "UNAUTHORIZED" },
-      },
-      401,
-    );
+    return unauthorizedServiceResponse(c);
   }
 
   let body: unknown;

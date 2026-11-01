@@ -133,38 +133,35 @@ services:
 
   public:
     build:
-      context: .
-      dockerfile: apps/public-astro/Dockerfile
+      context: ./apps/public-astro
+      dockerfile: Dockerfile
       target: dev
-    working_dir: /app/apps/public-astro
+    working_dir: /app
     environment:
       TZ: Asia/Jakarta
       ADMIN_API_URL: http://admin:3001
       ADMIN_INTERNAL_API_TOKEN: ${ADMIN_INTERNAL_API_TOKEN}
       PUBLIC_SITE_URL: ${PUBLIC_SITE_URL}
       PUBLIC_TURNSTILE_SITE_KEY: ${PUBLIC_TURNSTILE_SITE_KEY}
-      RAG_SERVICE_URL: http://rag:3005
       PUBLIC_CURSOR_WS_URL: ${PRESENCE_PUBLIC_WS_URL}
       SITE_URL: ${PUBLIC_SITE_CANONICAL_URL}
     ports:
       - '127.0.0.1:${PUBLIC_PORT:-3000}:3000'
     volumes:
-      - .:/app
-      - root-node-modules:/app/node_modules
+      - ./apps/public-astro:/app
+      - public-node-modules:/app/node_modules
     depends_on:
       admin:
-        condition: service_started
-      rag:
         condition: service_started
       live-presence:
         condition: service_started
 
   links:
     build:
-      context: .
-      dockerfile: apps/links-astro/Dockerfile
+      context: ./apps/links-astro
+      dockerfile: Dockerfile
       target: dev
-    working_dir: /app/apps/links-astro
+    working_dir: /app
     environment:
       TZ: Asia/Jakarta
       ADMIN_API_URL: http://admin:3001
@@ -173,18 +170,18 @@ services:
     ports:
       - '127.0.0.1:${LINKS_PORT:-3002}:3002'
     volumes:
-      - .:/app
-      - root-node-modules:/app/node_modules
+      - ./apps/links-astro:/app
+      - links-node-modules:/app/node_modules
     depends_on:
       admin:
         condition: service_started
 
   ngl:
     build:
-      context: .
-      dockerfile: apps/ngl-svelte/Dockerfile
+      context: ./apps/ngl-svelte
+      dockerfile: Dockerfile
       target: dev
-    working_dir: /app/apps/ngl-svelte
+    working_dir: /app
     environment:
       TZ: Asia/Jakarta
       ADMIN_API_URL: http://admin:3001
@@ -196,18 +193,18 @@ services:
     ports:
       - '127.0.0.1:${NGL_PORT:-3003}:3003'
     volumes:
-      - .:/app
-      - root-node-modules:/app/node_modules
+      - ./apps/ngl-svelte:/app
+      - ngl-node-modules:/app/node_modules
     depends_on:
       admin:
         condition: service_started
 
   live-presence:
     build:
-      context: .
-      dockerfile: apps/live-presence/Dockerfile
+      context: ./apps/live-presence
+      dockerfile: Dockerfile
       target: dev
-    working_dir: /app/apps/live-presence
+    working_dir: /app
     environment:
       TZ: Asia/Jakarta
       NODE_ENV: development
@@ -216,9 +213,11 @@ services:
     ports:
       - '127.0.0.1:${PRESENCE_PORT:-3006}:3006'
     volumes:
-      - .:/app
-      - root-node-modules:/app/node_modules
+      - ./apps/live-presence:/app
 
 volumes:
   db-data-dev:
   root-node-modules:
+  public-node-modules:
+  links-node-modules:
+  ngl-node-modules:

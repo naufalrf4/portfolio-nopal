@@ -3,7 +3,9 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 WAIT_TIMEOUT="${PROD_HEALTH_WAIT_TIMEOUT:-240}"
-BUILD_PARALLEL="${PROD_BUILD_PARALLEL:-2}"
+# Admin's Next.js build is memory intensive. Building two production images at
+# once caused Dokploy's host to SIGKILL the Admin build, leaving no containers.
+BUILD_PARALLEL="${PROD_BUILD_PARALLEL:-1}"
 ROLLBACK_FILE="$ROOT_DIR/.docker-prod-rollback.yml"
 
 ALL_SERVICES=(admin admin-cron notification-dispatch rag public links ngl live-presence)

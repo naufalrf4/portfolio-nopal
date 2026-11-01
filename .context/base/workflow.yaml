@@ -14,7 +14,7 @@ root:
     - '`bun run reset:seed` -> `bash ./scripts/docker-dev-reset-seed.sh`, which exists and works; it is the same flow as `bun run docker:dev:reset-seed`.'
     - 'Docker dev: `bun run docker:dev` (+ `docker:dev:down`), bootstrap via `docker:dev:migrate` then `docker:dev:seed`; `docker:dev:reset-seed` resets Admin DB and reseeds.'
     - 'Docker prod: `bun run docker:prod` (up), `docker:prod:migrate`, `docker:prod:bootstrap`; production DB is a Dokploy-managed postgres service reachable at `DB_HOST:-db`.'
-    - 'Deploy: GitHub webhook server (`scripts/github_webhook_server.py`, HMAC-verified, port 9010) triggers `scripts/github-webhook-deploy.sh` which pulls `main` and runs docker-prod-up + docker-prod-migrate. Pull-based only.'
+    - 'Deploy: GitHub webhook server (`scripts/github_webhook_server.py`, HMAC-verified, port 9010) triggers `scripts/github-webhook-deploy.sh` which pulls `main` and runs docker-prod-up + docker-prod-migrate. The last successful revision is recorded under `/var/lib/portfolio-webhook`; failed deploy retries compare against that revision. Pull-based only.'
 app_commands:
   admin:
     install: none needed; root `bun install` covers it

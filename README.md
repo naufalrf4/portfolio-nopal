@@ -36,6 +36,8 @@ ngl-svelte ───┘         ▲                  ▲
                          │                  │
                  rag-service ───────────────┘
 
+public-astro ──▶ Admin RAG proxy ──▶ rag-service
+
 public-astro ─┐
 links-astro ──┼──▶ live-presence (ephemeral WebSocket state)
 ngl-svelte ───┘
@@ -44,6 +46,10 @@ ngl-svelte ───┘
 ## Quick start
 
 ```sh
+# Clone the VPS/integration repo together with its pinned frontend repos.
+git clone --recurse-submodules https://github.com/naufalrf4/portfolio-nopal.git
+cd portfolio-nopal
+
 # Install the single workspace lockfile.
 bun install
 
@@ -77,7 +83,6 @@ Never commit real credentials.
 | Anonymous messages | `apps/ngl-svelte` | SvelteKit | 3003 | Turnstile-protected anonymous messaging |
 | RAG service | `apps/rag-service` | Bun + Hono | 3005 | Retrieval, embeddings, grounding, AI workflows |
 | Live presence | `apps/live-presence` | Bun WebSocket | 3006 | Ephemeral presence and cursor state |
-| Slide deck | `apps/slidedeck` | Vite | — | Static presentation-deck build artifact |
 
 ## Commands
 

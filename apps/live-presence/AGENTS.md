@@ -16,6 +16,7 @@ Authoritative AI control contract for this repository.
 - **Runtime:** Bun
 - **Language:** TypeScript
 - **Package Manager:** Bun
+- **Container build:** `Dockerfile` builds from this app directory and does not install the root workspace; preserve that boundary when extracting the app repo.
 - **Database / ORM:** none
 - **Testing Stack:** no dedicated automated test command; verify via `bun run start`, `/health`, and browser/manual websocket QA
 

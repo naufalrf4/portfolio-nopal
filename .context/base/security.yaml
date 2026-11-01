@@ -35,7 +35,7 @@ current_observations:
       - Admin API URL backchannel
     docs_surface: no `/docs` or `/redoc` endpoints exist on the TS/Hono runtime; docs endpoints were removed with the FastAPI implementation
     ingress_headers: Caddy (docker/caddy/Caddyfile) serves HSTS plus `Content-Security-Policy-Report-Only` and `Permissions-Policy` for staged browser hardening
-    public_edge_exposure: raw `/chat` should stay internal-only behind the public Astro proxy rather than a dedicated public RAG hostname
+    public_edge_exposure: raw RAG `/chat` stays private; browser requests pass through the Public Astro route and Admin's authenticated proxy
 
 recommended_hardening_from_user_direction_and_reference_research:
   - Use distinct Postgres roles for Admin, RAG, and migrations; do not share a single super-role.
@@ -48,7 +48,7 @@ recommended_hardening_from_user_direction_and_reference_research:
   - Keep Admin public API CORS on explicit origin allowlists; do not reintroduce wildcard browser origins.
   - Keep guestbook posting authorized with short-lived server-signed proofs rather than trusting client-stored email identity.
   - Keep public write endpoints rate-limited, and keep CAPTCHA protection on user-submitted message/contact/booking surfaces where the current UX already expects it.
-  - Keep browser chat traffic on the public Astro `/api/rag/chat` proxy and avoid re-exposing raw RAG chat at the public edge.
+  - Keep browser chat traffic on the Public Astro `/api/rag/chat` proxy, then Admin's authenticated RAG proxy; never expose raw RAG service URLs or tokens to the browser.
   - Keep production app containers non-root, read-only, and `no-new-privileges` unless a verified runtime requirement forces a narrower exception.
 
 database_policy:

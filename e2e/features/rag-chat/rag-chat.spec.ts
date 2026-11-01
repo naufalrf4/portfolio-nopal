@@ -5,6 +5,14 @@ import { available } from '../../helpers/services';
 export { manifest } from './manifest';
 
 const ready = await available('rag');
+const missingToken = requireEnv(['RAG_INGEST_SERVICE_TOKEN']);
+const serviceHeaders = missingToken
+  ? {}
+  : { 'x-service-token': env.RAG_INGEST_SERVICE_TOKEN as string };
+
+function postRagJson(path: string, body: unknown, headers: Record<string, string> = {}) {
+  return postJson(`${env.RAG_URL}${path}`, body, { ...serviceHeaders, ...headers });
+}
 
 describe.if(ready)('rag health', () => {
   test('health responds ok', async () => {
@@ -29,7 +37,26 @@ describe.if(ready)('rag ingest auth', () => {
   });
 });
 
-const missingToken = requireEnv(['RAG_INGEST_SERVICE_TOKEN']);
+describe.if(ready)('rag chat service auth', () => {
+  test('chat requires a service token', async () => {
+    const res = await postJson(`${env.RAG_URL}/chat`, { message: 'hello' });
+    expect(res.status, describeResponse(res)).toBe(401);
+  });
+
+  test('chat rejects an invalid service token', async () => {
+    const res = await postJson(
+      `${env.RAG_URL}/chat`,
+      { message: 'hello' },
+      { 'x-service-token': 'definitely-not-the-token' },
+    );
+    expect(res.status, describeResponse(res)).toBe(401);
+  });
+
+  test('confirmation requires a service token', async () => {
+    const res = await postJson(`${env.RAG_URL}/chat/confirm`, { confirm: false });
+    expect(res.status, describeResponse(res)).toBe(401);
+  });
+});
 
 describe.if(ready && !missingToken)('rag ingest authorized path', () => {
   test('valid token passes auth and fails on payload validation instead', async () => {
@@ -47,20 +74,20 @@ if (ready && missingToken) {
   test.skip(`rag ingest authorized path skipped: ${missingToken}`, () => {});
 }
 
-describe.if(ready)('rag chat input bounds', () => {
+describe.if(ready && !missingToken)('rag chat input bounds', () => {
   test('oversized chat message is rejected', async () => {
-    const res = await postJson(`${env.RAG_URL}/chat`, { message: 'x'.repeat(2_001) });
+    const res = await postRagJson('/chat', { message: 'x'.repeat(2_001) });
     expect(res.status, describeResponse(res)).toBe(400);
     expect(res.text).toContain('2000');
   });
 
   test('empty chat message is rejected', async () => {
-    const res = await postJson(`${env.RAG_URL}/chat`, { message: '' });
+    const res = await postRagJson('/chat', { message: '' });
     expect([400, 422], describeResponse(res)).toContain(res.status);
   });
 
   test('path-traversal sessionId is ignored instead of propagating', async () => {
-    const res = await postJson(`${env.RAG_URL}/chat`, {
+    const res = await postRagJson('/chat', {
       message: 'hello',
       sessionId: '../../etc/passwd',
     });
@@ -72,18 +99,18 @@ describe.if(ready)('rag chat input bounds', () => {
   });
 });
 
-describe.if(ready)('rag staged-action confirm contract', () => {
+describe.if(ready && !missingToken)('rag staged-action confirm contract', () => {
   const forgedActionId = '11111111-2222-3333-4444-555555555555';
   const sessionId = 'e2estagedsession';
 
   test('missing actionId is rejected', async () => {
-    const res = await postJson(`${env.RAG_URL}/chat/confirm`, { confirm: true, sessionId });
+    const res = await postRagJson('/chat/confirm', { confirm: true, sessionId });
     expect(res.status, describeResponse(res)).toBe(400);
     expect(res.text).toContain('INVALID_CONFIRM_REQUEST');
   });
 
   test('malformed sessionId is rejected', async () => {
-    const res = await postJson(`${env.RAG_URL}/chat/confirm`, {
+    const res = await postRagJson('/chat/confirm', {
       actionId: forgedActionId,
       sessionId: '../../etc/passwd',
       confirm: true,
@@ -93,7 +120,7 @@ describe.if(ready)('rag staged-action confirm contract', () => {
   });
 
   test('client-supplied tool and payload cannot drive execution', async () => {
-    const res = await postJson(`${env.RAG_URL}/chat/confirm`, {
+    const res = await postRagJson('/chat/confirm', {
       tool: 'submit_guestbook',
       confirm: true,
       payload: { message: 'x'.repeat(900) },
@@ -103,7 +130,7 @@ describe.if(ready)('rag staged-action confirm contract', () => {
   });
 
   test('unstaged actionId cannot be confirmed', async () => {
-    const res = await postJson(`${env.RAG_URL}/chat/confirm`, {
+    const res = await postRagJson('/chat/confirm', {
       actionId: forgedActionId,
       sessionId,
       confirm: true,
@@ -113,7 +140,7 @@ describe.if(ready)('rag staged-action confirm contract', () => {
   });
 
   test('declining an unknown action does not leak whether it existed', async () => {
-    const res = await postJson(`${env.RAG_URL}/chat/confirm`, {
+    const res = await postRagJson('/chat/confirm', {
       actionId: forgedActionId,
       sessionId,
       confirm: false,
@@ -125,4 +152,8 @@ describe.if(ready)('rag staged-action confirm contract', () => {
 
 if (!ready) {
   test.skip(`rag-chat skipped: not reachable at ${env.RAG_URL}`, () => {});
+}
+
+if (ready && missingToken) {
+  test.skip(`rag chat contract skipped: ${missingToken}`, () => {});
 }

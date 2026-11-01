@@ -1,0 +1,9 @@
+[submodule "apps/public-astro"]
+	path = apps/public-astro
+	url = https://github.com/naufalrf4/portfolio-public.git
+[submodule "apps/links-astro"]
+	path = apps/links-astro
+	url = https://github.com/naufalrf4/portfolio-links.git
+[submodule "apps/ngl-svelte"]
+	path = apps/ngl-svelte
+	url = https://github.com/naufalrf4/portfolio-ngl.git

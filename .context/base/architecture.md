@@ -7,6 +7,8 @@ Bun workspace monorepo for independent app repos under `apps/*` and shared packa
 ## Execution model
 
 - Root is a Bun workspace shell. A single `bun install` installs all apps and shared packages.
+- Public, Links, and NGL are pinned as Git submodules at their existing `apps/*` workspace paths. Clone with `--recurse-submodules`; the VPS pull deploy initializes pinned submodules before Docker builds.
+- Those three apps choose Cloudflare adapters when Pages injects `CF_PAGES=1`; normal root workspace and VPS Docker builds use Node adapters. VPS Docker builds run from each app submodule and install only its dependencies.
 - Each app owns its own scripts, runtime, and environment file.
 - Cross-app communication happens through HTTP APIs and service tokens, except for the direct database actors and websocket presence service documented below.
 
@@ -20,7 +22,7 @@ Bun workspace monorepo for independent app repos under `apps/*` and shared packa
 - `apps/public-astro`
   - Astro 5 + React public portfolio.
   - Reads portfolio content from Admin public APIs.
-  - Talks to the RAG service for chat requests.
+  - Proxies chat requests through Admin's public RAG API; it never calls the private RAG service directly.
   - Talks to `apps/live-presence` for ephemeral websocket presence.
   - Must not connect directly to the database.
 - `apps/links-astro`

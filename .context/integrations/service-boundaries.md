@@ -11,6 +11,7 @@
 
 - `apps/public-astro/src/lib/api.ts` -> Admin public endpoints for about, projects, blogs, achievements, guestbook
 - `apps/public-astro/src/pages/api/auth/sync.ts` -> Admin public auth sync endpoint
+- `apps/public-astro/src/pages/api/rag/chat.ts` and `chat/confirm.ts` -> Admin public RAG proxy; only Admin calls the private RAG service
 - `apps/public-astro` -> `apps/live-presence` websocket rooms for layout-wide cursor presence
 - `apps/links-astro/src/lib/api.ts` -> Admin public about and links endpoints
 - `apps/ngl-svelte/src/lib/api.ts` -> Admin public messages endpoint

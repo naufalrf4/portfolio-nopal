@@ -34,7 +34,7 @@ apps:
     language: TypeScript
     runtime: Bun
     styling: Tailwind CSS 4 + dark-first design tokens + Framer Motion; shared Neu* components renamed to Card/Button/Badge/Input/Textarea
-    data_access: Admin public API + direct browser/server fetch to RAG service for chat
+    data_access: Admin public API, including the Admin-proxied RAG chat flow
     testing_stack: build only in manifest; no lint or automated test script
     lockfile: none (root `bun.lock` only)
   links_astro:

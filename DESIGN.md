@@ -139,7 +139,6 @@ One WebGL canvas mounted from `BaseLayout.astro`, surviving Astro ClientRouter n
 | Project detail | Full-bleed proof image, sticky chapter rail |
 | Blogs | Lead story + publication index |
 | Services | Capability catalogue: hero + technical/talks service grids, availability status, CTA rail |
-| Portfolio | Deck content rendered server-side as scrolling editorial sections (retired client-side SPA slide viewer) |
 | Contact | Communication console: channel rail + form workspace |
 | AI assistant | Research cockpit: conversation canvas + citation rail |
 | Links | Identity transmission panel: profile top, indexed destination rows |

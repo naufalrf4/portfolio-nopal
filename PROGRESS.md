@@ -3,6 +3,93 @@
 Chronological timeline of meaningful project work, discoveries, decisions, and blockers for future agents.
 
 ## Entries
+### 2026-11-01 13:35
+
+- Task: continue Cloudflare Pages setup through the logged-in cloud browser
+- Mode: dashboard inspection and live endpoint verification
+- Files: `PROGRESS.md`
+- Status: browser access confirmed; no production DNS change completed
+- Notes: Pages projects are connected and latest Public deployment is active. `naufalrf-links.pages.dev` and `naufalrf-ngl.pages.dev` returned 200 in this check; Public returned 503. Admin public API and `presence.naufalrf.net/health` timed out. Pages environment inspection showed Public's configured URLs and presence websocket URL; required Admin internal token and Turnstile keys are still unavailable in project settings. `links.naufalrf.net` has a pre-existing A record (`34.21.164.61`); the Pages wizard proposes replacing it with a CNAME, but activation did not complete, so DNS remains unchanged. Keep custom domain cutover pending until the backend and app-specific secrets are ready.
+
+### 2026-11-01 12:16
+
+- Task: complete remaining deployment and submodule wiring for the standalone frontend repos
+- Mode: implementation + Pages/VPS deployment verification
+- Files: `.gitmodules`, root webhook/Compose/workspace docs, frontend submodule adapter configs and Dockerfiles, `.omx/plans/repo-split-deploy-plan.md`
+- Status: three frontend repos are pinned as submodules locally; Pages and VPS build paths are independent; production hostname cutover remains blocked by Admin/Presence reachability and missing Pages secrets/Turnstile configuration
+- Notes: Added dual adapter selection: Cloudflare Pages injects `CF_PAGES=1`, while root and Docker builds use Node adapters for VPS fallback. NGL Preview now uses the same `url_standard` flag as Production. The three child repos now carry standalone Dockerfiles, app-local production dependencies, and Node 22 slim Astro runtime images. Root Compose builds directly from each submodule context. Root pull deployment now initializes exact submodule SHAs before classification/build and treats `.gitmodules` as a deploy configuration change. Fixed gitlink matching because Git emits a changed submodule as `apps/<name>` without a trailing slash. Frontend-only and Presence-only updates skip database migrations; Admin/RAG/full changes retain schema-first migration behavior. Created child commits `3d32f6c` (Public), `6364347` (Links), and `f49ac3f` (NGL) and pushed them to their existing public remotes; root index pins those exact commits. No root commit or domain/DNS change was made.
+- Verification: all three Pages and Node adapter builds passed from standalone child workspaces; root workspace `bun install --frozen-lockfile` passed. Root production Compose built all three standalone fallback images; runtime smoke returned 503 for Public only because its Admin endpoint was deliberately set unreachable, and 200 for Links and NGL, with all three servers starting. `docker compose ... config -q`, `bash -n scripts/github-webhook-deploy.sh`, `git diff --check`, and a synthetic Git submodule pointer deploy-target check passed. Production Pages latest SHAs built successfully; Public remains 503 on Admin timeout, Links returns 200 fallback, and NGL project hostname returns 200. Admin and Presence still time out from this environment; no custom domains are attached and `ADMIN_INTERNAL_API_TOKEN` / `PUBLIC_TURNSTILE_SITE_KEY` remain unset in Pages.
+
+### 2026-11-01 11:45
+
+- Task: finish Cloudflare runtime verification for all standalone frontends
+- Mode: deployment debugging + production Pages checks
+- Files: `apps/ngl-svelte/wrangler.toml`, `.omx/plans/repo-split-deploy-plan.md`
+- Status: all three Pages `main` builds succeeded; Links and NGL `pages.dev` return HTTP 200; Public is blocked by Admin reachability
+- Notes: NGL's first Pages runtime returned 500 `Invalid URL string` while SvelteKit initialized page state. The NGL Wrangler config had compatibility fields nested under `[env.preview.vars]`; moved them to the top-level Pages config and enabled the documented `url_standard` flag. Local `wrangler pages dev` then returned 200 and the new Pages deployment at commit `c2ea2cc` now returns 200. Public's Pages Worker confirms requests to `https://admin.naufalrf.net/api/v1/public/about` time out, so Public follows its existing 503 service-unavailable path; no fallback data behavior was changed. `ADMIN_INTERNAL_API_TOKEN` and `PUBLIC_TURNSTILE_SITE_KEY` are still unavailable locally and were not guessed. No custom domains, DNS, root submodules, or VPS Compose changes were made.
+- Verification: NGL `bun run check && bun run build` passed after the config fix; local Wrangler Pages runtime returned 200. Cloudflare latest builds are `e0d64f0` (Public), `bc08020` (Links), `c2ea2cc` (NGL). Live `pages.dev` smoke: Links 200, NGL 200, Public 503 from Admin timeout. Root `git diff --check` passed.
+
+### 2026-11-01 11:39
+
+- Task: create and deploy the three standalone frontend repositories to Cloudflare Pages
+- Mode: implementation + authenticated GitHub/Cloudflare setup
+- Files: frontend Cloudflare configs and deployment docs, root `AGENTS.md`, `.omx/plans/repo-split-deploy-plan.md`
+- Status: three public GitHub remotes created and Pages Git integration builds succeeded; production domains and root submodules remain pending
+- Notes: Created `naufalrf4/portfolio-public` (`e0d64f0`), `portfolio-links` (`bc08020`), and `portfolio-ngl` (`99d1094`), each with standalone Bun lockfile and shared package snapshots. Connected Pages projects `naufalrf-public`, `naufalrf-links`, and `naufalrf-ngl`. Links and NGL `pages.dev` homepages return HTTP 200. Public returns the app's intended 503 service-unavailable response while SSR cannot reach `https://admin.naufalrf.net`; the same host timed out from this environment. Wrangler config is the source of truth for non-secret URLs and Bun version. `keep_vars` was rejected by Pages config validation and removed. No custom domains, DNS, Compose, or submodule changes were made. The Pages projects are left on `pages.dev` and the VPS frontend Compose path remains untouched.
+- Verification: clean standalone builds succeeded in Cloudflare Pages for all three latest `main` SHAs; Public/Links Astro `bun run build` passed and NGL `bun run check && bun run build` passed after Wrangler config changes. Latest Links/NGL homepage requests returned 200; Public's SSR dependency timeout was confirmed in its Pages runtime tail. `git diff --check` passed before the last root documentation update.
+
+### 2026-11-01 11:21
+
+- Task: continue repository split and prepare Pages remotes/projects after user completed Cloudflare login
+- Mode: implementation + live account inventory
+- Files: app READMEs, `.omx/plans/repo-split-deploy-plan.md`, standalone candidates under `/tmp`
+- Status: Cloudflare authenticated; GitHub authorization still pending; no Pages project or remote created
+- Notes: Corrected the plan to keep the existing Git repository name `naufalrf4/portfolio-nopal` as the Admin/VPS parent instead of inventing `portfolio-admin`. Added a README to each frontend extraction describing standalone install/build, shared-package snapshot, and API boundary. Cloudflare account inventory shows an old Git-integrated `naufalrf-portfolio` Pages project with only its pages.dev hostname, last modified 2 years ago and listed deployments failing; left it untouched. Corrected the NGL scratch candidate's misplaced file copies and revalidated its frozen install, Svelte check, and Cloudflare build successfully. Wrangler reports authenticated as `naufalrf32@gmail.com`; GitHub device flow is still awaiting approval.
+- Verification: NGL extraction `bun install --frozen-lockfile && bun run check && bun run build` passed. Cloudflare project list/deployment inventory completed read-only. GitHub `gh auth status` still reports no authenticated host.
+
+### 2026-11-01 11:19
+
+- Task: harden standalone frontend candidates and close deployment-plan gaps found by independent audits
+- Mode: implementation + local validation
+- Files: frontend `DEPLOYMENT.md`, `.gitignore`, AGENTS/config and NGL CSP; `.omx/plans/repo-split-deploy-plan.md`; local extracted repo candidates under `/tmp`
+- Status: local app builds and boundaries validated; remote creation, Pages project setup, and DNS/deployment remain blocked on GitHub/Cloudflare login
+- Notes: Two read-only Orca audits found: Pages projects should be created through Git integration from the prepared remotes (Direct Upload is not convertible to Git integration); root Admin/RAG Dockerfiles and migration scripts still copy frontend manifests, so after cutover root workspace patterns and build/deploy/dev orchestration must be made backend-only before frontend paths become submodules. Added that sequence to the plan. Added standalone-compatible AGENTS guidance, ignored `.env.*.local`/`.dev.vars*`, removed monorepo-coupled Dockerfiles from frontend scratch repos, and updated NGL CSP `connect-src` to derive exact websocket/HTTP origins from `PUBLIC_CURSOR_WS_URL`; its server origin checks remain explicit. Astro apps do not use `Astro.session`; local Pages SSR ran without a SESSION KV binding, so provisioning is conditional on future session use. Cloudflare's Pages project remains to verify in an authenticated preview.
+- Verification: Public and Links filtered repos passed fresh frozen install/build; NGL typecheck and Cloudflare build passed both in the root app and filtered repo. Root NGL lint reached ESLint after formatting passed, then failed on four existing issues (`no-empty` catch blocks in `LivePresenceBadge.svelte`/`ThemeToggler.svelte` and `svelte/no-at-html-tags` in `+layout.svelte`); none were introduced by the CSP change. Root Compose config for dev/prod, `git diff --check`, ignore rules, and browser asset service-token scan passed. GitHub CLI and Wrangler both remain unauthenticated.
+
+### 2026-11-01 11:10
+
+- Task: continue local preparation for four-repo portfolio deployment split
+- Mode: implementation + independent read-only audit in progress
+- Files: `apps/{public-astro,links-astro,ngl-svelte}/DEPLOYMENT.md`, app manifests/env example/Wrangler config, `.omx/plans/repo-split-deploy-plan.md`
+- Status: all local frontend extraction builds pass; remote and Cloudflare setup remain unavailable
+- Notes: Revalidated the plan against workspace/build evidence and kept the existing root repo as `portfolio-admin` (it already owns backend, Compose and VPS pull deployment). After Cloudflare acceptance, each frontend path will become a pinned submodule; deploy frontend repos directly so VPS deployment does not need recursive checkout. Added per-app Pages build/env instructions, pinned Bun package manager to local/runtime version 1.4.3, and removed the obsolete Public direct `RAG_SERVICE_URL` example. Official Cloudflare docs confirm Bun is supported by Pages build images and `process.env` is populated under `nodejs_compat` with the current compatibility date. A temporary verification mistake overwrote the workspace manifest in scratch repos; restored `workspaces: ["packages/*"]`, then all three frozen installs and builds passed again. GitHub CLI and Wrangler both report unauthenticated, so no repo creation, Pages preview, DNS update or deployment can proceed from this session. Started two Orca read-only audits for standalone frontend readiness and parent repo/submodule deployment impact.
+- Verification: each extracted child repo ran `bun install --frozen-lockfile && bun run build` successfully on Bun 1.4.3. Root `bun install --frozen-lockfile` passed. Compose config and `git diff --check` passed in previous milestone; rerun final diff/secret scan after audit findings are integrated.
+
+### 2026-11-01 11:05
+
+- Task: prepare independent frontend deployment and repo extraction, with Admin/RAG/Presence kept together for VPS deployment
+- Mode: implementation + local build/deployment-boundary verification
+- Files: Cloudflare adapter/config changes, Admin-to-RAG proxy/security changes, Compose/env examples, Slide Deck removal, `.omx/plans/repo-split-deploy-plan.md`, local filtered repositories under `/tmp`
+- Status: local preparation in progress; no remote repositories, commits, pushes, Pages preview, DNS, or production cutover
+- Notes: User's latest direction is to keep Admin, RAG, and Live Presence in a single backend repository/deploy while retaining Presence as its own Bun WebSocket container/process. Only Public Astro (`naufalrf.net`), Links Astro (`links.naufalrf.net`), and NGL Svelte (`ngl.naufalrf.net`) are frontend repos targeting Cloudflare Pages. Updated the plan to extract backend code/config/deploy scripts into `portfolio-admin`, and the three frontend repos separately; root can optionally pin all four as submodules. Public RAG chat/confirm now route through Admin with bounded bodies, rate limits, and Admin-to-RAG service authentication. User-requested Slide Deck feature/app and integrations have been removed. Standalone filtered child repos are local scratch directories only. GitHub CLI remains unauthenticated; do not claim remote repos or submodule pointers exist. Astro Cloudflare SESSION KV behavior still needs real Pages preview verification.
+- Verification: root workspace install/build and typecheck passed earlier; RAG tests and local Admin/RAG/Public Pages smoke passed earlier. The three filtered standalone frontend repositories each build successfully from their own workspace/lockfile; generated Cloudflare output scan found no `RAG_INGEST_SERVICE_TOKEN`, `RAG_SERVICE_TOKEN`, or smoke token. Both Compose configs validate with `.env.docker.prod.example`; `git diff --check` passes. Root lint still fails on an existing Admin unused-parameter warning and untouched NGL formatting.
+
+### 2026-11-01 10:55
+
+- Task: begin Cloudflare Pages and Git-repository separation work
+- Mode: implementation; root repo remains the integration/deployment source
+- Files: Links/NGL deployment configs, `bun.lock`, root build/start/Docker manifests, Public presentation route/app integration removal, `.omx/plans/repo-split-deploy-plan.md`, `PROGRESS.md`
+- Status: Links and NGL build for Cloudflare adapters locally; Public adapter work in progress; no remote repos, DNS, or production deployment changed
+- Notes: User clarified the presentation feature should be removed; deleted its app, Public `/portfolio` route, sync script, dev/build hooks, Docker workspace manifest copies, README row, and design-contract row. Links now uses Astro 5 Cloudflare adapter 12.6.13 and Pages Wrangler config; fixed its analytics proxy to read `ADMIN_API_URL` at request time as well as build time. NGL uses `adapter-cloudflare` 6.0.1 and Pages config. Both set `nodejs_compat` and compatibility date 2026-10-30 (the newest date supported by the installed Wrangler local runtime). NGL `check` and Cloudflare build pass; Links Cloudflare build and local Pages SSR homepage return 200. Astro 5 Cloudflare adapter still enables a `SESSION` KV binding by default; deployment binding requirements remain to verify. The RAG chat/confirm path is still a public-deployment gate because the current Public proxy points at Docker-only RAG DNS. Child repos still need the shared-package snapshot work before clean standalone builds. GitHub CLI is unauthenticated, so creating/remotes and pushing submodule commits remain unavailable.
+
+### 2026-11-01 08:39
+
+- Task: plan independent app deployments and possible Git submodule extraction
+- Mode: read-only repository/platform analysis + deployment plan
+- Files: `.omx/plans/repo-split-deploy-plan.md`, `PROGRESS.md`
+- Status: local Live Presence extraction pilot prepared; remote repositories and production deployment unchanged
+- Notes: Confirmed that the current blocker to independent builds is shared `workspace:*` packages and root-coupled builds, not runtime API boundaries. After user steering to prioritize separation, the plan starts with app repos pinned as submodules while the root workspace and VPS deployment remain operable. Hosting direction: Cloudflare Pages for Public (`naufalrf.net`), Links (`links.naufalrf.net`), and NGL (`ngl.naufalrf.net`) after adapter/runtime work; Admin (`admin.naufalrf.net`), RAG, and Presence (`presence.naufalrf.net`) stay on the VPS. Public's RAG path needs a private HTTPS ingress or Admin proxy because current service DNS is Docker-internal. Updated production env example hostnames. Made Live Presence Docker build app-local in both Compose files; standalone production image build plus `/health` and a WebSocket `join`/`welcome` smoke passed. Extracted its 16-commit path history into `/tmp/portfolio-nopal-live-presence` as a local child repo. GitHub CLI is not authenticated and SSH to GitHub port 22 times out, so no remote submodule or push was made. Slide Deck is out of the separation plan per user direction; no application code was removed.
+
 ### 2026-10-31 12:25
 
 - Task: restore and stage the Portfolio stack on the temporary MonevHub Dokploy server
@@ -1141,3 +1228,11 @@ Juga diverifikasi di QA akhir: toggle Events (Telegram per event type) benar-ben
 
 - **Mendaftarkan service worker di dalam alur push saja tidak cukup untuk PWA.** Install prompt butuh registration aktif sejak halaman dimuat, jadi registrasi harus hidup di layout, bukan menunggu user mengaktifkan notifikasi.
 - `manifest.webmanifest` disajikan dengan `application/manifest+json` dan `sw.js` dengan `application/javascript` tanpa konfigurasi tambahan — file statis di `public/` sudah cukup, tidak perlu rewrite/header khusus di `next.config.ts`.
+## 2026-11-01 14:10 — Audit production restore and current deploy
+
+- Task: finish database/media restoration, app deployment, and hostname routing.
+- Status: DB backup is valid and already restored to Dokploy Postgres; media bucket still lacks 7 referenced project images. The current Dokploy deployment has no running containers and no domains; public requests to all five hostnames time out.
+- Findings: the recorded Dokploy build cloned the old root revision and built for hours before the Admin image build was SIGKILLed. No Compose containers were created. The DB dump's schema journal matches all current migrations. R2 contains 63 objects; 23/30 unique DB media references match bucket objects, while seven project image keys have no exact or basename matches. The original GCS bucket is unavailable (404), and the R2 backup bucket contains DB dumps only.
+- Change: default production image build parallelism reduced from two to one in `scripts/docker-prod-up.sh` to avoid concurrent image memory pressure that killed the Admin build; documented this production constraint in `AGENTS.md`.
+- Still blocked: root changes are not committed/pushed, so Dokploy cannot deploy the fixes; Dokploy has no route/domains and the configured public A-record target does not answer; seven source images have no available copy to upload. Pages custom domains/secrets and public ingress need live account configuration after the root revision is available.
+- Verification: prior RAG typecheck/tests/build passed (17 tests); Docker compose config, deploy script syntax and diff checks passed before this final change. Live HTTP probes to `naufalrf.net`, `links`, `ngl`, `admin`, and `presence` timed out. Dokploy UI shows its sole deployment record as "Running" but the Containers tab reports no containers.

@@ -74,7 +74,7 @@ Authoritative AI control contract for this repository.
 - Admin manages the broader migration lifecycle; do not assume RAG owns cross-app schema migrations.
 - RAG is a direct database actor in this repo even though the non-admin frontend apps are not.
 - Docker `rag-bootstrap` should only provision the `vector` extension and `rag` schema; Admin Drizzle migrations own `rag.documents`, `rag.chunks`, and `rag.ingestion_runs`.
-- RAG should use `ADMIN_INTERNAL_API_TOKEN` for Admin internal API calls and `RAG_INGEST_SERVICE_TOKEN` for validating `/ingest`; `ADMIN_SERVICE_TOKEN` is legacy fallback compatibility only.
+- RAG should use `ADMIN_INTERNAL_API_TOKEN` for Admin internal API calls and `RAG_INGEST_SERVICE_TOKEN` for validating `/ingest` plus Admin-proxied `/chat` and `/chat/confirm`; those public-facing workflows must not be reachable without service auth. `ADMIN_SERVICE_TOKEN` is legacy fallback compatibility only.
 - Production browser chat traffic should reach RAG only through the `apps/public-astro` proxy layer; do not assume `POST /chat` is meant for direct public edge exposure.
 - RAG chat prompt building now uses forwarded `Accept-Language` as a response-language hint; preserve same-language, semi-casual/semi-formal answering unless the user explicitly changes that assistant behavior.
 - The service is now fully TypeScript/Hono/Bun (no Python/FastAPI/uv). All `fastapi/` and `alembic/` directories and `uv.lock` have been removed.
