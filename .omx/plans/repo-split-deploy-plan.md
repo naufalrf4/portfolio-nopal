@@ -26,14 +26,31 @@ Production remains one Dokploy-managed Compose project on the already configured
 - Admin and RAG Dockerfiles have app-local development targets. Root dev Compose mounts each submodule and uses separate dependency volumes.
 - Dokploy read-only inspection found the existing project `Portfolio` and stack `Portfolio Platform`, configured with auto-deploy and an existing remote server target.
 - The temporary HMAC receiver, route, and firewall exception were removed. Dokploy is the deployment controller.
-- Dokploy's existing stack now points to `naufalrf4/portfolio-deploy` on `main` at `./docker-compose.yml`; the existing server, project, environment, and Admin domain remain attached. A direct Presence domain mapping was removed; DNS was not changed.
-- The initial Dokploy deployment API request returned HTTP 200, but Dokploy currently reports the Compose stack as idle and the deployment queue has waiting jobs. Do not treat the deployment as complete until the queue starts and health checks pass.
+- Dokploy's existing stack now points to `naufalrf4/portfolio-deploy` on `main` at `./docker-compose.yml`; the existing server, project, environment, and Admin domain remain attached. A direct Presence domain mapping was removed.
+- Dokploy v0.30.10's in-memory queue was blocked by two orphaned active jobs. The controller was restarted with Swarm `stop-first` after checking that neither host had a live build process; the latest Portfolio deployment and the already-queued MonevHub deployment were re-enqueued and both completed.
+- New Dokploy stack `portfolio-platform-qhoghi` is healthy on the pinned Admin, RAG, and Presence images. RAG bootstrap and Admin migration/verification exited successfully (17/17 migrations). The old `portfolio-prod` app and sidecar containers are stopped as rollback standby; the separate Dokploy-managed Postgres service remains running. Traefik now routes only to the new stack.
+- Direct-origin smoke checks passed for Admin, RAG, Presence, and allowed/blocked Presence WebSocket origins. The existing Cloudflare-proxied Admin domain was corrected and verified in the Ingress verification section below.
 - Root integration changes were committed and pushed as `81272af`. A fresh recursive clone checked out all six exact pins, and root `bun install --frozen-lockfile` succeeded without installing Next.js.
 
-## Remaining gates
+## Migration completion state
 
-1. **Complete Dokploy deployment.** Source now targets `naufalrf4/portfolio-deploy`; verify the queued run reads the new Compose file and finishes. Its dependency graph requires RAG bootstrap, Admin migrations, and migration verification before Admin/RAG runtime. Failed steps must block dependent runtime replacement.
-2. **Verify production through Dokploy.** Check migration result, Admin API, RAG and Presence health, WebSocket origin handling, cron, logs, and that the existing Postgres data remains attached. Keep the prior image pins available for rollback.
+The repository split, submodule pins, app-local dependency/build boundaries, Dokploy repository configuration, remote image rollout, migration gate, service health, and direct-origin WebSocket routing are complete and verified. Dokploy currently reads `naufalrf4/portfolio-deploy` from `main` at `./docker-compose.yml` and targets `MonevHub Production`. The old `portfolio-prod` containers are stopped as rollback standby; Postgres remains attached and running.
+
+## Cross-deployment Live Presence follow-up
+
+- Production Presence now explicitly allows the exact Pages origins `https://naufalrf.net`, `https://links.naufalrf.net`, and `https://ngl.naufalrf.net`; the live `live-presence` container was recreated from the Dokploy Compose checkout environment.
+- `/presence/health` and `/presence/ws` both pass through the Admin Traefik router, which strips `/presence`. Public and Links now preserve the prefix; all three source commits are on their standalone `main` branches and current Cloudflare Pages production deployments point to those commits.
+- Links and NGL now publish normalized pointer movement and render remote participant cursors. Admin image publication and Dokploy rollout remain the final gate for stable public image URLs; the asset Worker is already deployed and verified.
+
+## Public asset delivery
+
+- `assets.naufalrf.net` is a Cloudflare Worker custom domain bound to the existing private R2 bucket, not a public R2 custom domain. It serves only image content from `about/`, `projects/`, and `achievements/` and rejects resume paths, traversal, other methods, and non-image objects.
+- Admin `/api/v1/public/*` responses map eligible image keys to stable asset URLs while Admin APIs keep signed URLs and resume links remain signed. DB media keys remain unchanged. One observed 403 experience logo reference was cleared so the existing fallback is used.
+- Worker smoke checks: a production avatar object returned 206 `image/png`; resume and traversal requests returned 404. Admin public API changes are committed/pushed and await image CI plus Dokploy promotion.
+
+## Ingress verification
+
+Using the Headscale workstation browser at CDP `100.64.0.4:9222`, the existing `admin.naufalrf.net` A record was updated from the retired origin to the current VPS origin, preserving Cloudflare proxying and Auto TTL. The unused `presence.naufalrf.net` A record was removed; Presence remains routed under Admin at `/presence`. Public checks now pass: Admin session endpoint 200, home redirects to login (307), Presence WebSocket 101 for an allowed origin and 403 for an untrusted origin. No public CDP subdomain or port was created; the browser remains private to Headscale.
 
 ## Build/resource rules
 
