@@ -28,13 +28,12 @@ Production remains one Dokploy-managed Compose project on the already configured
 - The temporary HMAC receiver, route, and firewall exception were removed. Dokploy is the deployment controller.
 - Dokploy's existing stack now points to `naufalrf4/portfolio-deploy` on `main` at `./docker-compose.yml`; the existing server, project, environment, and Admin domain remain attached. A direct Presence domain mapping was removed; DNS was not changed.
 - The initial Dokploy deployment API request returned HTTP 200, but Dokploy currently reports the Compose stack as idle and the deployment queue has waiting jobs. Do not treat the deployment as complete until the queue starts and health checks pass.
+- Root integration changes were committed and pushed as `81272af`. A fresh recursive clone checked out all six exact pins, and root `bun install --frozen-lockfile` succeeded without installing Next.js.
 
 ## Remaining gates
 
-1. **Prove root independence.** Root `bun install --frozen-lockfile` and `bun run install:apps admin` passed; root has no Next CLI while Admin has its own CLI. Check the remaining apps' lock/install metadata and verify E2E still resolves root package snapshots and app paths.
-2. **Complete Dokploy deployment.** Source now targets `naufalrf4/portfolio-deploy`; verify the queued run reads the new Compose file and finishes. Its dependency graph requires RAG bootstrap, Admin migrations, and migration verification before Admin/RAG runtime. Failed steps must block dependent runtime replacement.
-3. **Verify production through Dokploy.** Check migration result, Admin API, RAG and Presence health, WebSocket origin handling, cron, logs, and that the existing Postgres data remains attached. Keep the prior image pins available for rollback.
-4. **Publish the integration root.** Commit and push the root submodule pointers, shell-only workspaces, app-local Compose contexts, and updated docs after local checks. A fresh recursive clone must reproduce the pinned app commits and root E2E setup.
+1. **Complete Dokploy deployment.** Source now targets `naufalrf4/portfolio-deploy`; verify the queued run reads the new Compose file and finishes. Its dependency graph requires RAG bootstrap, Admin migrations, and migration verification before Admin/RAG runtime. Failed steps must block dependent runtime replacement.
+2. **Verify production through Dokploy.** Check migration result, Admin API, RAG and Presence health, WebSocket origin handling, cron, logs, and that the existing Postgres data remains attached. Keep the prior image pins available for rollback.
 
 ## Build/resource rules
 
