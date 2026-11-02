@@ -40,13 +40,13 @@ The repository split, submodule pins, app-local dependency/build boundaries, Dok
 
 - Production Presence now explicitly allows the exact Pages origins `https://naufalrf.net`, `https://links.naufalrf.net`, and `https://ngl.naufalrf.net`; the live `live-presence` container was recreated from the Dokploy Compose checkout environment.
 - `/presence/health` and `/presence/ws` both pass through the Admin Traefik router, which strips `/presence`. Public and Links now preserve the prefix; all three source commits are on their standalone `main` branches and current Cloudflare Pages production deployments point to those commits.
-- Links and NGL now publish normalized pointer movement and render remote participant cursors. Admin image publication and Dokploy rollout remain the final gate for stable public image URLs; the asset Worker is already deployed and verified.
+- Links and NGL now publish normalized pointer movement and render remote participant cursors. Production Pages for Public, Links, and NGL point to their updated commits; Admin's immutable image `47ce52b` is healthy in Dokploy.
 
 ## Public asset delivery
 
 - `assets.naufalrf.net` is a Cloudflare Worker custom domain bound to the existing private R2 bucket, not a public R2 custom domain. It serves only image content from `about/`, `projects/`, and `achievements/` and rejects resume paths, traversal, other methods, and non-image objects.
-- Admin `/api/v1/public/*` responses map eligible image keys to stable asset URLs while Admin APIs keep signed URLs and resume links remain signed. DB media keys remain unchanged. One observed 403 experience logo reference was cleared so the existing fallback is used.
-- Worker smoke checks: a production avatar object returned 206 `image/png`; resume and traversal requests returned 404. Admin public API changes are committed/pushed and await image CI plus Dokploy promotion.
+- Admin `/api/v1/public/*` responses map eligible image keys to stable asset URLs while Admin APIs keep signed URLs and resume links remain signed. DB media keys remain unchanged. Two observed 403 external image references were cleared so existing fallbacks are used.
+- Worker smoke checks: a production avatar object returned 206 `image/png`; resume and traversal requests returned 404. All 29 production public API image/resume URLs returned 2xx after rollout.
 
 ## Ingress verification
 
