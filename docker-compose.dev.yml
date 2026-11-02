@@ -21,10 +21,10 @@ services:
 
   admin:
     build:
-      context: .
-      dockerfile: apps/admin/Dockerfile
+      context: ./apps/admin
+      dockerfile: Dockerfile
       target: dev
-    working_dir: /app/apps/admin
+    working_dir: /app
     environment:
       TZ: Asia/Jakarta
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
@@ -67,18 +67,18 @@ services:
     ports:
       - '127.0.0.1:${ADMIN_PORT:-3001}:3001'
     volumes:
-      - .:/app
-      - root-node-modules:/app/node_modules
+      - ./apps/admin:/app
+      - admin-node-modules:/app/node_modules
     depends_on:
       db:
         condition: service_healthy
 
   rag:
     build:
-      context: .
-      dockerfile: apps/rag-service/Dockerfile
+      context: ./apps/rag-service
+      dockerfile: Dockerfile
       target: dev
-    working_dir: /app/apps/rag-service
+    working_dir: /app
     environment:
       TZ: Asia/Jakarta
       APP_ENV: development
@@ -104,8 +104,8 @@ services:
     ports:
       - '127.0.0.1:${RAG_PORT:-3005}:3005'
     volumes:
-      - .:/app
-      - root-node-modules:/app/node_modules
+      - ./apps/rag-service:/app
+      - rag-node-modules:/app/node_modules
     depends_on:
       db:
         condition: service_healthy
@@ -114,8 +114,8 @@ services:
 
   rag-bootstrap:
     build:
-      context: .
-      dockerfile: apps/rag-service/Dockerfile
+      context: ./apps/rag-service
+      dockerfile: Dockerfile
       target: dev
     working_dir: /app/apps/rag-service
     command: ['bun', 'run', 'db:bootstrap']
@@ -124,8 +124,8 @@ services:
       APP_ENV: development
       RAG_DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
     volumes:
-      - .:/app
-      - root-node-modules:/app/node_modules
+      - ./apps/rag-service:/app
+      - rag-node-modules:/app/node_modules
     depends_on:
       db:
         condition: service_healthy
@@ -217,7 +217,8 @@ services:
 
 volumes:
   db-data-dev:
-  root-node-modules:
+  admin-node-modules:
+  rag-node-modules:
   public-node-modules:
   links-node-modules:
   ngl-node-modules:

@@ -1,7 +1,7 @@
 {
   "name": "naufalrf-portfolio",
   "private": true,
-  "description": "Meta repository for standalone apps under apps/*",
+  "description": "Integration repository for pinned standalone apps",
   "scripts": {
     "dev:all": "bash ./start-dev.sh",
     "reset:seed": "bash ./scripts/docker-dev-reset-seed.sh",
@@ -16,9 +16,18 @@
     "lint-staged": "lint-staged",
     "commitlint": "commitlint",
     "dev": "bash ./start-dev.sh",
-    "build": "NODE_OPTIONS=--max-old-space-size=4096 bun run --filter admin build && bun run --filter public-astro build && bun run --filter links-astro build && bun run --filter ngl-svelte build && bun run --filter rag-service build",
-    "lint": "bun run --filter admin lint && bun run --filter ngl-svelte lint",
-    "typecheck": "bun run --filter admin typecheck && bun run --filter ngl-svelte check && bun run --filter rag-service typecheck",
+    "install:apps": "bash ./scripts/install-apps.sh",
+    "build:all": "bash ./scripts/build-apps.sh",
+    "build:admin": "cd apps/admin && bun run build",
+    "build:public": "cd apps/public-astro && bun run build",
+    "build:links": "cd apps/links-astro && bun run build",
+    "build:ngl": "cd apps/ngl-svelte && bun run build",
+    "build:rag": "cd apps/rag-service && bun run build",
+    "lint:admin": "cd apps/admin && bun run lint",
+    "lint:ngl": "cd apps/ngl-svelte && bun run lint",
+    "typecheck:admin": "cd apps/admin && bun run typecheck",
+    "typecheck:ngl": "cd apps/ngl-svelte && bun run check",
+    "typecheck:rag": "cd apps/rag-service && bun run typecheck",
     "test:e2e": "bun run e2e/runner.ts",
     "test:e2e:specs": "bun test e2e/features"
   },
@@ -41,7 +50,6 @@
     "node": ">=22.0.0"
   },
   "workspaces": [
-    "apps/*",
     "packages/*",
     "e2e"
   ]

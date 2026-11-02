@@ -3,6 +3,14 @@
 Chronological timeline of meaningful project work, discoveries, decisions, and blockers for future agents.
 
 ## Entries
+### 2026-11-02
+
+- Task: reduce unnecessary workspace build/install work and retest Admin's normal Next build
+- Files: root `package.json`/`README.md`, Admin and RAG Dockerfiles, Admin build script/config, `AGENTS.md`
+- Status: normal Admin build succeeds; targeted workspace install/build entrypoints added; standalone backend/deployment candidates prepared locally
+- Notes: `bun install --filter admin --frozen-lockfile` installed Admin dependencies while skipping the three uninitialized frontend submodules. A direct production `next build` on Next 16.3.3 completed successfully without `--debug-prerender` (TypeScript and all 76 static generation slots passed). Removed the stale workaround from the Admin package script and Docker builder. Docker dependency stages now use workspace filters for Admin and RAG, avoiding installation of unrelated app dependencies. Root gained per-app build commands while preserving the existing full build command. After the user authorized local preparation only, created Git-initialized candidates under ignored `.agent-workspace/backend-split/`: Admin, RAG, Presence, and deployment-only Compose. Admin/RAG include snapshots of only required shared packages and standalone lockfiles; candidate workflows publish immutable GHCR SHA tags. Clean source copies passed Admin frozen install and Node 22/Turbopack build under 6 GB/1 CPU (TypeScript, 76 static pages, standalone artifacts), RAG frozen install/build, and Presence production image build. The deployment repo uses an HMAC pull webhook and immutable image pins; the VPS stack contains only Admin, RAG, Presence, and operational sidecars.
+- Verification: Admin and RAG clean-copy builds passed; Compose and GH Actions workflow YAML parsed; image-pin validation and Bash/Python syntax passed. Docker-command simulations verified both Admin and RAG migration order, Presence-only migration skip, and rollback to the prior image after a health failure. No remote repositories, commits, pushes, or production services were changed.
+
 ### 2026-11-01 13:35
 
 - Task: continue Cloudflare Pages setup through the logged-in cloud browser
@@ -1285,3 +1293,42 @@ Juga diverifikasi di QA akhir: toggle Events (Telegram per event type) benar-ben
 - Correction to the previous memory fix: setting NODE_OPTIONS around bun run build cannot bound Bun's memory. Admin's Docker builder now uses Node 22 to invoke the Next CLI directly with a 2 GiB heap limit; the separate migrator target still uses Bun without compiling Next.
 - Admin + RAG + Live Presence remain the target VPS stack, with Admin hostname only and Presence routed by /presence/ws; Pages frontends now reference that websocket path.
 - Verification: local Node 24 executed Next CLI v16.3.3, all three Wrangler TOML files parse, production Compose config parses, deploy scripts pass Bash syntax, and git diff --check passes. Production remains undeployed pending the updated repositories and a successful server build.
+## 2026-11-02 — Local source split candidate validation
+
+- Task: advance the local-only split plan and assign bounded independent workstreams through Orca.
+- Result: clean-copy Admin frozen install and Node 22/Turbopack build passed in Docker with 6 GB RAM and 1 CPU. TypeScript passed, 76 static pages were generated, and standalone server/static artifacts were present. The candidate contract drift fixture was corrected to include `updatedAt`.
+- Result: clean-copy RAG frozen install/build passed, including `dist/index.js` and `dist/db-bootstrap.js`; clean-copy Presence production image build passed. The RAG Dockerfile image build remains unverified because the local Docker builder lacks BuildKit cache-mount support.
+- Deployment candidate: Compose contains only Admin, RAG, Presence, and their operational sidecars. Pages apps are absent so their runtimes do not receive Admin's internal credential. HMAC webhook and image-pin classification are present; Admin/RAG migrations run before rollout. Compose config, workflow YAML, pin validation, and script syntax passed. Docker-command simulations verified Admin/RAG migration order, Presence-only skip, and rollback overlay behavior after a health failure.
+- Work coordination: Admin, RAG/Presence, and deployment build/audit streams ran in isolated candidate directories; separate read-only reviews checked deployment invariants. Root retained integration and plan ownership. No GitHub repos, commits, pushes, root submodule pointers, DNS, or production services were changed.
+- Remaining gates: actual Admin/RAG Docker image builds on BuildKit, hosted CI/GHCR publication, and staging API/database/health/rollback checks. Creating remotes or publishing images still requires separate authorization.
+
+## 2026-11-02 — Standalone backend repositories and GHCR image preflight
+
+- Published public repositories `portfolio-admin`, `portfolio-rag`, `portfolio-presence`, and `portfolio-deploy` under the user's GitHub identity. All three service repositories have hosted CI image builds; initial immutable image tags passed on GitHub Actions.
+- VPS anonymously pulled the initial Admin, Admin migrator, RAG, and Presence image tags successfully. No live container or database was changed; the existing `portfolio-prod` Dokploy stack remains healthy.
+- Removed the unused Admin Turnstile public build input. Set the verified R2 account and production bucket as Admin Actions variables, then started a corrected Admin image build so Next Image embeds the valid private R2 hostname. Mapbox, GA, and VAPID public build values are currently empty in the Dokploy environment.
+- Updated the split plan to reflect publication. Remaining gates are the corrected Admin CI image, real immutable pins in `portfolio-deploy`, deployment receiver installation/routing with protected HMAC configuration, and production migration/rollout/smoke/rollback. Backend source in this integration workspace stays until the split runtime is stable.
+
+## 2026-11-02 — Image-only VPS cutover and webhook receiver
+
+- Promoted SHA-pinned Admin (`e84e767`), RAG (`cfe77ec`), and Presence (`6ea0b1d`) images from `portfolio-deploy` on the existing `portfolio-prod` Compose project. The Admin image was rebuilt after setting the verified R2 account and bucket variables.
+- Before rollout, RAG bootstrap completed and the Admin migrator verified 17 migrations applied against 17 on disk. Rollout then reported Admin, RAG, Live Presence, Admin cron, and notification dispatch healthy. Admin public API returned HTTP 200 through the direct origin; RAG and Presence health returned 200; Presence WebSocket returned 101 for an allowed origin and 403 for an untrusted origin. No database volume was replaced.
+- Installed the root-owned `portfolio-webhook` systemd receiver on the host, bound only to `172.17.0.1:9010`. Added an internal-only UFW rule for the Traefik bridge, and verified the direct-origin Traefik health route plus HMAC acceptance/rejection (202 for a correctly signed `ping`, 401 for an invalid signature). GitHub auto-delivery is not registered yet.
+- Public ingress remains unresolved: `admin.naufalrf.net` through Cloudflare times out, while direct-origin HTTPS succeeds. The available Cloudflare OAuth token has `zone:read` but no DNS edit permission. A DNS-only A record `deploy.naufalrf.net` pointing to the VPS origin is needed before GitHub webhook delivery can be activated. Keep the old backend source until public ingress and automated deploy delivery are verified.
+
+## 2026-11-02 — Switch deployment control to Dokploy
+
+- User specified that deployments must use Dokploy at `cloud.nrflabs.net` and its existing configured remote server; separate deployment DNS is unnecessary.
+- Tried the documented read-only `GET /api/project.all` using `x-api-key`; Dokploy returned HTTP 401 Unauthorized. No Dokploy resource was created or changed.
+- Disabled the temporary `portfolio-webhook` systemd service, removed its Traefik route and root-only env file, and deleted its narrow UFW rule. The production Admin/RAG/Presence containers were left running.
+- Next gate: user must rotate the key shared in chat and provide a valid Dokploy API key through a protected local file/environment so the existing project and remote target can be inspected. Then configure `portfolio-deploy` in Dokploy and verify migration order and API-triggered rollout.
+
+## 2026-11-02 — Pin all apps and connect the existing Dokploy stack
+
+- Correction: the earlier entry about a rejected Dokploy key is superseded. The user supplied a usable key; it was kept out of output. No DNS was added. The existing Dokploy project/remote server/environment were reused.
+- Root now pins all six apps as Git submodules. Admin seed data moved into `portfolio-admin`, where the standalone seed path now resolves inside the repo. `portfolio-admin` and `portfolio-rag` gained app-local Docker development targets.
+- Root Bun workspaces now contain only integration packages and E2E tooling. Root lockfile is 88 KB; `bun install --frozen-lockfile` installed root tooling only (352 packages), while the Admin frozen install ran from its own submodule (683 packages). Root Node modules no longer contain Next.js; Admin does.
+- Root Docker Compose build contexts now point to each app repository. Root install/build scripts install apps independently and make the all-app build an explicit sequential command.
+- `portfolio-deploy` now pins immutable image tags directly in Compose, eliminating image environment variables that Dokploy did not have. Its default dependency graph gates Admin/RAG on successful RAG bootstrap, Admin migration, and migration verification. Compose parsing and helper-script syntax passed.
+- Dokploy's existing `Portfolio Platform` stack now points to `naufalrf4/portfolio-deploy`, branch `main`, `./docker-compose.yml`, while retaining the same Compose project, environment, and remote server. The Admin domain remains. Removed the stale direct `presence.naufalrf.net` mapping; Presence stays at `/presence` behind Admin. This changed only Dokploy routing, not DNS.
+- The Dokploy deploy API returned HTTP 200, but the stack still reports `idle` and the queue contains waiting jobs. Deployment and production health verification remain pending; do not treat source configuration as a completed rollout.

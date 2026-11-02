@@ -7,3 +7,12 @@
 [submodule "apps/ngl-svelte"]
 	path = apps/ngl-svelte
 	url = https://github.com/naufalrf4/portfolio-ngl.git
+[submodule "apps/admin"]
+	path = apps/admin
+	url = https://github.com/naufalrf4/portfolio-admin.git
+[submodule "apps/rag-service"]
+	path = apps/rag-service
+	url = https://github.com/naufalrf4/portfolio-rag.git
+[submodule "apps/live-presence"]
+	path = apps/live-presence
+	url = https://github.com/naufalrf4/portfolio-presence.git

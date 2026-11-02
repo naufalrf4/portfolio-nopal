@@ -2,13 +2,14 @@
 
 ## Style
 
-Bun workspace monorepo for independent app repos under `apps/*` and shared packages under `packages/*`, with shared project truth documented at the root.
+Lightweight Bun integration workspace with six independent app repositories pinned under `apps/*`, root integration packages under `packages/*`, and shared project truth documented at the root.
 
 ## Execution model
 
-- Root is a Bun workspace shell. A single `bun install` installs all apps and shared packages.
-- Public, Links, and NGL are pinned as Git submodules at their existing `apps/*` workspace paths. Clone with `--recurse-submodules`; the VPS pull deploy initializes pinned submodules before Docker builds.
-- Those three apps choose Cloudflare adapters when Pages injects `CF_PAGES=1`; normal root workspace and VPS Docker builds use Node adapters. VPS Docker builds run from each app submodule and install only its dependencies.
+- Root `bun install` installs integration/E2E tooling and packages only. Each app owns its manifest, lockfile, dependency install, and build.
+- All six apps are pinned as Git submodules at their `apps/*` paths. Clone with `--recurse-submodules`; initialize all modules before app install/build.
+- Admin, RAG, and Live Presence publish immutable GHCR images: `naufalrf4/portfolio-admin`, `portfolio-rag`, and `portfolio-presence`. `naufalrf4/portfolio-deploy` owns VPS Compose and image promotion; it contains no app source or workspace install.
+- Public, Links, and NGL choose Cloudflare adapters when Pages injects `CF_PAGES=1`; their standalone Docker builds use Node adapters where needed. Docker contexts are app-local.
 - Each app owns its own scripts, runtime, and environment file.
 - Cross-app communication happens through HTTP APIs and service tokens, except for the direct database actors and websocket presence service documented below.
 
@@ -61,8 +62,7 @@ Bun workspace monorepo for independent app repos under `apps/*` and shared packa
 
 ## Design baseline
 
-- The visual authority is root `DESIGN.md` (dark-first, shared `@naufalrf/design-tokens`).
-- The legacy `../naufalrf-portfolio-phase2` neumorphic baseline was explicitly retired and replaced by DESIGN.md (commits `f70d51b`, `a61a7e9`, `cfaf77c`); `public-astro` renamed Neu* components to Card/Button/Badge/Input/Textarea and `admin` keeps `neu-*` names as a flat dark-first naming layer.
+- The visual authority is root `DESIGN.md` (dark-first, shared `@naufalrf/design-tokens`). Keep app-local token snapshots aligned with it.
 
 ## Repo truth notes
 

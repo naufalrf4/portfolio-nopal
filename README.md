@@ -4,9 +4,9 @@
 
 **A multi-app portfolio platform with one content authority and focused public surfaces.**
 
-Next.js administration, Astro public apps, SvelteKit messaging, Bun services, and PostgreSQL—coordinated in one Bun workspace.
+Six standalone apps, four shared source packages, and cross-app E2E tooling—coordinated by a lightweight integration repository.
 
-[![Runtime](https://img.shields.io/badge/runtime-Bun-f9f1e7?style=flat-square&logo=bun&logoColor=000000)](https://bun.sh)
+[![Runtime](https://img.shields.io/badge/runtime-per--app-f9f1e7?style=flat-square&logo=bun&logoColor=000000)](https://bun.sh)
 [![Admin](https://img.shields.io/badge/admin-Next.js%2016-111111?style=flat-square&logo=nextdotjs)](https://nextjs.org)
 [![Public](https://img.shields.io/badge/public-Astro%205-ff5d01?style=flat-square&logo=astro)](https://astro.build)
 [![Messaging](https://img.shields.io/badge/messaging-SvelteKit%202-ff3e00?style=flat-square&logo=svelte)](https://svelte.dev)
@@ -24,7 +24,8 @@ The platform keeps content, validation, and public API contracts in one place: `
 
 - **One authority** — Admin owns portfolio content, public contracts, moderation, and operations.
 - **Independent experiences** — portfolio, links, anonymous messages, live presence, and AI retrieval can evolve without sharing a frontend runtime.
-- **Shared foundations** — TypeScript configuration, design tokens, HTTP helpers, and API contracts live in workspace packages.
+- **Independent builds** — each app is a Git submodule with its own repository, lockfile, dependencies, and build.
+- **Shared foundations** — TypeScript configuration, design tokens, HTTP helpers, and API contracts are copied into app repos; root copies support cross-app tooling.
 - **Clear boundaries** — browser apps never access the database directly; realtime presence stays ephemeral; RAG has an explicitly limited data role.
 
 ## Architecture
@@ -46,12 +47,13 @@ ngl-svelte ───┘
 ## Quick start
 
 ```sh
-# Clone the VPS/integration repo together with its pinned frontend repos.
+# Clone the integration repo and all six pinned app repos.
 git clone --recurse-submodules https://github.com/naufalrf4/portfolio-nopal.git
 cd portfolio-nopal
 
-# Install the single workspace lockfile.
+# Install root-only E2E/shared tooling, then each app from its own lockfile.
 bun install
+bun run install:apps
 
 # Copy the local configuration needed for the apps you will run.
 cp apps/admin/.env.example apps/admin/.env.local
@@ -78,22 +80,41 @@ Never commit real credentials.
 | Surface | Path | Stack | Port | Responsibility |
 |---|---|---|:---:|---|
 | Public portfolio | `apps/public-astro` | Astro + React | 3000 | Portfolio, SEO, booking, guestbook, AI chat entrypoint |
-| Admin | `apps/admin` | Next.js | 3001 | Content authority, CMS, dashboard, public and internal APIs |
+| Admin | `apps/admin` | Next.js | 3001 | Content authority, CMS, dashboard, public and internal APIs; owns seed data |
 | Links | `apps/links-astro` | Astro + React | 3002 | Link-in-bio profile |
 | Anonymous messages | `apps/ngl-svelte` | SvelteKit | 3003 | Turnstile-protected anonymous messaging |
 | RAG service | `apps/rag-service` | Bun + Hono | 3005 | Retrieval, embeddings, grounding, AI workflows |
 | Live presence | `apps/live-presence` | Bun WebSocket | 3006 | Ephemeral presence and cursor state |
 
+## Standalone service repositories
+
+Every app under `apps/*` is an independent Git submodule. Admin, RAG, and Live Presence source repos publish immutable GHCR images; the Astro/Svelte apps deploy independently to Cloudflare Pages. [`portfolio-deploy`](https://github.com/naufalrf4/portfolio-deploy) owns the image-only VPS Compose stack. Runtime connections remain Admin↔RAG on private APIs, RAG↔Postgres for approved retrieval work, and browser↔Presence over WebSocket. Root owns only cross-app tooling, shared integration packages, and pinned app references.
+
 ## Commands
 
 ```sh
-# Development and build
+# Development and builds
 bun run dev:all
-bun run build
+cd apps/admin && bun run build
+
+# Install app dependencies once, independently per repository
+bun run install:apps
+bun run install:apps admin
+
+# Build only the app you changed
+bun run build:admin
+bun run build:public
+bun run build:links
+bun run build:ngl
+bun run build:rag
+bun run build:all       # explicit sequential build of all buildable apps
 
 # Quality gates
-bun run lint
-bun run typecheck
+bun run lint:admin
+bun run lint:ngl
+bun run typecheck:admin
+bun run typecheck:ngl
+bun run typecheck:rag
 bun run test:e2e
 bun run test:e2e:specs       # services must already be running
 
@@ -118,9 +139,9 @@ cd apps/rag-service && bun run typecheck && bun test && bun run build
 ## Workspace layout
 
 ```text
-apps/                 standalone application runtimes
-packages/             shared contracts, tokens, HTTP helpers, TypeScript config
-data/                 seed and RAG-ingest content
+apps/                 pinned standalone application repositories
+packages/             root copies for E2E and integration tooling
+apps/admin/data/      Admin-owned seed and RAG-ingest content
 e2e/                  API-only cross-app verification
 scripts/              Docker and deployment orchestration
 ```
@@ -136,7 +157,7 @@ scripts/              Docker and deployment orchestration
 
 ### Deployment
 
-Production deployment is pull-based. An HMAC-verified GitHub webhook triggers the production Docker update and migration scripts. PostgreSQL is Dokploy-managed in production; local development uses the dockerized `pgvector/pgvector` image.
+Production deployment is managed by Dokploy at `cloud.nrflabs.net` and targets its configured remote server. The existing Portfolio stack now points to `portfolio-deploy` and keeps its project, environment, Admin domain, server, and PostgreSQL. Its first deployment from the new source is pending in Dokploy's queue. The Compose dependency graph gates Admin/RAG runtime on RAG bootstrap and Admin migration success. Presence is routed under the Admin domain; no DNS changes are needed.
 
 ### Time
 

@@ -1,1 +1,0 @@
-export { usePublications } from './usePublications';

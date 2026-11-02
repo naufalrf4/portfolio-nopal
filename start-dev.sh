@@ -3,6 +3,13 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+for app in admin public-astro links-astro ngl-svelte rag-service; do
+  if [[ ! -d "$ROOT_DIR/apps/$app/node_modules" ]]; then
+    echo "Dependencies are missing in apps/$app; run 'bun run install:apps' from the repo root." >&2
+    exit 1
+  fi
+done
+
 # Startup order matters: admin + rag first (data/api providers), then consumers.
 providers=(
   "admin|$ROOT_DIR/apps/admin|bun run dev|http://localhost:3001"
