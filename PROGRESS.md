@@ -3,6 +3,14 @@
 Chronological timeline of meaningful project work, discoveries, decisions, and blockers for future agents.
 
 ## Entries
+### 2026-11-16
+
+- Task: make the portfolio chatbot agentic with JEv guardrails, lazy retrieval, and dashboard-managed agent settings
+- Files: Admin AI config/API/schema/migration, RAG agent config and JEv client/chat routing, Public Astro chatbot response display/timeout, knowledge-document ingest routes, compose/env templates
+- Status: local implementation and targeted tests pass; deployment still needs a TypeSafe API key and JEv retention/ZDR settings
+- Notes: Added a validated agent config to `llm_settings` for JEv model, routing and safety guidance, enabled tools, retrieval toggle/limit, and optional JEv output review. The Admin dashboard edits this config; RAG reads it through the existing authenticated internal endpoint. The JEv API key remains a RAG runtime secret. RAG batches Noul questions for input safety and routing, sends only redacted user-turn text (no retrieved/uploaded context) to JEv, and runs embedding retrieval only when the portfolio-search route is selected. Existing staged-action confirmation remains server-side. Knowledge document create/update now queues re-indexing. Public chatbot now renders the full response immediately instead of delaying fake streaming.
+- Verification: RAG build and typecheck passed; RAG `bun test` passed (84 tests). Admin `bun test` passed (186 tests), including agent settings validation; Admin typecheck reports only the existing missing Cloudflare `R2Bucket` type in `workers/public-assets/src/index.ts`. Prod Compose parses. Public typecheck reports existing `updatedAt` omissions in contract drift test fixtures; Astro build is blocked by local esbuild `EACCES`. Drizzle generated migration `0017_great_polaris.sql`; migration verification could not run because `DATABASE_URL` is unset. `git diff --check` passed. No deployment or external account settings changed.
+
 ### 2026-11-02
 
 - Task: reduce unnecessary workspace build/install work and retest Admin's normal Next build
@@ -1357,3 +1365,37 @@ Juga diverifikasi di QA akhir: toggle Events (Telegram per event type) benar-ben
 - Removed two broken external image references (TIU Cisco logo and one blog thumbnail, both observed HTTP 403) from their DB records; existing UI fallbacks render when these nullable image fields are empty.
 - Dokploy's saved Compose environment had drifted back to only the Public origin. Updated the durable setting through the Dokploy API and redeployed the existing stack. All three production Origins now upgrade; cursor moves from each were reflected in the shared overview (3/3), while an untrusted origin remains 403.
 - Verified 29 production API image/resume URLs; all returned 2xx. The private R2 Worker returned image bytes (206), rejected resume/traversal paths (404), and the Admin API now emits stable asset URLs while retaining signed resume URLs. Admin image CI and Dokploy promotion completed on immutable SHA `47ce52b`; Public, Links, and NGL Pages point to their pushed commits. Admin TypeScript, Links Cloudflare Pages build, and NGL Svelte check plus Cloudflare build passed.
+
+## 2026-11-02 — Local hardening, progressive rendering, and discovery audit
+
+- Traced auth and content behavior before editing. Public guestbook identity sync now requires an Admin-signed guestbook token and resolves its user by signed subject; client-supplied email/name/avatar can no longer overwrite another account's public identity.
+- Live Presence now closes sockets exceeding 30 inbound messages per second and coalesces movement snapshots into a 50 ms latest-position broadcast while preserving room and cross-app overview state.
+- Public Astro no longer hydrates/downloads its Three.js scene below 768 px or for reduced-motion users. Project detail returns 404 only for a real Admin API 404; upstream failures and timeouts now return 503 with `Retry-After` rather than mislabeling an existing project as missing.
+- Links analytics code now executes as inline JavaScript instead of remaining inside an unused template string. NGL's anonymity copy now discloses that IP/browser request metadata is recorded for abuse prevention.
+- Refreshed Public `llms.txt`, removed a brittle fixed project count, and aligned the chatbot description and JSON-LD fallback role with the curated AI-Augmented Engineer profile.
+- Cross-app read-only audit identified further work: make animated SSR content visible without JavaScript, defer the public chat renderer, repair the shared guestbook modal's focus handling, bound large public request bodies and RAG in-flight generation, and reduce duplicate profile fetches. These were not folded into this focused hardening slice.
+- Validation: `git diff --check` passed in root and all changed submodules; `apps/ngl-svelte` `bun run check` passed with zero diagnostics. `apps/admin` `bun run typecheck` is blocked by the existing untyped `R2Bucket` binding in `workers/public-assets/src/index.ts`; no edited Admin API errors were reported. No full Astro/Next builds or tests were run to avoid a long, resource-heavy all-app verification. No production configuration, database, commits, pushes, or deployments were changed.
+
+## 2026-11-16 — Harden Admin asset and submit validation paths
+
+- Admin update schemas now avoid create-time defaults on partial updates (projects, achievements, blog links, profile links, and booking availability); regression tests cover the omitted-field behavior.
+- R2 signed URLs normalize back to durable object keys; public project image serialization uses stable asset-host URLs from keys, and Admin project image reads refresh signed URLs. The image grid syncs fetched data after async loading.
+- About profile validation accepts legacy null experience logo values. Public contact and booking submissions trim user fields and return 400 for malformed JSON; booking slot claims are conditional/transactional to avoid double booking. Analytics and anonymous-message routes return structured validation errors instead of 500s for invalid bodies.
+- Verification: 8 targeted Bun tests pass and `git diff --check` passes. Admin typecheck remains blocked because the local `tsc` executable is not permitted to run. No deployment performed.
+- Follow-up route audit: booking/contact inputs now trim text and reject malformed JSON; booking slot updates claim an available slot atomically and reject invalid calendar dates/time ranges. RAG chat/confirm/ingest now reject non-object JSON and confirmation strings; partial update defaults are covered across achievement/blog/profile links and availability. Project-image/content mutations validate payload shape and duplicate reorder IDs.
+- Cross-app API proxies now return 400 for malformed JSON and 502 for upstream failures instead of reporting both as 500. Live Presence input sanitization/rate limits were reviewed; no additional defect was found in that message path.
+
+## 2026-11-16 — Keep Live Presence cursors within their app room
+
+- Live Presence overview messages contain participants from all app rooms. Added `roomId` to each participant and restricted Links/NGL cursor rendering to `links-home` and `ngl-home`, while preserving the shared online list/count.
+- Updated the Public client participant type for the expanded server payload; its cursor overlay already uses room-local state.
+- Verification: Presence bundles successfully and NGL `svelte-check` reports zero errors/warnings. Astro builds are blocked by non-executable local `astro`/`esbuild` binaries; direct Links/Public TypeScript checks hit existing `packages/contracts` fixture errors for missing `updatedAt`. `git diff --check` passes in all affected app repos. No deployment performed.
+- Follow-up: room-empty cleanup now refreshes the global overview; heartbeat pings receive acknowledgments, stale participants request a rejoin, and clients reconnect after missed acknowledgments. Per-tab session IDs replace older sockets to prevent duplicate presence; async health checks and stale socket events are ignored after cleanup. Local WebSocket smoke check passed duplicate replacement, stale rejoin, and pong acknowledgment.
+
+## 2026-11-16 — Pre-push release gate audit
+
+- Admin production build, typecheck, and 186 tests pass. Admin lint is fixed: all six directly imported ESLint plugins are now declared at versions already present in the lockfile; `bun install --frozen-lockfile` and `bun run lint` pass with zero warnings.
+- RAG build and typecheck pass; RAG tests pass 84/84. Live Presence bundles successfully. Public and Links Astro builds plus TypeScript checks pass; their contract drift fixtures now include the required `updatedAt` fields and each fixture suite passes 9/9. NGL Svelte check reports zero diagnostics; lint and production build pass.
+- All 18 Admin migrations, including `0017`, apply and verify on an isolated temporary pgvector database; the `agent_config` column is `jsonb NOT NULL`. Admin auth/cron/public-write API E2E passes 15/15 against that temporary DB; Presence E2E passes 4/4. This does not confirm the production database state. Dev and production Compose files parse with example env files, shell/Python syntax checks and `git diff --check` pass. Public build reports a 519 KB chunk warning.
+- Production remains unverified: local production env files are absent, the example `RAG_TYPESAFE_API_KEY` is empty, and Dokploy runtime secrets were not inspected. Full browser/visual route journeys and the live external JEv provider path were not run.
+- Working trees still contain uncommitted changes in the root and all six app submodules. Links, NGL, and Public are detached at current `origin/main` commits, so each needs a commit on an intended branch and the root needs matching gitlink updates before push. No commit, push, or production deploy was performed.

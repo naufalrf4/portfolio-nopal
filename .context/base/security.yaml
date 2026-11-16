@@ -8,7 +8,7 @@ current_observations:
       - public API CORS is request-scoped from `ADMIN_PUBLIC_API_ALLOWED_ORIGINS` in `src/proxy.ts`
       - '`ADMIN_INTERNAL_API_TOKEN` protects Admin internal API routes for RAG access, with legacy `ADMIN_SERVICE_TOKEN` fallback only for migration compatibility'
       - '`RAG_INGEST_SERVICE_TOKEN` is the preferred Admin -> RAG ingest secret, with legacy `ADMIN_SERVICE_TOKEN` fallback only for migration compatibility'
-      - public guestbook, booking, auth sync, and analytics POST routes now share the same in-memory rate-limit posture already used by contact and messages routes
+      - public guestbook, booking, auth sync, and analytics POST routes are rate-limited; guestbook auth sync must validate the signed guestbook token and resolve identity by its subject
   public_astro:
     direct_db_access: false
     public_inputs:
@@ -26,6 +26,9 @@ current_observations:
   live_presence:
     direct_db_access: false
     persistence: none; ephemeral in-memory websocket state only
+    websocket_limits:
+      messages_per_connection_per_second: 30
+      move_snapshot_coalescing_ms: 50
   rag_service:
     direct_db_access: true
     db_scope: intended for `rag` schema and retrieval/ingest responsibilities
