@@ -1399,3 +1399,8 @@ Juga diverifikasi di QA akhir: toggle Events (Telegram per event type) benar-ben
 - All 18 Admin migrations, including `0017`, apply and verify on an isolated temporary pgvector database; the `agent_config` column is `jsonb NOT NULL`. Admin auth/cron/public-write API E2E passes 15/15 against that temporary DB; Presence E2E passes 4/4. This does not confirm the production database state. Dev and production Compose files parse with example env files, shell/Python syntax checks and `git diff --check` pass. Public build reports a 519 KB chunk warning.
 - Production remains unverified: local production env files are absent, the example `RAG_TYPESAFE_API_KEY` is empty, and Dokploy runtime secrets were not inspected. Full browser/visual route journeys and the live external JEv provider path were not run.
 - Working trees still contain uncommitted changes in the root and all six app submodules. Links, NGL, and Public are detached at current `origin/main` commits, so each needs a commit on an intended branch and the root needs matching gitlink updates before push. No commit, push, or production deploy was performed.
+
+## 2026-11-17 — Remove NGL metadata disclosure copy
+
+- Removed the extra disclosure paragraph beneath the NGL anonymous-message form. A source search found no matching user-facing disclosure in the other apps.
+- Verification: NGL `bun run check` reports zero diagnostics; `bun run lint` passes; repository diff is limited to the removed paragraph.
