@@ -8,6 +8,7 @@ current_observations:
       - public API CORS is request-scoped from `ADMIN_PUBLIC_API_ALLOWED_ORIGINS` in `src/proxy.ts`
       - '`ADMIN_INTERNAL_API_TOKEN` protects Admin internal API routes for RAG access, with legacy `ADMIN_SERVICE_TOKEN` fallback only for migration compatibility'
       - '`RAG_INGEST_SERVICE_TOKEN` is the preferred Admin -> RAG ingest secret, with legacy `ADMIN_SERVICE_TOKEN` fallback only for migration compatibility'
+      - 'The TypeSafe JEv key is encrypted in `llm_settings`; only the service-authenticated internal config route releases it to RAG, while the admin browser sees only whether a key is configured.'
       - public guestbook, booking, auth sync, and analytics POST routes are rate-limited; guestbook auth sync must validate the signed guestbook token and resolve identity by its subject
   public_astro:
     direct_db_access: false

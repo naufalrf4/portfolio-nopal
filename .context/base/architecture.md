@@ -12,6 +12,7 @@ Lightweight Bun integration workspace with six independent app repositories pinn
 - Public, Links, and NGL choose Cloudflare adapters when Pages injects `CF_PAGES=1`; their standalone Docker builds use Node adapters where needed. Docker contexts are app-local.
 - Each app owns its own scripts, runtime, and environment file.
 - Cross-app communication happens through HTTP APIs and service tokens, except for the direct database actors and websocket presence service documented below.
+- Chat model/provider settings, JEv routing/safety rules, tool access, and the TypeSafe key are managed in Admin. Admin encrypts the JEv key at rest and releases it only to RAG through the service-authenticated internal config endpoint; the old RAG environment key is compatibility fallback only.
 
 ## App boundaries
 

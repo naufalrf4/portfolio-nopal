@@ -3,6 +3,26 @@
 Chronological timeline of meaningful project work, discoveries, decisions, and blockers for future agents.
 
 ## Entries
+### 2026-11-17
+
+- Task: move JEv credential management into Admin and clarify assistant controls
+- Files: Admin LLM settings/API/schema/UI, Admin migration `0018`, RAG JEv configuration and guardrails, dashboard navigation, deployment env examples, architecture/security guidance
+- Status: local implementation complete; source repositories and Dokploy deployment have not been committed or pushed for this feature
+- Notes: Admin stores the TypeSafe key encrypted with AES-256-GCM using the stable `NEXTAUTH_SECRET`-derived key. The browser receives only configured/unset status; the key is decrypted only in the service-authenticated internal Admin→RAG config response. The Admin AI Assistant page now separates providers, JEv routing, safety rules, and tools/knowledge; it includes a connection check with no visitor data and descriptions for all six tools. RAG prefers the Admin key and retains the old environment key only as a migration fallback. Tool toggles now block confirmation of disabled staged actions.
+- Verification: Admin lint/typecheck/build and 191 tests pass; RAG typecheck/build and 85 tests pass. Migration `0018` was generated. Production database migration, browser walkthrough, and live TypeSafe request were not run from this environment.
+
+- Task: reconcile Dokploy GHCR image pins with current backend commits
+- Files: local `portfolio-deploy/docker-compose.yml` candidate; `PROGRESS.md`
+- Status: current image pins pushed to `portfolio-deploy` main; production health smoke passed after the push
+- Notes: Admin `ed717eb2719319e1f08a7aa373e95a77ed3a407f`, RAG `9d55c47cbd69b39a77e744df684f746977da0656`, and Presence `dae7421b038d59d7e444539db2e55c5175281522` builds completed successfully on GitHub Actions. Promoted Admin/migrator, RAG/bootstrap, and Presence references in commit `8de399d`. Dokploy AutoDeploy is configured on `portfolio-deploy` main.
+- Verification: immutable SHA pin validator, Compose config parse, and `git diff --check` passed. Post-push Admin returned its expected login redirect (307) and Presence health returned 200. Dokploy's exact active deployment revision was not inspected. Local Compose parsing reports expected warnings because production environment values are not present in this workstation.
+
+- Task: update the Public chatbot provider credit and clarify the split deployment configuration
+- Files: `apps/public-astro/src/components/chatbot/PoweredBy.tsx`, `PROGRESS.md`
+- Status: provider credit updated locally; no Dokploy, Pages, commit, push, or production deployment was changed
+- Notes: Replaced the old GPT Luna label with “Powered by DeepSeek V4.1 Flash” and its inline DeepSeek mark. The existing deployment split is Public (`naufalrf-public`), Links (`naufalrf-links`), and NGL (`naufalrf-ngl`) on Cloudflare Pages; Dokploy's existing Portfolio Platform Compose app uses `naufalrf4/portfolio-deploy`, branch `main`, and `./docker-compose.yml` for the VPS stack (Admin, RAG, Presence, and operational services).
+- Verification: Public build passed with its normal Node adapter and with `CF_PAGES=1` selecting the Cloudflare adapter. `git diff --check` passed.
+
 ### 2026-11-16
 
 - Task: make the portfolio chatbot agentic with JEv guardrails, lazy retrieval, and dashboard-managed agent settings
